@@ -1,0 +1,34 @@
+/*
+ * Copyright (c) 2019-2020 Arm Limited. All rights reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the License); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* ETHOSU_PMU config file */
+#ifndef ethosu_pmu_config_h
+#define ethosu_pmu_config_h
+
+/*   Initial values */
+#define INIT_PMCR            (@NPU_PMCR@)
+#define INIT_PMCNTENSET      (@NPU_PMCNTENSET@)
+#define INIT_PMCNTENCLR      (@NPU_PMCNTENCLR@)
+#define INIT_PMOVSSET        (@NPU_PMOVSSET@)
+#define INIT_PMOVSCLR        (@NPU_PMOVSCLR@)
+#define INIT_PMINTSET        (@NPU_PMINTSET@)
+#define INIT_PMINTCLR        (@NPU_PMINTCLR@)
+#define INIT_PMCCNTR         (@NPU_PMCCNTR@)
+#define INIT_PMCCNTR_CFG     (@NPU_PMCCNTR_CFG@)
+
+#endif
