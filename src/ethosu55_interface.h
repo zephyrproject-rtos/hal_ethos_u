@@ -42,7 +42,7 @@
 #endif
 
 #define NNX_ARCH_VERSION_MAJOR 0
-#define NNX_ARCH_VERSION_MINOR 154
+#define NNX_ARCH_VERSION_MINOR 162
 #define NNX_ARCH_VERSION_PATCH 0
 #define NNX_ARCH_BASENAME "ULTAN"
 
@@ -312,6 +312,10 @@
 //
 // Register subpage HW_DEBUG_INTERNAL
 //
+#define NPU_REG_WD_STATUS 0x0100
+#define NPU_REG_MAC_STATUS 0x0104
+#define NPU_REG_DMA_STATUS 0x0108
+#define NPU_REG_AO_STATUS 0x0110
 #define NPU_REG_CLKFORCE 0x0140
 #define NPU_REG_DEBUG 0x0144
 #define NPU_REG_DEBUG2 0x0148
@@ -738,6 +742,14 @@ enum class ifm_scale_mode : uint8_t
     SCALE_OPB_32BIT = 2,
 };
 
+enum class macs_per_cc : uint8_t
+{
+    MACS_PER_CC_IS_5 = 0x5,
+    MACS_PER_CC_IS_6 = 0x6,
+    MACS_PER_CC_IS_7 = 0x7,
+    MACS_PER_CC_IS_8 = 0x8,
+};
+
 enum class memory_type : uint8_t
 {
     AXI0_OUTSTANDING_COUNTER0 = 0,
@@ -757,6 +769,7 @@ enum class ofm_precision : uint8_t
 
 enum class pmu_event_type : uint16_t
 {
+    NO_EVENT                   = 0x00,
     CYCLE                      = 0x11,
     NPU_IDLE                   = 0x20,
     MAC_ACTIVE                 = 0x30,
@@ -767,6 +780,7 @@ enum class pmu_event_type : uint16_t
     MAC_STALLED_BY_WD          = 0x35,
     MAC_STALLED_BY_ACC         = 0x36,
     MAC_STALLED_BY_IB          = 0x37,
+    MAC_ACTIVE_32BIT           = 0x38,
     AO_ACTIVE                  = 0x40,
     AO_ACTIVE_8BIT             = 0x41,
     AO_ACTIVE_16BIT            = 0x42,
@@ -784,6 +798,10 @@ enum class pmu_event_type : uint16_t
     WD_PARSE_STALLED           = 0x55,
     WD_PARSE_STALLED_IN        = 0x56,
     WD_PARSE_STALLED_OUT       = 0x57,
+    WD_TRANS_WS                = 0x58,
+    WD_TRANS_WB                = 0x59,
+    WD_TRANS_DW0               = 0x5a,
+    WD_TRANS_DW1               = 0x5b,
     AXI0_RD_TRANS_ACCEPTED     = 0x80,
     AXI0_RD_TRANS_COMPLETED    = 0x81,
     AXI0_RD_DATA_BEAT_RECEIVED = 0x82,
@@ -832,11 +850,6 @@ enum class privilege_level : uint8_t
     PRIVILEGED = 1,
 };
 
-enum class product : uint8_t
-{
-    ETHOS_U55 = 0,
-};
-
 enum class resampling_mode : uint8_t
 {
     NONE      = 0,
@@ -855,6 +868,13 @@ enum class security_level : uint8_t
 {
     SECURE     = 0,
     NON_SECURE = 1,
+};
+
+enum class shram_size : uint8_t
+{
+    SHRAM_48KB = 0x30,
+    SHRAM_24KB = 0x18,
+    SHRAM_16KB = 0x10,
 };
 
 enum class state : uint8_t
@@ -1037,6 +1057,14 @@ enum ifm_scale_mode
     IFM_SCALE_MODE_SCALE_OPB_32BIT = 2,
 };
 
+enum macs_per_cc
+{
+    MACS_PER_CC_MACS_PER_CC_IS_5 = 0x5,
+    MACS_PER_CC_MACS_PER_CC_IS_6 = 0x6,
+    MACS_PER_CC_MACS_PER_CC_IS_7 = 0x7,
+    MACS_PER_CC_MACS_PER_CC_IS_8 = 0x8,
+};
+
 enum memory_type
 {
     MEMORY_TYPE_AXI0_OUTSTANDING_COUNTER0 = 0,
@@ -1056,6 +1084,7 @@ enum ofm_precision
 
 enum pmu_event_type
 {
+    PMU_EVENT_TYPE_NO_EVENT                   = 0x00,
     PMU_EVENT_TYPE_CYCLE                      = 0x11,
     PMU_EVENT_TYPE_NPU_IDLE                   = 0x20,
     PMU_EVENT_TYPE_MAC_ACTIVE                 = 0x30,
@@ -1066,6 +1095,7 @@ enum pmu_event_type
     PMU_EVENT_TYPE_MAC_STALLED_BY_WD          = 0x35,
     PMU_EVENT_TYPE_MAC_STALLED_BY_ACC         = 0x36,
     PMU_EVENT_TYPE_MAC_STALLED_BY_IB          = 0x37,
+    PMU_EVENT_TYPE_MAC_ACTIVE_32BIT           = 0x38,
     PMU_EVENT_TYPE_AO_ACTIVE                  = 0x40,
     PMU_EVENT_TYPE_AO_ACTIVE_8BIT             = 0x41,
     PMU_EVENT_TYPE_AO_ACTIVE_16BIT            = 0x42,
@@ -1083,6 +1113,10 @@ enum pmu_event_type
     PMU_EVENT_TYPE_WD_PARSE_STALLED           = 0x55,
     PMU_EVENT_TYPE_WD_PARSE_STALLED_IN        = 0x56,
     PMU_EVENT_TYPE_WD_PARSE_STALLED_OUT       = 0x57,
+    PMU_EVENT_TYPE_WD_TRANS_WS                = 0x58,
+    PMU_EVENT_TYPE_WD_TRANS_WB                = 0x59,
+    PMU_EVENT_TYPE_WD_TRANS_DW0               = 0x5a,
+    PMU_EVENT_TYPE_WD_TRANS_DW1               = 0x5b,
     PMU_EVENT_TYPE_AXI0_RD_TRANS_ACCEPTED     = 0x80,
     PMU_EVENT_TYPE_AXI0_RD_TRANS_COMPLETED    = 0x81,
     PMU_EVENT_TYPE_AXI0_RD_DATA_BEAT_RECEIVED = 0x82,
@@ -1131,11 +1165,6 @@ enum privilege_level
     PRIVILEGE_LEVEL_PRIVILEGED = 1,
 };
 
-enum product
-{
-    PRODUCT_ETHOS_U55 = 0,
-};
-
 enum resampling_mode
 {
     RESAMPLING_MODE_NONE      = 0,
@@ -1154,6 +1183,13 @@ enum security_level
 {
     SECURITY_LEVEL_SECURE     = 0,
     SECURITY_LEVEL_NON_SECURE = 1,
+};
+
+enum shram_size
+{
+    SHRAM_SIZE_SHRAM_48KB = 0x30,
+    SHRAM_SIZE_SHRAM_24KB = 0x18,
+    SHRAM_SIZE_SHRAM_16KB = 0x10,
 };
 
 enum state
@@ -3500,10 +3536,10 @@ struct id_r
   private:
 #endif //__cplusplus
 #ifdef MODEL_REGS
-    ::core::dt::uint_t<4> version_status; // 0 for now
+    ::core::dt::uint_t<4> version_status; // This is the version of the product
     ::core::dt::uint_t<4> version_minor;  // This is the n for the P part of an RnPn release number
     ::core::dt::uint_t<4> version_major;  // This is the n for the R part of an RnPn release number
-    ::core::dt::uint_t<4> product_major;  // 0 for now
+    ::core::dt::uint_t<4> product_major;  // This is the X part of the ML00X product number
     ::core::dt::uint_t<4> arch_patch_rev; // This is the patch number of the architecture version a.b
     ::core::dt::uint_t<8>
         arch_minor_rev; // This is the minor architecture version number, b in the architecture version a.b
@@ -3514,10 +3550,10 @@ struct id_r
     {
         struct
         {
-            uint32_t version_status : 4; // 0 for now
+            uint32_t version_status : 4; // This is the version of the product
             uint32_t version_minor : 4;  // This is the n for the P part of an RnPn release number
             uint32_t version_major : 4;  // This is the n for the R part of an RnPn release number
-            uint32_t product_major : 4;  // 0 for now
+            uint32_t product_major : 4;  // This is the X part of the ML00X product number
             uint32_t arch_patch_rev : 4; // This is the patch number of the architecture version a.b
             uint32_t
                 arch_minor_rev : 8; // This is the minor architecture version number, b in the architecture version a.b
@@ -3531,9 +3567,9 @@ struct id_r
   public:
 #ifdef MODEL_REGS
     CONSTEXPR id_r() :
-        version_status(static_cast<uint32_t>(0x0)), version_minor(static_cast<uint32_t>(0x0)),
-        version_major(static_cast<uint32_t>(0x0)), product_major(static_cast<uint32_t>(0x0)),
-        arch_patch_rev(static_cast<uint32_t>(0)), arch_minor_rev(static_cast<uint32_t>(154)),
+        version_status(static_cast<uint32_t>(1)), version_minor(static_cast<uint32_t>(0x0)),
+        version_major(static_cast<uint32_t>(0x0)), product_major(static_cast<uint32_t>(4)),
+        arch_patch_rev(static_cast<uint32_t>(0)), arch_minor_rev(static_cast<uint32_t>(162)),
         arch_major_rev(static_cast<uint32_t>(0))
     {
     }
@@ -3563,9 +3599,9 @@ struct id_r
     }
 #else
     CONSTEXPR id_r() :
-        version_status(static_cast<uint32_t>(0x0)), version_minor(static_cast<uint32_t>(0x0)),
-        version_major(static_cast<uint32_t>(0x0)), product_major(static_cast<uint32_t>(0x0)),
-        arch_patch_rev(static_cast<uint32_t>(0)), arch_minor_rev(static_cast<uint32_t>(154)),
+        version_status(static_cast<uint32_t>(1)), version_minor(static_cast<uint32_t>(0x0)),
+        version_major(static_cast<uint32_t>(0x0)), product_major(static_cast<uint32_t>(4)),
+        arch_patch_rev(static_cast<uint32_t>(0)), arch_minor_rev(static_cast<uint32_t>(162)),
         arch_major_rev(static_cast<uint32_t>(0))
     {
     }
@@ -4864,8 +4900,8 @@ struct config_r
   public:
 #ifdef MODEL_REGS
     CONSTEXPR config_r() :
-        macs_per_cc(static_cast<uint32_t>(0x0)), cmd_stream_version(static_cast<uint32_t>(0x0)),
-        shram_size(static_cast<uint32_t>(0x0)), product(static_cast<uint32_t>(::product::ETHOS_U55))
+        macs_per_cc(static_cast<uint32_t>(0)), cmd_stream_version(static_cast<uint32_t>(0x0)),
+        shram_size(static_cast<uint32_t>(0)), product(static_cast<uint32_t>(0))
     {
     }
     CONSTEXPR config_r(uint32_t value) :
@@ -4889,9 +4925,8 @@ struct config_r
     }
 #else
     CONSTEXPR config_r() :
-        macs_per_cc(static_cast<uint32_t>(0x0)), cmd_stream_version(static_cast<uint32_t>(0x0)),
-        shram_size(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)),
-        product(static_cast<uint32_t>(::product::ETHOS_U55))
+        macs_per_cc(static_cast<uint32_t>(0)), cmd_stream_version(static_cast<uint32_t>(0x0)),
+        shram_size(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)), product(static_cast<uint32_t>(0))
     {
     }
     CONSTEXPR config_r(uint32_t init) : word(init) {}
@@ -4916,19 +4951,19 @@ struct config_r
         return *this;
     }
 #endif
-    CONSTEXPR uint32_t get_macs_per_cc() const
+    CONSTEXPR ::macs_per_cc get_macs_per_cc() const
     {
-        uint32_t value = static_cast<uint32_t>(macs_per_cc);
+        ::macs_per_cc value = static_cast<::macs_per_cc>(macs_per_cc);
         return value;
     }
 #ifndef MODEL_REGS
-    uint32_t get_macs_per_cc() const volatile
+    ::macs_per_cc get_macs_per_cc() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(macs_per_cc);
+        ::macs_per_cc value = static_cast<::macs_per_cc>(macs_per_cc);
         return value;
     }
 #endif
-    CONSTEXPR config_r &set_macs_per_cc(uint32_t value)
+    CONSTEXPR config_r &set_macs_per_cc(::macs_per_cc value)
     {
         macs_per_cc = ((1u << 4) - 1) & static_cast<uint32_t>(value);
         return *this;
@@ -4950,36 +4985,36 @@ struct config_r
         cmd_stream_version = ((1u << 4) - 1) & static_cast<uint32_t>(value);
         return *this;
     }
-    CONSTEXPR uint32_t get_shram_size() const
+    CONSTEXPR ::shram_size get_shram_size() const
     {
-        uint32_t value = static_cast<uint32_t>(shram_size);
+        ::shram_size value = static_cast<::shram_size>(shram_size);
         return value;
     }
 #ifndef MODEL_REGS
-    uint32_t get_shram_size() const volatile
+    ::shram_size get_shram_size() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(shram_size);
+        ::shram_size value = static_cast<::shram_size>(shram_size);
         return value;
     }
 #endif
-    CONSTEXPR config_r &set_shram_size(uint32_t value)
+    CONSTEXPR config_r &set_shram_size(::shram_size value)
     {
         shram_size = ((1u << 8) - 1) & static_cast<uint32_t>(value);
         return *this;
     }
-    CONSTEXPR ::product get_product() const
+    CONSTEXPR uint32_t get_product() const
     {
-        ::product value = static_cast<::product>(product);
+        uint32_t value = static_cast<uint32_t>(product);
         return value;
     }
 #ifndef MODEL_REGS
-    ::product get_product() const volatile
+    uint32_t get_product() const volatile
     {
-        ::product value = static_cast<::product>(product);
+        uint32_t value = static_cast<uint32_t>(product);
         return value;
     }
 #endif
-    CONSTEXPR config_r &set_product(::product value)
+    CONSTEXPR config_r &set_product(uint32_t value)
     {
         product = ((1u << 4) - 1) & static_cast<uint32_t>(value);
         return *this;
@@ -5342,7 +5377,7 @@ struct axi_limit0_r
   public:
 #ifdef MODEL_REGS
     CONSTEXPR axi_limit0_r() :
-        max_beats(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
+        max_beats(static_cast<uint32_t>(0x0)), memtype(static_cast<uint32_t>(0)),
         max_outstanding_read_m1(static_cast<uint32_t>(0x00)), max_outstanding_write_m1(static_cast<uint32_t>(0x000000))
     {
     }
@@ -5368,7 +5403,7 @@ struct axi_limit0_r
     }
 #else
     CONSTEXPR axi_limit0_r() :
-        max_beats(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
+        max_beats(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
         reserved1(static_cast<uint32_t>(0)), max_outstanding_read_m1(static_cast<uint32_t>(0x00)),
         max_outstanding_write_m1(static_cast<uint32_t>(0x000000))
     {
@@ -5500,7 +5535,7 @@ struct axi_limit1_r
   public:
 #ifdef MODEL_REGS
     CONSTEXPR axi_limit1_r() :
-        max_beats(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
+        max_beats(static_cast<uint32_t>(0x0)), memtype(static_cast<uint32_t>(0)),
         max_outstanding_read_m1(static_cast<uint32_t>(0x00)), max_outstanding_write_m1(static_cast<uint32_t>(0x000000))
     {
     }
@@ -5526,7 +5561,7 @@ struct axi_limit1_r
     }
 #else
     CONSTEXPR axi_limit1_r() :
-        max_beats(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
+        max_beats(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
         reserved1(static_cast<uint32_t>(0)), max_outstanding_read_m1(static_cast<uint32_t>(0x00)),
         max_outstanding_write_m1(static_cast<uint32_t>(0x000000))
     {
@@ -5658,7 +5693,7 @@ struct axi_limit2_r
   public:
 #ifdef MODEL_REGS
     CONSTEXPR axi_limit2_r() :
-        max_beats(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
+        max_beats(static_cast<uint32_t>(0x0)), memtype(static_cast<uint32_t>(0)),
         max_outstanding_read_m1(static_cast<uint32_t>(0x00)), max_outstanding_write_m1(static_cast<uint32_t>(0x000000))
     {
     }
@@ -5684,7 +5719,7 @@ struct axi_limit2_r
     }
 #else
     CONSTEXPR axi_limit2_r() :
-        max_beats(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
+        max_beats(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
         reserved1(static_cast<uint32_t>(0)), max_outstanding_read_m1(static_cast<uint32_t>(0x00)),
         max_outstanding_write_m1(static_cast<uint32_t>(0x000000))
     {
@@ -5816,7 +5851,7 @@ struct axi_limit3_r
   public:
 #ifdef MODEL_REGS
     CONSTEXPR axi_limit3_r() :
-        max_beats(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
+        max_beats(static_cast<uint32_t>(0x0)), memtype(static_cast<uint32_t>(0)),
         max_outstanding_read_m1(static_cast<uint32_t>(0x00)), max_outstanding_write_m1(static_cast<uint32_t>(0x000000))
     {
     }
@@ -5842,7 +5877,7 @@ struct axi_limit3_r
     }
 #else
     CONSTEXPR axi_limit3_r() :
-        max_beats(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
+        max_beats(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
         reserved1(static_cast<uint32_t>(0)), max_outstanding_read_m1(static_cast<uint32_t>(0x00)),
         max_outstanding_write_m1(static_cast<uint32_t>(0x000000))
     {
@@ -7921,14 +7956,24 @@ struct NPU_REG
     STRUCT basep14_r BASEP14; // 0xb8
     STRUCT basep15_r BASEP15; // 0xbc
 #ifndef MODEL_REGS
-    uint32_t unused2[32];
+    uint32_t unused2[16];
+#endif
+    uint32_t WD_STATUS;  // 0x100
+    uint32_t MAC_STATUS; // 0x104
+    uint32_t DMA_STATUS; // 0x108
+#ifndef MODEL_REGS
+    uint32_t unused3[1];
+#endif
+    uint32_t AO_STATUS; // 0x110
+#ifndef MODEL_REGS
+    uint32_t unused4[11];
 #endif
     STRUCT clkforce_r CLKFORCE; // 0x140
     uint32_t DEBUG;             // 0x144
     uint32_t DEBUG2;            // 0x148
     uint32_t DEBUGCORE;         // 0x14c
 #ifndef MODEL_REGS
-    uint32_t unused3[12];
+    uint32_t unused5[12];
 #endif
     STRUCT pmcr_r PMCR;             // 0x180
     STRUCT pmcntenset_r PMCNTENSET; // 0x184
@@ -7938,14 +7983,14 @@ struct NPU_REG
     STRUCT pmintset_r PMINTSET;     // 0x194
     STRUCT pmintclr_r PMINTCLR;     // 0x198
 #ifndef MODEL_REGS
-    uint32_t unused4[1];
+    uint32_t unused6[1];
 #endif
     STRUCT pmccntr_lo_r PMCCNTR_LO;   // 0x1a0
     STRUCT pmccntr_hi_r PMCCNTR_HI;   // 0x1a4
     STRUCT pmccntr_cfg_r PMCCNTR_CFG; // 0x1a8
     STRUCT pmcaxi_chan_r PMCAXI_CHAN; // 0x1ac
 #ifndef MODEL_REGS
-    uint32_t unused5[20];
+    uint32_t unused7[20];
 #endif
     uint32_t KERNEL_X;           // 0x200
     uint32_t KERNEL_Y;           // 0x204
@@ -7982,19 +8027,19 @@ struct NPU_REG
     uint32_t DMA_SCALE_SRC;      // 0x280
     uint32_t DMA_SCALE_SRC_HI;   // 0x284
 #ifndef MODEL_REGS
-    uint32_t unused6[13];
+    uint32_t unused8[13];
 #endif
     uint32_t CURRENT_CMD; // 0x2bc
 #ifndef MODEL_REGS
-    uint32_t unused7[16];
+    uint32_t unused9[16];
 #endif
     uint32_t PMEVCNTR[4]; // 0x300
 #ifndef MODEL_REGS
-    uint32_t unused8[28];
+    uint32_t unused10[28];
 #endif
     STRUCT pmevtyper0_r PMEVTYPER[4]; // 0x380
 #ifndef MODEL_REGS
-    uint32_t unused9[28];
+    uint32_t unused11[28];
 #endif
     uint32_t SHARED_BUFFER[256]; // 0x400
     uint32_t IFM_PAD_TOP;        // 0x800
@@ -8004,11 +8049,11 @@ struct NPU_REG
     uint32_t IFM_DEPTH_M1;       // 0x810
     uint32_t IFM_PRECISION;      // 0x814
 #ifndef MODEL_REGS
-    uint32_t unused10[1];
+    uint32_t unused12[1];
 #endif
     uint32_t IFM_UPSCALE; // 0x81c
 #ifndef MODEL_REGS
-    uint32_t unused11[1];
+    uint32_t unused13[1];
 #endif
     uint32_t IFM_ZERO_POINT; // 0x824
     uint32_t IFM_WIDTH0_M1;  // 0x828
@@ -8016,11 +8061,11 @@ struct NPU_REG
     uint32_t IFM_HEIGHT1_M1; // 0x830
     uint32_t IFM_IB_END;     // 0x834
 #ifndef MODEL_REGS
-    uint32_t unused12[1];
+    uint32_t unused14[1];
 #endif
     uint32_t IFM_REGION; // 0x83c
 #ifndef MODEL_REGS
-    uint32_t unused13[1];
+    uint32_t unused15[1];
 #endif
     uint32_t OFM_WIDTH_M1;      // 0x844
     uint32_t OFM_HEIGHT_M1;     // 0x848
@@ -8031,13 +8076,13 @@ struct NPU_REG
     uint32_t OFM_BLK_DEPTH_M1;  // 0x85c
     uint32_t OFM_ZERO_POINT;    // 0x860
 #ifndef MODEL_REGS
-    uint32_t unused14[1];
+    uint32_t unused16[1];
 #endif
     uint32_t OFM_WIDTH0_M1;  // 0x868
     uint32_t OFM_HEIGHT0_M1; // 0x86c
     uint32_t OFM_HEIGHT1_M1; // 0x870
 #ifndef MODEL_REGS
-    uint32_t unused15[2];
+    uint32_t unused17[2];
 #endif
     uint32_t OFM_REGION;       // 0x87c
     uint32_t KERNEL_WIDTH_M1;  // 0x880
@@ -8051,11 +8096,11 @@ struct NPU_REG
     uint32_t WEIGHT_REGION;    // 0x8a0
     uint32_t SCALE_REGION;     // 0x8a4
 #ifndef MODEL_REGS
-    uint32_t unused16[3];
+    uint32_t unused18[3];
 #endif
     uint32_t AB_START; // 0x8b4
 #ifndef MODEL_REGS
-    uint32_t unused17[1];
+    uint32_t unused19[1];
 #endif
     uint32_t BLOCKDEP;        // 0x8bc
     uint32_t DMA0_SRC_REGION; // 0x8c0
@@ -8063,16 +8108,16 @@ struct NPU_REG
     uint32_t DMA0_SIZE0;      // 0x8c8
     uint32_t DMA0_SIZE1;      // 0x8cc
 #ifndef MODEL_REGS
-    uint32_t unused18[12];
+    uint32_t unused20[12];
 #endif
     uint32_t IFM2_BROADCAST; // 0x900
     uint32_t IFM2_SCALAR;    // 0x904
 #ifndef MODEL_REGS
-    uint32_t unused19[3];
+    uint32_t unused21[3];
 #endif
     uint32_t IFM2_PRECISION; // 0x914
 #ifndef MODEL_REGS
-    uint32_t unused20[3];
+    uint32_t unused22[3];
 #endif
     uint32_t IFM2_ZERO_POINT; // 0x924
     uint32_t IFM2_WIDTH0_M1;  // 0x928
@@ -8080,11 +8125,11 @@ struct NPU_REG
     uint32_t IFM2_HEIGHT1_M1; // 0x930
     uint32_t IFM2_IB_START;   // 0x934
 #ifndef MODEL_REGS
-    uint32_t unused21[1];
+    uint32_t unused23[1];
 #endif
     uint32_t IFM2_REGION; // 0x93c
 #ifndef MODEL_REGS
-    uint32_t unused22[48];
+    uint32_t unused24[48];
 #endif
     uint32_t IFM_BASE0;       // 0xa00
     uint32_t IFM_BASE0_HI;    // 0xa04
@@ -8101,7 +8146,7 @@ struct NPU_REG
     uint32_t IFM_STRIDE_C;    // 0xa30
     uint32_t IFM_STRIDE_C_HI; // 0xa34
 #ifndef MODEL_REGS
-    uint32_t unused23[2];
+    uint32_t unused25[2];
 #endif
     uint32_t OFM_BASE0;       // 0xa40
     uint32_t OFM_BASE0_HI;    // 0xa44
@@ -8118,7 +8163,7 @@ struct NPU_REG
     uint32_t OFM_STRIDE_C;    // 0xa70
     uint32_t OFM_STRIDE_C_HI; // 0xa74
 #ifndef MODEL_REGS
-    uint32_t unused24[2];
+    uint32_t unused26[2];
 #endif
     uint32_t WEIGHT_BASE;      // 0xa80
     uint32_t WEIGHT_BASE_HI;   // 0xa84
@@ -8128,7 +8173,7 @@ struct NPU_REG
     uint32_t SCALE_BASE_HI;    // 0xa94
     uint32_t SCALE_LENGTH;     // 0xa98
 #ifndef MODEL_REGS
-    uint32_t unused25[1];
+    uint32_t unused27[1];
 #endif
     uint32_t OFM_SCALE;       // 0xaa0
     uint32_t OFM_SCALE_SHIFT; // 0xaa4
@@ -8136,7 +8181,7 @@ struct NPU_REG
     uint32_t OPA_SCALE_SHIFT; // 0xaac
     uint32_t OPB_SCALE;       // 0xab0
 #ifndef MODEL_REGS
-    uint32_t unused26[3];
+    uint32_t unused28[3];
 #endif
     uint32_t DMA0_SRC;      // 0xac0
     uint32_t DMA0_SRC_HI;   // 0xac4
@@ -8149,7 +8194,7 @@ struct NPU_REG
     uint32_t DMA0_SKIP1;    // 0xae0
     uint32_t DMA0_SKIP1_HI; // 0xae4
 #ifndef MODEL_REGS
-    uint32_t unused27[6];
+    uint32_t unused29[6];
 #endif
     uint32_t IFM2_BASE0;       // 0xb00
     uint32_t IFM2_BASE0_HI;    // 0xb04
@@ -8166,7 +8211,7 @@ struct NPU_REG
     uint32_t IFM2_STRIDE_C;    // 0xb30
     uint32_t IFM2_STRIDE_C_HI; // 0xb34
 #ifndef MODEL_REGS
-    uint32_t unused28[2];
+    uint32_t unused30[2];
 #endif
     uint32_t WEIGHT1_BASE;      // 0xb40
     uint32_t WEIGHT1_BASE_HI;   // 0xb44
@@ -8176,11 +8221,11 @@ struct NPU_REG
     uint32_t SCALE1_BASE_HI;    // 0xb54
     uint32_t SCALE1_LENGTH;     // 0xb58
 #ifndef MODEL_REGS
-    uint32_t unused29[281];
+    uint32_t unused31[281];
 #endif
     uint32_t REVISION; // 0xfc0
 #ifndef MODEL_REGS
-    uint32_t unused30[3];
+    uint32_t unused32[3];
 #endif
     STRUCT pid4_r PID4; // 0xfd0
     STRUCT pid5_r PID5; // 0xfd4
@@ -8201,7 +8246,7 @@ struct NPU_REG
     }
     void reset()
     {
-        ID                 = 161480704;
+        ID                 = 169885697;
         STATUS             = 8;
         CMD                = 0;
         RESET              = 0;
@@ -8247,6 +8292,10 @@ struct NPU_REG
         CID1               = 240;
         CID2               = 5;
         CID3               = 177;
+        WD_STATUS          = 0;
+        MAC_STATUS         = 0;
+        DMA_STATUS         = 0;
+        AO_STATUS          = 0;
         CLKFORCE           = 0;
         DEBUG              = 0;
         DEBUG2             = 0;
@@ -8522,6 +8571,14 @@ struct NPU_REG
             return CID2;
         case 4092:
             return CID3;
+        case 256:
+            return WD_STATUS;
+        case 260:
+            return MAC_STATUS;
+        case 264:
+            return DMA_STATUS;
+        case 272:
+            return AO_STATUS;
         case 320:
             return CLKFORCE;
         case 324:
@@ -9537,6 +9594,18 @@ struct NPU_REG
             return;
         case 4092:
             CID3 = value;
+            return;
+        case 256:
+            WD_STATUS = value;
+            return;
+        case 260:
+            MAC_STATUS = value;
+            return;
+        case 264:
+            DMA_STATUS = value;
+            return;
+        case 272:
+            AO_STATUS = value;
             return;
         case 320:
             CLKFORCE = value;
@@ -10953,6 +11022,14 @@ struct NPU_REG
         case 4088:
             return access_type_t::RO;
         case 4092:
+            return access_type_t::RO;
+        case 256:
+            return access_type_t::RO;
+        case 260:
+            return access_type_t::RO;
+        case 264:
+            return access_type_t::RO;
+        case 272:
             return access_type_t::RO;
         case 320:
             return access_type_t::RW;
@@ -16501,6 +16578,11 @@ struct npu_set_scale1_length_t
     FUNC(ifm_scale_mode, SCALE_16BIT)                                                                                  \
     SEP FUNC(ifm_scale_mode, SCALE_OPA_32BIT) SEP FUNC(ifm_scale_mode, SCALE_OPB_32BIT)
 
+#define EXPAND_MACS_PER_CC(FUNC, SEP)                                                                                  \
+    FUNC(macs_per_cc, MACS_PER_CC_IS_5)                                                                                \
+    SEP FUNC(macs_per_cc, MACS_PER_CC_IS_6) SEP FUNC(macs_per_cc, MACS_PER_CC_IS_7)                                    \
+        SEP FUNC(macs_per_cc, MACS_PER_CC_IS_8)
+
 #define EXPAND_MEMORY_TYPE(FUNC, SEP)                                                                                  \
     FUNC(memory_type, AXI0_OUTSTANDING_COUNTER0)                                                                       \
     SEP FUNC(memory_type, AXI0_OUTSTANDING_COUNTER1) SEP FUNC(memory_type, AXI1_OUTSTANDING_COUNTER2)                  \
@@ -16511,37 +16593,44 @@ struct npu_set_scale1_length_t
     SEP FUNC(ofm_precision, S8) SEP FUNC(ofm_precision, U16) SEP FUNC(ofm_precision, S16) SEP FUNC(ofm_precision, S32)
 
 #define EXPAND_PMU_EVENT_TYPE(FUNC, SEP)                                                                                  \
-    FUNC(pmu_event_type, CYCLE)                                                                                           \
-    SEP FUNC(pmu_event_type, NPU_IDLE) SEP FUNC(pmu_event_type, MAC_ACTIVE) SEP FUNC(                                     \
+    FUNC(pmu_event_type, NO_EVENT)                                                                                        \
+    SEP FUNC(pmu_event_type, CYCLE) SEP FUNC(pmu_event_type, NPU_IDLE) SEP FUNC(pmu_event_type, MAC_ACTIVE) SEP FUNC(     \
         pmu_event_type, MAC_ACTIVE_8BIT) SEP FUNC(pmu_event_type, MAC_ACTIVE_16BIT) SEP FUNC(pmu_event_type,              \
                                                                                              MAC_DPU_ACTIVE)              \
         SEP FUNC(pmu_event_type, MAC_STALLED_BY_WD_ACC) SEP FUNC(pmu_event_type, MAC_STALLED_BY_WD) SEP FUNC(             \
             pmu_event_type, MAC_STALLED_BY_ACC) SEP FUNC(pmu_event_type, MAC_STALLED_BY_IB) SEP FUNC(pmu_event_type,      \
-                                                                                                     AO_ACTIVE)           \
-            SEP FUNC(pmu_event_type, AO_ACTIVE_8BIT) SEP FUNC(pmu_event_type, AO_ACTIVE_16BIT) SEP FUNC(                  \
-                pmu_event_type, AO_STALLED_BY_OFMP_OB) SEP FUNC(pmu_event_type, AO_STALLED_BY_OFMP)                       \
-                SEP FUNC(pmu_event_type, AO_STALLED_BY_OB) SEP FUNC(pmu_event_type, AO_STALLED_BY_ACC_IB) SEP FUNC(       \
-                    pmu_event_type, AO_STALLED_BY_ACC) SEP FUNC(pmu_event_type, AO_STALLED_BY_IB)                         \
-                    SEP FUNC(pmu_event_type, WD_ACTIVE) SEP FUNC(pmu_event_type, WD_STALLED) SEP FUNC(                    \
-                        pmu_event_type, WD_STALLED_BY_WS) SEP FUNC(pmu_event_type, WD_STALLED_BY_WD_BUF)                  \
+                                                                                                     MAC_ACTIVE_32BIT)    \
+            SEP FUNC(pmu_event_type, AO_ACTIVE) SEP FUNC(pmu_event_type, AO_ACTIVE_8BIT) SEP FUNC(                        \
+                pmu_event_type, AO_ACTIVE_16BIT) SEP FUNC(pmu_event_type, AO_STALLED_BY_OFMP_OB)                          \
+                SEP FUNC(pmu_event_type, AO_STALLED_BY_OFMP) SEP FUNC(pmu_event_type, AO_STALLED_BY_OB) SEP FUNC(         \
+                    pmu_event_type, AO_STALLED_BY_ACC_IB) SEP FUNC(pmu_event_type, AO_STALLED_BY_ACC)                     \
+                    SEP FUNC(pmu_event_type, AO_STALLED_BY_IB) SEP FUNC(pmu_event_type, WD_ACTIVE) SEP FUNC(              \
+                        pmu_event_type, WD_STALLED) SEP FUNC(pmu_event_type,                                              \
+                                                             WD_STALLED_BY_WS) SEP FUNC(pmu_event_type,                   \
+                                                                                        WD_STALLED_BY_WD_BUF)             \
                         SEP FUNC(pmu_event_type, WD_PARSE_ACTIVE) SEP FUNC(pmu_event_type, WD_PARSE_STALLED) SEP FUNC(    \
-                            pmu_event_type, WD_PARSE_STALLED_IN) SEP FUNC(pmu_event_type, WD_PARSE_STALLED_OUT)           \
-                            SEP FUNC(pmu_event_type, AXI0_RD_TRANS_ACCEPTED) SEP FUNC(                                    \
-                                pmu_event_type, AXI0_RD_TRANS_COMPLETED) SEP FUNC(pmu_event_type,                         \
-                                                                                  AXI0_RD_DATA_BEAT_RECEIVED)             \
-                                SEP FUNC(pmu_event_type, AXI0_RD_TRAN_REQ_STALLED) SEP FUNC(                              \
+                            pmu_event_type,                                                                               \
+                            WD_PARSE_STALLED_IN) SEP FUNC(pmu_event_type,                                                 \
+                                                          WD_PARSE_STALLED_OUT) SEP FUNC(pmu_event_type, WD_TRANS_WS)     \
+                            SEP FUNC(pmu_event_type, WD_TRANS_WB) SEP FUNC(pmu_event_type, WD_TRANS_DW0) SEP FUNC(        \
+                                pmu_event_type,                                                                           \
+                                WD_TRANS_DW1) SEP FUNC(pmu_event_type, AXI0_RD_TRANS_ACCEPTED)                            \
+                                SEP FUNC(pmu_event_type, AXI0_RD_TRANS_COMPLETED) SEP FUNC(                               \
                                     pmu_event_type,                                                                       \
-                                    AXI0_WR_TRANS_ACCEPTED) SEP FUNC(pmu_event_type, AXI0_WR_TRANS_COMPLETED_M)           \
-                                    SEP FUNC(                                                                             \
+                                    AXI0_RD_DATA_BEAT_RECEIVED) SEP FUNC(pmu_event_type, AXI0_RD_TRAN_REQ_STALLED)        \
+                                    SEP FUNC(pmu_event_type, AXI0_WR_TRANS_ACCEPTED) SEP FUNC(                            \
                                         pmu_event_type,                                                                   \
-                                        AXI0_WR_TRANS_COMPLETED_S) SEP FUNC(pmu_event_type, AXI0_WR_DATA_BEAT_WRITTEN)    \
-                                        SEP FUNC(pmu_event_type, AXI0_WR_TRAN_REQ_STALLED) SEP FUNC(                      \
+                                        AXI0_WR_TRANS_COMPLETED_M) SEP FUNC(pmu_event_type, AXI0_WR_TRANS_COMPLETED_S)    \
+                                        SEP FUNC(pmu_event_type, AXI0_WR_DATA_BEAT_WRITTEN) SEP FUNC(                     \
                                             pmu_event_type,                                                               \
-                                            AXI0_WR_DATA_BEAT_STALLED) SEP FUNC(pmu_event_type, AXI0_ENABLED_CYCLES)      \
-                                            SEP FUNC(pmu_event_type, AXI0_RD_STALL_LIMIT) SEP FUNC(                       \
+                                            AXI0_WR_TRAN_REQ_STALLED) SEP FUNC(pmu_event_type,                            \
+                                                                               AXI0_WR_DATA_BEAT_STALLED)                 \
+                                            SEP FUNC(pmu_event_type, AXI0_ENABLED_CYCLES) SEP FUNC(                       \
                                                 pmu_event_type,                                                           \
-                                                AXI0_WR_STALL_LIMIT) SEP FUNC(pmu_event_type, AXI1_RD_TRANS_ACCEPTED)     \
-                                                SEP FUNC(pmu_event_type, AXI1_RD_TRANS_COMPLETED)                         \
+                                                AXI0_RD_STALL_LIMIT) SEP FUNC(pmu_event_type, AXI0_WR_STALL_LIMIT)        \
+                                                SEP FUNC(pmu_event_type,                                                  \
+                                                         AXI1_RD_TRANS_ACCEPTED) SEP FUNC(pmu_event_type,                 \
+                                                                                          AXI1_RD_TRANS_COMPLETED)        \
                                                     SEP FUNC(pmu_event_type, AXI1_RD_DATA_BEAT_RECEIVED) SEP FUNC(        \
                                                         pmu_event_type,                                                   \
                                                         AXI1_RD_TRAN_REQ_STALLED) SEP FUNC(pmu_event_type,                \
@@ -16575,14 +16664,15 @@ struct npu_set_scale1_length_t
 
 #define EXPAND_PRIVILEGE_LEVEL(FUNC, SEP) FUNC(privilege_level, USER) SEP FUNC(privilege_level, PRIVILEGED)
 
-#define EXPAND_PRODUCT(FUNC, SEP) FUNC(product, ETHOS_U55)
-
 #define EXPAND_RESAMPLING_MODE(FUNC, SEP)                                                                              \
     FUNC(resampling_mode, NONE) SEP FUNC(resampling_mode, NEAREST) SEP FUNC(resampling_mode, TRANSPOSE)
 
 #define EXPAND_ROUNDING(FUNC, SEP) FUNC(rounding, TFL) SEP FUNC(rounding, TRUNCATE) SEP FUNC(rounding, NATURAL)
 
 #define EXPAND_SECURITY_LEVEL(FUNC, SEP) FUNC(security_level, SECURE) SEP FUNC(security_level, NON_SECURE)
+
+#define EXPAND_SHRAM_SIZE(FUNC, SEP)                                                                                   \
+    FUNC(shram_size, SHRAM_48KB) SEP FUNC(shram_size, SHRAM_24KB) SEP FUNC(shram_size, SHRAM_16KB)
 
 #define EXPAND_STATE(FUNC, SEP) FUNC(state, STOPPED) SEP FUNC(state, RUNNING)
 
