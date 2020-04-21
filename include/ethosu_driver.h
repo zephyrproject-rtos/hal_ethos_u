@@ -92,6 +92,11 @@ int ethosu_invoke(const void *custom_data_ptr,
  */
 void ethosu_abort(void);
 
+/**
+ * Interrupt handler do be called on IRQ from Ethos-U
+ */
+void ethosu_irq_handler(void);
+
 #ifdef __cplusplus
 }
 #endif

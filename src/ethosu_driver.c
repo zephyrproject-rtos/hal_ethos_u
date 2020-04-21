@@ -20,8 +20,9 @@
 
 #include "ethosu_common.h"
 #include "ethosu_device.h"
-#include "irq_driver.h"
+
 #include <assert.h>
+#include <cmsis_compiler.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -34,7 +35,7 @@ static int abort_inference = false;
 static volatile bool irq_triggered = false;
 #if defined(CPU_CORTEX_M3) || defined(CPU_CORTEX_M4) || defined(CPU_CORTEX_M7) || defined(CPU_CORTEX_M33) ||           \
     defined(CPU_CORTEX_M55)
-void irq_handler()
+void ethosu_irq_handler(void)
 {
     uint8_t irq_raised = 0;
     (void)ethosu_is_irq_raised(&irq_raised);
@@ -56,13 +57,12 @@ static inline void wait_for_irq(void)
             break;
         }
 
-        sleep();
+        __WFI();
 
         __enable_irq();
     }
 }
 #else
-#define setup_irq(...)
 // Just polling the status register
 static inline void wait_for_irq(void)
 {
@@ -197,8 +197,6 @@ int ethosu_init(void)
         LOG_ERR("Failed reset of Ethos-U\n");
         return -1;
     }
-
-    setup_irq(&irq_handler, EthosuIrq);
 
     return_code = ethosu_dev_init();
 
