@@ -16,16 +16,13 @@
  * limitations under the License.
  */
 
-#pragma once
+#ifndef ETHOSU55_INTERFACE_H
+#define ETHOSU55_INTERFACE_H
 
 #ifdef __KERNEL__
 #include <linux/types.h>
 #else
 #include <stdint.h>
-#endif
-
-#ifdef MODEL_REGS
-#include "core/simple_types.h"
 #endif
 
 #if !defined(__cplusplus) || __cplusplus < 201402L
@@ -42,9 +39,8 @@
 #endif
 
 #define NNX_ARCH_VERSION_MAJOR 0
-#define NNX_ARCH_VERSION_MINOR 162
+#define NNX_ARCH_VERSION_MINOR 169
 #define NNX_ARCH_VERSION_PATCH 0
-#define NNX_ARCH_BASENAME "ULTAN"
 
 // Register offsets
 
@@ -728,11 +724,11 @@ enum class elementwise_mode : uint8_t
 
 enum class ifm_precision : uint8_t
 {
-    W8_U8  = 0,
-    W8_S8  = 1,
-    W8_U16 = 4,
-    W8_S16 = 5,
-    W8_S32 = 9,
+    U8  = 0,
+    S8  = 1,
+    U16 = 4,
+    S16 = 5,
+    S32 = 9,
 };
 
 enum class ifm_scale_mode : uint8_t
@@ -1043,11 +1039,11 @@ enum elementwise_mode
 
 enum ifm_precision
 {
-    IFM_PRECISION_W8_U8  = 0,
-    IFM_PRECISION_W8_S8  = 1,
-    IFM_PRECISION_W8_U16 = 4,
-    IFM_PRECISION_W8_S16 = 5,
-    IFM_PRECISION_W8_S32 = 9,
+    IFM_PRECISION_U8  = 0,
+    IFM_PRECISION_S8  = 1,
+    IFM_PRECISION_U16 = 4,
+    IFM_PRECISION_S16 = 5,
+    IFM_PRECISION_S32 = 9,
 };
 
 enum ifm_scale_mode
@@ -1213,14 +1209,6 @@ struct clkforce_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<1> top_level_clk; // set to 1 to force on TOP level clock
-    ::core::dt::uint_t<1> cc_clk;        // set to 1 to force on CC clock
-    ::core::dt::uint_t<1> dma_clk;       // set to 1 to force on DMA clock
-    ::core::dt::uint_t<1> mac_clk;       // set to 1 to force on MAC clock
-    ::core::dt::uint_t<1> ao_clk;        // set to 1 to force on AO clock
-    ::core::dt::uint_t<1> wd_clk;        // set to 1 to force on WD clock
-#else
     union
     {
         struct
@@ -1235,38 +1223,8 @@ struct clkforce_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR clkforce_r() :
-        top_level_clk(static_cast<uint32_t>(0)), cc_clk(static_cast<uint32_t>(0)), dma_clk(static_cast<uint32_t>(0)),
-        mac_clk(static_cast<uint32_t>(0)), ao_clk(static_cast<uint32_t>(0)), wd_clk(static_cast<uint32_t>(0))
-    {
-    }
-    CONSTEXPR clkforce_r(uint32_t value) :
-        top_level_clk(value >> 0), cc_clk(value >> 1), dma_clk(value >> 2), mac_clk(value >> 3), ao_clk(value >> 4),
-        wd_clk(value >> 5)
-    {
-    }
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        top_level_clk = value >> 0;
-        cc_clk        = value >> 1;
-        dma_clk       = value >> 2;
-        mac_clk       = value >> 3;
-        ao_clk        = value >> 4;
-        wd_clk        = value >> 5;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (top_level_clk << 0) | (cc_clk << 1) | (dma_clk << 2) | (mac_clk << 3) | (ao_clk << 4) | (wd_clk << 5);
-    }
-    clkforce_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR clkforce_r() :
         top_level_clk(static_cast<uint32_t>(0)), cc_clk(static_cast<uint32_t>(0)), dma_clk(static_cast<uint32_t>(0)),
         mac_clk(static_cast<uint32_t>(0)), ao_clk(static_cast<uint32_t>(0)), wd_clk(static_cast<uint32_t>(0)),
@@ -1294,19 +1252,16 @@ struct clkforce_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_top_level_clk() const
     {
         uint32_t value = static_cast<uint32_t>(top_level_clk);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_top_level_clk() const volatile
     {
         uint32_t value = static_cast<uint32_t>(top_level_clk);
         return value;
     }
-#endif
     CONSTEXPR clkforce_r &set_top_level_clk(uint32_t value)
     {
         top_level_clk = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -1317,13 +1272,11 @@ struct clkforce_r
         uint32_t value = static_cast<uint32_t>(cc_clk);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_cc_clk() const volatile
     {
         uint32_t value = static_cast<uint32_t>(cc_clk);
         return value;
     }
-#endif
     CONSTEXPR clkforce_r &set_cc_clk(uint32_t value)
     {
         cc_clk = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -1334,13 +1287,11 @@ struct clkforce_r
         uint32_t value = static_cast<uint32_t>(dma_clk);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_dma_clk() const volatile
     {
         uint32_t value = static_cast<uint32_t>(dma_clk);
         return value;
     }
-#endif
     CONSTEXPR clkforce_r &set_dma_clk(uint32_t value)
     {
         dma_clk = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -1351,13 +1302,11 @@ struct clkforce_r
         uint32_t value = static_cast<uint32_t>(mac_clk);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_mac_clk() const volatile
     {
         uint32_t value = static_cast<uint32_t>(mac_clk);
         return value;
     }
-#endif
     CONSTEXPR clkforce_r &set_mac_clk(uint32_t value)
     {
         mac_clk = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -1368,13 +1317,11 @@ struct clkforce_r
         uint32_t value = static_cast<uint32_t>(ao_clk);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_ao_clk() const volatile
     {
         uint32_t value = static_cast<uint32_t>(ao_clk);
         return value;
     }
-#endif
     CONSTEXPR clkforce_r &set_ao_clk(uint32_t value)
     {
         ao_clk = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -1385,13 +1332,11 @@ struct clkforce_r
         uint32_t value = static_cast<uint32_t>(wd_clk);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_wd_clk() const volatile
     {
         uint32_t value = static_cast<uint32_t>(wd_clk);
         return value;
     }
-#endif
     CONSTEXPR clkforce_r &set_wd_clk(uint32_t value)
     {
         wd_clk = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -1406,33 +1351,13 @@ struct basep0_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> addr_word; // The low word of the 64-bit address
-#else
     union
     {
         uint32_t addr_word; // The low word of the 64-bit address
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR basep0_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep0_r(uint32_t value) : addr_word(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        addr_word = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (addr_word << 0);
-    }
-    basep0_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR basep0_r() : addr_word(static_cast<uint32_t>(0)) {}
     CONSTEXPR basep0_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -1455,19 +1380,16 @@ struct basep0_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_addr_word() const
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_addr_word() const volatile
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#endif
     CONSTEXPR basep0_r &set_addr_word(uint32_t value)
     {
         addr_word = static_cast<uint32_t>(value);
@@ -1482,33 +1404,13 @@ struct basep1_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> addr_word; // The high word of the 64-bit address
-#else
     union
     {
         uint32_t addr_word; // The high word of the 64-bit address
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR basep1_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep1_r(uint32_t value) : addr_word(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        addr_word = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (addr_word << 0);
-    }
-    basep1_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR basep1_r() : addr_word(static_cast<uint32_t>(0)) {}
     CONSTEXPR basep1_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -1531,19 +1433,16 @@ struct basep1_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_addr_word() const
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_addr_word() const volatile
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#endif
     CONSTEXPR basep1_r &set_addr_word(uint32_t value)
     {
         addr_word = static_cast<uint32_t>(value);
@@ -1558,33 +1457,13 @@ struct basep2_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> addr_word; // The low word of the 64-bit address
-#else
     union
     {
         uint32_t addr_word; // The low word of the 64-bit address
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR basep2_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep2_r(uint32_t value) : addr_word(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        addr_word = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (addr_word << 0);
-    }
-    basep2_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR basep2_r() : addr_word(static_cast<uint32_t>(0)) {}
     CONSTEXPR basep2_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -1607,19 +1486,16 @@ struct basep2_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_addr_word() const
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_addr_word() const volatile
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#endif
     CONSTEXPR basep2_r &set_addr_word(uint32_t value)
     {
         addr_word = static_cast<uint32_t>(value);
@@ -1634,33 +1510,13 @@ struct basep3_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> addr_word; // The high word of the 64-bit address
-#else
     union
     {
         uint32_t addr_word; // The high word of the 64-bit address
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR basep3_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep3_r(uint32_t value) : addr_word(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        addr_word = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (addr_word << 0);
-    }
-    basep3_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR basep3_r() : addr_word(static_cast<uint32_t>(0)) {}
     CONSTEXPR basep3_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -1683,19 +1539,16 @@ struct basep3_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_addr_word() const
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_addr_word() const volatile
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#endif
     CONSTEXPR basep3_r &set_addr_word(uint32_t value)
     {
         addr_word = static_cast<uint32_t>(value);
@@ -1710,33 +1563,13 @@ struct basep4_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> addr_word; // The low word of the 64-bit address
-#else
     union
     {
         uint32_t addr_word; // The low word of the 64-bit address
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR basep4_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep4_r(uint32_t value) : addr_word(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        addr_word = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (addr_word << 0);
-    }
-    basep4_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR basep4_r() : addr_word(static_cast<uint32_t>(0)) {}
     CONSTEXPR basep4_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -1759,19 +1592,16 @@ struct basep4_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_addr_word() const
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_addr_word() const volatile
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#endif
     CONSTEXPR basep4_r &set_addr_word(uint32_t value)
     {
         addr_word = static_cast<uint32_t>(value);
@@ -1786,33 +1616,13 @@ struct basep5_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> addr_word; // The high word of the 64-bit address
-#else
     union
     {
         uint32_t addr_word; // The high word of the 64-bit address
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR basep5_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep5_r(uint32_t value) : addr_word(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        addr_word = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (addr_word << 0);
-    }
-    basep5_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR basep5_r() : addr_word(static_cast<uint32_t>(0)) {}
     CONSTEXPR basep5_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -1835,19 +1645,16 @@ struct basep5_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_addr_word() const
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_addr_word() const volatile
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#endif
     CONSTEXPR basep5_r &set_addr_word(uint32_t value)
     {
         addr_word = static_cast<uint32_t>(value);
@@ -1862,33 +1669,13 @@ struct basep6_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> addr_word; // The low word of the 64-bit address
-#else
     union
     {
         uint32_t addr_word; // The low word of the 64-bit address
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR basep6_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep6_r(uint32_t value) : addr_word(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        addr_word = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (addr_word << 0);
-    }
-    basep6_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR basep6_r() : addr_word(static_cast<uint32_t>(0)) {}
     CONSTEXPR basep6_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -1911,19 +1698,16 @@ struct basep6_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_addr_word() const
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_addr_word() const volatile
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#endif
     CONSTEXPR basep6_r &set_addr_word(uint32_t value)
     {
         addr_word = static_cast<uint32_t>(value);
@@ -1938,33 +1722,13 @@ struct basep7_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> addr_word; // The high word of the 64-bit address
-#else
     union
     {
         uint32_t addr_word; // The high word of the 64-bit address
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR basep7_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep7_r(uint32_t value) : addr_word(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        addr_word = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (addr_word << 0);
-    }
-    basep7_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR basep7_r() : addr_word(static_cast<uint32_t>(0)) {}
     CONSTEXPR basep7_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -1987,19 +1751,16 @@ struct basep7_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_addr_word() const
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_addr_word() const volatile
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#endif
     CONSTEXPR basep7_r &set_addr_word(uint32_t value)
     {
         addr_word = static_cast<uint32_t>(value);
@@ -2014,33 +1775,13 @@ struct basep8_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> addr_word; // The low word of the 64-bit address
-#else
     union
     {
         uint32_t addr_word; // The low word of the 64-bit address
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR basep8_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep8_r(uint32_t value) : addr_word(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        addr_word = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (addr_word << 0);
-    }
-    basep8_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR basep8_r() : addr_word(static_cast<uint32_t>(0)) {}
     CONSTEXPR basep8_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -2063,19 +1804,16 @@ struct basep8_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_addr_word() const
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_addr_word() const volatile
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#endif
     CONSTEXPR basep8_r &set_addr_word(uint32_t value)
     {
         addr_word = static_cast<uint32_t>(value);
@@ -2090,33 +1828,13 @@ struct basep9_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> addr_word; // The high word of the 64-bit address
-#else
     union
     {
         uint32_t addr_word; // The high word of the 64-bit address
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR basep9_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep9_r(uint32_t value) : addr_word(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        addr_word = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (addr_word << 0);
-    }
-    basep9_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR basep9_r() : addr_word(static_cast<uint32_t>(0)) {}
     CONSTEXPR basep9_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -2139,19 +1857,16 @@ struct basep9_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_addr_word() const
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_addr_word() const volatile
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#endif
     CONSTEXPR basep9_r &set_addr_word(uint32_t value)
     {
         addr_word = static_cast<uint32_t>(value);
@@ -2166,33 +1881,13 @@ struct basep10_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> addr_word; // The low word of the 64-bit address
-#else
     union
     {
         uint32_t addr_word; // The low word of the 64-bit address
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR basep10_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep10_r(uint32_t value) : addr_word(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        addr_word = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (addr_word << 0);
-    }
-    basep10_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR basep10_r() : addr_word(static_cast<uint32_t>(0)) {}
     CONSTEXPR basep10_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -2215,19 +1910,16 @@ struct basep10_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_addr_word() const
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_addr_word() const volatile
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#endif
     CONSTEXPR basep10_r &set_addr_word(uint32_t value)
     {
         addr_word = static_cast<uint32_t>(value);
@@ -2242,33 +1934,13 @@ struct basep11_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> addr_word; // The high word of the 64-bit address
-#else
     union
     {
         uint32_t addr_word; // The high word of the 64-bit address
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR basep11_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep11_r(uint32_t value) : addr_word(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        addr_word = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (addr_word << 0);
-    }
-    basep11_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR basep11_r() : addr_word(static_cast<uint32_t>(0)) {}
     CONSTEXPR basep11_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -2291,19 +1963,16 @@ struct basep11_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_addr_word() const
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_addr_word() const volatile
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#endif
     CONSTEXPR basep11_r &set_addr_word(uint32_t value)
     {
         addr_word = static_cast<uint32_t>(value);
@@ -2318,33 +1987,13 @@ struct basep12_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> addr_word; // The low word of the 64-bit address
-#else
     union
     {
         uint32_t addr_word; // The low word of the 64-bit address
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR basep12_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep12_r(uint32_t value) : addr_word(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        addr_word = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (addr_word << 0);
-    }
-    basep12_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR basep12_r() : addr_word(static_cast<uint32_t>(0)) {}
     CONSTEXPR basep12_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -2367,19 +2016,16 @@ struct basep12_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_addr_word() const
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_addr_word() const volatile
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#endif
     CONSTEXPR basep12_r &set_addr_word(uint32_t value)
     {
         addr_word = static_cast<uint32_t>(value);
@@ -2394,33 +2040,13 @@ struct basep13_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> addr_word; // The high word of the 64-bit address
-#else
     union
     {
         uint32_t addr_word; // The high word of the 64-bit address
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR basep13_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep13_r(uint32_t value) : addr_word(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        addr_word = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (addr_word << 0);
-    }
-    basep13_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR basep13_r() : addr_word(static_cast<uint32_t>(0)) {}
     CONSTEXPR basep13_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -2443,19 +2069,16 @@ struct basep13_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_addr_word() const
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_addr_word() const volatile
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#endif
     CONSTEXPR basep13_r &set_addr_word(uint32_t value)
     {
         addr_word = static_cast<uint32_t>(value);
@@ -2470,33 +2093,13 @@ struct basep14_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> addr_word; // The low word of the 64-bit address
-#else
     union
     {
         uint32_t addr_word; // The low word of the 64-bit address
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR basep14_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep14_r(uint32_t value) : addr_word(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        addr_word = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (addr_word << 0);
-    }
-    basep14_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR basep14_r() : addr_word(static_cast<uint32_t>(0)) {}
     CONSTEXPR basep14_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -2519,19 +2122,16 @@ struct basep14_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_addr_word() const
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_addr_word() const volatile
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#endif
     CONSTEXPR basep14_r &set_addr_word(uint32_t value)
     {
         addr_word = static_cast<uint32_t>(value);
@@ -2546,33 +2146,13 @@ struct basep15_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> addr_word; // The high word of the 64-bit address
-#else
     union
     {
         uint32_t addr_word; // The high word of the 64-bit address
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR basep15_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep15_r(uint32_t value) : addr_word(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        addr_word = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (addr_word << 0);
-    }
-    basep15_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR basep15_r() : addr_word(static_cast<uint32_t>(0)) {}
     CONSTEXPR basep15_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -2595,19 +2175,16 @@ struct basep15_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_addr_word() const
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_addr_word() const volatile
     {
         uint32_t value = static_cast<uint32_t>(addr_word);
         return value;
     }
-#endif
     CONSTEXPR basep15_r &set_addr_word(uint32_t value)
     {
         addr_word = static_cast<uint32_t>(value);
@@ -2622,33 +2199,13 @@ struct pid4_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> PID4; // Byte 4 of Peripheral ID (Lower 8 bits valid)
-#else
     union
     {
         uint32_t PID4; // Byte 4 of Peripheral ID (Lower 8 bits valid)
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR pid4_r() : PID4(static_cast<uint32_t>(0x04)) {}
-    CONSTEXPR pid4_r(uint32_t value) : PID4(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        PID4 = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (PID4 << 0);
-    }
-    pid4_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR pid4_r() : PID4(static_cast<uint32_t>(0x04)) {}
     CONSTEXPR pid4_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -2671,19 +2228,16 @@ struct pid4_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_PID4() const
     {
         uint32_t value = static_cast<uint32_t>(PID4);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_PID4() const volatile
     {
         uint32_t value = static_cast<uint32_t>(PID4);
         return value;
     }
-#endif
     CONSTEXPR pid4_r &set_PID4(uint32_t value)
     {
         PID4 = static_cast<uint32_t>(value);
@@ -2698,33 +2252,13 @@ struct pid5_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> PID5; // Byte 5 of Peripheral ID (Lower 8 bits valid)
-#else
     union
     {
         uint32_t PID5; // Byte 5 of Peripheral ID (Lower 8 bits valid)
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR pid5_r() : PID5(static_cast<uint32_t>(0x00)) {}
-    CONSTEXPR pid5_r(uint32_t value) : PID5(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        PID5 = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (PID5 << 0);
-    }
-    pid5_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR pid5_r() : PID5(static_cast<uint32_t>(0x00)) {}
     CONSTEXPR pid5_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -2747,19 +2281,16 @@ struct pid5_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_PID5() const
     {
         uint32_t value = static_cast<uint32_t>(PID5);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_PID5() const volatile
     {
         uint32_t value = static_cast<uint32_t>(PID5);
         return value;
     }
-#endif
     CONSTEXPR pid5_r &set_PID5(uint32_t value)
     {
         PID5 = static_cast<uint32_t>(value);
@@ -2774,33 +2305,13 @@ struct pid6_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> PID6; // Byte 6 of Peripheral ID (Lower 8 bits valid)
-#else
     union
     {
         uint32_t PID6; // Byte 6 of Peripheral ID (Lower 8 bits valid)
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR pid6_r() : PID6(static_cast<uint32_t>(0x00)) {}
-    CONSTEXPR pid6_r(uint32_t value) : PID6(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        PID6 = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (PID6 << 0);
-    }
-    pid6_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR pid6_r() : PID6(static_cast<uint32_t>(0x00)) {}
     CONSTEXPR pid6_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -2823,19 +2334,16 @@ struct pid6_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_PID6() const
     {
         uint32_t value = static_cast<uint32_t>(PID6);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_PID6() const volatile
     {
         uint32_t value = static_cast<uint32_t>(PID6);
         return value;
     }
-#endif
     CONSTEXPR pid6_r &set_PID6(uint32_t value)
     {
         PID6 = static_cast<uint32_t>(value);
@@ -2850,33 +2358,13 @@ struct pid7_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> PID7; // Byte 7 of Peripheral ID (Lower 8 bits valid)
-#else
     union
     {
         uint32_t PID7; // Byte 7 of Peripheral ID (Lower 8 bits valid)
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR pid7_r() : PID7(static_cast<uint32_t>(0x00)) {}
-    CONSTEXPR pid7_r(uint32_t value) : PID7(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        PID7 = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (PID7 << 0);
-    }
-    pid7_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR pid7_r() : PID7(static_cast<uint32_t>(0x00)) {}
     CONSTEXPR pid7_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -2899,19 +2387,16 @@ struct pid7_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_PID7() const
     {
         uint32_t value = static_cast<uint32_t>(PID7);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_PID7() const volatile
     {
         uint32_t value = static_cast<uint32_t>(PID7);
         return value;
     }
-#endif
     CONSTEXPR pid7_r &set_PID7(uint32_t value)
     {
         PID7 = static_cast<uint32_t>(value);
@@ -2926,33 +2411,13 @@ struct pid0_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> PID0; // Byte 0 of Peripheral ID (Lower 8 bits valid)
-#else
     union
     {
         uint32_t PID0; // Byte 0 of Peripheral ID (Lower 8 bits valid)
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR pid0_r() : PID0(static_cast<uint32_t>(0x80)) {}
-    CONSTEXPR pid0_r(uint32_t value) : PID0(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        PID0 = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (PID0 << 0);
-    }
-    pid0_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR pid0_r() : PID0(static_cast<uint32_t>(0x80)) {}
     CONSTEXPR pid0_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -2975,19 +2440,16 @@ struct pid0_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_PID0() const
     {
         uint32_t value = static_cast<uint32_t>(PID0);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_PID0() const volatile
     {
         uint32_t value = static_cast<uint32_t>(PID0);
         return value;
     }
-#endif
     CONSTEXPR pid0_r &set_PID0(uint32_t value)
     {
         PID0 = static_cast<uint32_t>(value);
@@ -3003,33 +2465,13 @@ struct pid1_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> PID1; // Byte 1 of Peripheral ID (Lower 8 bits valid)
-#else
     union
     {
         uint32_t PID1; // Byte 1 of Peripheral ID (Lower 8 bits valid)
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR pid1_r() : PID1(static_cast<uint32_t>(0xB5)) {}
-    CONSTEXPR pid1_r(uint32_t value) : PID1(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        PID1 = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (PID1 << 0);
-    }
-    pid1_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR pid1_r() : PID1(static_cast<uint32_t>(0xB5)) {}
     CONSTEXPR pid1_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -3052,19 +2494,16 @@ struct pid1_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_PID1() const
     {
         uint32_t value = static_cast<uint32_t>(PID1);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_PID1() const volatile
     {
         uint32_t value = static_cast<uint32_t>(PID1);
         return value;
     }
-#endif
     CONSTEXPR pid1_r &set_PID1(uint32_t value)
     {
         PID1 = static_cast<uint32_t>(value);
@@ -3079,33 +2518,13 @@ struct pid2_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> PID2; // Byte 2 of Peripheral ID (Lower 8 bits valid)
-#else
     union
     {
         uint32_t PID2; // Byte 2 of Peripheral ID (Lower 8 bits valid)
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR pid2_r() : PID2(static_cast<uint32_t>(0x0B)) {}
-    CONSTEXPR pid2_r(uint32_t value) : PID2(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        PID2 = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (PID2 << 0);
-    }
-    pid2_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR pid2_r() : PID2(static_cast<uint32_t>(0x0B)) {}
     CONSTEXPR pid2_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -3128,19 +2547,16 @@ struct pid2_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_PID2() const
     {
         uint32_t value = static_cast<uint32_t>(PID2);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_PID2() const volatile
     {
         uint32_t value = static_cast<uint32_t>(PID2);
         return value;
     }
-#endif
     CONSTEXPR pid2_r &set_PID2(uint32_t value)
     {
         PID2 = static_cast<uint32_t>(value);
@@ -3155,33 +2571,13 @@ struct pid3_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> PID3; // Byte 1 of Peripheral ID (Lower 8 bits valid)
-#else
     union
     {
         uint32_t PID3; // Byte 1 of Peripheral ID (Lower 8 bits valid)
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR pid3_r() : PID3(static_cast<uint32_t>(0x0)) {}
-    CONSTEXPR pid3_r(uint32_t value) : PID3(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        PID3 = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (PID3 << 0);
-    }
-    pid3_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR pid3_r() : PID3(static_cast<uint32_t>(0x0)) {}
     CONSTEXPR pid3_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -3204,19 +2600,16 @@ struct pid3_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_PID3() const
     {
         uint32_t value = static_cast<uint32_t>(PID3);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_PID3() const volatile
     {
         uint32_t value = static_cast<uint32_t>(PID3);
         return value;
     }
-#endif
     CONSTEXPR pid3_r &set_PID3(uint32_t value)
     {
         PID3 = static_cast<uint32_t>(value);
@@ -3231,33 +2624,13 @@ struct cid0_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> CID0; // Byte 0 of Component ID (Lower 8 bits valid)
-#else
     union
     {
         uint32_t CID0; // Byte 0 of Component ID (Lower 8 bits valid)
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR cid0_r() : CID0(static_cast<uint32_t>(0x0D)) {}
-    CONSTEXPR cid0_r(uint32_t value) : CID0(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        CID0 = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (CID0 << 0);
-    }
-    cid0_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR cid0_r() : CID0(static_cast<uint32_t>(0x0D)) {}
     CONSTEXPR cid0_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -3280,19 +2653,16 @@ struct cid0_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_CID0() const
     {
         uint32_t value = static_cast<uint32_t>(CID0);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_CID0() const volatile
     {
         uint32_t value = static_cast<uint32_t>(CID0);
         return value;
     }
-#endif
     CONSTEXPR cid0_r &set_CID0(uint32_t value)
     {
         CID0 = static_cast<uint32_t>(value);
@@ -3307,33 +2677,13 @@ struct cid1_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> CID1; // Byte 1 of Component ID (Lower 8 bits valid)
-#else
     union
     {
         uint32_t CID1; // Byte 1 of Component ID (Lower 8 bits valid)
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR cid1_r() : CID1(static_cast<uint32_t>(0xF0)) {}
-    CONSTEXPR cid1_r(uint32_t value) : CID1(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        CID1 = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (CID1 << 0);
-    }
-    cid1_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR cid1_r() : CID1(static_cast<uint32_t>(0xF0)) {}
     CONSTEXPR cid1_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -3356,19 +2706,16 @@ struct cid1_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_CID1() const
     {
         uint32_t value = static_cast<uint32_t>(CID1);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_CID1() const volatile
     {
         uint32_t value = static_cast<uint32_t>(CID1);
         return value;
     }
-#endif
     CONSTEXPR cid1_r &set_CID1(uint32_t value)
     {
         CID1 = static_cast<uint32_t>(value);
@@ -3383,33 +2730,13 @@ struct cid2_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> CID2; // Byte 2 of Component ID (Lower 8 bits valid)
-#else
     union
     {
         uint32_t CID2; // Byte 2 of Component ID (Lower 8 bits valid)
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR cid2_r() : CID2(static_cast<uint32_t>(0x05)) {}
-    CONSTEXPR cid2_r(uint32_t value) : CID2(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        CID2 = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (CID2 << 0);
-    }
-    cid2_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR cid2_r() : CID2(static_cast<uint32_t>(0x05)) {}
     CONSTEXPR cid2_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -3432,19 +2759,16 @@ struct cid2_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_CID2() const
     {
         uint32_t value = static_cast<uint32_t>(CID2);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_CID2() const volatile
     {
         uint32_t value = static_cast<uint32_t>(CID2);
         return value;
     }
-#endif
     CONSTEXPR cid2_r &set_CID2(uint32_t value)
     {
         CID2 = static_cast<uint32_t>(value);
@@ -3459,33 +2783,13 @@ struct cid3_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> CID3; // Byte 3 of Component ID (Lower 8 bits valid)
-#else
     union
     {
         uint32_t CID3; // Byte 3 of Component ID (Lower 8 bits valid)
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR cid3_r() : CID3(static_cast<uint32_t>(0xB1)) {}
-    CONSTEXPR cid3_r(uint32_t value) : CID3(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        CID3 = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (CID3 << 0);
-    }
-    cid3_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR cid3_r() : CID3(static_cast<uint32_t>(0xB1)) {}
     CONSTEXPR cid3_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -3508,19 +2812,16 @@ struct cid3_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_CID3() const
     {
         uint32_t value = static_cast<uint32_t>(CID3);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_CID3() const volatile
     {
         uint32_t value = static_cast<uint32_t>(CID3);
         return value;
     }
-#endif
     CONSTEXPR cid3_r &set_CID3(uint32_t value)
     {
         CID3 = static_cast<uint32_t>(value);
@@ -3535,17 +2836,6 @@ struct id_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<4> version_status; // This is the version of the product
-    ::core::dt::uint_t<4> version_minor;  // This is the n for the P part of an RnPn release number
-    ::core::dt::uint_t<4> version_major;  // This is the n for the R part of an RnPn release number
-    ::core::dt::uint_t<4> product_major;  // This is the X part of the ML00X product number
-    ::core::dt::uint_t<4> arch_patch_rev; // This is the patch number of the architecture version a.b
-    ::core::dt::uint_t<8>
-        arch_minor_rev; // This is the minor architecture version number, b in the architecture version a.b
-    ::core::dt::uint_t<4>
-        arch_major_rev; // This is the major architecture version number, a in the architecture version a.b
-#else
     union
     {
         struct
@@ -3562,46 +2852,12 @@ struct id_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
     CONSTEXPR id_r() :
         version_status(static_cast<uint32_t>(1)), version_minor(static_cast<uint32_t>(0x0)),
         version_major(static_cast<uint32_t>(0x0)), product_major(static_cast<uint32_t>(4)),
-        arch_patch_rev(static_cast<uint32_t>(0)), arch_minor_rev(static_cast<uint32_t>(162)),
-        arch_major_rev(static_cast<uint32_t>(0))
-    {
-    }
-    CONSTEXPR id_r(uint32_t value) :
-        version_status(value >> 0), version_minor(value >> 4), version_major(value >> 8), product_major(value >> 12),
-        arch_patch_rev(value >> 16), arch_minor_rev(value >> 20), arch_major_rev(value >> 28)
-    {
-    }
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        version_status = value >> 0;
-        version_minor  = value >> 4;
-        version_major  = value >> 8;
-        product_major  = value >> 12;
-        arch_patch_rev = value >> 16;
-        arch_minor_rev = value >> 20;
-        arch_major_rev = value >> 28;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (version_status << 0) | (version_minor << 4) | (version_major << 8) | (product_major << 12) |
-               (arch_patch_rev << 16) | (arch_minor_rev << 20) | (arch_major_rev << 28);
-    }
-    id_r copy()
-    {
-        return *this;
-    }
-#else
-    CONSTEXPR id_r() :
-        version_status(static_cast<uint32_t>(1)), version_minor(static_cast<uint32_t>(0x0)),
-        version_major(static_cast<uint32_t>(0x0)), product_major(static_cast<uint32_t>(4)),
-        arch_patch_rev(static_cast<uint32_t>(0)), arch_minor_rev(static_cast<uint32_t>(162)),
+        arch_patch_rev(static_cast<uint32_t>(0)), arch_minor_rev(static_cast<uint32_t>(169)),
         arch_major_rev(static_cast<uint32_t>(0))
     {
     }
@@ -3626,19 +2882,16 @@ struct id_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_version_status() const
     {
         uint32_t value = static_cast<uint32_t>(version_status);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_version_status() const volatile
     {
         uint32_t value = static_cast<uint32_t>(version_status);
         return value;
     }
-#endif
     CONSTEXPR id_r &set_version_status(uint32_t value)
     {
         version_status = ((1u << 4) - 1) & static_cast<uint32_t>(value);
@@ -3649,13 +2902,11 @@ struct id_r
         uint32_t value = static_cast<uint32_t>(version_minor);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_version_minor() const volatile
     {
         uint32_t value = static_cast<uint32_t>(version_minor);
         return value;
     }
-#endif
     CONSTEXPR id_r &set_version_minor(uint32_t value)
     {
         version_minor = ((1u << 4) - 1) & static_cast<uint32_t>(value);
@@ -3666,13 +2917,11 @@ struct id_r
         uint32_t value = static_cast<uint32_t>(version_major);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_version_major() const volatile
     {
         uint32_t value = static_cast<uint32_t>(version_major);
         return value;
     }
-#endif
     CONSTEXPR id_r &set_version_major(uint32_t value)
     {
         version_major = ((1u << 4) - 1) & static_cast<uint32_t>(value);
@@ -3683,13 +2932,11 @@ struct id_r
         uint32_t value = static_cast<uint32_t>(product_major);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_product_major() const volatile
     {
         uint32_t value = static_cast<uint32_t>(product_major);
         return value;
     }
-#endif
     CONSTEXPR id_r &set_product_major(uint32_t value)
     {
         product_major = ((1u << 4) - 1) & static_cast<uint32_t>(value);
@@ -3700,13 +2947,11 @@ struct id_r
         uint32_t value = static_cast<uint32_t>(arch_patch_rev);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_arch_patch_rev() const volatile
     {
         uint32_t value = static_cast<uint32_t>(arch_patch_rev);
         return value;
     }
-#endif
     CONSTEXPR id_r &set_arch_patch_rev(uint32_t value)
     {
         arch_patch_rev = ((1u << 4) - 1) & static_cast<uint32_t>(value);
@@ -3717,13 +2962,11 @@ struct id_r
         uint32_t value = static_cast<uint32_t>(arch_minor_rev);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_arch_minor_rev() const volatile
     {
         uint32_t value = static_cast<uint32_t>(arch_minor_rev);
         return value;
     }
-#endif
     CONSTEXPR id_r &set_arch_minor_rev(uint32_t value)
     {
         arch_minor_rev = ((1u << 8) - 1) & static_cast<uint32_t>(value);
@@ -3734,13 +2977,11 @@ struct id_r
         uint32_t value = static_cast<uint32_t>(arch_major_rev);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_arch_major_rev() const volatile
     {
         uint32_t value = static_cast<uint32_t>(arch_major_rev);
         return value;
     }
-#endif
     CONSTEXPR id_r &set_arch_major_rev(uint32_t value)
     {
         arch_major_rev = ((1u << 4) - 1) & static_cast<uint32_t>(value);
@@ -3755,28 +2996,6 @@ struct status_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<1> state; // NPU state, 0 = Stopped, 1 = Running
-    ::core::dt::uint_t<1>
-        irq_raised; // Raw IRQ status, 0 = IRQ not raised, 1 = IRQ raised. IRQ is cleared using command register bit 1
-    ::core::dt::uint_t<1>
-        bus_status; // 0=OK, 1=Bus abort detected and processing halted (NPU will reach IDLE state and not to start
-                    // process any more commands/AXI transactions). Can only be cleared by a reset
-    ::core::dt::uint_t<1>
-        reset_status; // Reset is ongoing and only this register can be read (other registers read as 0 and writes are
-                      // ignored.) A value of 0 means NPU is not being reset and can be accessed as normal
-    ::core::dt::uint_t<1>
-        cmd_parse_error; // 0=No error 1=Command stream parsing error detected. Can only be cleared by reset
-    ::core::dt::uint_t<1>
-        cmd_end_reached; // 0=Not reached, 1=Reached. Cleared by writing QBASE or QSIZE when NPU is in stopped state
-    ::core::dt::uint_t<1> pmu_irq_raised; // 0=No PMU IRQ, 1=PMU IRQ raised. Cleared by using command register bit 1
-    ::core::dt::uint_t<1>
-        wd_fault; // Weight decoder state: 0=no fault 1=weight decoder decompression fault. Can only be cleared by reset
-    ::core::dt::uint_t<1> faulting_interface; // Faulting interface on bus abort. 0=AXI-M0 1=AXI-M1
-    ::core::dt::uint_t<4> faulting_channel; // Faulting channel on a bus abort. Read: 0=Cmd 1=IFM 2=Weights 3=Scale+Bias
-                                            // 4=Mem2Mem; Write: 8=OFM 9=Mem2Mem
-    ::core::dt::uint_t<16> irq_history_mask; // IRQ History mask
-#else
     union
     {
         struct
@@ -3805,50 +3024,8 @@ struct status_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR status_r() :
-        state(static_cast<uint32_t>(::state::STOPPED)), irq_raised(static_cast<uint32_t>(0x0)),
-        bus_status(static_cast<uint32_t>(0x0)), reset_status(static_cast<uint32_t>(0x1)),
-        cmd_parse_error(static_cast<uint32_t>(0x0)), cmd_end_reached(static_cast<uint32_t>(0x0)),
-        pmu_irq_raised(static_cast<uint32_t>(0x0)), wd_fault(static_cast<uint32_t>(0x0)),
-        faulting_interface(static_cast<uint32_t>(0x0)), faulting_channel(static_cast<uint32_t>(0x0)),
-        irq_history_mask(static_cast<uint32_t>(0x0))
-    {
-    }
-    CONSTEXPR status_r(uint32_t value) :
-        state(value >> 0), irq_raised(value >> 1), bus_status(value >> 2), reset_status(value >> 3),
-        cmd_parse_error(value >> 4), cmd_end_reached(value >> 5), pmu_irq_raised(value >> 6), wd_fault(value >> 7),
-        faulting_interface(value >> 11), faulting_channel(value >> 12), irq_history_mask(value >> 16)
-    {
-    }
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        state              = value >> 0;
-        irq_raised         = value >> 1;
-        bus_status         = value >> 2;
-        reset_status       = value >> 3;
-        cmd_parse_error    = value >> 4;
-        cmd_end_reached    = value >> 5;
-        pmu_irq_raised     = value >> 6;
-        wd_fault           = value >> 7;
-        faulting_interface = value >> 11;
-        faulting_channel   = value >> 12;
-        irq_history_mask   = value >> 16;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (state << 0) | (irq_raised << 1) | (bus_status << 2) | (reset_status << 3) | (cmd_parse_error << 4) |
-               (cmd_end_reached << 5) | (pmu_irq_raised << 6) | (wd_fault << 7) | (faulting_interface << 11) |
-               (faulting_channel << 12) | (irq_history_mask << 16);
-    }
-    status_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR status_r() :
         state(static_cast<uint32_t>(::state::STOPPED)), irq_raised(static_cast<uint32_t>(0x0)),
         bus_status(static_cast<uint32_t>(0x0)), reset_status(static_cast<uint32_t>(0x1)),
@@ -3879,19 +3056,16 @@ struct status_r
     {
         return *this;
     }
-#endif
     CONSTEXPR ::state get_state() const
     {
         ::state value = static_cast<::state>(state);
         return value;
     }
-#ifndef MODEL_REGS
     ::state get_state() const volatile
     {
         ::state value = static_cast<::state>(state);
         return value;
     }
-#endif
     CONSTEXPR status_r &set_state(::state value)
     {
         state = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -3902,13 +3076,11 @@ struct status_r
         uint32_t value = static_cast<uint32_t>(irq_raised);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_irq_raised() const volatile
     {
         uint32_t value = static_cast<uint32_t>(irq_raised);
         return value;
     }
-#endif
     CONSTEXPR status_r &set_irq_raised(uint32_t value)
     {
         irq_raised = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -3919,13 +3091,11 @@ struct status_r
         uint32_t value = static_cast<uint32_t>(bus_status);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_bus_status() const volatile
     {
         uint32_t value = static_cast<uint32_t>(bus_status);
         return value;
     }
-#endif
     CONSTEXPR status_r &set_bus_status(uint32_t value)
     {
         bus_status = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -3936,13 +3106,11 @@ struct status_r
         uint32_t value = static_cast<uint32_t>(reset_status);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_reset_status() const volatile
     {
         uint32_t value = static_cast<uint32_t>(reset_status);
         return value;
     }
-#endif
     CONSTEXPR status_r &set_reset_status(uint32_t value)
     {
         reset_status = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -3953,13 +3121,11 @@ struct status_r
         uint32_t value = static_cast<uint32_t>(cmd_parse_error);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_cmd_parse_error() const volatile
     {
         uint32_t value = static_cast<uint32_t>(cmd_parse_error);
         return value;
     }
-#endif
     CONSTEXPR status_r &set_cmd_parse_error(uint32_t value)
     {
         cmd_parse_error = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -3970,13 +3136,11 @@ struct status_r
         uint32_t value = static_cast<uint32_t>(cmd_end_reached);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_cmd_end_reached() const volatile
     {
         uint32_t value = static_cast<uint32_t>(cmd_end_reached);
         return value;
     }
-#endif
     CONSTEXPR status_r &set_cmd_end_reached(uint32_t value)
     {
         cmd_end_reached = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -3987,13 +3151,11 @@ struct status_r
         uint32_t value = static_cast<uint32_t>(pmu_irq_raised);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_pmu_irq_raised() const volatile
     {
         uint32_t value = static_cast<uint32_t>(pmu_irq_raised);
         return value;
     }
-#endif
     CONSTEXPR status_r &set_pmu_irq_raised(uint32_t value)
     {
         pmu_irq_raised = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -4004,13 +3166,11 @@ struct status_r
         uint32_t value = static_cast<uint32_t>(wd_fault);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_wd_fault() const volatile
     {
         uint32_t value = static_cast<uint32_t>(wd_fault);
         return value;
     }
-#endif
     CONSTEXPR status_r &set_wd_fault(uint32_t value)
     {
         wd_fault = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -4021,13 +3181,11 @@ struct status_r
         uint32_t value = static_cast<uint32_t>(faulting_interface);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_faulting_interface() const volatile
     {
         uint32_t value = static_cast<uint32_t>(faulting_interface);
         return value;
     }
-#endif
     CONSTEXPR status_r &set_faulting_interface(uint32_t value)
     {
         faulting_interface = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -4038,13 +3196,11 @@ struct status_r
         uint32_t value = static_cast<uint32_t>(faulting_channel);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_faulting_channel() const volatile
     {
         uint32_t value = static_cast<uint32_t>(faulting_channel);
         return value;
     }
-#endif
     CONSTEXPR status_r &set_faulting_channel(uint32_t value)
     {
         faulting_channel = ((1u << 4) - 1) & static_cast<uint32_t>(value);
@@ -4055,13 +3211,11 @@ struct status_r
         uint32_t value = static_cast<uint32_t>(irq_history_mask);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_irq_history_mask() const volatile
     {
         uint32_t value = static_cast<uint32_t>(irq_history_mask);
         return value;
     }
-#endif
     CONSTEXPR status_r &set_irq_history_mask(uint32_t value)
     {
         irq_history_mask = ((1u << 16) - 1) & static_cast<uint32_t>(value);
@@ -4076,17 +3230,6 @@ struct cmd_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<1>
-        transition_to_running_state; // Write 1 to transition the NPU to running state. Writing 0 has no effect
-    ::core::dt::uint_t<1> clear_irq; // Write 1 to clear the IRQ status in the STATUS register. Writing 0 has no effect
-    ::core::dt::uint_t<1> clock_q_enable; // Write 1 to this bit to enable clock off using clock q-interface and enable
-                                          // the master clock gate
-    ::core::dt::uint_t<1> power_q_enable; // Write 1 to this bit to enable power off using power q-interface
-    ::core::dt::uint_t<1>
-        stop_request; // Write 1 to this bit to request STOP after completing any already-started commands
-    ::core::dt::uint_t<16> clear_irq_history; // Clears the IRQ history mask
-#else
     union
     {
         struct
@@ -4104,40 +3247,8 @@ struct cmd_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR cmd_r() :
-        transition_to_running_state(static_cast<uint32_t>(0x0)), clear_irq(static_cast<uint32_t>(0x0)),
-        clock_q_enable(static_cast<uint32_t>(0x0)), power_q_enable(static_cast<uint32_t>(0x0)),
-        stop_request(static_cast<uint32_t>(0x0)), clear_irq_history(static_cast<uint32_t>(0x0))
-    {
-    }
-    CONSTEXPR cmd_r(uint32_t value) :
-        transition_to_running_state(value >> 0), clear_irq(value >> 1), clock_q_enable(value >> 2),
-        power_q_enable(value >> 3), stop_request(value >> 4), clear_irq_history(value >> 16)
-    {
-    }
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        transition_to_running_state = value >> 0;
-        clear_irq                   = value >> 1;
-        clock_q_enable              = value >> 2;
-        power_q_enable              = value >> 3;
-        stop_request                = value >> 4;
-        clear_irq_history           = value >> 16;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (transition_to_running_state << 0) | (clear_irq << 1) | (clock_q_enable << 2) | (power_q_enable << 3) |
-               (stop_request << 4) | (clear_irq_history << 16);
-    }
-    cmd_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR cmd_r() :
         transition_to_running_state(static_cast<uint32_t>(0x0)), clear_irq(static_cast<uint32_t>(0x0)),
         clock_q_enable(static_cast<uint32_t>(0x0)), power_q_enable(static_cast<uint32_t>(0x0)),
@@ -4166,19 +3277,16 @@ struct cmd_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_transition_to_running_state() const
     {
         uint32_t value = static_cast<uint32_t>(transition_to_running_state);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_transition_to_running_state() const volatile
     {
         uint32_t value = static_cast<uint32_t>(transition_to_running_state);
         return value;
     }
-#endif
     CONSTEXPR cmd_r &set_transition_to_running_state(uint32_t value)
     {
         transition_to_running_state = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -4189,13 +3297,11 @@ struct cmd_r
         uint32_t value = static_cast<uint32_t>(clear_irq);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_clear_irq() const volatile
     {
         uint32_t value = static_cast<uint32_t>(clear_irq);
         return value;
     }
-#endif
     CONSTEXPR cmd_r &set_clear_irq(uint32_t value)
     {
         clear_irq = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -4206,13 +3312,11 @@ struct cmd_r
         uint32_t value = static_cast<uint32_t>(clock_q_enable);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_clock_q_enable() const volatile
     {
         uint32_t value = static_cast<uint32_t>(clock_q_enable);
         return value;
     }
-#endif
     CONSTEXPR cmd_r &set_clock_q_enable(uint32_t value)
     {
         clock_q_enable = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -4223,13 +3327,11 @@ struct cmd_r
         uint32_t value = static_cast<uint32_t>(power_q_enable);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_power_q_enable() const volatile
     {
         uint32_t value = static_cast<uint32_t>(power_q_enable);
         return value;
     }
-#endif
     CONSTEXPR cmd_r &set_power_q_enable(uint32_t value)
     {
         power_q_enable = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -4240,13 +3342,11 @@ struct cmd_r
         uint32_t value = static_cast<uint32_t>(stop_request);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_stop_request() const volatile
     {
         uint32_t value = static_cast<uint32_t>(stop_request);
         return value;
     }
-#endif
     CONSTEXPR cmd_r &set_stop_request(uint32_t value)
     {
         stop_request = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -4257,13 +3357,11 @@ struct cmd_r
         uint32_t value = static_cast<uint32_t>(clear_irq_history);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_clear_irq_history() const volatile
     {
         uint32_t value = static_cast<uint32_t>(clear_irq_history);
         return value;
     }
-#endif
     CONSTEXPR cmd_r &set_clear_irq_history(uint32_t value)
     {
         clear_irq_history = ((1u << 16) - 1) & static_cast<uint32_t>(value);
@@ -4278,10 +3376,6 @@ struct reset_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<1> pending_CPL; // Current privilege level 0=User 1=Privileged
-    ::core::dt::uint_t<1> pending_CSL; // Current security level 0=Secure 1=Non secure
-#else
     union
     {
         struct
@@ -4292,30 +3386,8 @@ struct reset_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR reset_r() :
-        pending_CPL(static_cast<uint32_t>(::privilege_level::USER)),
-        pending_CSL(static_cast<uint32_t>(::security_level::SECURE))
-    {
-    }
-    CONSTEXPR reset_r(uint32_t value) : pending_CPL(value >> 0), pending_CSL(value >> 1) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        pending_CPL = value >> 0;
-        pending_CSL = value >> 1;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (pending_CPL << 0) | (pending_CSL << 1);
-    }
-    reset_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR reset_r() :
         pending_CPL(static_cast<uint32_t>(::privilege_level::USER)),
         pending_CSL(static_cast<uint32_t>(::security_level::SECURE)), reserved0(static_cast<uint32_t>(0))
@@ -4342,19 +3414,16 @@ struct reset_r
     {
         return *this;
     }
-#endif
     CONSTEXPR ::privilege_level get_pending_CPL() const
     {
         ::privilege_level value = static_cast<::privilege_level>(pending_CPL);
         return value;
     }
-#ifndef MODEL_REGS
     ::privilege_level get_pending_CPL() const volatile
     {
         ::privilege_level value = static_cast<::privilege_level>(pending_CPL);
         return value;
     }
-#endif
     CONSTEXPR reset_r &set_pending_CPL(::privilege_level value)
     {
         pending_CPL = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -4365,13 +3434,11 @@ struct reset_r
         ::security_level value = static_cast<::security_level>(pending_CSL);
         return value;
     }
-#ifndef MODEL_REGS
     ::security_level get_pending_CSL() const volatile
     {
         ::security_level value = static_cast<::security_level>(pending_CSL);
         return value;
     }
-#endif
     CONSTEXPR reset_r &set_pending_CSL(::security_level value)
     {
         pending_CSL = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -4386,33 +3453,13 @@ struct qbase0_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> QBASE0; // The 4 byte aligned lower bytes of the base address value for the command stream
-#else
     union
     {
         uint32_t QBASE0; // The 4 byte aligned lower bytes of the base address value for the command stream
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR qbase0_r() : QBASE0(static_cast<uint32_t>(0x00000000)) {}
-    CONSTEXPR qbase0_r(uint32_t value) : QBASE0(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        QBASE0 = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (QBASE0 << 0);
-    }
-    qbase0_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR qbase0_r() : QBASE0(static_cast<uint32_t>(0x00000000)) {}
     CONSTEXPR qbase0_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -4435,19 +3482,16 @@ struct qbase0_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_QBASE0() const
     {
         uint32_t value = static_cast<uint32_t>(QBASE0);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_QBASE0() const volatile
     {
         uint32_t value = static_cast<uint32_t>(QBASE0);
         return value;
     }
-#endif
     CONSTEXPR qbase0_r &set_QBASE0(uint32_t value)
     {
         QBASE0 = static_cast<uint32_t>(value);
@@ -4462,33 +3506,13 @@ struct qbase1_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> QBASE1; // The 4 byte aligned upper bytes of the base address value for the command stream
-#else
     union
     {
         uint32_t QBASE1; // The 4 byte aligned upper bytes of the base address value for the command stream
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR qbase1_r() : QBASE1(static_cast<uint32_t>(0x00000000)) {}
-    CONSTEXPR qbase1_r(uint32_t value) : QBASE1(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        QBASE1 = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (QBASE1 << 0);
-    }
-    qbase1_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR qbase1_r() : QBASE1(static_cast<uint32_t>(0x00000000)) {}
     CONSTEXPR qbase1_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -4511,19 +3535,16 @@ struct qbase1_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_QBASE1() const
     {
         uint32_t value = static_cast<uint32_t>(QBASE1);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_QBASE1() const volatile
     {
         uint32_t value = static_cast<uint32_t>(QBASE1);
         return value;
     }
-#endif
     CONSTEXPR qbase1_r &set_QBASE1(uint32_t value)
     {
         QBASE1 = static_cast<uint32_t>(value);
@@ -4538,33 +3559,13 @@ struct qread_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> QREAD; // The read offset of the current command under execution
-#else
     union
     {
         uint32_t QREAD; // The read offset of the current command under execution
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR qread_r() : QREAD(static_cast<uint32_t>(0x00000000)) {}
-    CONSTEXPR qread_r(uint32_t value) : QREAD(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        QREAD = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (QREAD << 0);
-    }
-    qread_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR qread_r() : QREAD(static_cast<uint32_t>(0x00000000)) {}
     CONSTEXPR qread_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -4587,19 +3588,16 @@ struct qread_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_QREAD() const
     {
         uint32_t value = static_cast<uint32_t>(QREAD);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_QREAD() const volatile
     {
         uint32_t value = static_cast<uint32_t>(QREAD);
         return value;
     }
-#endif
     CONSTEXPR qread_r &set_QREAD(uint32_t value)
     {
         QREAD = static_cast<uint32_t>(value);
@@ -4614,33 +3612,13 @@ struct qconfig_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> QCONFIG; // AXI configuration for the command stream in the range 0-3
-#else
     union
     {
         uint32_t QCONFIG; // AXI configuration for the command stream in the range 0-3
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR qconfig_r() : QCONFIG(static_cast<uint32_t>(0x00000000)) {}
-    CONSTEXPR qconfig_r(uint32_t value) : QCONFIG(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        QCONFIG = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (QCONFIG << 0);
-    }
-    qconfig_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR qconfig_r() : QCONFIG(static_cast<uint32_t>(0x00000000)) {}
     CONSTEXPR qconfig_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -4663,19 +3641,16 @@ struct qconfig_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_QCONFIG() const
     {
         uint32_t value = static_cast<uint32_t>(QCONFIG);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_QCONFIG() const volatile
     {
         uint32_t value = static_cast<uint32_t>(QCONFIG);
         return value;
     }
-#endif
     CONSTEXPR qconfig_r &set_QCONFIG(uint32_t value)
     {
         QCONFIG = static_cast<uint32_t>(value);
@@ -4690,33 +3665,13 @@ struct qsize_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> QSIZE; // Size of the next command stream to be executed by the NPU
-#else
     union
     {
         uint32_t QSIZE; // Size of the next command stream to be executed by the NPU
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR qsize_r() : QSIZE(static_cast<uint32_t>(0x00000000)) {}
-    CONSTEXPR qsize_r(uint32_t value) : QSIZE(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        QSIZE = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (QSIZE << 0);
-    }
-    qsize_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR qsize_r() : QSIZE(static_cast<uint32_t>(0x00000000)) {}
     CONSTEXPR qsize_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -4739,19 +3694,16 @@ struct qsize_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_QSIZE() const
     {
         uint32_t value = static_cast<uint32_t>(QSIZE);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_QSIZE() const volatile
     {
         uint32_t value = static_cast<uint32_t>(QSIZE);
         return value;
     }
-#endif
     CONSTEXPR qsize_r &set_QSIZE(uint32_t value)
     {
         QSIZE = static_cast<uint32_t>(value);
@@ -4766,10 +3718,6 @@ struct prot_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<1> active_CPL; // Current privilege level 0=User 1=Privileged
-    ::core::dt::uint_t<1> active_CSL; // Current security level 0=Secure 1=Non secure
-#else
     union
     {
         struct
@@ -4780,30 +3728,8 @@ struct prot_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR prot_r() :
-        active_CPL(static_cast<uint32_t>(::privilege_level::USER)),
-        active_CSL(static_cast<uint32_t>(::security_level::SECURE))
-    {
-    }
-    CONSTEXPR prot_r(uint32_t value) : active_CPL(value >> 0), active_CSL(value >> 1) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        active_CPL = value >> 0;
-        active_CSL = value >> 1;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (active_CPL << 0) | (active_CSL << 1);
-    }
-    prot_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR prot_r() :
         active_CPL(static_cast<uint32_t>(::privilege_level::USER)),
         active_CSL(static_cast<uint32_t>(::security_level::SECURE)), reserved0(static_cast<uint32_t>(0))
@@ -4830,19 +3756,16 @@ struct prot_r
     {
         return *this;
     }
-#endif
     CONSTEXPR ::privilege_level get_active_CPL() const
     {
         ::privilege_level value = static_cast<::privilege_level>(active_CPL);
         return value;
     }
-#ifndef MODEL_REGS
     ::privilege_level get_active_CPL() const volatile
     {
         ::privilege_level value = static_cast<::privilege_level>(active_CPL);
         return value;
     }
-#endif
     CONSTEXPR prot_r &set_active_CPL(::privilege_level value)
     {
         active_CPL = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -4853,13 +3776,11 @@ struct prot_r
         ::security_level value = static_cast<::security_level>(active_CSL);
         return value;
     }
-#ifndef MODEL_REGS
     ::security_level get_active_CSL() const volatile
     {
         ::security_level value = static_cast<::security_level>(active_CSL);
         return value;
     }
-#endif
     CONSTEXPR prot_r &set_active_CSL(::security_level value)
     {
         active_CSL = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -4874,14 +3795,6 @@ struct config_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<4>
-        macs_per_cc; // The log2(macs/clock cycle). Valid encoding range is 5 to 8 for 32 to 256 MACs/clock cycle.
-    ::core::dt::uint_t<4>
-        cmd_stream_version;           // command stream version accepted by this NPU. Set to 0 for Ethos-U55 EAC.
-    ::core::dt::uint_t<8> shram_size; // Size in KB of SHRAM in the range 8 to 48.
-    ::core::dt::uint_t<4> product;    // Product configuration
-#else
     union
     {
         struct
@@ -4895,35 +3808,8 @@ struct config_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR config_r() :
-        macs_per_cc(static_cast<uint32_t>(0)), cmd_stream_version(static_cast<uint32_t>(0x0)),
-        shram_size(static_cast<uint32_t>(0)), product(static_cast<uint32_t>(0))
-    {
-    }
-    CONSTEXPR config_r(uint32_t value) :
-        macs_per_cc(value >> 0), cmd_stream_version(value >> 4), shram_size(value >> 8), product(value >> 28)
-    {
-    }
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        macs_per_cc        = value >> 0;
-        cmd_stream_version = value >> 4;
-        shram_size         = value >> 8;
-        product            = value >> 28;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (macs_per_cc << 0) | (cmd_stream_version << 4) | (shram_size << 8) | (product << 28);
-    }
-    config_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR config_r() :
         macs_per_cc(static_cast<uint32_t>(0)), cmd_stream_version(static_cast<uint32_t>(0x0)),
         shram_size(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)), product(static_cast<uint32_t>(0))
@@ -4950,19 +3836,16 @@ struct config_r
     {
         return *this;
     }
-#endif
     CONSTEXPR ::macs_per_cc get_macs_per_cc() const
     {
         ::macs_per_cc value = static_cast<::macs_per_cc>(macs_per_cc);
         return value;
     }
-#ifndef MODEL_REGS
     ::macs_per_cc get_macs_per_cc() const volatile
     {
         ::macs_per_cc value = static_cast<::macs_per_cc>(macs_per_cc);
         return value;
     }
-#endif
     CONSTEXPR config_r &set_macs_per_cc(::macs_per_cc value)
     {
         macs_per_cc = ((1u << 4) - 1) & static_cast<uint32_t>(value);
@@ -4973,13 +3856,11 @@ struct config_r
         uint32_t value = static_cast<uint32_t>(cmd_stream_version);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_cmd_stream_version() const volatile
     {
         uint32_t value = static_cast<uint32_t>(cmd_stream_version);
         return value;
     }
-#endif
     CONSTEXPR config_r &set_cmd_stream_version(uint32_t value)
     {
         cmd_stream_version = ((1u << 4) - 1) & static_cast<uint32_t>(value);
@@ -4990,13 +3871,11 @@ struct config_r
         ::shram_size value = static_cast<::shram_size>(shram_size);
         return value;
     }
-#ifndef MODEL_REGS
     ::shram_size get_shram_size() const volatile
     {
         ::shram_size value = static_cast<::shram_size>(shram_size);
         return value;
     }
-#endif
     CONSTEXPR config_r &set_shram_size(::shram_size value)
     {
         shram_size = ((1u << 8) - 1) & static_cast<uint32_t>(value);
@@ -5007,13 +3886,11 @@ struct config_r
         uint32_t value = static_cast<uint32_t>(product);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_product() const volatile
     {
         uint32_t value = static_cast<uint32_t>(product);
         return value;
     }
-#endif
     CONSTEXPR config_r &set_product(uint32_t value)
     {
         product = ((1u << 4) - 1) & static_cast<uint32_t>(value);
@@ -5028,33 +3905,13 @@ struct lock_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> LOCK; // 32 bit value for LOCK configuration
-#else
     union
     {
         uint32_t LOCK; // 32 bit value for LOCK configuration
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR lock_r() : LOCK(static_cast<uint32_t>(0x00000000)) {}
-    CONSTEXPR lock_r(uint32_t value) : LOCK(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        LOCK = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (LOCK << 0);
-    }
-    lock_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR lock_r() : LOCK(static_cast<uint32_t>(0x00000000)) {}
     CONSTEXPR lock_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -5077,19 +3934,16 @@ struct lock_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_LOCK() const
     {
         uint32_t value = static_cast<uint32_t>(LOCK);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_LOCK() const volatile
     {
         uint32_t value = static_cast<uint32_t>(LOCK);
         return value;
     }
-#endif
     CONSTEXPR lock_r &set_LOCK(uint32_t value)
     {
         LOCK = static_cast<uint32_t>(value);
@@ -5104,16 +3958,6 @@ struct regioncfg_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<2> region0; // Bits for Region0 Configurion
-    ::core::dt::uint_t<2> region1; // Bits for Region1 Configurion
-    ::core::dt::uint_t<2> region2; // Bits for Region2 Configurion
-    ::core::dt::uint_t<2> region3; // Bits for Region3 Configurion
-    ::core::dt::uint_t<2> region4; // Bits for Region4 Configurion
-    ::core::dt::uint_t<2> region5; // Bits for Region5 Configurion
-    ::core::dt::uint_t<2> region6; // Bits for Region6 Configurion
-    ::core::dt::uint_t<2> region7; // Bits for Region7 Configurion
-#else
     union
     {
         struct
@@ -5130,47 +3974,8 @@ struct regioncfg_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR regioncfg_r() :
-        region0(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)),
-        region1(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)),
-        region2(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)),
-        region3(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)),
-        region4(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)),
-        region5(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)),
-        region6(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)),
-        region7(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0))
-    {
-    }
-    CONSTEXPR regioncfg_r(uint32_t value) :
-        region0(value >> 0), region1(value >> 2), region2(value >> 4), region3(value >> 6), region4(value >> 8),
-        region5(value >> 10), region6(value >> 12), region7(value >> 14)
-    {
-    }
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        region0 = value >> 0;
-        region1 = value >> 2;
-        region2 = value >> 4;
-        region3 = value >> 6;
-        region4 = value >> 8;
-        region5 = value >> 10;
-        region6 = value >> 12;
-        region7 = value >> 14;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (region0 << 0) | (region1 << 2) | (region2 << 4) | (region3 << 6) | (region4 << 8) | (region5 << 10) |
-               (region6 << 12) | (region7 << 14);
-    }
-    regioncfg_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR regioncfg_r() :
         region0(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)),
         region1(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)),
@@ -5203,19 +4008,16 @@ struct regioncfg_r
     {
         return *this;
     }
-#endif
     CONSTEXPR ::memory_type get_region0() const
     {
         ::memory_type value = static_cast<::memory_type>(region0);
         return value;
     }
-#ifndef MODEL_REGS
     ::memory_type get_region0() const volatile
     {
         ::memory_type value = static_cast<::memory_type>(region0);
         return value;
     }
-#endif
     CONSTEXPR regioncfg_r &set_region0(::memory_type value)
     {
         region0 = ((1u << 2) - 1) & static_cast<uint32_t>(value);
@@ -5226,13 +4028,11 @@ struct regioncfg_r
         ::memory_type value = static_cast<::memory_type>(region1);
         return value;
     }
-#ifndef MODEL_REGS
     ::memory_type get_region1() const volatile
     {
         ::memory_type value = static_cast<::memory_type>(region1);
         return value;
     }
-#endif
     CONSTEXPR regioncfg_r &set_region1(::memory_type value)
     {
         region1 = ((1u << 2) - 1) & static_cast<uint32_t>(value);
@@ -5243,13 +4043,11 @@ struct regioncfg_r
         ::memory_type value = static_cast<::memory_type>(region2);
         return value;
     }
-#ifndef MODEL_REGS
     ::memory_type get_region2() const volatile
     {
         ::memory_type value = static_cast<::memory_type>(region2);
         return value;
     }
-#endif
     CONSTEXPR regioncfg_r &set_region2(::memory_type value)
     {
         region2 = ((1u << 2) - 1) & static_cast<uint32_t>(value);
@@ -5260,13 +4058,11 @@ struct regioncfg_r
         ::memory_type value = static_cast<::memory_type>(region3);
         return value;
     }
-#ifndef MODEL_REGS
     ::memory_type get_region3() const volatile
     {
         ::memory_type value = static_cast<::memory_type>(region3);
         return value;
     }
-#endif
     CONSTEXPR regioncfg_r &set_region3(::memory_type value)
     {
         region3 = ((1u << 2) - 1) & static_cast<uint32_t>(value);
@@ -5277,13 +4073,11 @@ struct regioncfg_r
         ::memory_type value = static_cast<::memory_type>(region4);
         return value;
     }
-#ifndef MODEL_REGS
     ::memory_type get_region4() const volatile
     {
         ::memory_type value = static_cast<::memory_type>(region4);
         return value;
     }
-#endif
     CONSTEXPR regioncfg_r &set_region4(::memory_type value)
     {
         region4 = ((1u << 2) - 1) & static_cast<uint32_t>(value);
@@ -5294,13 +4088,11 @@ struct regioncfg_r
         ::memory_type value = static_cast<::memory_type>(region5);
         return value;
     }
-#ifndef MODEL_REGS
     ::memory_type get_region5() const volatile
     {
         ::memory_type value = static_cast<::memory_type>(region5);
         return value;
     }
-#endif
     CONSTEXPR regioncfg_r &set_region5(::memory_type value)
     {
         region5 = ((1u << 2) - 1) & static_cast<uint32_t>(value);
@@ -5311,13 +4103,11 @@ struct regioncfg_r
         ::memory_type value = static_cast<::memory_type>(region6);
         return value;
     }
-#ifndef MODEL_REGS
     ::memory_type get_region6() const volatile
     {
         ::memory_type value = static_cast<::memory_type>(region6);
         return value;
     }
-#endif
     CONSTEXPR regioncfg_r &set_region6(::memory_type value)
     {
         region6 = ((1u << 2) - 1) & static_cast<uint32_t>(value);
@@ -5328,13 +4118,11 @@ struct regioncfg_r
         ::memory_type value = static_cast<::memory_type>(region7);
         return value;
     }
-#ifndef MODEL_REGS
     ::memory_type get_region7() const volatile
     {
         ::memory_type value = static_cast<::memory_type>(region7);
         return value;
     }
-#endif
     CONSTEXPR regioncfg_r &set_region7(::memory_type value)
     {
         region7 = ((1u << 2) - 1) & static_cast<uint32_t>(value);
@@ -5349,14 +4137,6 @@ struct axi_limit0_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<2> max_beats; // Burst split alignment: 0=64 bytes, 1=128 bytes, 2=256 bytes, 3=reserved
-    ::core::dt::uint_t<4> memtype;   // Memtype
-    ::core::dt::uint_t<8>
-        max_outstanding_read_m1; // Maximum number of outstanding AXI read transactions - 1 in range 0 to 31
-    ::core::dt::uint_t<8>
-        max_outstanding_write_m1; // Maximum number of outstanding AXI write transactions - 1 in range 0 to 15
-#else
     union
     {
         struct
@@ -5372,36 +4152,8 @@ struct axi_limit0_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR axi_limit0_r() :
-        max_beats(static_cast<uint32_t>(0x0)), memtype(static_cast<uint32_t>(0)),
-        max_outstanding_read_m1(static_cast<uint32_t>(0x00)), max_outstanding_write_m1(static_cast<uint32_t>(0x000000))
-    {
-    }
-    CONSTEXPR axi_limit0_r(uint32_t value) :
-        max_beats(value >> 0), memtype(value >> 4), max_outstanding_read_m1(value >> 16),
-        max_outstanding_write_m1(value >> 24)
-    {
-    }
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        max_beats                = value >> 0;
-        memtype                  = value >> 4;
-        max_outstanding_read_m1  = value >> 16;
-        max_outstanding_write_m1 = value >> 24;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (max_beats << 0) | (memtype << 4) | (max_outstanding_read_m1 << 16) | (max_outstanding_write_m1 << 24);
-    }
-    axi_limit0_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR axi_limit0_r() :
         max_beats(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
         reserved1(static_cast<uint32_t>(0)), max_outstanding_read_m1(static_cast<uint32_t>(0x00)),
@@ -5429,19 +4181,16 @@ struct axi_limit0_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_max_beats() const
     {
         uint32_t value = static_cast<uint32_t>(max_beats);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_max_beats() const volatile
     {
         uint32_t value = static_cast<uint32_t>(max_beats);
         return value;
     }
-#endif
     CONSTEXPR axi_limit0_r &set_max_beats(uint32_t value)
     {
         max_beats = ((1u << 2) - 1) & static_cast<uint32_t>(value);
@@ -5452,13 +4201,11 @@ struct axi_limit0_r
         uint32_t value = static_cast<uint32_t>(memtype);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_memtype() const volatile
     {
         uint32_t value = static_cast<uint32_t>(memtype);
         return value;
     }
-#endif
     CONSTEXPR axi_limit0_r &set_memtype(uint32_t value)
     {
         memtype = ((1u << 4) - 1) & static_cast<uint32_t>(value);
@@ -5469,13 +4216,11 @@ struct axi_limit0_r
         uint32_t value = static_cast<uint32_t>(max_outstanding_read_m1);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_max_outstanding_read_m1() const volatile
     {
         uint32_t value = static_cast<uint32_t>(max_outstanding_read_m1);
         return value;
     }
-#endif
     CONSTEXPR axi_limit0_r &set_max_outstanding_read_m1(uint32_t value)
     {
         max_outstanding_read_m1 = ((1u << 8) - 1) & static_cast<uint32_t>(value);
@@ -5486,13 +4231,11 @@ struct axi_limit0_r
         uint32_t value = static_cast<uint32_t>(max_outstanding_write_m1);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_max_outstanding_write_m1() const volatile
     {
         uint32_t value = static_cast<uint32_t>(max_outstanding_write_m1);
         return value;
     }
-#endif
     CONSTEXPR axi_limit0_r &set_max_outstanding_write_m1(uint32_t value)
     {
         max_outstanding_write_m1 = ((1u << 8) - 1) & static_cast<uint32_t>(value);
@@ -5507,14 +4250,6 @@ struct axi_limit1_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<2> max_beats; // Burst split alignment: 0=64 bytes, 1=128 bytes, 2=256 bytes, 3=reserved
-    ::core::dt::uint_t<4> memtype;   // Memtype
-    ::core::dt::uint_t<8>
-        max_outstanding_read_m1; // Maximum number of outstanding AXI read transactions - 1 in range 0 to 31
-    ::core::dt::uint_t<8>
-        max_outstanding_write_m1; // Maximum number of outstanding AXI write transactions - 1 in range 0 to 15
-#else
     union
     {
         struct
@@ -5530,36 +4265,8 @@ struct axi_limit1_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR axi_limit1_r() :
-        max_beats(static_cast<uint32_t>(0x0)), memtype(static_cast<uint32_t>(0)),
-        max_outstanding_read_m1(static_cast<uint32_t>(0x00)), max_outstanding_write_m1(static_cast<uint32_t>(0x000000))
-    {
-    }
-    CONSTEXPR axi_limit1_r(uint32_t value) :
-        max_beats(value >> 0), memtype(value >> 4), max_outstanding_read_m1(value >> 16),
-        max_outstanding_write_m1(value >> 24)
-    {
-    }
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        max_beats                = value >> 0;
-        memtype                  = value >> 4;
-        max_outstanding_read_m1  = value >> 16;
-        max_outstanding_write_m1 = value >> 24;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (max_beats << 0) | (memtype << 4) | (max_outstanding_read_m1 << 16) | (max_outstanding_write_m1 << 24);
-    }
-    axi_limit1_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR axi_limit1_r() :
         max_beats(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
         reserved1(static_cast<uint32_t>(0)), max_outstanding_read_m1(static_cast<uint32_t>(0x00)),
@@ -5587,19 +4294,16 @@ struct axi_limit1_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_max_beats() const
     {
         uint32_t value = static_cast<uint32_t>(max_beats);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_max_beats() const volatile
     {
         uint32_t value = static_cast<uint32_t>(max_beats);
         return value;
     }
-#endif
     CONSTEXPR axi_limit1_r &set_max_beats(uint32_t value)
     {
         max_beats = ((1u << 2) - 1) & static_cast<uint32_t>(value);
@@ -5610,13 +4314,11 @@ struct axi_limit1_r
         uint32_t value = static_cast<uint32_t>(memtype);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_memtype() const volatile
     {
         uint32_t value = static_cast<uint32_t>(memtype);
         return value;
     }
-#endif
     CONSTEXPR axi_limit1_r &set_memtype(uint32_t value)
     {
         memtype = ((1u << 4) - 1) & static_cast<uint32_t>(value);
@@ -5627,13 +4329,11 @@ struct axi_limit1_r
         uint32_t value = static_cast<uint32_t>(max_outstanding_read_m1);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_max_outstanding_read_m1() const volatile
     {
         uint32_t value = static_cast<uint32_t>(max_outstanding_read_m1);
         return value;
     }
-#endif
     CONSTEXPR axi_limit1_r &set_max_outstanding_read_m1(uint32_t value)
     {
         max_outstanding_read_m1 = ((1u << 8) - 1) & static_cast<uint32_t>(value);
@@ -5644,13 +4344,11 @@ struct axi_limit1_r
         uint32_t value = static_cast<uint32_t>(max_outstanding_write_m1);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_max_outstanding_write_m1() const volatile
     {
         uint32_t value = static_cast<uint32_t>(max_outstanding_write_m1);
         return value;
     }
-#endif
     CONSTEXPR axi_limit1_r &set_max_outstanding_write_m1(uint32_t value)
     {
         max_outstanding_write_m1 = ((1u << 8) - 1) & static_cast<uint32_t>(value);
@@ -5665,14 +4363,6 @@ struct axi_limit2_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<2> max_beats; // Burst split alignment: 0=64 bytes, 1=128 bytes, 2=256 bytes, 3=reserved
-    ::core::dt::uint_t<4> memtype;   // Memtype
-    ::core::dt::uint_t<8>
-        max_outstanding_read_m1; // Maximum number of outstanding AXI read transactions - 1 in range 0 to 31
-    ::core::dt::uint_t<8>
-        max_outstanding_write_m1; // Maximum number of outstanding AXI write transactions - 1 in range 0 to 15
-#else
     union
     {
         struct
@@ -5688,36 +4378,8 @@ struct axi_limit2_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR axi_limit2_r() :
-        max_beats(static_cast<uint32_t>(0x0)), memtype(static_cast<uint32_t>(0)),
-        max_outstanding_read_m1(static_cast<uint32_t>(0x00)), max_outstanding_write_m1(static_cast<uint32_t>(0x000000))
-    {
-    }
-    CONSTEXPR axi_limit2_r(uint32_t value) :
-        max_beats(value >> 0), memtype(value >> 4), max_outstanding_read_m1(value >> 16),
-        max_outstanding_write_m1(value >> 24)
-    {
-    }
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        max_beats                = value >> 0;
-        memtype                  = value >> 4;
-        max_outstanding_read_m1  = value >> 16;
-        max_outstanding_write_m1 = value >> 24;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (max_beats << 0) | (memtype << 4) | (max_outstanding_read_m1 << 16) | (max_outstanding_write_m1 << 24);
-    }
-    axi_limit2_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR axi_limit2_r() :
         max_beats(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
         reserved1(static_cast<uint32_t>(0)), max_outstanding_read_m1(static_cast<uint32_t>(0x00)),
@@ -5745,19 +4407,16 @@ struct axi_limit2_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_max_beats() const
     {
         uint32_t value = static_cast<uint32_t>(max_beats);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_max_beats() const volatile
     {
         uint32_t value = static_cast<uint32_t>(max_beats);
         return value;
     }
-#endif
     CONSTEXPR axi_limit2_r &set_max_beats(uint32_t value)
     {
         max_beats = ((1u << 2) - 1) & static_cast<uint32_t>(value);
@@ -5768,13 +4427,11 @@ struct axi_limit2_r
         uint32_t value = static_cast<uint32_t>(memtype);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_memtype() const volatile
     {
         uint32_t value = static_cast<uint32_t>(memtype);
         return value;
     }
-#endif
     CONSTEXPR axi_limit2_r &set_memtype(uint32_t value)
     {
         memtype = ((1u << 4) - 1) & static_cast<uint32_t>(value);
@@ -5785,13 +4442,11 @@ struct axi_limit2_r
         uint32_t value = static_cast<uint32_t>(max_outstanding_read_m1);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_max_outstanding_read_m1() const volatile
     {
         uint32_t value = static_cast<uint32_t>(max_outstanding_read_m1);
         return value;
     }
-#endif
     CONSTEXPR axi_limit2_r &set_max_outstanding_read_m1(uint32_t value)
     {
         max_outstanding_read_m1 = ((1u << 8) - 1) & static_cast<uint32_t>(value);
@@ -5802,13 +4457,11 @@ struct axi_limit2_r
         uint32_t value = static_cast<uint32_t>(max_outstanding_write_m1);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_max_outstanding_write_m1() const volatile
     {
         uint32_t value = static_cast<uint32_t>(max_outstanding_write_m1);
         return value;
     }
-#endif
     CONSTEXPR axi_limit2_r &set_max_outstanding_write_m1(uint32_t value)
     {
         max_outstanding_write_m1 = ((1u << 8) - 1) & static_cast<uint32_t>(value);
@@ -5823,14 +4476,6 @@ struct axi_limit3_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<2> max_beats; // Burst split alignment: 0=64 bytes, 1=128 bytes, 2=256 bytes, 3=reserved
-    ::core::dt::uint_t<4> memtype;   // Memtype
-    ::core::dt::uint_t<8>
-        max_outstanding_read_m1; // Maximum number of outstanding AXI read transactions - 1 in range 0 to 31
-    ::core::dt::uint_t<8>
-        max_outstanding_write_m1; // Maximum number of outstanding AXI write transactions - 1 in range 0 to 15
-#else
     union
     {
         struct
@@ -5846,36 +4491,8 @@ struct axi_limit3_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR axi_limit3_r() :
-        max_beats(static_cast<uint32_t>(0x0)), memtype(static_cast<uint32_t>(0)),
-        max_outstanding_read_m1(static_cast<uint32_t>(0x00)), max_outstanding_write_m1(static_cast<uint32_t>(0x000000))
-    {
-    }
-    CONSTEXPR axi_limit3_r(uint32_t value) :
-        max_beats(value >> 0), memtype(value >> 4), max_outstanding_read_m1(value >> 16),
-        max_outstanding_write_m1(value >> 24)
-    {
-    }
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        max_beats                = value >> 0;
-        memtype                  = value >> 4;
-        max_outstanding_read_m1  = value >> 16;
-        max_outstanding_write_m1 = value >> 24;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (max_beats << 0) | (memtype << 4) | (max_outstanding_read_m1 << 16) | (max_outstanding_write_m1 << 24);
-    }
-    axi_limit3_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR axi_limit3_r() :
         max_beats(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
         reserved1(static_cast<uint32_t>(0)), max_outstanding_read_m1(static_cast<uint32_t>(0x00)),
@@ -5903,19 +4520,16 @@ struct axi_limit3_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_max_beats() const
     {
         uint32_t value = static_cast<uint32_t>(max_beats);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_max_beats() const volatile
     {
         uint32_t value = static_cast<uint32_t>(max_beats);
         return value;
     }
-#endif
     CONSTEXPR axi_limit3_r &set_max_beats(uint32_t value)
     {
         max_beats = ((1u << 2) - 1) & static_cast<uint32_t>(value);
@@ -5926,13 +4540,11 @@ struct axi_limit3_r
         uint32_t value = static_cast<uint32_t>(memtype);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_memtype() const volatile
     {
         uint32_t value = static_cast<uint32_t>(memtype);
         return value;
     }
-#endif
     CONSTEXPR axi_limit3_r &set_memtype(uint32_t value)
     {
         memtype = ((1u << 4) - 1) & static_cast<uint32_t>(value);
@@ -5943,13 +4555,11 @@ struct axi_limit3_r
         uint32_t value = static_cast<uint32_t>(max_outstanding_read_m1);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_max_outstanding_read_m1() const volatile
     {
         uint32_t value = static_cast<uint32_t>(max_outstanding_read_m1);
         return value;
     }
-#endif
     CONSTEXPR axi_limit3_r &set_max_outstanding_read_m1(uint32_t value)
     {
         max_outstanding_read_m1 = ((1u << 8) - 1) & static_cast<uint32_t>(value);
@@ -5960,13 +4570,11 @@ struct axi_limit3_r
         uint32_t value = static_cast<uint32_t>(max_outstanding_write_m1);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_max_outstanding_write_m1() const volatile
     {
         uint32_t value = static_cast<uint32_t>(max_outstanding_write_m1);
         return value;
     }
-#endif
     CONSTEXPR axi_limit3_r &set_max_outstanding_write_m1(uint32_t value)
     {
         max_outstanding_write_m1 = ((1u << 8) - 1) & static_cast<uint32_t>(value);
@@ -5981,13 +4589,6 @@ struct pmcr_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<1> cnt_en;        // Enable counters (RW)
-    ::core::dt::uint_t<1> event_cnt_rst; // Reset event counters (WO)
-    ::core::dt::uint_t<1> cycle_cnt_rst; // Reset cycle counter (WO)
-    ::core::dt::uint_t<1> mask_en;       // PMU can be enabled/disabled by command stream operation NPU_OP_PMU_MASK
-    ::core::dt::uint_t<5> num_event_cnt; // Number of event counters (RO)
-#else
     union
     {
         struct
@@ -6002,38 +4603,8 @@ struct pmcr_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR pmcr_r() :
-        cnt_en(static_cast<uint32_t>(0)), event_cnt_rst(static_cast<uint32_t>(0)),
-        cycle_cnt_rst(static_cast<uint32_t>(0)), mask_en(static_cast<uint32_t>(0)),
-        num_event_cnt(static_cast<uint32_t>(4))
-    {
-    }
-    CONSTEXPR pmcr_r(uint32_t value) :
-        cnt_en(value >> 0), event_cnt_rst(value >> 1), cycle_cnt_rst(value >> 2), mask_en(value >> 3),
-        num_event_cnt(value >> 11)
-    {
-    }
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        cnt_en        = value >> 0;
-        event_cnt_rst = value >> 1;
-        cycle_cnt_rst = value >> 2;
-        mask_en       = value >> 3;
-        num_event_cnt = value >> 11;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (cnt_en << 0) | (event_cnt_rst << 1) | (cycle_cnt_rst << 2) | (mask_en << 3) | (num_event_cnt << 11);
-    }
-    pmcr_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR pmcr_r() :
         cnt_en(static_cast<uint32_t>(0)), event_cnt_rst(static_cast<uint32_t>(0)),
         cycle_cnt_rst(static_cast<uint32_t>(0)), mask_en(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)),
@@ -6061,19 +4632,16 @@ struct pmcr_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_cnt_en() const
     {
         uint32_t value = static_cast<uint32_t>(cnt_en);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_cnt_en() const volatile
     {
         uint32_t value = static_cast<uint32_t>(cnt_en);
         return value;
     }
-#endif
     CONSTEXPR pmcr_r &set_cnt_en(uint32_t value)
     {
         cnt_en = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6084,13 +4652,11 @@ struct pmcr_r
         uint32_t value = static_cast<uint32_t>(event_cnt_rst);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_event_cnt_rst() const volatile
     {
         uint32_t value = static_cast<uint32_t>(event_cnt_rst);
         return value;
     }
-#endif
     CONSTEXPR pmcr_r &set_event_cnt_rst(uint32_t value)
     {
         event_cnt_rst = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6101,13 +4667,11 @@ struct pmcr_r
         uint32_t value = static_cast<uint32_t>(cycle_cnt_rst);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_cycle_cnt_rst() const volatile
     {
         uint32_t value = static_cast<uint32_t>(cycle_cnt_rst);
         return value;
     }
-#endif
     CONSTEXPR pmcr_r &set_cycle_cnt_rst(uint32_t value)
     {
         cycle_cnt_rst = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6118,13 +4682,11 @@ struct pmcr_r
         uint32_t value = static_cast<uint32_t>(mask_en);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_mask_en() const volatile
     {
         uint32_t value = static_cast<uint32_t>(mask_en);
         return value;
     }
-#endif
     CONSTEXPR pmcr_r &set_mask_en(uint32_t value)
     {
         mask_en = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6135,13 +4697,11 @@ struct pmcr_r
         uint32_t value = static_cast<uint32_t>(num_event_cnt);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_num_event_cnt() const volatile
     {
         uint32_t value = static_cast<uint32_t>(num_event_cnt);
         return value;
     }
-#endif
     CONSTEXPR pmcr_r &set_num_event_cnt(uint32_t value)
     {
         num_event_cnt = ((1u << 5) - 1) & static_cast<uint32_t>(value);
@@ -6156,13 +4716,6 @@ struct pmcntenset_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<1> EVENT_CNT_0; // Event counter enable bit for PMEVCNTR0
-    ::core::dt::uint_t<1> EVENT_CNT_1; // Event counter enable bit for PMEVCNTR1
-    ::core::dt::uint_t<1> EVENT_CNT_2; // Event counter enable bit for PMEVCNTR2
-    ::core::dt::uint_t<1> EVENT_CNT_3; // Event counter enable bit for PMEVCNTR3
-    ::core::dt::uint_t<1> CYCLE_CNT;   // PMCCNTR enable bit
-#else
     union
     {
         struct
@@ -6176,38 +4729,8 @@ struct pmcntenset_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR pmcntenset_r() :
-        EVENT_CNT_0(static_cast<uint32_t>(0)), EVENT_CNT_1(static_cast<uint32_t>(0)),
-        EVENT_CNT_2(static_cast<uint32_t>(0)), EVENT_CNT_3(static_cast<uint32_t>(0)),
-        CYCLE_CNT(static_cast<uint32_t>(0))
-    {
-    }
-    CONSTEXPR pmcntenset_r(uint32_t value) :
-        EVENT_CNT_0(value >> 0), EVENT_CNT_1(value >> 1), EVENT_CNT_2(value >> 2), EVENT_CNT_3(value >> 3),
-        CYCLE_CNT(value >> 31)
-    {
-    }
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        EVENT_CNT_0 = value >> 0;
-        EVENT_CNT_1 = value >> 1;
-        EVENT_CNT_2 = value >> 2;
-        EVENT_CNT_3 = value >> 3;
-        CYCLE_CNT   = value >> 31;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (EVENT_CNT_0 << 0) | (EVENT_CNT_1 << 1) | (EVENT_CNT_2 << 2) | (EVENT_CNT_3 << 3) | (CYCLE_CNT << 31);
-    }
-    pmcntenset_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR pmcntenset_r() :
         EVENT_CNT_0(static_cast<uint32_t>(0)), EVENT_CNT_1(static_cast<uint32_t>(0)),
         EVENT_CNT_2(static_cast<uint32_t>(0)), EVENT_CNT_3(static_cast<uint32_t>(0)),
@@ -6235,19 +4758,16 @@ struct pmcntenset_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_EVENT_CNT_0() const
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_0);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_EVENT_CNT_0() const volatile
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_0);
         return value;
     }
-#endif
     CONSTEXPR pmcntenset_r &set_EVENT_CNT_0(uint32_t value)
     {
         EVENT_CNT_0 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6258,13 +4778,11 @@ struct pmcntenset_r
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_1);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_EVENT_CNT_1() const volatile
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_1);
         return value;
     }
-#endif
     CONSTEXPR pmcntenset_r &set_EVENT_CNT_1(uint32_t value)
     {
         EVENT_CNT_1 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6275,13 +4793,11 @@ struct pmcntenset_r
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_2);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_EVENT_CNT_2() const volatile
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_2);
         return value;
     }
-#endif
     CONSTEXPR pmcntenset_r &set_EVENT_CNT_2(uint32_t value)
     {
         EVENT_CNT_2 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6292,13 +4808,11 @@ struct pmcntenset_r
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_3);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_EVENT_CNT_3() const volatile
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_3);
         return value;
     }
-#endif
     CONSTEXPR pmcntenset_r &set_EVENT_CNT_3(uint32_t value)
     {
         EVENT_CNT_3 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6309,13 +4823,11 @@ struct pmcntenset_r
         uint32_t value = static_cast<uint32_t>(CYCLE_CNT);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_CYCLE_CNT() const volatile
     {
         uint32_t value = static_cast<uint32_t>(CYCLE_CNT);
         return value;
     }
-#endif
     CONSTEXPR pmcntenset_r &set_CYCLE_CNT(uint32_t value)
     {
         CYCLE_CNT = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6330,13 +4842,6 @@ struct pmcntenclr_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<1> EVENT_CNT_0; // Event counter disable bit for PMEVCNTR0
-    ::core::dt::uint_t<1> EVENT_CNT_1; // Event counter disable bit for PMEVCNTR1
-    ::core::dt::uint_t<1> EVENT_CNT_2; // Event counter disable bit for PMEVCNTR2
-    ::core::dt::uint_t<1> EVENT_CNT_3; // Event counter disable bit for PMEVCNTR3
-    ::core::dt::uint_t<1> CYCLE_CNT;   // PMCCNTR disable bit
-#else
     union
     {
         struct
@@ -6350,38 +4855,8 @@ struct pmcntenclr_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR pmcntenclr_r() :
-        EVENT_CNT_0(static_cast<uint32_t>(0)), EVENT_CNT_1(static_cast<uint32_t>(0)),
-        EVENT_CNT_2(static_cast<uint32_t>(0)), EVENT_CNT_3(static_cast<uint32_t>(0)),
-        CYCLE_CNT(static_cast<uint32_t>(0))
-    {
-    }
-    CONSTEXPR pmcntenclr_r(uint32_t value) :
-        EVENT_CNT_0(value >> 0), EVENT_CNT_1(value >> 1), EVENT_CNT_2(value >> 2), EVENT_CNT_3(value >> 3),
-        CYCLE_CNT(value >> 31)
-    {
-    }
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        EVENT_CNT_0 = value >> 0;
-        EVENT_CNT_1 = value >> 1;
-        EVENT_CNT_2 = value >> 2;
-        EVENT_CNT_3 = value >> 3;
-        CYCLE_CNT   = value >> 31;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (EVENT_CNT_0 << 0) | (EVENT_CNT_1 << 1) | (EVENT_CNT_2 << 2) | (EVENT_CNT_3 << 3) | (CYCLE_CNT << 31);
-    }
-    pmcntenclr_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR pmcntenclr_r() :
         EVENT_CNT_0(static_cast<uint32_t>(0)), EVENT_CNT_1(static_cast<uint32_t>(0)),
         EVENT_CNT_2(static_cast<uint32_t>(0)), EVENT_CNT_3(static_cast<uint32_t>(0)),
@@ -6409,19 +4884,16 @@ struct pmcntenclr_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_EVENT_CNT_0() const
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_0);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_EVENT_CNT_0() const volatile
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_0);
         return value;
     }
-#endif
     CONSTEXPR pmcntenclr_r &set_EVENT_CNT_0(uint32_t value)
     {
         EVENT_CNT_0 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6432,13 +4904,11 @@ struct pmcntenclr_r
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_1);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_EVENT_CNT_1() const volatile
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_1);
         return value;
     }
-#endif
     CONSTEXPR pmcntenclr_r &set_EVENT_CNT_1(uint32_t value)
     {
         EVENT_CNT_1 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6449,13 +4919,11 @@ struct pmcntenclr_r
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_2);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_EVENT_CNT_2() const volatile
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_2);
         return value;
     }
-#endif
     CONSTEXPR pmcntenclr_r &set_EVENT_CNT_2(uint32_t value)
     {
         EVENT_CNT_2 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6466,13 +4934,11 @@ struct pmcntenclr_r
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_3);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_EVENT_CNT_3() const volatile
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_3);
         return value;
     }
-#endif
     CONSTEXPR pmcntenclr_r &set_EVENT_CNT_3(uint32_t value)
     {
         EVENT_CNT_3 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6483,13 +4949,11 @@ struct pmcntenclr_r
         uint32_t value = static_cast<uint32_t>(CYCLE_CNT);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_CYCLE_CNT() const volatile
     {
         uint32_t value = static_cast<uint32_t>(CYCLE_CNT);
         return value;
     }
-#endif
     CONSTEXPR pmcntenclr_r &set_CYCLE_CNT(uint32_t value)
     {
         CYCLE_CNT = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6504,13 +4968,6 @@ struct pmovsset_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<1> EVENT_CNT_0_OVF; // Event counter overflow set bit for PMEVCNTR0
-    ::core::dt::uint_t<1> EVENT_CNT_1_OVF; // Event counter overflow set bit for PMEVCNTR1
-    ::core::dt::uint_t<1> EVENT_CNT_2_OVF; // Event counter overflow set bit for PMEVCNTR2
-    ::core::dt::uint_t<1> EVENT_CNT_3_OVF; // Event counter overflow set bit for PMEVCNTR3
-    ::core::dt::uint_t<1> CYCLE_CNT_OVF;   // PMCCNTR overflow set bit
-#else
     union
     {
         struct
@@ -6524,39 +4981,8 @@ struct pmovsset_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR pmovsset_r() :
-        EVENT_CNT_0_OVF(static_cast<uint32_t>(0)), EVENT_CNT_1_OVF(static_cast<uint32_t>(0)),
-        EVENT_CNT_2_OVF(static_cast<uint32_t>(0)), EVENT_CNT_3_OVF(static_cast<uint32_t>(0)),
-        CYCLE_CNT_OVF(static_cast<uint32_t>(0))
-    {
-    }
-    CONSTEXPR pmovsset_r(uint32_t value) :
-        EVENT_CNT_0_OVF(value >> 0), EVENT_CNT_1_OVF(value >> 1), EVENT_CNT_2_OVF(value >> 2),
-        EVENT_CNT_3_OVF(value >> 3), CYCLE_CNT_OVF(value >> 31)
-    {
-    }
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        EVENT_CNT_0_OVF = value >> 0;
-        EVENT_CNT_1_OVF = value >> 1;
-        EVENT_CNT_2_OVF = value >> 2;
-        EVENT_CNT_3_OVF = value >> 3;
-        CYCLE_CNT_OVF   = value >> 31;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (EVENT_CNT_0_OVF << 0) | (EVENT_CNT_1_OVF << 1) | (EVENT_CNT_2_OVF << 2) | (EVENT_CNT_3_OVF << 3) |
-               (CYCLE_CNT_OVF << 31);
-    }
-    pmovsset_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR pmovsset_r() :
         EVENT_CNT_0_OVF(static_cast<uint32_t>(0)), EVENT_CNT_1_OVF(static_cast<uint32_t>(0)),
         EVENT_CNT_2_OVF(static_cast<uint32_t>(0)), EVENT_CNT_3_OVF(static_cast<uint32_t>(0)),
@@ -6584,19 +5010,16 @@ struct pmovsset_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_EVENT_CNT_0_OVF() const
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_0_OVF);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_EVENT_CNT_0_OVF() const volatile
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_0_OVF);
         return value;
     }
-#endif
     CONSTEXPR pmovsset_r &set_EVENT_CNT_0_OVF(uint32_t value)
     {
         EVENT_CNT_0_OVF = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6607,13 +5030,11 @@ struct pmovsset_r
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_1_OVF);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_EVENT_CNT_1_OVF() const volatile
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_1_OVF);
         return value;
     }
-#endif
     CONSTEXPR pmovsset_r &set_EVENT_CNT_1_OVF(uint32_t value)
     {
         EVENT_CNT_1_OVF = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6624,13 +5045,11 @@ struct pmovsset_r
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_2_OVF);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_EVENT_CNT_2_OVF() const volatile
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_2_OVF);
         return value;
     }
-#endif
     CONSTEXPR pmovsset_r &set_EVENT_CNT_2_OVF(uint32_t value)
     {
         EVENT_CNT_2_OVF = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6641,13 +5060,11 @@ struct pmovsset_r
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_3_OVF);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_EVENT_CNT_3_OVF() const volatile
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_3_OVF);
         return value;
     }
-#endif
     CONSTEXPR pmovsset_r &set_EVENT_CNT_3_OVF(uint32_t value)
     {
         EVENT_CNT_3_OVF = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6658,13 +5075,11 @@ struct pmovsset_r
         uint32_t value = static_cast<uint32_t>(CYCLE_CNT_OVF);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_CYCLE_CNT_OVF() const volatile
     {
         uint32_t value = static_cast<uint32_t>(CYCLE_CNT_OVF);
         return value;
     }
-#endif
     CONSTEXPR pmovsset_r &set_CYCLE_CNT_OVF(uint32_t value)
     {
         CYCLE_CNT_OVF = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6679,13 +5094,6 @@ struct pmovsclr_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<1> EVENT_CNT_0_OVF; // Event counter overflow clear bit for PMEVCNTR0
-    ::core::dt::uint_t<1> EVENT_CNT_1_OVF; // Event counter overflow clear bit for PMEVCNTR1
-    ::core::dt::uint_t<1> EVENT_CNT_2_OVF; // Event counter overflow clear bit for PMEVCNTR2
-    ::core::dt::uint_t<1> EVENT_CNT_3_OVF; // Event counter overflow clear bit for PMEVCNTR3
-    ::core::dt::uint_t<1> CYCLE_CNT_OVF;   // PMCCNTR overflow clear bit
-#else
     union
     {
         struct
@@ -6699,39 +5107,8 @@ struct pmovsclr_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR pmovsclr_r() :
-        EVENT_CNT_0_OVF(static_cast<uint32_t>(0)), EVENT_CNT_1_OVF(static_cast<uint32_t>(0)),
-        EVENT_CNT_2_OVF(static_cast<uint32_t>(0)), EVENT_CNT_3_OVF(static_cast<uint32_t>(0)),
-        CYCLE_CNT_OVF(static_cast<uint32_t>(0))
-    {
-    }
-    CONSTEXPR pmovsclr_r(uint32_t value) :
-        EVENT_CNT_0_OVF(value >> 0), EVENT_CNT_1_OVF(value >> 1), EVENT_CNT_2_OVF(value >> 2),
-        EVENT_CNT_3_OVF(value >> 3), CYCLE_CNT_OVF(value >> 31)
-    {
-    }
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        EVENT_CNT_0_OVF = value >> 0;
-        EVENT_CNT_1_OVF = value >> 1;
-        EVENT_CNT_2_OVF = value >> 2;
-        EVENT_CNT_3_OVF = value >> 3;
-        CYCLE_CNT_OVF   = value >> 31;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (EVENT_CNT_0_OVF << 0) | (EVENT_CNT_1_OVF << 1) | (EVENT_CNT_2_OVF << 2) | (EVENT_CNT_3_OVF << 3) |
-               (CYCLE_CNT_OVF << 31);
-    }
-    pmovsclr_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR pmovsclr_r() :
         EVENT_CNT_0_OVF(static_cast<uint32_t>(0)), EVENT_CNT_1_OVF(static_cast<uint32_t>(0)),
         EVENT_CNT_2_OVF(static_cast<uint32_t>(0)), EVENT_CNT_3_OVF(static_cast<uint32_t>(0)),
@@ -6759,19 +5136,16 @@ struct pmovsclr_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_EVENT_CNT_0_OVF() const
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_0_OVF);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_EVENT_CNT_0_OVF() const volatile
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_0_OVF);
         return value;
     }
-#endif
     CONSTEXPR pmovsclr_r &set_EVENT_CNT_0_OVF(uint32_t value)
     {
         EVENT_CNT_0_OVF = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6782,13 +5156,11 @@ struct pmovsclr_r
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_1_OVF);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_EVENT_CNT_1_OVF() const volatile
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_1_OVF);
         return value;
     }
-#endif
     CONSTEXPR pmovsclr_r &set_EVENT_CNT_1_OVF(uint32_t value)
     {
         EVENT_CNT_1_OVF = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6799,13 +5171,11 @@ struct pmovsclr_r
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_2_OVF);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_EVENT_CNT_2_OVF() const volatile
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_2_OVF);
         return value;
     }
-#endif
     CONSTEXPR pmovsclr_r &set_EVENT_CNT_2_OVF(uint32_t value)
     {
         EVENT_CNT_2_OVF = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6816,13 +5186,11 @@ struct pmovsclr_r
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_3_OVF);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_EVENT_CNT_3_OVF() const volatile
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_3_OVF);
         return value;
     }
-#endif
     CONSTEXPR pmovsclr_r &set_EVENT_CNT_3_OVF(uint32_t value)
     {
         EVENT_CNT_3_OVF = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6833,13 +5201,11 @@ struct pmovsclr_r
         uint32_t value = static_cast<uint32_t>(CYCLE_CNT_OVF);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_CYCLE_CNT_OVF() const volatile
     {
         uint32_t value = static_cast<uint32_t>(CYCLE_CNT_OVF);
         return value;
     }
-#endif
     CONSTEXPR pmovsclr_r &set_CYCLE_CNT_OVF(uint32_t value)
     {
         CYCLE_CNT_OVF = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6854,13 +5220,6 @@ struct pmintset_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<1> EVENT_CNT_0_INT; // Event counter overflow interrupt request enable bit for PMEVCNTR0
-    ::core::dt::uint_t<1> EVENT_CNT_1_INT; // Event counter overflow interrupt request enable bit for PMEVCNTR1
-    ::core::dt::uint_t<1> EVENT_CNT_2_INT; // Event counter overflow interrupt request enable bit for PMEVCNTR2
-    ::core::dt::uint_t<1> EVENT_CNT_3_INT; // Event counter overflow interrupt request enable bit for PMEVCNTR3
-    ::core::dt::uint_t<1> CYCLE_CNT_INT;   // PMCCNTR overflow interrupt request enable bit
-#else
     union
     {
         struct
@@ -6874,39 +5233,8 @@ struct pmintset_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR pmintset_r() :
-        EVENT_CNT_0_INT(static_cast<uint32_t>(0)), EVENT_CNT_1_INT(static_cast<uint32_t>(0)),
-        EVENT_CNT_2_INT(static_cast<uint32_t>(0)), EVENT_CNT_3_INT(static_cast<uint32_t>(0)),
-        CYCLE_CNT_INT(static_cast<uint32_t>(0))
-    {
-    }
-    CONSTEXPR pmintset_r(uint32_t value) :
-        EVENT_CNT_0_INT(value >> 0), EVENT_CNT_1_INT(value >> 1), EVENT_CNT_2_INT(value >> 2),
-        EVENT_CNT_3_INT(value >> 3), CYCLE_CNT_INT(value >> 31)
-    {
-    }
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        EVENT_CNT_0_INT = value >> 0;
-        EVENT_CNT_1_INT = value >> 1;
-        EVENT_CNT_2_INT = value >> 2;
-        EVENT_CNT_3_INT = value >> 3;
-        CYCLE_CNT_INT   = value >> 31;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (EVENT_CNT_0_INT << 0) | (EVENT_CNT_1_INT << 1) | (EVENT_CNT_2_INT << 2) | (EVENT_CNT_3_INT << 3) |
-               (CYCLE_CNT_INT << 31);
-    }
-    pmintset_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR pmintset_r() :
         EVENT_CNT_0_INT(static_cast<uint32_t>(0)), EVENT_CNT_1_INT(static_cast<uint32_t>(0)),
         EVENT_CNT_2_INT(static_cast<uint32_t>(0)), EVENT_CNT_3_INT(static_cast<uint32_t>(0)),
@@ -6934,19 +5262,16 @@ struct pmintset_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_EVENT_CNT_0_INT() const
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_0_INT);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_EVENT_CNT_0_INT() const volatile
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_0_INT);
         return value;
     }
-#endif
     CONSTEXPR pmintset_r &set_EVENT_CNT_0_INT(uint32_t value)
     {
         EVENT_CNT_0_INT = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6957,13 +5282,11 @@ struct pmintset_r
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_1_INT);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_EVENT_CNT_1_INT() const volatile
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_1_INT);
         return value;
     }
-#endif
     CONSTEXPR pmintset_r &set_EVENT_CNT_1_INT(uint32_t value)
     {
         EVENT_CNT_1_INT = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6974,13 +5297,11 @@ struct pmintset_r
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_2_INT);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_EVENT_CNT_2_INT() const volatile
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_2_INT);
         return value;
     }
-#endif
     CONSTEXPR pmintset_r &set_EVENT_CNT_2_INT(uint32_t value)
     {
         EVENT_CNT_2_INT = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -6991,13 +5312,11 @@ struct pmintset_r
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_3_INT);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_EVENT_CNT_3_INT() const volatile
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_3_INT);
         return value;
     }
-#endif
     CONSTEXPR pmintset_r &set_EVENT_CNT_3_INT(uint32_t value)
     {
         EVENT_CNT_3_INT = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -7008,13 +5327,11 @@ struct pmintset_r
         uint32_t value = static_cast<uint32_t>(CYCLE_CNT_INT);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_CYCLE_CNT_INT() const volatile
     {
         uint32_t value = static_cast<uint32_t>(CYCLE_CNT_INT);
         return value;
     }
-#endif
     CONSTEXPR pmintset_r &set_CYCLE_CNT_INT(uint32_t value)
     {
         CYCLE_CNT_INT = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -7029,13 +5346,6 @@ struct pmintclr_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<1> EVENT_CNT_0_INT; // Event counter overflow interrupt request disable bit for PMEVCNTR0
-    ::core::dt::uint_t<1> EVENT_CNT_1_INT; // Event counter overflow interrupt request disable bit for PMEVCNTR1
-    ::core::dt::uint_t<1> EVENT_CNT_2_INT; // Event counter overflow interrupt request disable bit for PMEVCNTR2
-    ::core::dt::uint_t<1> EVENT_CNT_3_INT; // Event counter overflow interrupt request disable bit for PMEVCNTR3
-    ::core::dt::uint_t<1> CYCLE_CNT_INT;   // PMCCNTR overflow interrupt request disable bit
-#else
     union
     {
         struct
@@ -7049,39 +5359,8 @@ struct pmintclr_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR pmintclr_r() :
-        EVENT_CNT_0_INT(static_cast<uint32_t>(0)), EVENT_CNT_1_INT(static_cast<uint32_t>(0)),
-        EVENT_CNT_2_INT(static_cast<uint32_t>(0)), EVENT_CNT_3_INT(static_cast<uint32_t>(0)),
-        CYCLE_CNT_INT(static_cast<uint32_t>(0))
-    {
-    }
-    CONSTEXPR pmintclr_r(uint32_t value) :
-        EVENT_CNT_0_INT(value >> 0), EVENT_CNT_1_INT(value >> 1), EVENT_CNT_2_INT(value >> 2),
-        EVENT_CNT_3_INT(value >> 3), CYCLE_CNT_INT(value >> 31)
-    {
-    }
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        EVENT_CNT_0_INT = value >> 0;
-        EVENT_CNT_1_INT = value >> 1;
-        EVENT_CNT_2_INT = value >> 2;
-        EVENT_CNT_3_INT = value >> 3;
-        CYCLE_CNT_INT   = value >> 31;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (EVENT_CNT_0_INT << 0) | (EVENT_CNT_1_INT << 1) | (EVENT_CNT_2_INT << 2) | (EVENT_CNT_3_INT << 3) |
-               (CYCLE_CNT_INT << 31);
-    }
-    pmintclr_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR pmintclr_r() :
         EVENT_CNT_0_INT(static_cast<uint32_t>(0)), EVENT_CNT_1_INT(static_cast<uint32_t>(0)),
         EVENT_CNT_2_INT(static_cast<uint32_t>(0)), EVENT_CNT_3_INT(static_cast<uint32_t>(0)),
@@ -7109,19 +5388,16 @@ struct pmintclr_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_EVENT_CNT_0_INT() const
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_0_INT);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_EVENT_CNT_0_INT() const volatile
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_0_INT);
         return value;
     }
-#endif
     CONSTEXPR pmintclr_r &set_EVENT_CNT_0_INT(uint32_t value)
     {
         EVENT_CNT_0_INT = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -7132,13 +5408,11 @@ struct pmintclr_r
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_1_INT);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_EVENT_CNT_1_INT() const volatile
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_1_INT);
         return value;
     }
-#endif
     CONSTEXPR pmintclr_r &set_EVENT_CNT_1_INT(uint32_t value)
     {
         EVENT_CNT_1_INT = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -7149,13 +5423,11 @@ struct pmintclr_r
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_2_INT);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_EVENT_CNT_2_INT() const volatile
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_2_INT);
         return value;
     }
-#endif
     CONSTEXPR pmintclr_r &set_EVENT_CNT_2_INT(uint32_t value)
     {
         EVENT_CNT_2_INT = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -7166,13 +5438,11 @@ struct pmintclr_r
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_3_INT);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_EVENT_CNT_3_INT() const volatile
     {
         uint32_t value = static_cast<uint32_t>(EVENT_CNT_3_INT);
         return value;
     }
-#endif
     CONSTEXPR pmintclr_r &set_EVENT_CNT_3_INT(uint32_t value)
     {
         EVENT_CNT_3_INT = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -7183,13 +5453,11 @@ struct pmintclr_r
         uint32_t value = static_cast<uint32_t>(CYCLE_CNT_INT);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_CYCLE_CNT_INT() const volatile
     {
         uint32_t value = static_cast<uint32_t>(CYCLE_CNT_INT);
         return value;
     }
-#endif
     CONSTEXPR pmintclr_r &set_CYCLE_CNT_INT(uint32_t value)
     {
         CYCLE_CNT_INT = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -7204,33 +5472,13 @@ struct pmccntr_lo_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<32> CYCLE_CNT_LO; // Cycle count low
-#else
     union
     {
         uint32_t CYCLE_CNT_LO; // Cycle count low
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR pmccntr_lo_r() : CYCLE_CNT_LO(static_cast<uint32_t>(0)) {}
-    CONSTEXPR pmccntr_lo_r(uint32_t value) : CYCLE_CNT_LO(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        CYCLE_CNT_LO = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (CYCLE_CNT_LO << 0);
-    }
-    pmccntr_lo_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR pmccntr_lo_r() : CYCLE_CNT_LO(static_cast<uint32_t>(0)) {}
     CONSTEXPR pmccntr_lo_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -7253,19 +5501,16 @@ struct pmccntr_lo_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_CYCLE_CNT_LO() const
     {
         uint32_t value = static_cast<uint32_t>(CYCLE_CNT_LO);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_CYCLE_CNT_LO() const volatile
     {
         uint32_t value = static_cast<uint32_t>(CYCLE_CNT_LO);
         return value;
     }
-#endif
     CONSTEXPR pmccntr_lo_r &set_CYCLE_CNT_LO(uint32_t value)
     {
         CYCLE_CNT_LO = static_cast<uint32_t>(value);
@@ -7280,9 +5525,6 @@ struct pmccntr_hi_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<16> CYCLE_CNT_HI; // Cycle count high
-#else
     union
     {
         struct
@@ -7292,25 +5534,8 @@ struct pmccntr_hi_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR pmccntr_hi_r() : CYCLE_CNT_HI(static_cast<uint32_t>(0)) {}
-    CONSTEXPR pmccntr_hi_r(uint32_t value) : CYCLE_CNT_HI(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        CYCLE_CNT_HI = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (CYCLE_CNT_HI << 0);
-    }
-    pmccntr_hi_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR pmccntr_hi_r() : CYCLE_CNT_HI(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)) {}
     CONSTEXPR pmccntr_hi_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -7333,19 +5558,16 @@ struct pmccntr_hi_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_CYCLE_CNT_HI() const
     {
         uint32_t value = static_cast<uint32_t>(CYCLE_CNT_HI);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_CYCLE_CNT_HI() const volatile
     {
         uint32_t value = static_cast<uint32_t>(CYCLE_CNT_HI);
         return value;
     }
-#endif
     CONSTEXPR pmccntr_hi_r &set_CYCLE_CNT_HI(uint32_t value)
     {
         CYCLE_CNT_HI = ((1u << 16) - 1) & static_cast<uint32_t>(value);
@@ -7360,10 +5582,6 @@ struct pmccntr_cfg_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<10> CYCLE_CNT_CFG_START; // Cycle counter start event
-    ::core::dt::uint_t<10> CYCLE_CNT_CFG_STOP;  // Cycle counter stop event
-#else
     union
     {
         struct
@@ -7375,29 +5593,8 @@ struct pmccntr_cfg_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR pmccntr_cfg_r() :
-        CYCLE_CNT_CFG_START(static_cast<uint32_t>(0)), CYCLE_CNT_CFG_STOP(static_cast<uint32_t>(0))
-    {
-    }
-    CONSTEXPR pmccntr_cfg_r(uint32_t value) : CYCLE_CNT_CFG_START(value >> 0), CYCLE_CNT_CFG_STOP(value >> 16) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        CYCLE_CNT_CFG_START = value >> 0;
-        CYCLE_CNT_CFG_STOP  = value >> 16;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (CYCLE_CNT_CFG_START << 0) | (CYCLE_CNT_CFG_STOP << 16);
-    }
-    pmccntr_cfg_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR pmccntr_cfg_r() :
         CYCLE_CNT_CFG_START(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)),
         CYCLE_CNT_CFG_STOP(static_cast<uint32_t>(0)), reserved1(static_cast<uint32_t>(0))
@@ -7424,19 +5621,16 @@ struct pmccntr_cfg_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_CYCLE_CNT_CFG_START() const
     {
         uint32_t value = static_cast<uint32_t>(CYCLE_CNT_CFG_START);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_CYCLE_CNT_CFG_START() const volatile
     {
         uint32_t value = static_cast<uint32_t>(CYCLE_CNT_CFG_START);
         return value;
     }
-#endif
     CONSTEXPR pmccntr_cfg_r &set_CYCLE_CNT_CFG_START(uint32_t value)
     {
         CYCLE_CNT_CFG_START = ((1u << 10) - 1) & static_cast<uint32_t>(value);
@@ -7447,13 +5641,11 @@ struct pmccntr_cfg_r
         uint32_t value = static_cast<uint32_t>(CYCLE_CNT_CFG_STOP);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_CYCLE_CNT_CFG_STOP() const volatile
     {
         uint32_t value = static_cast<uint32_t>(CYCLE_CNT_CFG_STOP);
         return value;
     }
-#endif
     CONSTEXPR pmccntr_cfg_r &set_CYCLE_CNT_CFG_STOP(uint32_t value)
     {
         CYCLE_CNT_CFG_STOP = ((1u << 10) - 1) & static_cast<uint32_t>(value);
@@ -7468,13 +5660,6 @@ struct pmcaxi_chan_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<4> AXI_CHAN; // Channel number to monitor (Read: 0=Cmd 1=IFM 2=Weights 3=Scale+Bias 4=Mem2Mem;
-                                    // Write: 8=OFM 9=Mem2Mem)
-    ::core::dt::uint_t<1> RW;       // 0 for read, 1 for write
-    ::core::dt::uint_t<2>
-        AXI_CNT; // AXI counter to monitor (0=AXI0 counter0, 1=AXI0 counter1, 2=AXI1 counter 2, 3=AXI counter3)
-#else
     union
     {
         struct
@@ -7489,30 +5674,8 @@ struct pmcaxi_chan_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR pmcaxi_chan_r() :
-        AXI_CHAN(static_cast<uint32_t>(0)), RW(static_cast<uint32_t>(0)), AXI_CNT(static_cast<uint32_t>(0))
-    {
-    }
-    CONSTEXPR pmcaxi_chan_r(uint32_t value) : AXI_CHAN(value >> 0), RW(value >> 7), AXI_CNT(value >> 8) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        AXI_CHAN = value >> 0;
-        RW       = value >> 7;
-        AXI_CNT  = value >> 8;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (AXI_CHAN << 0) | (RW << 7) | (AXI_CNT << 8);
-    }
-    pmcaxi_chan_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR pmcaxi_chan_r() :
         AXI_CHAN(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)), RW(static_cast<uint32_t>(0)),
         AXI_CNT(static_cast<uint32_t>(0)), reserved1(static_cast<uint32_t>(0))
@@ -7539,19 +5702,16 @@ struct pmcaxi_chan_r
     {
         return *this;
     }
-#endif
     CONSTEXPR uint32_t get_AXI_CHAN() const
     {
         uint32_t value = static_cast<uint32_t>(AXI_CHAN);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_AXI_CHAN() const volatile
     {
         uint32_t value = static_cast<uint32_t>(AXI_CHAN);
         return value;
     }
-#endif
     CONSTEXPR pmcaxi_chan_r &set_AXI_CHAN(uint32_t value)
     {
         AXI_CHAN = ((1u << 4) - 1) & static_cast<uint32_t>(value);
@@ -7562,13 +5722,11 @@ struct pmcaxi_chan_r
         uint32_t value = static_cast<uint32_t>(RW);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_RW() const volatile
     {
         uint32_t value = static_cast<uint32_t>(RW);
         return value;
     }
-#endif
     CONSTEXPR pmcaxi_chan_r &set_RW(uint32_t value)
     {
         RW = ((1u << 1) - 1) & static_cast<uint32_t>(value);
@@ -7579,13 +5737,11 @@ struct pmcaxi_chan_r
         uint32_t value = static_cast<uint32_t>(AXI_CNT);
         return value;
     }
-#ifndef MODEL_REGS
     uint32_t get_AXI_CNT() const volatile
     {
         uint32_t value = static_cast<uint32_t>(AXI_CNT);
         return value;
     }
-#endif
     CONSTEXPR pmcaxi_chan_r &set_AXI_CNT(uint32_t value)
     {
         AXI_CNT = ((1u << 2) - 1) & static_cast<uint32_t>(value);
@@ -7600,9 +5756,6 @@ struct pmevtyper0_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<10> EV_TYPE; // Event Type
-#else
     union
     {
         struct
@@ -7612,25 +5765,8 @@ struct pmevtyper0_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR pmevtyper0_r() : EV_TYPE(static_cast<uint32_t>(0)) {}
-    CONSTEXPR pmevtyper0_r(uint32_t value) : EV_TYPE(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        EV_TYPE = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (EV_TYPE << 0);
-    }
-    pmevtyper0_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR pmevtyper0_r() : EV_TYPE(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)) {}
     CONSTEXPR pmevtyper0_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -7653,19 +5789,16 @@ struct pmevtyper0_r
     {
         return *this;
     }
-#endif
     CONSTEXPR ::pmu_event_type get_EV_TYPE() const
     {
         ::pmu_event_type value = static_cast<::pmu_event_type>(EV_TYPE);
         return value;
     }
-#ifndef MODEL_REGS
     ::pmu_event_type get_EV_TYPE() const volatile
     {
         ::pmu_event_type value = static_cast<::pmu_event_type>(EV_TYPE);
         return value;
     }
-#endif
     CONSTEXPR pmevtyper0_r &set_EV_TYPE(::pmu_event_type value)
     {
         EV_TYPE = ((1u << 10) - 1) & static_cast<uint32_t>(value);
@@ -7680,9 +5813,6 @@ struct pmevtyper1_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<10> EV_TYPE; // Event Type
-#else
     union
     {
         struct
@@ -7692,25 +5822,8 @@ struct pmevtyper1_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR pmevtyper1_r() : EV_TYPE(static_cast<uint32_t>(0)) {}
-    CONSTEXPR pmevtyper1_r(uint32_t value) : EV_TYPE(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        EV_TYPE = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (EV_TYPE << 0);
-    }
-    pmevtyper1_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR pmevtyper1_r() : EV_TYPE(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)) {}
     CONSTEXPR pmevtyper1_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -7733,19 +5846,16 @@ struct pmevtyper1_r
     {
         return *this;
     }
-#endif
     CONSTEXPR ::pmu_event_type get_EV_TYPE() const
     {
         ::pmu_event_type value = static_cast<::pmu_event_type>(EV_TYPE);
         return value;
     }
-#ifndef MODEL_REGS
     ::pmu_event_type get_EV_TYPE() const volatile
     {
         ::pmu_event_type value = static_cast<::pmu_event_type>(EV_TYPE);
         return value;
     }
-#endif
     CONSTEXPR pmevtyper1_r &set_EV_TYPE(::pmu_event_type value)
     {
         EV_TYPE = ((1u << 10) - 1) & static_cast<uint32_t>(value);
@@ -7760,9 +5870,6 @@ struct pmevtyper2_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<10> EV_TYPE; // Event Type
-#else
     union
     {
         struct
@@ -7772,25 +5879,8 @@ struct pmevtyper2_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR pmevtyper2_r() : EV_TYPE(static_cast<uint32_t>(0)) {}
-    CONSTEXPR pmevtyper2_r(uint32_t value) : EV_TYPE(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        EV_TYPE = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (EV_TYPE << 0);
-    }
-    pmevtyper2_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR pmevtyper2_r() : EV_TYPE(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)) {}
     CONSTEXPR pmevtyper2_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -7813,19 +5903,16 @@ struct pmevtyper2_r
     {
         return *this;
     }
-#endif
     CONSTEXPR ::pmu_event_type get_EV_TYPE() const
     {
         ::pmu_event_type value = static_cast<::pmu_event_type>(EV_TYPE);
         return value;
     }
-#ifndef MODEL_REGS
     ::pmu_event_type get_EV_TYPE() const volatile
     {
         ::pmu_event_type value = static_cast<::pmu_event_type>(EV_TYPE);
         return value;
     }
-#endif
     CONSTEXPR pmevtyper2_r &set_EV_TYPE(::pmu_event_type value)
     {
         EV_TYPE = ((1u << 10) - 1) & static_cast<uint32_t>(value);
@@ -7840,9 +5927,6 @@ struct pmevtyper3_r
 #ifdef __cplusplus
   private:
 #endif //__cplusplus
-#ifdef MODEL_REGS
-    ::core::dt::uint_t<10> EV_TYPE; // Event Type
-#else
     union
     {
         struct
@@ -7852,25 +5936,8 @@ struct pmevtyper3_r
         };
         uint32_t word;
     };
-#endif
 #ifdef __cplusplus
   public:
-#ifdef MODEL_REGS
-    CONSTEXPR pmevtyper3_r() : EV_TYPE(static_cast<uint32_t>(0)) {}
-    CONSTEXPR pmevtyper3_r(uint32_t value) : EV_TYPE(value >> 0) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        EV_TYPE = value >> 0;
-    }
-    CONSTEXPR operator uint32_t() const
-    {
-        return (EV_TYPE << 0);
-    }
-    pmevtyper3_r copy()
-    {
-        return *this;
-    }
-#else
     CONSTEXPR pmevtyper3_r() : EV_TYPE(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)) {}
     CONSTEXPR pmevtyper3_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
@@ -7893,19 +5960,16 @@ struct pmevtyper3_r
     {
         return *this;
     }
-#endif
     CONSTEXPR ::pmu_event_type get_EV_TYPE() const
     {
         ::pmu_event_type value = static_cast<::pmu_event_type>(EV_TYPE);
         return value;
     }
-#ifndef MODEL_REGS
     ::pmu_event_type get_EV_TYPE() const volatile
     {
         ::pmu_event_type value = static_cast<::pmu_event_type>(EV_TYPE);
         return value;
     }
-#endif
     CONSTEXPR pmevtyper3_r &set_EV_TYPE(::pmu_event_type value)
     {
         EV_TYPE = ((1u << 10) - 1) & static_cast<uint32_t>(value);
@@ -7928,17 +5992,13 @@ struct NPU_REG
     STRUCT prot_r PROT;       // 0x24
     STRUCT config_r CONFIG;   // 0x28
     STRUCT lock_r LOCK;       // 0x2c
-#ifndef MODEL_REGS
     uint32_t unused0[3];
-#endif
     STRUCT regioncfg_r REGIONCFG;   // 0x3c
     STRUCT axi_limit0_r AXI_LIMIT0; // 0x40
     STRUCT axi_limit1_r AXI_LIMIT1; // 0x44
     STRUCT axi_limit2_r AXI_LIMIT2; // 0x48
     STRUCT axi_limit3_r AXI_LIMIT3; // 0x4c
-#ifndef MODEL_REGS
     uint32_t unused1[12];
-#endif
     STRUCT basep0_r BASEP0;   // 0x80
     STRUCT basep1_r BASEP1;   // 0x84
     STRUCT basep2_r BASEP2;   // 0x88
@@ -7955,26 +6015,18 @@ struct NPU_REG
     STRUCT basep13_r BASEP13; // 0xb4
     STRUCT basep14_r BASEP14; // 0xb8
     STRUCT basep15_r BASEP15; // 0xbc
-#ifndef MODEL_REGS
     uint32_t unused2[16];
-#endif
     uint32_t WD_STATUS;  // 0x100
     uint32_t MAC_STATUS; // 0x104
     uint32_t DMA_STATUS; // 0x108
-#ifndef MODEL_REGS
     uint32_t unused3[1];
-#endif
     uint32_t AO_STATUS; // 0x110
-#ifndef MODEL_REGS
     uint32_t unused4[11];
-#endif
     STRUCT clkforce_r CLKFORCE; // 0x140
     uint32_t DEBUG;             // 0x144
     uint32_t DEBUG2;            // 0x148
     uint32_t DEBUGCORE;         // 0x14c
-#ifndef MODEL_REGS
     uint32_t unused5[12];
-#endif
     STRUCT pmcr_r PMCR;             // 0x180
     STRUCT pmcntenset_r PMCNTENSET; // 0x184
     STRUCT pmcntenclr_r PMCNTENCLR; // 0x188
@@ -7982,16 +6034,12 @@ struct NPU_REG
     STRUCT pmovsclr_r PMOVSCLR;     // 0x190
     STRUCT pmintset_r PMINTSET;     // 0x194
     STRUCT pmintclr_r PMINTCLR;     // 0x198
-#ifndef MODEL_REGS
     uint32_t unused6[1];
-#endif
     STRUCT pmccntr_lo_r PMCCNTR_LO;   // 0x1a0
     STRUCT pmccntr_hi_r PMCCNTR_HI;   // 0x1a4
     STRUCT pmccntr_cfg_r PMCCNTR_CFG; // 0x1a8
     STRUCT pmcaxi_chan_r PMCAXI_CHAN; // 0x1ac
-#ifndef MODEL_REGS
     uint32_t unused7[20];
-#endif
     uint32_t KERNEL_X;           // 0x200
     uint32_t KERNEL_Y;           // 0x204
     uint32_t KERNEL_W_M1;        // 0x208
@@ -8026,21 +6074,13 @@ struct NPU_REG
     uint32_t CURRENT_QREAD;      // 0x27c
     uint32_t DMA_SCALE_SRC;      // 0x280
     uint32_t DMA_SCALE_SRC_HI;   // 0x284
-#ifndef MODEL_REGS
     uint32_t unused8[13];
-#endif
     uint32_t CURRENT_CMD; // 0x2bc
-#ifndef MODEL_REGS
     uint32_t unused9[16];
-#endif
     uint32_t PMEVCNTR[4]; // 0x300
-#ifndef MODEL_REGS
     uint32_t unused10[28];
-#endif
     STRUCT pmevtyper0_r PMEVTYPER[4]; // 0x380
-#ifndef MODEL_REGS
     uint32_t unused11[28];
-#endif
     uint32_t SHARED_BUFFER[256]; // 0x400
     uint32_t IFM_PAD_TOP;        // 0x800
     uint32_t IFM_PAD_LEFT;       // 0x804
@@ -8048,25 +6088,17 @@ struct NPU_REG
     uint32_t IFM_PAD_BOTTOM;     // 0x80c
     uint32_t IFM_DEPTH_M1;       // 0x810
     uint32_t IFM_PRECISION;      // 0x814
-#ifndef MODEL_REGS
     uint32_t unused12[1];
-#endif
     uint32_t IFM_UPSCALE; // 0x81c
-#ifndef MODEL_REGS
     uint32_t unused13[1];
-#endif
     uint32_t IFM_ZERO_POINT; // 0x824
     uint32_t IFM_WIDTH0_M1;  // 0x828
     uint32_t IFM_HEIGHT0_M1; // 0x82c
     uint32_t IFM_HEIGHT1_M1; // 0x830
     uint32_t IFM_IB_END;     // 0x834
-#ifndef MODEL_REGS
     uint32_t unused14[1];
-#endif
     uint32_t IFM_REGION; // 0x83c
-#ifndef MODEL_REGS
     uint32_t unused15[1];
-#endif
     uint32_t OFM_WIDTH_M1;      // 0x844
     uint32_t OFM_HEIGHT_M1;     // 0x848
     uint32_t OFM_DEPTH_M1;      // 0x84c
@@ -8075,15 +6107,11 @@ struct NPU_REG
     uint32_t OFM_BLK_HEIGHT_M1; // 0x858
     uint32_t OFM_BLK_DEPTH_M1;  // 0x85c
     uint32_t OFM_ZERO_POINT;    // 0x860
-#ifndef MODEL_REGS
     uint32_t unused16[1];
-#endif
     uint32_t OFM_WIDTH0_M1;  // 0x868
     uint32_t OFM_HEIGHT0_M1; // 0x86c
     uint32_t OFM_HEIGHT1_M1; // 0x870
-#ifndef MODEL_REGS
     uint32_t unused17[2];
-#endif
     uint32_t OFM_REGION;       // 0x87c
     uint32_t KERNEL_WIDTH_M1;  // 0x880
     uint32_t KERNEL_HEIGHT_M1; // 0x884
@@ -8095,42 +6123,28 @@ struct NPU_REG
     uint32_t ACTIVATION_MAX;   // 0x89c
     uint32_t WEIGHT_REGION;    // 0x8a0
     uint32_t SCALE_REGION;     // 0x8a4
-#ifndef MODEL_REGS
     uint32_t unused18[3];
-#endif
     uint32_t AB_START; // 0x8b4
-#ifndef MODEL_REGS
     uint32_t unused19[1];
-#endif
     uint32_t BLOCKDEP;        // 0x8bc
     uint32_t DMA0_SRC_REGION; // 0x8c0
     uint32_t DMA0_DST_REGION; // 0x8c4
     uint32_t DMA0_SIZE0;      // 0x8c8
     uint32_t DMA0_SIZE1;      // 0x8cc
-#ifndef MODEL_REGS
     uint32_t unused20[12];
-#endif
     uint32_t IFM2_BROADCAST; // 0x900
     uint32_t IFM2_SCALAR;    // 0x904
-#ifndef MODEL_REGS
     uint32_t unused21[3];
-#endif
     uint32_t IFM2_PRECISION; // 0x914
-#ifndef MODEL_REGS
     uint32_t unused22[3];
-#endif
     uint32_t IFM2_ZERO_POINT; // 0x924
     uint32_t IFM2_WIDTH0_M1;  // 0x928
     uint32_t IFM2_HEIGHT0_M1; // 0x92c
     uint32_t IFM2_HEIGHT1_M1; // 0x930
     uint32_t IFM2_IB_START;   // 0x934
-#ifndef MODEL_REGS
     uint32_t unused23[1];
-#endif
     uint32_t IFM2_REGION; // 0x93c
-#ifndef MODEL_REGS
     uint32_t unused24[48];
-#endif
     uint32_t IFM_BASE0;       // 0xa00
     uint32_t IFM_BASE0_HI;    // 0xa04
     uint32_t IFM_BASE1;       // 0xa08
@@ -8145,9 +6159,7 @@ struct NPU_REG
     uint32_t IFM_STRIDE_Y_HI; // 0xa2c
     uint32_t IFM_STRIDE_C;    // 0xa30
     uint32_t IFM_STRIDE_C_HI; // 0xa34
-#ifndef MODEL_REGS
     uint32_t unused25[2];
-#endif
     uint32_t OFM_BASE0;       // 0xa40
     uint32_t OFM_BASE0_HI;    // 0xa44
     uint32_t OFM_BASE1;       // 0xa48
@@ -8162,9 +6174,7 @@ struct NPU_REG
     uint32_t OFM_STRIDE_Y_HI; // 0xa6c
     uint32_t OFM_STRIDE_C;    // 0xa70
     uint32_t OFM_STRIDE_C_HI; // 0xa74
-#ifndef MODEL_REGS
     uint32_t unused26[2];
-#endif
     uint32_t WEIGHT_BASE;      // 0xa80
     uint32_t WEIGHT_BASE_HI;   // 0xa84
     uint32_t WEIGHT_LENGTH;    // 0xa88
@@ -8172,17 +6182,13 @@ struct NPU_REG
     uint32_t SCALE_BASE;       // 0xa90
     uint32_t SCALE_BASE_HI;    // 0xa94
     uint32_t SCALE_LENGTH;     // 0xa98
-#ifndef MODEL_REGS
     uint32_t unused27[1];
-#endif
     uint32_t OFM_SCALE;       // 0xaa0
     uint32_t OFM_SCALE_SHIFT; // 0xaa4
     uint32_t OPA_SCALE;       // 0xaa8
     uint32_t OPA_SCALE_SHIFT; // 0xaac
     uint32_t OPB_SCALE;       // 0xab0
-#ifndef MODEL_REGS
     uint32_t unused28[3];
-#endif
     uint32_t DMA0_SRC;      // 0xac0
     uint32_t DMA0_SRC_HI;   // 0xac4
     uint32_t DMA0_DST;      // 0xac8
@@ -8193,9 +6199,7 @@ struct NPU_REG
     uint32_t DMA0_SKIP0_HI; // 0xadc
     uint32_t DMA0_SKIP1;    // 0xae0
     uint32_t DMA0_SKIP1_HI; // 0xae4
-#ifndef MODEL_REGS
     uint32_t unused29[6];
-#endif
     uint32_t IFM2_BASE0;       // 0xb00
     uint32_t IFM2_BASE0_HI;    // 0xb04
     uint32_t IFM2_BASE1;       // 0xb08
@@ -8210,9 +6214,7 @@ struct NPU_REG
     uint32_t IFM2_STRIDE_Y_HI; // 0xb2c
     uint32_t IFM2_STRIDE_C;    // 0xb30
     uint32_t IFM2_STRIDE_C_HI; // 0xb34
-#ifndef MODEL_REGS
     uint32_t unused30[2];
-#endif
     uint32_t WEIGHT1_BASE;      // 0xb40
     uint32_t WEIGHT1_BASE_HI;   // 0xb44
     uint32_t WEIGHT1_LENGTH;    // 0xb48
@@ -8220,13 +6222,9 @@ struct NPU_REG
     uint32_t SCALE1_BASE;       // 0xb50
     uint32_t SCALE1_BASE_HI;    // 0xb54
     uint32_t SCALE1_LENGTH;     // 0xb58
-#ifndef MODEL_REGS
     uint32_t unused31[281];
-#endif
     uint32_t REVISION; // 0xfc0
-#ifndef MODEL_REGS
     uint32_t unused32[3];
-#endif
     STRUCT pid4_r PID4; // 0xfd0
     STRUCT pid5_r PID5; // 0xfd4
     STRUCT pid6_r PID6; // 0xfd8
@@ -8246,7 +6244,7 @@ struct NPU_REG
     }
     void reset()
     {
-        ID                 = 169885697;
+        ID                 = 177225729;
         STATUS             = 8;
         CMD                = 0;
         RESET              = 0;
@@ -8474,2454 +6472,10 @@ struct NPU_REG
         for (size_t i = 0; i < (sizeof(SHARED_BUFFER) / sizeof(SHARED_BUFFER[0])); ++i)
             SHARED_BUFFER[i] = 0;
     }
-#ifdef MODEL_REGS
-    uint32_t get(size_t offset) const
-    {
-        switch (offset)
-        {
-        case 0:
-            return ID;
-        case 4:
-            return STATUS;
-        case 8:
-            return CMD;
-        case 12:
-            return RESET;
-        case 16:
-            return QBASE0;
-        case 20:
-            return QBASE1;
-        case 24:
-            return QREAD;
-        case 28:
-            return QCONFIG;
-        case 32:
-            return QSIZE;
-        case 36:
-            return PROT;
-        case 40:
-            return CONFIG;
-        case 44:
-            return LOCK;
-        case 60:
-            return REGIONCFG;
-        case 64:
-            return AXI_LIMIT0;
-        case 68:
-            return AXI_LIMIT1;
-        case 72:
-            return AXI_LIMIT2;
-        case 76:
-            return AXI_LIMIT3;
-        case 128:
-            return BASEP0;
-        case 132:
-            return BASEP1;
-        case 136:
-            return BASEP2;
-        case 140:
-            return BASEP3;
-        case 144:
-            return BASEP4;
-        case 148:
-            return BASEP5;
-        case 152:
-            return BASEP6;
-        case 156:
-            return BASEP7;
-        case 160:
-            return BASEP8;
-        case 164:
-            return BASEP9;
-        case 168:
-            return BASEP10;
-        case 172:
-            return BASEP11;
-        case 176:
-            return BASEP12;
-        case 180:
-            return BASEP13;
-        case 184:
-            return BASEP14;
-        case 188:
-            return BASEP15;
-        case 4032:
-            return REVISION;
-        case 4048:
-            return PID4;
-        case 4052:
-            return PID5;
-        case 4056:
-            return PID6;
-        case 4060:
-            return PID7;
-        case 4064:
-            return PID0;
-        case 4068:
-            return PID1;
-        case 4072:
-            return PID2;
-        case 4076:
-            return PID3;
-        case 4080:
-            return CID0;
-        case 4084:
-            return CID1;
-        case 4088:
-            return CID2;
-        case 4092:
-            return CID3;
-        case 256:
-            return WD_STATUS;
-        case 260:
-            return MAC_STATUS;
-        case 264:
-            return DMA_STATUS;
-        case 272:
-            return AO_STATUS;
-        case 320:
-            return CLKFORCE;
-        case 324:
-            return DEBUG;
-        case 328:
-            return DEBUG2;
-        case 332:
-            return DEBUGCORE;
-        case 512:
-            return KERNEL_X;
-        case 516:
-            return KERNEL_Y;
-        case 520:
-            return KERNEL_W_M1;
-        case 524:
-            return KERNEL_H_M1;
-        case 528:
-            return OFM_CBLK_WIDTH_M1;
-        case 532:
-            return OFM_CBLK_HEIGHT_M1;
-        case 536:
-            return OFM_CBLK_DEPTH_M1;
-        case 540:
-            return IFM_CBLK_DEPTH_M1;
-        case 544:
-            return OFM_X;
-        case 548:
-            return OFM_Y;
-        case 552:
-            return OFM_Z;
-        case 556:
-            return IFM_Z;
-        case 560:
-            return PAD_TOP;
-        case 564:
-            return PAD_LEFT;
-        case 568:
-            return IFM_CBLK_WIDTH;
-        case 572:
-            return IFM_CBLK_HEIGHT;
-        case 576:
-            return DMA_IFM_SRC;
-        case 580:
-            return DMA_IFM_SRC_HI;
-        case 584:
-            return DMA_IFM_DST;
-        case 588:
-            return DMA_OFM_SRC;
-        case 592:
-            return DMA_OFM_DST;
-        case 596:
-            return DMA_OFM_DST_HI;
-        case 600:
-            return DMA_WEIGHT_SRC;
-        case 604:
-            return DMA_WEIGHT_SRC_HI;
-        case 608:
-            return DMA_CMD_SRC;
-        case 612:
-            return DMA_CMD_SRC_HI;
-        case 616:
-            return DMA_CMD_SIZE;
-        case 620:
-            return DMA_M2M_SRC;
-        case 624:
-            return DMA_M2M_SRC_HI;
-        case 628:
-            return DMA_M2M_DST;
-        case 632:
-            return DMA_M2M_DST_HI;
-        case 636:
-            return CURRENT_QREAD;
-        case 640:
-            return DMA_SCALE_SRC;
-        case 644:
-            return DMA_SCALE_SRC_HI;
-        case 700:
-            return CURRENT_CMD;
-        case 2048:
-            return IFM_PAD_TOP;
-        case 2052:
-            return IFM_PAD_LEFT;
-        case 2056:
-            return IFM_PAD_RIGHT;
-        case 2060:
-            return IFM_PAD_BOTTOM;
-        case 2064:
-            return IFM_DEPTH_M1;
-        case 2068:
-            return IFM_PRECISION;
-        case 2076:
-            return IFM_UPSCALE;
-        case 2084:
-            return IFM_ZERO_POINT;
-        case 2088:
-            return IFM_WIDTH0_M1;
-        case 2092:
-            return IFM_HEIGHT0_M1;
-        case 2096:
-            return IFM_HEIGHT1_M1;
-        case 2100:
-            return IFM_IB_END;
-        case 2108:
-            return IFM_REGION;
-        case 2116:
-            return OFM_WIDTH_M1;
-        case 2120:
-            return OFM_HEIGHT_M1;
-        case 2124:
-            return OFM_DEPTH_M1;
-        case 2128:
-            return OFM_PRECISION;
-        case 2132:
-            return OFM_BLK_WIDTH_M1;
-        case 2136:
-            return OFM_BLK_HEIGHT_M1;
-        case 2140:
-            return OFM_BLK_DEPTH_M1;
-        case 2144:
-            return OFM_ZERO_POINT;
-        case 2152:
-            return OFM_WIDTH0_M1;
-        case 2156:
-            return OFM_HEIGHT0_M1;
-        case 2160:
-            return OFM_HEIGHT1_M1;
-        case 2172:
-            return OFM_REGION;
-        case 2176:
-            return KERNEL_WIDTH_M1;
-        case 2180:
-            return KERNEL_HEIGHT_M1;
-        case 2184:
-            return KERNEL_STRIDE;
-        case 2188:
-            return PARALLEL_MODE;
-        case 2192:
-            return ACC_FORMAT;
-        case 2196:
-            return ACTIVATION;
-        case 2200:
-            return ACTIVATION_MIN;
-        case 2204:
-            return ACTIVATION_MAX;
-        case 2208:
-            return WEIGHT_REGION;
-        case 2212:
-            return SCALE_REGION;
-        case 2228:
-            return AB_START;
-        case 2236:
-            return BLOCKDEP;
-        case 2240:
-            return DMA0_SRC_REGION;
-        case 2244:
-            return DMA0_DST_REGION;
-        case 2248:
-            return DMA0_SIZE0;
-        case 2252:
-            return DMA0_SIZE1;
-        case 2304:
-            return IFM2_BROADCAST;
-        case 2308:
-            return IFM2_SCALAR;
-        case 2324:
-            return IFM2_PRECISION;
-        case 2340:
-            return IFM2_ZERO_POINT;
-        case 2344:
-            return IFM2_WIDTH0_M1;
-        case 2348:
-            return IFM2_HEIGHT0_M1;
-        case 2352:
-            return IFM2_HEIGHT1_M1;
-        case 2356:
-            return IFM2_IB_START;
-        case 2364:
-            return IFM2_REGION;
-        case 2560:
-            return IFM_BASE0;
-        case 2564:
-            return IFM_BASE0_HI;
-        case 2568:
-            return IFM_BASE1;
-        case 2572:
-            return IFM_BASE1_HI;
-        case 2576:
-            return IFM_BASE2;
-        case 2580:
-            return IFM_BASE2_HI;
-        case 2584:
-            return IFM_BASE3;
-        case 2588:
-            return IFM_BASE3_HI;
-        case 2592:
-            return IFM_STRIDE_X;
-        case 2596:
-            return IFM_STRIDE_X_HI;
-        case 2600:
-            return IFM_STRIDE_Y;
-        case 2604:
-            return IFM_STRIDE_Y_HI;
-        case 2608:
-            return IFM_STRIDE_C;
-        case 2612:
-            return IFM_STRIDE_C_HI;
-        case 2624:
-            return OFM_BASE0;
-        case 2628:
-            return OFM_BASE0_HI;
-        case 2632:
-            return OFM_BASE1;
-        case 2636:
-            return OFM_BASE1_HI;
-        case 2640:
-            return OFM_BASE2;
-        case 2644:
-            return OFM_BASE2_HI;
-        case 2648:
-            return OFM_BASE3;
-        case 2652:
-            return OFM_BASE3_HI;
-        case 2656:
-            return OFM_STRIDE_X;
-        case 2660:
-            return OFM_STRIDE_X_HI;
-        case 2664:
-            return OFM_STRIDE_Y;
-        case 2668:
-            return OFM_STRIDE_Y_HI;
-        case 2672:
-            return OFM_STRIDE_C;
-        case 2676:
-            return OFM_STRIDE_C_HI;
-        case 2688:
-            return WEIGHT_BASE;
-        case 2692:
-            return WEIGHT_BASE_HI;
-        case 2696:
-            return WEIGHT_LENGTH;
-        case 2700:
-            return WEIGHT_LENGTH_HI;
-        case 2704:
-            return SCALE_BASE;
-        case 2708:
-            return SCALE_BASE_HI;
-        case 2712:
-            return SCALE_LENGTH;
-        case 2720:
-            return OFM_SCALE;
-        case 2724:
-            return OFM_SCALE_SHIFT;
-        case 2728:
-            return OPA_SCALE;
-        case 2732:
-            return OPA_SCALE_SHIFT;
-        case 2736:
-            return OPB_SCALE;
-        case 2752:
-            return DMA0_SRC;
-        case 2756:
-            return DMA0_SRC_HI;
-        case 2760:
-            return DMA0_DST;
-        case 2764:
-            return DMA0_DST_HI;
-        case 2768:
-            return DMA0_LEN;
-        case 2772:
-            return DMA0_LEN_HI;
-        case 2776:
-            return DMA0_SKIP0;
-        case 2780:
-            return DMA0_SKIP0_HI;
-        case 2784:
-            return DMA0_SKIP1;
-        case 2788:
-            return DMA0_SKIP1_HI;
-        case 2816:
-            return IFM2_BASE0;
-        case 2820:
-            return IFM2_BASE0_HI;
-        case 2824:
-            return IFM2_BASE1;
-        case 2828:
-            return IFM2_BASE1_HI;
-        case 2832:
-            return IFM2_BASE2;
-        case 2836:
-            return IFM2_BASE2_HI;
-        case 2840:
-            return IFM2_BASE3;
-        case 2844:
-            return IFM2_BASE3_HI;
-        case 2848:
-            return IFM2_STRIDE_X;
-        case 2852:
-            return IFM2_STRIDE_X_HI;
-        case 2856:
-            return IFM2_STRIDE_Y;
-        case 2860:
-            return IFM2_STRIDE_Y_HI;
-        case 2864:
-            return IFM2_STRIDE_C;
-        case 2868:
-            return IFM2_STRIDE_C_HI;
-        case 2880:
-            return WEIGHT1_BASE;
-        case 2884:
-            return WEIGHT1_BASE_HI;
-        case 2888:
-            return WEIGHT1_LENGTH;
-        case 2892:
-            return WEIGHT1_LENGTH_HI;
-        case 2896:
-            return SCALE1_BASE;
-        case 2900:
-            return SCALE1_BASE_HI;
-        case 2904:
-            return SCALE1_LENGTH;
-        case 384:
-            return PMCR;
-        case 388:
-            return PMCNTENSET;
-        case 392:
-            return PMCNTENCLR;
-        case 396:
-            return PMOVSSET;
-        case 400:
-            return PMOVSCLR;
-        case 404:
-            return PMINTSET;
-        case 408:
-            return PMINTCLR;
-        case 416:
-            return PMCCNTR_LO;
-        case 420:
-            return PMCCNTR_HI;
-        case 424:
-            return PMCCNTR_CFG;
-        case 428:
-            return PMCAXI_CHAN;
-        case 768:
-            return PMEVCNTR[0];
-        case 772:
-            return PMEVCNTR[1];
-        case 776:
-            return PMEVCNTR[2];
-        case 780:
-            return PMEVCNTR[3];
-        case 896:
-            return PMEVTYPER[0];
-        case 900:
-            return PMEVTYPER[1];
-        case 904:
-            return PMEVTYPER[2];
-        case 908:
-            return PMEVTYPER[3];
-        case 1024:
-            return SHARED_BUFFER[0];
-        case 1028:
-            return SHARED_BUFFER[1];
-        case 1032:
-            return SHARED_BUFFER[2];
-        case 1036:
-            return SHARED_BUFFER[3];
-        case 1040:
-            return SHARED_BUFFER[4];
-        case 1044:
-            return SHARED_BUFFER[5];
-        case 1048:
-            return SHARED_BUFFER[6];
-        case 1052:
-            return SHARED_BUFFER[7];
-        case 1056:
-            return SHARED_BUFFER[8];
-        case 1060:
-            return SHARED_BUFFER[9];
-        case 1064:
-            return SHARED_BUFFER[10];
-        case 1068:
-            return SHARED_BUFFER[11];
-        case 1072:
-            return SHARED_BUFFER[12];
-        case 1076:
-            return SHARED_BUFFER[13];
-        case 1080:
-            return SHARED_BUFFER[14];
-        case 1084:
-            return SHARED_BUFFER[15];
-        case 1088:
-            return SHARED_BUFFER[16];
-        case 1092:
-            return SHARED_BUFFER[17];
-        case 1096:
-            return SHARED_BUFFER[18];
-        case 1100:
-            return SHARED_BUFFER[19];
-        case 1104:
-            return SHARED_BUFFER[20];
-        case 1108:
-            return SHARED_BUFFER[21];
-        case 1112:
-            return SHARED_BUFFER[22];
-        case 1116:
-            return SHARED_BUFFER[23];
-        case 1120:
-            return SHARED_BUFFER[24];
-        case 1124:
-            return SHARED_BUFFER[25];
-        case 1128:
-            return SHARED_BUFFER[26];
-        case 1132:
-            return SHARED_BUFFER[27];
-        case 1136:
-            return SHARED_BUFFER[28];
-        case 1140:
-            return SHARED_BUFFER[29];
-        case 1144:
-            return SHARED_BUFFER[30];
-        case 1148:
-            return SHARED_BUFFER[31];
-        case 1152:
-            return SHARED_BUFFER[32];
-        case 1156:
-            return SHARED_BUFFER[33];
-        case 1160:
-            return SHARED_BUFFER[34];
-        case 1164:
-            return SHARED_BUFFER[35];
-        case 1168:
-            return SHARED_BUFFER[36];
-        case 1172:
-            return SHARED_BUFFER[37];
-        case 1176:
-            return SHARED_BUFFER[38];
-        case 1180:
-            return SHARED_BUFFER[39];
-        case 1184:
-            return SHARED_BUFFER[40];
-        case 1188:
-            return SHARED_BUFFER[41];
-        case 1192:
-            return SHARED_BUFFER[42];
-        case 1196:
-            return SHARED_BUFFER[43];
-        case 1200:
-            return SHARED_BUFFER[44];
-        case 1204:
-            return SHARED_BUFFER[45];
-        case 1208:
-            return SHARED_BUFFER[46];
-        case 1212:
-            return SHARED_BUFFER[47];
-        case 1216:
-            return SHARED_BUFFER[48];
-        case 1220:
-            return SHARED_BUFFER[49];
-        case 1224:
-            return SHARED_BUFFER[50];
-        case 1228:
-            return SHARED_BUFFER[51];
-        case 1232:
-            return SHARED_BUFFER[52];
-        case 1236:
-            return SHARED_BUFFER[53];
-        case 1240:
-            return SHARED_BUFFER[54];
-        case 1244:
-            return SHARED_BUFFER[55];
-        case 1248:
-            return SHARED_BUFFER[56];
-        case 1252:
-            return SHARED_BUFFER[57];
-        case 1256:
-            return SHARED_BUFFER[58];
-        case 1260:
-            return SHARED_BUFFER[59];
-        case 1264:
-            return SHARED_BUFFER[60];
-        case 1268:
-            return SHARED_BUFFER[61];
-        case 1272:
-            return SHARED_BUFFER[62];
-        case 1276:
-            return SHARED_BUFFER[63];
-        case 1280:
-            return SHARED_BUFFER[64];
-        case 1284:
-            return SHARED_BUFFER[65];
-        case 1288:
-            return SHARED_BUFFER[66];
-        case 1292:
-            return SHARED_BUFFER[67];
-        case 1296:
-            return SHARED_BUFFER[68];
-        case 1300:
-            return SHARED_BUFFER[69];
-        case 1304:
-            return SHARED_BUFFER[70];
-        case 1308:
-            return SHARED_BUFFER[71];
-        case 1312:
-            return SHARED_BUFFER[72];
-        case 1316:
-            return SHARED_BUFFER[73];
-        case 1320:
-            return SHARED_BUFFER[74];
-        case 1324:
-            return SHARED_BUFFER[75];
-        case 1328:
-            return SHARED_BUFFER[76];
-        case 1332:
-            return SHARED_BUFFER[77];
-        case 1336:
-            return SHARED_BUFFER[78];
-        case 1340:
-            return SHARED_BUFFER[79];
-        case 1344:
-            return SHARED_BUFFER[80];
-        case 1348:
-            return SHARED_BUFFER[81];
-        case 1352:
-            return SHARED_BUFFER[82];
-        case 1356:
-            return SHARED_BUFFER[83];
-        case 1360:
-            return SHARED_BUFFER[84];
-        case 1364:
-            return SHARED_BUFFER[85];
-        case 1368:
-            return SHARED_BUFFER[86];
-        case 1372:
-            return SHARED_BUFFER[87];
-        case 1376:
-            return SHARED_BUFFER[88];
-        case 1380:
-            return SHARED_BUFFER[89];
-        case 1384:
-            return SHARED_BUFFER[90];
-        case 1388:
-            return SHARED_BUFFER[91];
-        case 1392:
-            return SHARED_BUFFER[92];
-        case 1396:
-            return SHARED_BUFFER[93];
-        case 1400:
-            return SHARED_BUFFER[94];
-        case 1404:
-            return SHARED_BUFFER[95];
-        case 1408:
-            return SHARED_BUFFER[96];
-        case 1412:
-            return SHARED_BUFFER[97];
-        case 1416:
-            return SHARED_BUFFER[98];
-        case 1420:
-            return SHARED_BUFFER[99];
-        case 1424:
-            return SHARED_BUFFER[100];
-        case 1428:
-            return SHARED_BUFFER[101];
-        case 1432:
-            return SHARED_BUFFER[102];
-        case 1436:
-            return SHARED_BUFFER[103];
-        case 1440:
-            return SHARED_BUFFER[104];
-        case 1444:
-            return SHARED_BUFFER[105];
-        case 1448:
-            return SHARED_BUFFER[106];
-        case 1452:
-            return SHARED_BUFFER[107];
-        case 1456:
-            return SHARED_BUFFER[108];
-        case 1460:
-            return SHARED_BUFFER[109];
-        case 1464:
-            return SHARED_BUFFER[110];
-        case 1468:
-            return SHARED_BUFFER[111];
-        case 1472:
-            return SHARED_BUFFER[112];
-        case 1476:
-            return SHARED_BUFFER[113];
-        case 1480:
-            return SHARED_BUFFER[114];
-        case 1484:
-            return SHARED_BUFFER[115];
-        case 1488:
-            return SHARED_BUFFER[116];
-        case 1492:
-            return SHARED_BUFFER[117];
-        case 1496:
-            return SHARED_BUFFER[118];
-        case 1500:
-            return SHARED_BUFFER[119];
-        case 1504:
-            return SHARED_BUFFER[120];
-        case 1508:
-            return SHARED_BUFFER[121];
-        case 1512:
-            return SHARED_BUFFER[122];
-        case 1516:
-            return SHARED_BUFFER[123];
-        case 1520:
-            return SHARED_BUFFER[124];
-        case 1524:
-            return SHARED_BUFFER[125];
-        case 1528:
-            return SHARED_BUFFER[126];
-        case 1532:
-            return SHARED_BUFFER[127];
-        case 1536:
-            return SHARED_BUFFER[128];
-        case 1540:
-            return SHARED_BUFFER[129];
-        case 1544:
-            return SHARED_BUFFER[130];
-        case 1548:
-            return SHARED_BUFFER[131];
-        case 1552:
-            return SHARED_BUFFER[132];
-        case 1556:
-            return SHARED_BUFFER[133];
-        case 1560:
-            return SHARED_BUFFER[134];
-        case 1564:
-            return SHARED_BUFFER[135];
-        case 1568:
-            return SHARED_BUFFER[136];
-        case 1572:
-            return SHARED_BUFFER[137];
-        case 1576:
-            return SHARED_BUFFER[138];
-        case 1580:
-            return SHARED_BUFFER[139];
-        case 1584:
-            return SHARED_BUFFER[140];
-        case 1588:
-            return SHARED_BUFFER[141];
-        case 1592:
-            return SHARED_BUFFER[142];
-        case 1596:
-            return SHARED_BUFFER[143];
-        case 1600:
-            return SHARED_BUFFER[144];
-        case 1604:
-            return SHARED_BUFFER[145];
-        case 1608:
-            return SHARED_BUFFER[146];
-        case 1612:
-            return SHARED_BUFFER[147];
-        case 1616:
-            return SHARED_BUFFER[148];
-        case 1620:
-            return SHARED_BUFFER[149];
-        case 1624:
-            return SHARED_BUFFER[150];
-        case 1628:
-            return SHARED_BUFFER[151];
-        case 1632:
-            return SHARED_BUFFER[152];
-        case 1636:
-            return SHARED_BUFFER[153];
-        case 1640:
-            return SHARED_BUFFER[154];
-        case 1644:
-            return SHARED_BUFFER[155];
-        case 1648:
-            return SHARED_BUFFER[156];
-        case 1652:
-            return SHARED_BUFFER[157];
-        case 1656:
-            return SHARED_BUFFER[158];
-        case 1660:
-            return SHARED_BUFFER[159];
-        case 1664:
-            return SHARED_BUFFER[160];
-        case 1668:
-            return SHARED_BUFFER[161];
-        case 1672:
-            return SHARED_BUFFER[162];
-        case 1676:
-            return SHARED_BUFFER[163];
-        case 1680:
-            return SHARED_BUFFER[164];
-        case 1684:
-            return SHARED_BUFFER[165];
-        case 1688:
-            return SHARED_BUFFER[166];
-        case 1692:
-            return SHARED_BUFFER[167];
-        case 1696:
-            return SHARED_BUFFER[168];
-        case 1700:
-            return SHARED_BUFFER[169];
-        case 1704:
-            return SHARED_BUFFER[170];
-        case 1708:
-            return SHARED_BUFFER[171];
-        case 1712:
-            return SHARED_BUFFER[172];
-        case 1716:
-            return SHARED_BUFFER[173];
-        case 1720:
-            return SHARED_BUFFER[174];
-        case 1724:
-            return SHARED_BUFFER[175];
-        case 1728:
-            return SHARED_BUFFER[176];
-        case 1732:
-            return SHARED_BUFFER[177];
-        case 1736:
-            return SHARED_BUFFER[178];
-        case 1740:
-            return SHARED_BUFFER[179];
-        case 1744:
-            return SHARED_BUFFER[180];
-        case 1748:
-            return SHARED_BUFFER[181];
-        case 1752:
-            return SHARED_BUFFER[182];
-        case 1756:
-            return SHARED_BUFFER[183];
-        case 1760:
-            return SHARED_BUFFER[184];
-        case 1764:
-            return SHARED_BUFFER[185];
-        case 1768:
-            return SHARED_BUFFER[186];
-        case 1772:
-            return SHARED_BUFFER[187];
-        case 1776:
-            return SHARED_BUFFER[188];
-        case 1780:
-            return SHARED_BUFFER[189];
-        case 1784:
-            return SHARED_BUFFER[190];
-        case 1788:
-            return SHARED_BUFFER[191];
-        case 1792:
-            return SHARED_BUFFER[192];
-        case 1796:
-            return SHARED_BUFFER[193];
-        case 1800:
-            return SHARED_BUFFER[194];
-        case 1804:
-            return SHARED_BUFFER[195];
-        case 1808:
-            return SHARED_BUFFER[196];
-        case 1812:
-            return SHARED_BUFFER[197];
-        case 1816:
-            return SHARED_BUFFER[198];
-        case 1820:
-            return SHARED_BUFFER[199];
-        case 1824:
-            return SHARED_BUFFER[200];
-        case 1828:
-            return SHARED_BUFFER[201];
-        case 1832:
-            return SHARED_BUFFER[202];
-        case 1836:
-            return SHARED_BUFFER[203];
-        case 1840:
-            return SHARED_BUFFER[204];
-        case 1844:
-            return SHARED_BUFFER[205];
-        case 1848:
-            return SHARED_BUFFER[206];
-        case 1852:
-            return SHARED_BUFFER[207];
-        case 1856:
-            return SHARED_BUFFER[208];
-        case 1860:
-            return SHARED_BUFFER[209];
-        case 1864:
-            return SHARED_BUFFER[210];
-        case 1868:
-            return SHARED_BUFFER[211];
-        case 1872:
-            return SHARED_BUFFER[212];
-        case 1876:
-            return SHARED_BUFFER[213];
-        case 1880:
-            return SHARED_BUFFER[214];
-        case 1884:
-            return SHARED_BUFFER[215];
-        case 1888:
-            return SHARED_BUFFER[216];
-        case 1892:
-            return SHARED_BUFFER[217];
-        case 1896:
-            return SHARED_BUFFER[218];
-        case 1900:
-            return SHARED_BUFFER[219];
-        case 1904:
-            return SHARED_BUFFER[220];
-        case 1908:
-            return SHARED_BUFFER[221];
-        case 1912:
-            return SHARED_BUFFER[222];
-        case 1916:
-            return SHARED_BUFFER[223];
-        case 1920:
-            return SHARED_BUFFER[224];
-        case 1924:
-            return SHARED_BUFFER[225];
-        case 1928:
-            return SHARED_BUFFER[226];
-        case 1932:
-            return SHARED_BUFFER[227];
-        case 1936:
-            return SHARED_BUFFER[228];
-        case 1940:
-            return SHARED_BUFFER[229];
-        case 1944:
-            return SHARED_BUFFER[230];
-        case 1948:
-            return SHARED_BUFFER[231];
-        case 1952:
-            return SHARED_BUFFER[232];
-        case 1956:
-            return SHARED_BUFFER[233];
-        case 1960:
-            return SHARED_BUFFER[234];
-        case 1964:
-            return SHARED_BUFFER[235];
-        case 1968:
-            return SHARED_BUFFER[236];
-        case 1972:
-            return SHARED_BUFFER[237];
-        case 1976:
-            return SHARED_BUFFER[238];
-        case 1980:
-            return SHARED_BUFFER[239];
-        case 1984:
-            return SHARED_BUFFER[240];
-        case 1988:
-            return SHARED_BUFFER[241];
-        case 1992:
-            return SHARED_BUFFER[242];
-        case 1996:
-            return SHARED_BUFFER[243];
-        case 2000:
-            return SHARED_BUFFER[244];
-        case 2004:
-            return SHARED_BUFFER[245];
-        case 2008:
-            return SHARED_BUFFER[246];
-        case 2012:
-            return SHARED_BUFFER[247];
-        case 2016:
-            return SHARED_BUFFER[248];
-        case 2020:
-            return SHARED_BUFFER[249];
-        case 2024:
-            return SHARED_BUFFER[250];
-        case 2028:
-            return SHARED_BUFFER[251];
-        case 2032:
-            return SHARED_BUFFER[252];
-        case 2036:
-            return SHARED_BUFFER[253];
-        case 2040:
-            return SHARED_BUFFER[254];
-        case 2044:
-            return SHARED_BUFFER[255];
-        default:
-            throw std::runtime_error("invalid register address");
-        }
-    }
-    void set(size_t offset, uint32_t value)
-    {
-        switch (offset)
-        {
-        case 0:
-            ID = value;
-            return;
-        case 4:
-            STATUS = value;
-            return;
-        case 8:
-            CMD = value;
-            return;
-        case 12:
-            RESET = value;
-            return;
-        case 16:
-            QBASE0 = value;
-            return;
-        case 20:
-            QBASE1 = value;
-            return;
-        case 24:
-            QREAD = value;
-            return;
-        case 28:
-            QCONFIG = value;
-            return;
-        case 32:
-            QSIZE = value;
-            return;
-        case 36:
-            PROT = value;
-            return;
-        case 40:
-            CONFIG = value;
-            return;
-        case 44:
-            LOCK = value;
-            return;
-        case 60:
-            REGIONCFG = value;
-            return;
-        case 64:
-            AXI_LIMIT0 = value;
-            return;
-        case 68:
-            AXI_LIMIT1 = value;
-            return;
-        case 72:
-            AXI_LIMIT2 = value;
-            return;
-        case 76:
-            AXI_LIMIT3 = value;
-            return;
-        case 128:
-            BASEP0 = value;
-            return;
-        case 132:
-            BASEP1 = value;
-            return;
-        case 136:
-            BASEP2 = value;
-            return;
-        case 140:
-            BASEP3 = value;
-            return;
-        case 144:
-            BASEP4 = value;
-            return;
-        case 148:
-            BASEP5 = value;
-            return;
-        case 152:
-            BASEP6 = value;
-            return;
-        case 156:
-            BASEP7 = value;
-            return;
-        case 160:
-            BASEP8 = value;
-            return;
-        case 164:
-            BASEP9 = value;
-            return;
-        case 168:
-            BASEP10 = value;
-            return;
-        case 172:
-            BASEP11 = value;
-            return;
-        case 176:
-            BASEP12 = value;
-            return;
-        case 180:
-            BASEP13 = value;
-            return;
-        case 184:
-            BASEP14 = value;
-            return;
-        case 188:
-            BASEP15 = value;
-            return;
-        case 4032:
-            REVISION = value;
-            return;
-        case 4048:
-            PID4 = value;
-            return;
-        case 4052:
-            PID5 = value;
-            return;
-        case 4056:
-            PID6 = value;
-            return;
-        case 4060:
-            PID7 = value;
-            return;
-        case 4064:
-            PID0 = value;
-            return;
-        case 4068:
-            PID1 = value;
-            return;
-        case 4072:
-            PID2 = value;
-            return;
-        case 4076:
-            PID3 = value;
-            return;
-        case 4080:
-            CID0 = value;
-            return;
-        case 4084:
-            CID1 = value;
-            return;
-        case 4088:
-            CID2 = value;
-            return;
-        case 4092:
-            CID3 = value;
-            return;
-        case 256:
-            WD_STATUS = value;
-            return;
-        case 260:
-            MAC_STATUS = value;
-            return;
-        case 264:
-            DMA_STATUS = value;
-            return;
-        case 272:
-            AO_STATUS = value;
-            return;
-        case 320:
-            CLKFORCE = value;
-            return;
-        case 324:
-            DEBUG = value;
-            return;
-        case 328:
-            DEBUG2 = value;
-            return;
-        case 332:
-            DEBUGCORE = value;
-            return;
-        case 512:
-            KERNEL_X = value;
-            return;
-        case 516:
-            KERNEL_Y = value;
-            return;
-        case 520:
-            KERNEL_W_M1 = value;
-            return;
-        case 524:
-            KERNEL_H_M1 = value;
-            return;
-        case 528:
-            OFM_CBLK_WIDTH_M1 = value;
-            return;
-        case 532:
-            OFM_CBLK_HEIGHT_M1 = value;
-            return;
-        case 536:
-            OFM_CBLK_DEPTH_M1 = value;
-            return;
-        case 540:
-            IFM_CBLK_DEPTH_M1 = value;
-            return;
-        case 544:
-            OFM_X = value;
-            return;
-        case 548:
-            OFM_Y = value;
-            return;
-        case 552:
-            OFM_Z = value;
-            return;
-        case 556:
-            IFM_Z = value;
-            return;
-        case 560:
-            PAD_TOP = value;
-            return;
-        case 564:
-            PAD_LEFT = value;
-            return;
-        case 568:
-            IFM_CBLK_WIDTH = value;
-            return;
-        case 572:
-            IFM_CBLK_HEIGHT = value;
-            return;
-        case 576:
-            DMA_IFM_SRC = value;
-            return;
-        case 580:
-            DMA_IFM_SRC_HI = value;
-            return;
-        case 584:
-            DMA_IFM_DST = value;
-            return;
-        case 588:
-            DMA_OFM_SRC = value;
-            return;
-        case 592:
-            DMA_OFM_DST = value;
-            return;
-        case 596:
-            DMA_OFM_DST_HI = value;
-            return;
-        case 600:
-            DMA_WEIGHT_SRC = value;
-            return;
-        case 604:
-            DMA_WEIGHT_SRC_HI = value;
-            return;
-        case 608:
-            DMA_CMD_SRC = value;
-            return;
-        case 612:
-            DMA_CMD_SRC_HI = value;
-            return;
-        case 616:
-            DMA_CMD_SIZE = value;
-            return;
-        case 620:
-            DMA_M2M_SRC = value;
-            return;
-        case 624:
-            DMA_M2M_SRC_HI = value;
-            return;
-        case 628:
-            DMA_M2M_DST = value;
-            return;
-        case 632:
-            DMA_M2M_DST_HI = value;
-            return;
-        case 636:
-            CURRENT_QREAD = value;
-            return;
-        case 640:
-            DMA_SCALE_SRC = value;
-            return;
-        case 644:
-            DMA_SCALE_SRC_HI = value;
-            return;
-        case 700:
-            CURRENT_CMD = value;
-            return;
-        case 2048:
-            IFM_PAD_TOP = value;
-            return;
-        case 2052:
-            IFM_PAD_LEFT = value;
-            return;
-        case 2056:
-            IFM_PAD_RIGHT = value;
-            return;
-        case 2060:
-            IFM_PAD_BOTTOM = value;
-            return;
-        case 2064:
-            IFM_DEPTH_M1 = value;
-            return;
-        case 2068:
-            IFM_PRECISION = value;
-            return;
-        case 2076:
-            IFM_UPSCALE = value;
-            return;
-        case 2084:
-            IFM_ZERO_POINT = value;
-            return;
-        case 2088:
-            IFM_WIDTH0_M1 = value;
-            return;
-        case 2092:
-            IFM_HEIGHT0_M1 = value;
-            return;
-        case 2096:
-            IFM_HEIGHT1_M1 = value;
-            return;
-        case 2100:
-            IFM_IB_END = value;
-            return;
-        case 2108:
-            IFM_REGION = value;
-            return;
-        case 2116:
-            OFM_WIDTH_M1 = value;
-            return;
-        case 2120:
-            OFM_HEIGHT_M1 = value;
-            return;
-        case 2124:
-            OFM_DEPTH_M1 = value;
-            return;
-        case 2128:
-            OFM_PRECISION = value;
-            return;
-        case 2132:
-            OFM_BLK_WIDTH_M1 = value;
-            return;
-        case 2136:
-            OFM_BLK_HEIGHT_M1 = value;
-            return;
-        case 2140:
-            OFM_BLK_DEPTH_M1 = value;
-            return;
-        case 2144:
-            OFM_ZERO_POINT = value;
-            return;
-        case 2152:
-            OFM_WIDTH0_M1 = value;
-            return;
-        case 2156:
-            OFM_HEIGHT0_M1 = value;
-            return;
-        case 2160:
-            OFM_HEIGHT1_M1 = value;
-            return;
-        case 2172:
-            OFM_REGION = value;
-            return;
-        case 2176:
-            KERNEL_WIDTH_M1 = value;
-            return;
-        case 2180:
-            KERNEL_HEIGHT_M1 = value;
-            return;
-        case 2184:
-            KERNEL_STRIDE = value;
-            return;
-        case 2188:
-            PARALLEL_MODE = value;
-            return;
-        case 2192:
-            ACC_FORMAT = value;
-            return;
-        case 2196:
-            ACTIVATION = value;
-            return;
-        case 2200:
-            ACTIVATION_MIN = value;
-            return;
-        case 2204:
-            ACTIVATION_MAX = value;
-            return;
-        case 2208:
-            WEIGHT_REGION = value;
-            return;
-        case 2212:
-            SCALE_REGION = value;
-            return;
-        case 2228:
-            AB_START = value;
-            return;
-        case 2236:
-            BLOCKDEP = value;
-            return;
-        case 2240:
-            DMA0_SRC_REGION = value;
-            return;
-        case 2244:
-            DMA0_DST_REGION = value;
-            return;
-        case 2248:
-            DMA0_SIZE0 = value;
-            return;
-        case 2252:
-            DMA0_SIZE1 = value;
-            return;
-        case 2304:
-            IFM2_BROADCAST = value;
-            return;
-        case 2308:
-            IFM2_SCALAR = value;
-            return;
-        case 2324:
-            IFM2_PRECISION = value;
-            return;
-        case 2340:
-            IFM2_ZERO_POINT = value;
-            return;
-        case 2344:
-            IFM2_WIDTH0_M1 = value;
-            return;
-        case 2348:
-            IFM2_HEIGHT0_M1 = value;
-            return;
-        case 2352:
-            IFM2_HEIGHT1_M1 = value;
-            return;
-        case 2356:
-            IFM2_IB_START = value;
-            return;
-        case 2364:
-            IFM2_REGION = value;
-            return;
-        case 2560:
-            IFM_BASE0 = value;
-            return;
-        case 2564:
-            IFM_BASE0_HI = value;
-            return;
-        case 2568:
-            IFM_BASE1 = value;
-            return;
-        case 2572:
-            IFM_BASE1_HI = value;
-            return;
-        case 2576:
-            IFM_BASE2 = value;
-            return;
-        case 2580:
-            IFM_BASE2_HI = value;
-            return;
-        case 2584:
-            IFM_BASE3 = value;
-            return;
-        case 2588:
-            IFM_BASE3_HI = value;
-            return;
-        case 2592:
-            IFM_STRIDE_X = value;
-            return;
-        case 2596:
-            IFM_STRIDE_X_HI = value;
-            return;
-        case 2600:
-            IFM_STRIDE_Y = value;
-            return;
-        case 2604:
-            IFM_STRIDE_Y_HI = value;
-            return;
-        case 2608:
-            IFM_STRIDE_C = value;
-            return;
-        case 2612:
-            IFM_STRIDE_C_HI = value;
-            return;
-        case 2624:
-            OFM_BASE0 = value;
-            return;
-        case 2628:
-            OFM_BASE0_HI = value;
-            return;
-        case 2632:
-            OFM_BASE1 = value;
-            return;
-        case 2636:
-            OFM_BASE1_HI = value;
-            return;
-        case 2640:
-            OFM_BASE2 = value;
-            return;
-        case 2644:
-            OFM_BASE2_HI = value;
-            return;
-        case 2648:
-            OFM_BASE3 = value;
-            return;
-        case 2652:
-            OFM_BASE3_HI = value;
-            return;
-        case 2656:
-            OFM_STRIDE_X = value;
-            return;
-        case 2660:
-            OFM_STRIDE_X_HI = value;
-            return;
-        case 2664:
-            OFM_STRIDE_Y = value;
-            return;
-        case 2668:
-            OFM_STRIDE_Y_HI = value;
-            return;
-        case 2672:
-            OFM_STRIDE_C = value;
-            return;
-        case 2676:
-            OFM_STRIDE_C_HI = value;
-            return;
-        case 2688:
-            WEIGHT_BASE = value;
-            return;
-        case 2692:
-            WEIGHT_BASE_HI = value;
-            return;
-        case 2696:
-            WEIGHT_LENGTH = value;
-            return;
-        case 2700:
-            WEIGHT_LENGTH_HI = value;
-            return;
-        case 2704:
-            SCALE_BASE = value;
-            return;
-        case 2708:
-            SCALE_BASE_HI = value;
-            return;
-        case 2712:
-            SCALE_LENGTH = value;
-            return;
-        case 2720:
-            OFM_SCALE = value;
-            return;
-        case 2724:
-            OFM_SCALE_SHIFT = value;
-            return;
-        case 2728:
-            OPA_SCALE = value;
-            return;
-        case 2732:
-            OPA_SCALE_SHIFT = value;
-            return;
-        case 2736:
-            OPB_SCALE = value;
-            return;
-        case 2752:
-            DMA0_SRC = value;
-            return;
-        case 2756:
-            DMA0_SRC_HI = value;
-            return;
-        case 2760:
-            DMA0_DST = value;
-            return;
-        case 2764:
-            DMA0_DST_HI = value;
-            return;
-        case 2768:
-            DMA0_LEN = value;
-            return;
-        case 2772:
-            DMA0_LEN_HI = value;
-            return;
-        case 2776:
-            DMA0_SKIP0 = value;
-            return;
-        case 2780:
-            DMA0_SKIP0_HI = value;
-            return;
-        case 2784:
-            DMA0_SKIP1 = value;
-            return;
-        case 2788:
-            DMA0_SKIP1_HI = value;
-            return;
-        case 2816:
-            IFM2_BASE0 = value;
-            return;
-        case 2820:
-            IFM2_BASE0_HI = value;
-            return;
-        case 2824:
-            IFM2_BASE1 = value;
-            return;
-        case 2828:
-            IFM2_BASE1_HI = value;
-            return;
-        case 2832:
-            IFM2_BASE2 = value;
-            return;
-        case 2836:
-            IFM2_BASE2_HI = value;
-            return;
-        case 2840:
-            IFM2_BASE3 = value;
-            return;
-        case 2844:
-            IFM2_BASE3_HI = value;
-            return;
-        case 2848:
-            IFM2_STRIDE_X = value;
-            return;
-        case 2852:
-            IFM2_STRIDE_X_HI = value;
-            return;
-        case 2856:
-            IFM2_STRIDE_Y = value;
-            return;
-        case 2860:
-            IFM2_STRIDE_Y_HI = value;
-            return;
-        case 2864:
-            IFM2_STRIDE_C = value;
-            return;
-        case 2868:
-            IFM2_STRIDE_C_HI = value;
-            return;
-        case 2880:
-            WEIGHT1_BASE = value;
-            return;
-        case 2884:
-            WEIGHT1_BASE_HI = value;
-            return;
-        case 2888:
-            WEIGHT1_LENGTH = value;
-            return;
-        case 2892:
-            WEIGHT1_LENGTH_HI = value;
-            return;
-        case 2896:
-            SCALE1_BASE = value;
-            return;
-        case 2900:
-            SCALE1_BASE_HI = value;
-            return;
-        case 2904:
-            SCALE1_LENGTH = value;
-            return;
-        case 384:
-            PMCR = value;
-            return;
-        case 388:
-            PMCNTENSET = value;
-            return;
-        case 392:
-            PMCNTENCLR = value;
-            return;
-        case 396:
-            PMOVSSET = value;
-            return;
-        case 400:
-            PMOVSCLR = value;
-            return;
-        case 404:
-            PMINTSET = value;
-            return;
-        case 408:
-            PMINTCLR = value;
-            return;
-        case 416:
-            PMCCNTR_LO = value;
-            return;
-        case 420:
-            PMCCNTR_HI = value;
-            return;
-        case 424:
-            PMCCNTR_CFG = value;
-            return;
-        case 428:
-            PMCAXI_CHAN = value;
-            return;
-        case 768:
-            PMEVCNTR[0] = value;
-            return;
-        case 772:
-            PMEVCNTR[1] = value;
-            return;
-        case 776:
-            PMEVCNTR[2] = value;
-            return;
-        case 780:
-            PMEVCNTR[3] = value;
-            return;
-        case 896:
-            PMEVTYPER[0] = value;
-            return;
-        case 900:
-            PMEVTYPER[1] = value;
-            return;
-        case 904:
-            PMEVTYPER[2] = value;
-            return;
-        case 908:
-            PMEVTYPER[3] = value;
-            return;
-        case 1024:
-            SHARED_BUFFER[0] = value;
-            return;
-        case 1028:
-            SHARED_BUFFER[1] = value;
-            return;
-        case 1032:
-            SHARED_BUFFER[2] = value;
-            return;
-        case 1036:
-            SHARED_BUFFER[3] = value;
-            return;
-        case 1040:
-            SHARED_BUFFER[4] = value;
-            return;
-        case 1044:
-            SHARED_BUFFER[5] = value;
-            return;
-        case 1048:
-            SHARED_BUFFER[6] = value;
-            return;
-        case 1052:
-            SHARED_BUFFER[7] = value;
-            return;
-        case 1056:
-            SHARED_BUFFER[8] = value;
-            return;
-        case 1060:
-            SHARED_BUFFER[9] = value;
-            return;
-        case 1064:
-            SHARED_BUFFER[10] = value;
-            return;
-        case 1068:
-            SHARED_BUFFER[11] = value;
-            return;
-        case 1072:
-            SHARED_BUFFER[12] = value;
-            return;
-        case 1076:
-            SHARED_BUFFER[13] = value;
-            return;
-        case 1080:
-            SHARED_BUFFER[14] = value;
-            return;
-        case 1084:
-            SHARED_BUFFER[15] = value;
-            return;
-        case 1088:
-            SHARED_BUFFER[16] = value;
-            return;
-        case 1092:
-            SHARED_BUFFER[17] = value;
-            return;
-        case 1096:
-            SHARED_BUFFER[18] = value;
-            return;
-        case 1100:
-            SHARED_BUFFER[19] = value;
-            return;
-        case 1104:
-            SHARED_BUFFER[20] = value;
-            return;
-        case 1108:
-            SHARED_BUFFER[21] = value;
-            return;
-        case 1112:
-            SHARED_BUFFER[22] = value;
-            return;
-        case 1116:
-            SHARED_BUFFER[23] = value;
-            return;
-        case 1120:
-            SHARED_BUFFER[24] = value;
-            return;
-        case 1124:
-            SHARED_BUFFER[25] = value;
-            return;
-        case 1128:
-            SHARED_BUFFER[26] = value;
-            return;
-        case 1132:
-            SHARED_BUFFER[27] = value;
-            return;
-        case 1136:
-            SHARED_BUFFER[28] = value;
-            return;
-        case 1140:
-            SHARED_BUFFER[29] = value;
-            return;
-        case 1144:
-            SHARED_BUFFER[30] = value;
-            return;
-        case 1148:
-            SHARED_BUFFER[31] = value;
-            return;
-        case 1152:
-            SHARED_BUFFER[32] = value;
-            return;
-        case 1156:
-            SHARED_BUFFER[33] = value;
-            return;
-        case 1160:
-            SHARED_BUFFER[34] = value;
-            return;
-        case 1164:
-            SHARED_BUFFER[35] = value;
-            return;
-        case 1168:
-            SHARED_BUFFER[36] = value;
-            return;
-        case 1172:
-            SHARED_BUFFER[37] = value;
-            return;
-        case 1176:
-            SHARED_BUFFER[38] = value;
-            return;
-        case 1180:
-            SHARED_BUFFER[39] = value;
-            return;
-        case 1184:
-            SHARED_BUFFER[40] = value;
-            return;
-        case 1188:
-            SHARED_BUFFER[41] = value;
-            return;
-        case 1192:
-            SHARED_BUFFER[42] = value;
-            return;
-        case 1196:
-            SHARED_BUFFER[43] = value;
-            return;
-        case 1200:
-            SHARED_BUFFER[44] = value;
-            return;
-        case 1204:
-            SHARED_BUFFER[45] = value;
-            return;
-        case 1208:
-            SHARED_BUFFER[46] = value;
-            return;
-        case 1212:
-            SHARED_BUFFER[47] = value;
-            return;
-        case 1216:
-            SHARED_BUFFER[48] = value;
-            return;
-        case 1220:
-            SHARED_BUFFER[49] = value;
-            return;
-        case 1224:
-            SHARED_BUFFER[50] = value;
-            return;
-        case 1228:
-            SHARED_BUFFER[51] = value;
-            return;
-        case 1232:
-            SHARED_BUFFER[52] = value;
-            return;
-        case 1236:
-            SHARED_BUFFER[53] = value;
-            return;
-        case 1240:
-            SHARED_BUFFER[54] = value;
-            return;
-        case 1244:
-            SHARED_BUFFER[55] = value;
-            return;
-        case 1248:
-            SHARED_BUFFER[56] = value;
-            return;
-        case 1252:
-            SHARED_BUFFER[57] = value;
-            return;
-        case 1256:
-            SHARED_BUFFER[58] = value;
-            return;
-        case 1260:
-            SHARED_BUFFER[59] = value;
-            return;
-        case 1264:
-            SHARED_BUFFER[60] = value;
-            return;
-        case 1268:
-            SHARED_BUFFER[61] = value;
-            return;
-        case 1272:
-            SHARED_BUFFER[62] = value;
-            return;
-        case 1276:
-            SHARED_BUFFER[63] = value;
-            return;
-        case 1280:
-            SHARED_BUFFER[64] = value;
-            return;
-        case 1284:
-            SHARED_BUFFER[65] = value;
-            return;
-        case 1288:
-            SHARED_BUFFER[66] = value;
-            return;
-        case 1292:
-            SHARED_BUFFER[67] = value;
-            return;
-        case 1296:
-            SHARED_BUFFER[68] = value;
-            return;
-        case 1300:
-            SHARED_BUFFER[69] = value;
-            return;
-        case 1304:
-            SHARED_BUFFER[70] = value;
-            return;
-        case 1308:
-            SHARED_BUFFER[71] = value;
-            return;
-        case 1312:
-            SHARED_BUFFER[72] = value;
-            return;
-        case 1316:
-            SHARED_BUFFER[73] = value;
-            return;
-        case 1320:
-            SHARED_BUFFER[74] = value;
-            return;
-        case 1324:
-            SHARED_BUFFER[75] = value;
-            return;
-        case 1328:
-            SHARED_BUFFER[76] = value;
-            return;
-        case 1332:
-            SHARED_BUFFER[77] = value;
-            return;
-        case 1336:
-            SHARED_BUFFER[78] = value;
-            return;
-        case 1340:
-            SHARED_BUFFER[79] = value;
-            return;
-        case 1344:
-            SHARED_BUFFER[80] = value;
-            return;
-        case 1348:
-            SHARED_BUFFER[81] = value;
-            return;
-        case 1352:
-            SHARED_BUFFER[82] = value;
-            return;
-        case 1356:
-            SHARED_BUFFER[83] = value;
-            return;
-        case 1360:
-            SHARED_BUFFER[84] = value;
-            return;
-        case 1364:
-            SHARED_BUFFER[85] = value;
-            return;
-        case 1368:
-            SHARED_BUFFER[86] = value;
-            return;
-        case 1372:
-            SHARED_BUFFER[87] = value;
-            return;
-        case 1376:
-            SHARED_BUFFER[88] = value;
-            return;
-        case 1380:
-            SHARED_BUFFER[89] = value;
-            return;
-        case 1384:
-            SHARED_BUFFER[90] = value;
-            return;
-        case 1388:
-            SHARED_BUFFER[91] = value;
-            return;
-        case 1392:
-            SHARED_BUFFER[92] = value;
-            return;
-        case 1396:
-            SHARED_BUFFER[93] = value;
-            return;
-        case 1400:
-            SHARED_BUFFER[94] = value;
-            return;
-        case 1404:
-            SHARED_BUFFER[95] = value;
-            return;
-        case 1408:
-            SHARED_BUFFER[96] = value;
-            return;
-        case 1412:
-            SHARED_BUFFER[97] = value;
-            return;
-        case 1416:
-            SHARED_BUFFER[98] = value;
-            return;
-        case 1420:
-            SHARED_BUFFER[99] = value;
-            return;
-        case 1424:
-            SHARED_BUFFER[100] = value;
-            return;
-        case 1428:
-            SHARED_BUFFER[101] = value;
-            return;
-        case 1432:
-            SHARED_BUFFER[102] = value;
-            return;
-        case 1436:
-            SHARED_BUFFER[103] = value;
-            return;
-        case 1440:
-            SHARED_BUFFER[104] = value;
-            return;
-        case 1444:
-            SHARED_BUFFER[105] = value;
-            return;
-        case 1448:
-            SHARED_BUFFER[106] = value;
-            return;
-        case 1452:
-            SHARED_BUFFER[107] = value;
-            return;
-        case 1456:
-            SHARED_BUFFER[108] = value;
-            return;
-        case 1460:
-            SHARED_BUFFER[109] = value;
-            return;
-        case 1464:
-            SHARED_BUFFER[110] = value;
-            return;
-        case 1468:
-            SHARED_BUFFER[111] = value;
-            return;
-        case 1472:
-            SHARED_BUFFER[112] = value;
-            return;
-        case 1476:
-            SHARED_BUFFER[113] = value;
-            return;
-        case 1480:
-            SHARED_BUFFER[114] = value;
-            return;
-        case 1484:
-            SHARED_BUFFER[115] = value;
-            return;
-        case 1488:
-            SHARED_BUFFER[116] = value;
-            return;
-        case 1492:
-            SHARED_BUFFER[117] = value;
-            return;
-        case 1496:
-            SHARED_BUFFER[118] = value;
-            return;
-        case 1500:
-            SHARED_BUFFER[119] = value;
-            return;
-        case 1504:
-            SHARED_BUFFER[120] = value;
-            return;
-        case 1508:
-            SHARED_BUFFER[121] = value;
-            return;
-        case 1512:
-            SHARED_BUFFER[122] = value;
-            return;
-        case 1516:
-            SHARED_BUFFER[123] = value;
-            return;
-        case 1520:
-            SHARED_BUFFER[124] = value;
-            return;
-        case 1524:
-            SHARED_BUFFER[125] = value;
-            return;
-        case 1528:
-            SHARED_BUFFER[126] = value;
-            return;
-        case 1532:
-            SHARED_BUFFER[127] = value;
-            return;
-        case 1536:
-            SHARED_BUFFER[128] = value;
-            return;
-        case 1540:
-            SHARED_BUFFER[129] = value;
-            return;
-        case 1544:
-            SHARED_BUFFER[130] = value;
-            return;
-        case 1548:
-            SHARED_BUFFER[131] = value;
-            return;
-        case 1552:
-            SHARED_BUFFER[132] = value;
-            return;
-        case 1556:
-            SHARED_BUFFER[133] = value;
-            return;
-        case 1560:
-            SHARED_BUFFER[134] = value;
-            return;
-        case 1564:
-            SHARED_BUFFER[135] = value;
-            return;
-        case 1568:
-            SHARED_BUFFER[136] = value;
-            return;
-        case 1572:
-            SHARED_BUFFER[137] = value;
-            return;
-        case 1576:
-            SHARED_BUFFER[138] = value;
-            return;
-        case 1580:
-            SHARED_BUFFER[139] = value;
-            return;
-        case 1584:
-            SHARED_BUFFER[140] = value;
-            return;
-        case 1588:
-            SHARED_BUFFER[141] = value;
-            return;
-        case 1592:
-            SHARED_BUFFER[142] = value;
-            return;
-        case 1596:
-            SHARED_BUFFER[143] = value;
-            return;
-        case 1600:
-            SHARED_BUFFER[144] = value;
-            return;
-        case 1604:
-            SHARED_BUFFER[145] = value;
-            return;
-        case 1608:
-            SHARED_BUFFER[146] = value;
-            return;
-        case 1612:
-            SHARED_BUFFER[147] = value;
-            return;
-        case 1616:
-            SHARED_BUFFER[148] = value;
-            return;
-        case 1620:
-            SHARED_BUFFER[149] = value;
-            return;
-        case 1624:
-            SHARED_BUFFER[150] = value;
-            return;
-        case 1628:
-            SHARED_BUFFER[151] = value;
-            return;
-        case 1632:
-            SHARED_BUFFER[152] = value;
-            return;
-        case 1636:
-            SHARED_BUFFER[153] = value;
-            return;
-        case 1640:
-            SHARED_BUFFER[154] = value;
-            return;
-        case 1644:
-            SHARED_BUFFER[155] = value;
-            return;
-        case 1648:
-            SHARED_BUFFER[156] = value;
-            return;
-        case 1652:
-            SHARED_BUFFER[157] = value;
-            return;
-        case 1656:
-            SHARED_BUFFER[158] = value;
-            return;
-        case 1660:
-            SHARED_BUFFER[159] = value;
-            return;
-        case 1664:
-            SHARED_BUFFER[160] = value;
-            return;
-        case 1668:
-            SHARED_BUFFER[161] = value;
-            return;
-        case 1672:
-            SHARED_BUFFER[162] = value;
-            return;
-        case 1676:
-            SHARED_BUFFER[163] = value;
-            return;
-        case 1680:
-            SHARED_BUFFER[164] = value;
-            return;
-        case 1684:
-            SHARED_BUFFER[165] = value;
-            return;
-        case 1688:
-            SHARED_BUFFER[166] = value;
-            return;
-        case 1692:
-            SHARED_BUFFER[167] = value;
-            return;
-        case 1696:
-            SHARED_BUFFER[168] = value;
-            return;
-        case 1700:
-            SHARED_BUFFER[169] = value;
-            return;
-        case 1704:
-            SHARED_BUFFER[170] = value;
-            return;
-        case 1708:
-            SHARED_BUFFER[171] = value;
-            return;
-        case 1712:
-            SHARED_BUFFER[172] = value;
-            return;
-        case 1716:
-            SHARED_BUFFER[173] = value;
-            return;
-        case 1720:
-            SHARED_BUFFER[174] = value;
-            return;
-        case 1724:
-            SHARED_BUFFER[175] = value;
-            return;
-        case 1728:
-            SHARED_BUFFER[176] = value;
-            return;
-        case 1732:
-            SHARED_BUFFER[177] = value;
-            return;
-        case 1736:
-            SHARED_BUFFER[178] = value;
-            return;
-        case 1740:
-            SHARED_BUFFER[179] = value;
-            return;
-        case 1744:
-            SHARED_BUFFER[180] = value;
-            return;
-        case 1748:
-            SHARED_BUFFER[181] = value;
-            return;
-        case 1752:
-            SHARED_BUFFER[182] = value;
-            return;
-        case 1756:
-            SHARED_BUFFER[183] = value;
-            return;
-        case 1760:
-            SHARED_BUFFER[184] = value;
-            return;
-        case 1764:
-            SHARED_BUFFER[185] = value;
-            return;
-        case 1768:
-            SHARED_BUFFER[186] = value;
-            return;
-        case 1772:
-            SHARED_BUFFER[187] = value;
-            return;
-        case 1776:
-            SHARED_BUFFER[188] = value;
-            return;
-        case 1780:
-            SHARED_BUFFER[189] = value;
-            return;
-        case 1784:
-            SHARED_BUFFER[190] = value;
-            return;
-        case 1788:
-            SHARED_BUFFER[191] = value;
-            return;
-        case 1792:
-            SHARED_BUFFER[192] = value;
-            return;
-        case 1796:
-            SHARED_BUFFER[193] = value;
-            return;
-        case 1800:
-            SHARED_BUFFER[194] = value;
-            return;
-        case 1804:
-            SHARED_BUFFER[195] = value;
-            return;
-        case 1808:
-            SHARED_BUFFER[196] = value;
-            return;
-        case 1812:
-            SHARED_BUFFER[197] = value;
-            return;
-        case 1816:
-            SHARED_BUFFER[198] = value;
-            return;
-        case 1820:
-            SHARED_BUFFER[199] = value;
-            return;
-        case 1824:
-            SHARED_BUFFER[200] = value;
-            return;
-        case 1828:
-            SHARED_BUFFER[201] = value;
-            return;
-        case 1832:
-            SHARED_BUFFER[202] = value;
-            return;
-        case 1836:
-            SHARED_BUFFER[203] = value;
-            return;
-        case 1840:
-            SHARED_BUFFER[204] = value;
-            return;
-        case 1844:
-            SHARED_BUFFER[205] = value;
-            return;
-        case 1848:
-            SHARED_BUFFER[206] = value;
-            return;
-        case 1852:
-            SHARED_BUFFER[207] = value;
-            return;
-        case 1856:
-            SHARED_BUFFER[208] = value;
-            return;
-        case 1860:
-            SHARED_BUFFER[209] = value;
-            return;
-        case 1864:
-            SHARED_BUFFER[210] = value;
-            return;
-        case 1868:
-            SHARED_BUFFER[211] = value;
-            return;
-        case 1872:
-            SHARED_BUFFER[212] = value;
-            return;
-        case 1876:
-            SHARED_BUFFER[213] = value;
-            return;
-        case 1880:
-            SHARED_BUFFER[214] = value;
-            return;
-        case 1884:
-            SHARED_BUFFER[215] = value;
-            return;
-        case 1888:
-            SHARED_BUFFER[216] = value;
-            return;
-        case 1892:
-            SHARED_BUFFER[217] = value;
-            return;
-        case 1896:
-            SHARED_BUFFER[218] = value;
-            return;
-        case 1900:
-            SHARED_BUFFER[219] = value;
-            return;
-        case 1904:
-            SHARED_BUFFER[220] = value;
-            return;
-        case 1908:
-            SHARED_BUFFER[221] = value;
-            return;
-        case 1912:
-            SHARED_BUFFER[222] = value;
-            return;
-        case 1916:
-            SHARED_BUFFER[223] = value;
-            return;
-        case 1920:
-            SHARED_BUFFER[224] = value;
-            return;
-        case 1924:
-            SHARED_BUFFER[225] = value;
-            return;
-        case 1928:
-            SHARED_BUFFER[226] = value;
-            return;
-        case 1932:
-            SHARED_BUFFER[227] = value;
-            return;
-        case 1936:
-            SHARED_BUFFER[228] = value;
-            return;
-        case 1940:
-            SHARED_BUFFER[229] = value;
-            return;
-        case 1944:
-            SHARED_BUFFER[230] = value;
-            return;
-        case 1948:
-            SHARED_BUFFER[231] = value;
-            return;
-        case 1952:
-            SHARED_BUFFER[232] = value;
-            return;
-        case 1956:
-            SHARED_BUFFER[233] = value;
-            return;
-        case 1960:
-            SHARED_BUFFER[234] = value;
-            return;
-        case 1964:
-            SHARED_BUFFER[235] = value;
-            return;
-        case 1968:
-            SHARED_BUFFER[236] = value;
-            return;
-        case 1972:
-            SHARED_BUFFER[237] = value;
-            return;
-        case 1976:
-            SHARED_BUFFER[238] = value;
-            return;
-        case 1980:
-            SHARED_BUFFER[239] = value;
-            return;
-        case 1984:
-            SHARED_BUFFER[240] = value;
-            return;
-        case 1988:
-            SHARED_BUFFER[241] = value;
-            return;
-        case 1992:
-            SHARED_BUFFER[242] = value;
-            return;
-        case 1996:
-            SHARED_BUFFER[243] = value;
-            return;
-        case 2000:
-            SHARED_BUFFER[244] = value;
-            return;
-        case 2004:
-            SHARED_BUFFER[245] = value;
-            return;
-        case 2008:
-            SHARED_BUFFER[246] = value;
-            return;
-        case 2012:
-            SHARED_BUFFER[247] = value;
-            return;
-        case 2016:
-            SHARED_BUFFER[248] = value;
-            return;
-        case 2020:
-            SHARED_BUFFER[249] = value;
-            return;
-        case 2024:
-            SHARED_BUFFER[250] = value;
-            return;
-        case 2028:
-            SHARED_BUFFER[251] = value;
-            return;
-        case 2032:
-            SHARED_BUFFER[252] = value;
-            return;
-        case 2036:
-            SHARED_BUFFER[253] = value;
-            return;
-        case 2040:
-            SHARED_BUFFER[254] = value;
-            return;
-        case 2044:
-            SHARED_BUFFER[255] = value;
-            return;
-        default:
-            throw std::runtime_error("invalid register address");
-        }
-    }
-#else
     uint32_t &operator[](const int addr_offset)
     {
         return reinterpret_cast<uint32_t *>(this)[addr_offset / 4];
     }
-#endif
     enum class access_type_t : bool
     {
         RO,
@@ -12542,7 +8096,7 @@ struct npu_set_ifm_precision_t
 {
     uint32_t cmd_code : 10;     // NPU_SET_IFM_PRECISION
     uint32_t must_be_zero0 : 6; // 0
-    uint32_t param : 4;
+    uint32_t precision : 4;
     uint32_t reserved0 : 2;
     uint32_t format : 2;
     uint32_t scale_mode : 2;
@@ -12576,13 +8130,13 @@ struct npu_set_ifm_precision_t
         format = static_cast<uint32_t>(value);
         return *this;
     }
-    CONSTEXPR ::ifm_precision get_param() const
+    CONSTEXPR ::ifm_precision get_precision() const
     {
-        return static_cast<::ifm_precision>(param);
+        return static_cast<::ifm_precision>(precision);
     }
-    CONSTEXPR npu_set_ifm_precision_t &set_param(::ifm_precision value)
+    CONSTEXPR npu_set_ifm_precision_t &set_precision(::ifm_precision value)
     {
-        param = static_cast<uint32_t>(value);
+        precision = static_cast<uint32_t>(value);
         return *this;
     }
     CONSTEXPR ::rounding get_round_mode() const
@@ -13416,9 +8970,10 @@ struct npu_set_kernel_height_m1_t
 #endif //__cplusplus
 };
 
-// Kernel stride b0=X stride-1, b1=Y stride-1, b2=weight order (0=depth, 1=kernel) b3 = kernel_x_dilation - 1 (0=no x
-// dilation, 1=x dilation of x2) b4 = kernel_y_dilation -1 (0=no y dilation, 1=y dilation of x2) b5 = kernel
-// decomposition size (0 for kernel_split_size=8, 1 for kernel_split_size=4)
+// Kernel stride b0=(X stride-1)&1, b1=(Y stride-1)&1, b2=weight order (0=depth, 1=kernel) b3 = kernel_x_dilation - 1
+// (0=no x dilation, 1=x dilation of x2) b4 = kernel_y_dilation -1 (0=no y dilation, 1=y dilation of x2) b5 = kernel
+// decomposition size (0 for kernel_split_size=8, 1 for kernel_split_size=4) b[8:6] = (X stride-1)>>1 b[11:9] = (Y
+// stride-1)>>1
 struct npu_set_kernel_stride_t
 {
     uint32_t cmd_code : 10;     // NPU_SET_KERNEL_STRIDE
@@ -14111,7 +9666,7 @@ struct npu_set_ifm2_precision_t
 {
     uint32_t cmd_code : 10;     // NPU_SET_IFM2_PRECISION
     uint32_t must_be_zero0 : 6; // 0
-    uint32_t param : 4;
+    uint32_t precision : 4;
     uint32_t reserved0 : 2;
     uint32_t format : 2;
     uint32_t reserved1 : 8;
@@ -14143,13 +9698,13 @@ struct npu_set_ifm2_precision_t
         format = static_cast<uint32_t>(value);
         return *this;
     }
-    CONSTEXPR ::ifm_precision get_param() const
+    CONSTEXPR ::ifm_precision get_precision() const
     {
-        return static_cast<::ifm_precision>(param);
+        return static_cast<::ifm_precision>(precision);
     }
-    CONSTEXPR npu_set_ifm2_precision_t &set_param(::ifm_precision value)
+    CONSTEXPR npu_set_ifm2_precision_t &set_precision(::ifm_precision value)
     {
-        param = static_cast<uint32_t>(value);
+        precision = static_cast<uint32_t>(value);
         return *this;
     }
 #endif //__cplusplus
@@ -16570,9 +12125,8 @@ struct npu_set_scale1_length_t
             SEP FUNC(elementwise_mode, CLZ) SEP FUNC(elementwise_mode, SHR) SEP FUNC(elementwise_mode, SHL)
 
 #define EXPAND_IFM_PRECISION(FUNC, SEP)                                                                                \
-    FUNC(ifm_precision, W8_U8)                                                                                         \
-    SEP FUNC(ifm_precision, W8_S8) SEP FUNC(ifm_precision, W8_U16) SEP FUNC(ifm_precision, W8_S16)                     \
-        SEP FUNC(ifm_precision, W8_S32)
+    FUNC(ifm_precision, U8)                                                                                            \
+    SEP FUNC(ifm_precision, S8) SEP FUNC(ifm_precision, U16) SEP FUNC(ifm_precision, S16) SEP FUNC(ifm_precision, S32)
 
 #define EXPAND_IFM_SCALE_MODE(FUNC, SEP)                                                                               \
     FUNC(ifm_scale_mode, SCALE_16BIT)                                                                                  \
@@ -16678,3 +12232,4 @@ struct npu_set_scale1_length_t
 
 #define EXPAND_STRIDE_MODE(FUNC, SEP)                                                                                  \
     FUNC(stride_mode, STRIDE_MODE_1D) SEP FUNC(stride_mode, STRIDE_MODE_2D) SEP FUNC(stride_mode, STRIDE_MODE_3D)
+#endif /* ETHOSU55_INTERFACE_H */
