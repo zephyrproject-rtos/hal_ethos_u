@@ -33,7 +33,7 @@ extern "C" {
  ******************************************************************************/
 
 #define ETHOSU_DRIVER_VERSION_MAJOR 0  ///< Driver major version
-#define ETHOSU_DRIVER_VERSION_MINOR 13 ///< Driver minor version
+#define ETHOSU_DRIVER_VERSION_MINOR 14 ///< Driver minor version
 #define ETHOSU_DRIVER_VERSION_PATCH 0  ///< Driver patch version
 #define ETHOSU_DRIVER_BASEP_INDEXES 8  ///< Number of base pointer indexes
 

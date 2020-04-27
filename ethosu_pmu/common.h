@@ -47,4 +47,4 @@
 #define EXIT static __init void
 #endif
 
-#endif // mpu_pmu_common_h
+#endif // ethosu_pmu_common_h
