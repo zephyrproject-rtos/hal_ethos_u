@@ -16,61 +16,28 @@
  * limitations under the License.
  */
 
-#if defined(__ICCARM__)
-#pragma system_include /* treat file as system include file for MISRA check */
-#elif defined(__clang__)
-#pragma clang system_header /* treat file as system include file */
-#endif
-
 #ifndef PMU_ETHOSU_H
 #define PMU_ETHOSU_H
 
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define ETHOSU_PMU_NCOUNTERS 4
 
-#include <cmsis_compiler.h>
-
-#ifdef NOTNOW
-#if defined(CPU_CORTEX_M55)
-#include <core_cm55.h>
-#elif defined(CPU_CORTEX_M33)
-#include <core_cm33.h>
-#else
-#error npu-pmu not supported for CPU
-#endif
-#else
-/* IO definitions (access restrictions to peripheral registers) */
-/**
-    \defgroup CMSIS_glob_defs CMSIS Global Defines
-
-    <strong>IO Type Qualifiers</strong> are used
-    \li to specify the access to peripheral variables.
-    \li for automatic generation of peripheral register debug information.
-*/
-#ifdef __cplusplus
-#define __I volatile /*!< Defines 'read only' permissions */
-#else
-#define __I volatile const /*!< Defines 'read only' permissions */
-#endif
-#define __O volatile        /*!< Defines 'write only' permissions */
-#define __IO volatile       /*!< Defines 'read / write' permissions */
-
-/* following defines should be used for structure members */
-#define __IM volatile const /*! Defines 'read only' structure member permissions */
-#define __OM volatile       /*! Defines 'write only' structure member permissions */
-#define __IOM volatile      /*! Defines 'read / write' structure member permissions */
-#endif
-
-typedef struct
+typedef volatile struct
 {
-    __IOM uint32_t PMCR;
-    __IOM uint32_t PMCNTENSET;
-    __IOM uint32_t PMCNTENCLR;
-    __IOM uint32_t PMOVSSET;
-    __IOM uint32_t PMOVSCLR;
-    __IOM uint32_t PMINTSET;
-    __IOM uint32_t PMINTCLR;
-    __IOM uint64_t PMCCNTR;
-    __IOM uint32_t PMCCNTR_CFG;
+    uint32_t PMCR;
+    uint32_t PMCNTENSET;
+    uint32_t PMCNTENCLR;
+    uint32_t PMOVSSET;
+    uint32_t PMOVSCLR;
+    uint32_t PMINTSET;
+    uint32_t PMINTCLR;
+    uint64_t PMCCNTR;
+    uint32_t PMCCNTR_CFG;
 } PMU_Ethosu_ctrl_Type;
 
 typedef uint32_t PMU_Ethosu_cntr_Type[ETHOSU_PMU_NCOUNTERS];
@@ -173,37 +140,37 @@ uint32_t pmu_event_value(enum ethosu_pmu_event_type);
 // CMSIS ref API
 /** \brief PMU Functions */
 
-__STATIC_INLINE void ETHOSU_PMU_Enable(void);
-__STATIC_INLINE void ETHOSU_PMU_Disable(void);
+static inline void ETHOSU_PMU_Enable(void);
+static inline void ETHOSU_PMU_Disable(void);
 
-__STATIC_INLINE void ETHOSU_PMU_Set_EVTYPER(uint32_t num, enum ethosu_pmu_event_type type);
-__STATIC_INLINE enum ethosu_pmu_event_type ETHOSU_PMU_Get_EVTYPER(uint32_t num);
+static inline void ETHOSU_PMU_Set_EVTYPER(uint32_t num, enum ethosu_pmu_event_type type);
+static inline enum ethosu_pmu_event_type ETHOSU_PMU_Get_EVTYPER(uint32_t num);
 
-__STATIC_INLINE void ETHOSU_PMU_CYCCNT_Reset(void);
-__STATIC_INLINE void ETHOSU_PMU_EVCNTR_ALL_Reset(void);
+static inline void ETHOSU_PMU_CYCCNT_Reset(void);
+static inline void ETHOSU_PMU_EVCNTR_ALL_Reset(void);
 
-__STATIC_INLINE void ETHOSU_PMU_CNTR_Enable(uint32_t mask);
-__STATIC_INLINE void ETHOSU_PMU_CNTR_Disable(uint32_t mask);
-__STATIC_INLINE uint32_t ETHOSU_PMU_CNTR_Status();
+static inline void ETHOSU_PMU_CNTR_Enable(uint32_t mask);
+static inline void ETHOSU_PMU_CNTR_Disable(uint32_t mask);
+static inline uint32_t ETHOSU_PMU_CNTR_Status();
 
-__STATIC_INLINE uint64_t ETHOSU_PMU_Get_CCNTR(void);
-__STATIC_INLINE void ETHOSU_PMU_Set_CCNTR(uint64_t val);
-__STATIC_INLINE uint32_t ETHOSU_PMU_Get_EVCNTR(uint32_t num);
-__STATIC_INLINE void ETHOSU_PMU_Set_EVCNTR(uint32_t num, uint32_t val);
+static inline uint64_t ETHOSU_PMU_Get_CCNTR(void);
+static inline void ETHOSU_PMU_Set_CCNTR(uint64_t val);
+static inline uint32_t ETHOSU_PMU_Get_EVCNTR(uint32_t num);
+static inline void ETHOSU_PMU_Set_EVCNTR(uint32_t num, uint32_t val);
 
-__STATIC_INLINE uint32_t ETHOSU_PMU_Get_CNTR_OVS(void);
-__STATIC_INLINE void ETHOSU_PMU_Set_CNTR_OVS(uint32_t mask);
+static inline uint32_t ETHOSU_PMU_Get_CNTR_OVS(void);
+static inline void ETHOSU_PMU_Set_CNTR_OVS(uint32_t mask);
 
-__STATIC_INLINE void ETHOSU_PMU_Set_CNTR_IRQ_Enable(uint32_t mask);
-__STATIC_INLINE void ETHOSU_PMU_Set_CNTR_IRQ_Disable(uint32_t mask);
-__STATIC_INLINE uint32_t ETHOSU_PMU_Get_IRQ_Enable();
+static inline void ETHOSU_PMU_Set_CNTR_IRQ_Enable(uint32_t mask);
+static inline void ETHOSU_PMU_Set_CNTR_IRQ_Disable(uint32_t mask);
+static inline uint32_t ETHOSU_PMU_Get_IRQ_Enable();
 
-__STATIC_INLINE void ETHOSU_PMU_CNTR_Increment(uint32_t mask);
+static inline void ETHOSU_PMU_CNTR_Increment(uint32_t mask);
 
 /**
   \brief   Enable the PMU
 */
-__STATIC_INLINE void ETHOSU_PMU_Enable(void)
+static inline void ETHOSU_PMU_Enable(void)
 {
     ethosu_pmu_ctrl->PMCR |= ETHOSU_PMU_CTRL_ENABLE_Msk;
 }
@@ -211,7 +178,7 @@ __STATIC_INLINE void ETHOSU_PMU_Enable(void)
 /**
   \brief   Disable the PMU
 */
-__STATIC_INLINE void ETHOSU_PMU_Disable(void)
+static inline void ETHOSU_PMU_Disable(void)
 {
     ethosu_pmu_ctrl->PMCR &= ~ETHOSU_PMU_CTRL_ENABLE_Msk;
 }
@@ -221,7 +188,7 @@ __STATIC_INLINE void ETHOSU_PMU_Disable(void)
   \param [in]    num     Event counter (0-ETHOSU_PMU_NCOUNTERS) to configure
   \param [in]    type    Event to count
 */
-__STATIC_INLINE void ETHOSU_PMU_Set_EVTYPER(uint32_t num, enum ethosu_pmu_event_type type)
+static inline void ETHOSU_PMU_Set_EVTYPER(uint32_t num, enum ethosu_pmu_event_type type)
 {
     (*ethosu_pmu_evnt)[num] = pmu_event_value(type);
 }
@@ -231,7 +198,7 @@ __STATIC_INLINE void ETHOSU_PMU_Set_EVTYPER(uint32_t num, enum ethosu_pmu_event_
   \param [in]    num     Event counter (0-ETHOSU_PMU_NCOUNTERS) to configure
   \return        type    Event to count
 */
-__STATIC_INLINE enum ethosu_pmu_event_type ETHOSU_PMU_Get_EVTYPER(uint32_t num)
+static inline enum ethosu_pmu_event_type ETHOSU_PMU_Get_EVTYPER(uint32_t num)
 {
     return pmu_event_type((*ethosu_pmu_evnt)[num]);
 }
@@ -239,7 +206,7 @@ __STATIC_INLINE enum ethosu_pmu_event_type ETHOSU_PMU_Get_EVTYPER(uint32_t num)
 /**
   \brief  Reset cycle counter
 */
-__STATIC_INLINE void ETHOSU_PMU_CYCCNT_Reset(void)
+static inline void ETHOSU_PMU_CYCCNT_Reset(void)
 {
     ethosu_pmu_ctrl->PMCR |= ETHOSU_PMU_CTRL_CYCCNT_RESET_Msk;
 }
@@ -247,7 +214,7 @@ __STATIC_INLINE void ETHOSU_PMU_CYCCNT_Reset(void)
 /**
   \brief  Reset all event counters
 */
-__STATIC_INLINE void ETHOSU_PMU_EVCNTR_ALL_Reset(void)
+static inline void ETHOSU_PMU_EVCNTR_ALL_Reset(void)
 {
     ethosu_pmu_ctrl->PMCR |= ETHOSU_PMU_CTRL_EVENTCNT_RESET_Msk;
 }
@@ -259,7 +226,7 @@ __STATIC_INLINE void ETHOSU_PMU_EVCNTR_ALL_Reset(void)
           - event counters (bit 0-ETHOSU_PMU_NCOUNTERS)
           - cycle counter  (bit 31)
 */
-__STATIC_INLINE void ETHOSU_PMU_CNTR_Enable(uint32_t mask)
+static inline void ETHOSU_PMU_CNTR_Enable(uint32_t mask)
 {
     ethosu_pmu_ctrl->PMCNTENSET = mask;
 }
@@ -271,7 +238,7 @@ __STATIC_INLINE void ETHOSU_PMU_CNTR_Enable(uint32_t mask)
           - event counters (bit 0-ETHOSU_PMU_NCOUNTERS)
           - cycle counter  (bit 31)
 */
-__STATIC_INLINE void ETHOSU_PMU_CNTR_Disable(uint32_t mask)
+static inline void ETHOSU_PMU_CNTR_Disable(uint32_t mask)
 {
     ethosu_pmu_ctrl->PMCNTENCLR = mask;
 }
@@ -286,7 +253,7 @@ __STATIC_INLINE void ETHOSU_PMU_CNTR_Disable(uint32_t mask)
           - cycle counter  activate  (bit 31)
   \note   ETHOSU specific. Usage breaks CMSIS complience
 */
-__STATIC_INLINE uint32_t ETHOSU_PMU_CNTR_Status()
+static inline uint32_t ETHOSU_PMU_CNTR_Status()
 {
     return ethosu_pmu_ctrl->PMCNTENSET;
 }
@@ -300,7 +267,7 @@ __STATIC_INLINE uint32_t ETHOSU_PMU_CNTR_Status()
           is not greater than the former, it means overflow of LSW without
           incrementing MSW has occurred, in which case the former value is used.
 */
-__STATIC_INLINE uint64_t ETHOSU_PMU_Get_CCNTR(void)
+static inline uint64_t ETHOSU_PMU_Get_CCNTR(void)
 {
     uint64_t val1 = ethosu_pmu_ctrl->PMCCNTR;
     uint64_t val2 = ethosu_pmu_ctrl->PMCCNTR;
@@ -319,7 +286,7 @@ __STATIC_INLINE uint64_t ETHOSU_PMU_Get_CCNTR(void)
           To work-around raciness, counter is temporary disabled if enabled.
   \note   ETHOSU specific. Usage breaks CMSIS complience
 */
-__STATIC_INLINE void ETHOSU_PMU_Set_CCNTR(uint64_t val)
+static inline void ETHOSU_PMU_Set_CCNTR(uint64_t val)
 {
     uint32_t mask = ETHOSU_PMU_CNTR_Status();
 
@@ -341,7 +308,7 @@ __STATIC_INLINE void ETHOSU_PMU_Set_CCNTR(uint64_t val)
   \param [in]    num     Event counter (0-ETHOSU_PMU_NCOUNTERS)
   \return                Event count
 */
-__STATIC_INLINE uint32_t ETHOSU_PMU_Get_EVCNTR(uint32_t num)
+static inline uint32_t ETHOSU_PMU_Get_EVCNTR(uint32_t num)
 {
     return (*ethosu_pmu_cntr)[num];
 }
@@ -352,7 +319,7 @@ __STATIC_INLINE uint32_t ETHOSU_PMU_Get_EVCNTR(uint32_t num)
   \param [in]    val     Conter value
   \note   ETHOSU specific. Usage breaks CMSIS complience
 */
-__STATIC_INLINE void ETHOSU_PMU_Set_EVCNTR(uint32_t num, uint32_t val)
+static inline void ETHOSU_PMU_Set_EVCNTR(uint32_t num, uint32_t val)
 {
     (*ethosu_pmu_cntr)[num] = val;
 }
@@ -362,7 +329,7 @@ __STATIC_INLINE void ETHOSU_PMU_Set_EVCNTR(uint32_t num, uint32_t val)
            - event counters (bit 0-ETHOSU_PMU_NCOUNTERS))
            - cycle counter  (bit 31)
 */
-__STATIC_INLINE uint32_t ETHOSU_PMU_Get_CNTR_OVS(void)
+static inline uint32_t ETHOSU_PMU_Get_CNTR_OVS(void)
 {
     return ethosu_pmu_ctrl->PMOVSSET;
 }
@@ -374,7 +341,7 @@ __STATIC_INLINE uint32_t ETHOSU_PMU_Get_CNTR_OVS(void)
            - event counters (bit 0-ETHOSU_PMU_NCOUNTERS)
            - cycle counter  (bit 31)
 */
-__STATIC_INLINE void ETHOSU_PMU_Set_CNTR_OVS(uint32_t mask)
+static inline void ETHOSU_PMU_Set_CNTR_OVS(uint32_t mask)
 {
     ethosu_pmu_ctrl->PMOVSCLR = mask;
 }
@@ -386,7 +353,7 @@ __STATIC_INLINE void ETHOSU_PMU_Set_CNTR_OVS(uint32_t mask)
            - event counters (bit 0-ETHOSU_PMU_NCOUNTERS)
            - cycle counter  (bit 31)
 */
-__STATIC_INLINE void ETHOSU_PMU_Set_CNTR_IRQ_Enable(uint32_t mask)
+static inline void ETHOSU_PMU_Set_CNTR_IRQ_Enable(uint32_t mask)
 {
     ethosu_pmu_ctrl->PMINTSET = mask;
 }
@@ -398,7 +365,7 @@ __STATIC_INLINE void ETHOSU_PMU_Set_CNTR_IRQ_Enable(uint32_t mask)
            - event counters (bit 0-ETHOSU_PMU_NCOUNTERS)
            - cycle counter  (bit 31)
 */
-__STATIC_INLINE void ETHOSU_PMU_Set_CNTR_IRQ_Disable(uint32_t mask)
+static inline void ETHOSU_PMU_Set_CNTR_IRQ_Disable(uint32_t mask)
 {
     ethosu_pmu_ctrl->PMINTCLR = mask;
 }
@@ -411,7 +378,7 @@ __STATIC_INLINE void ETHOSU_PMU_Set_CNTR_IRQ_Disable(uint32_t mask)
            - cycle counter  (bit 31)
   \note   ETHOSU specific. Usage breaks CMSIS complience
 */
-__STATIC_INLINE uint32_t ETHOSU_PMU_Get_IRQ_Enable()
+static inline uint32_t ETHOSU_PMU_Get_IRQ_Enable()
 {
     return ethosu_pmu_ctrl->PMINTSET;
 }
@@ -423,7 +390,7 @@ __STATIC_INLINE uint32_t ETHOSU_PMU_Get_IRQ_Enable()
            - cycle counter  (bit 31)
   \note    Software increment bits for one or more event counters.
 */
-__STATIC_INLINE void ETHOSU_PMU_CNTR_Increment(uint32_t mask)
+static inline void ETHOSU_PMU_CNTR_Increment(uint32_t mask)
 {
     uint32_t cntrs_active = ETHOSU_PMU_CNTR_Status();
 
@@ -454,5 +421,9 @@ __STATIC_INLINE void ETHOSU_PMU_CNTR_Increment(uint32_t mask)
         }
     }
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* PMU_ETHOSU_H */
