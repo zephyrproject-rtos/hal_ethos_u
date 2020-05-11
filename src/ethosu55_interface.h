@@ -38,8 +38,8 @@
 #include <stdexcept>
 #endif
 
-#define NNX_ARCH_VERSION_MAJOR 0
-#define NNX_ARCH_VERSION_MINOR 169
+#define NNX_ARCH_VERSION_MAJOR 1
+#define NNX_ARCH_VERSION_MINOR 0
 #define NNX_ARCH_VERSION_PATCH 0
 
 // Register offsets
@@ -310,11 +310,12 @@
 //
 #define NPU_REG_WD_STATUS 0x0100
 #define NPU_REG_MAC_STATUS 0x0104
-#define NPU_REG_DMA_STATUS 0x0108
-#define NPU_REG_AO_STATUS 0x0110
+#define NPU_REG_AO_STATUS 0x0108
+#define NPU_REG_DMA_STATUS0 0x0110
+#define NPU_REG_DMA_STATUS1 0x0114
 #define NPU_REG_CLKFORCE 0x0140
-#define NPU_REG_DEBUG 0x0144
-#define NPU_REG_DEBUG2 0x0148
+#define NPU_REG_DEBUG_ADDR 0x0144
+#define NPU_REG_DEBUG_MISC 0x0148
 #define NPU_REG_DEBUGCORE 0x014C
 #define HW_DEBUG_INTERNAL_REGISTERS_SIZE 0x0150
 
@@ -380,7 +381,7 @@
 #define NPU_REG_REGISTERS_SIZE 0x0050
 
 //
-// Register subpage PMU_INTERNAL
+// Register subpage PMU
 //
 #define NPU_REG_PMCR 0x0180
 #define NPU_REG_PMCNTENSET 0x0184
@@ -401,7 +402,7 @@
 #define NPU_REG_PMEVTYPER1 0x0384
 #define NPU_REG_PMEVTYPER2 0x0388
 #define NPU_REG_PMEVTYPER3 0x038C
-#define PMU_INTERNAL_REGISTERS_SIZE 0x0390
+#define PMU_REGISTERS_SIZE 0x0390
 
 //
 // Register subpage TSU_DEBUG_INTERNAL
@@ -487,7 +488,6 @@
 #define NPU_REG_WEIGHT_BASE 0x0A80
 #define NPU_REG_WEIGHT_BASE_HI 0x0A84
 #define NPU_REG_WEIGHT_LENGTH 0x0A88
-#define NPU_REG_WEIGHT_LENGTH_HI 0x0A8C
 #define NPU_REG_SCALE_BASE 0x0A90
 #define NPU_REG_SCALE_BASE_HI 0x0A94
 #define NPU_REG_SCALE_LENGTH 0x0A98
@@ -523,7 +523,6 @@
 #define NPU_REG_WEIGHT1_BASE 0x0B40
 #define NPU_REG_WEIGHT1_BASE_HI 0x0B44
 #define NPU_REG_WEIGHT1_LENGTH 0x0B48
-#define NPU_REG_WEIGHT1_LENGTH_HI 0x0B4C
 #define NPU_REG_SCALE1_BASE 0x0B50
 #define NPU_REG_SCALE1_BASE_HI 0x0B54
 #define NPU_REG_SCALE1_LENGTH 0x0B58
@@ -573,14 +572,14 @@
 
 // Enum types
 
-enum class acc_format : uint8_t
+enum class acc_format : uint16_t
 {
     INT_32BIT = 0,
     INT_40BIT = 1,
     FP_S5_10  = 2,
 };
 
-enum class activation : uint8_t
+enum class activation : uint16_t
 {
     NONE      = 0,
     TANH      = 3,
@@ -661,7 +660,7 @@ enum class cmd0 : uint16_t
     NPU_SET_IFM2_REGION       = 0x18F,
 };
 
-enum class cmd1 : uint8_t
+enum class cmd1 : uint16_t
 {
     NPU_SET_IFM_BASE0      = 0x000,
     NPU_SET_IFM_BASE1      = 0x001,
@@ -708,7 +707,7 @@ enum class data_format : uint8_t
     NHCWB16 = 1,
 };
 
-enum class elementwise_mode : uint8_t
+enum class elementwise_mode : uint16_t
 {
     MUL   = 0,
     ADD   = 1,
@@ -765,75 +764,79 @@ enum class ofm_precision : uint8_t
 
 enum class pmu_event_type : uint16_t
 {
-    NO_EVENT                   = 0x00,
-    CYCLE                      = 0x11,
-    NPU_IDLE                   = 0x20,
-    MAC_ACTIVE                 = 0x30,
-    MAC_ACTIVE_8BIT            = 0x31,
-    MAC_ACTIVE_16BIT           = 0x32,
-    MAC_DPU_ACTIVE             = 0x33,
-    MAC_STALLED_BY_WD_ACC      = 0x34,
-    MAC_STALLED_BY_WD          = 0x35,
-    MAC_STALLED_BY_ACC         = 0x36,
-    MAC_STALLED_BY_IB          = 0x37,
-    MAC_ACTIVE_32BIT           = 0x38,
-    AO_ACTIVE                  = 0x40,
-    AO_ACTIVE_8BIT             = 0x41,
-    AO_ACTIVE_16BIT            = 0x42,
-    AO_STALLED_BY_OFMP_OB      = 0x43,
-    AO_STALLED_BY_OFMP         = 0x44,
-    AO_STALLED_BY_OB           = 0x45,
-    AO_STALLED_BY_ACC_IB       = 0x46,
-    AO_STALLED_BY_ACC          = 0x47,
-    AO_STALLED_BY_IB           = 0x48,
-    WD_ACTIVE                  = 0x50,
-    WD_STALLED                 = 0x51,
-    WD_STALLED_BY_WS           = 0x52,
-    WD_STALLED_BY_WD_BUF       = 0x53,
-    WD_PARSE_ACTIVE            = 0x54,
-    WD_PARSE_STALLED           = 0x55,
-    WD_PARSE_STALLED_IN        = 0x56,
-    WD_PARSE_STALLED_OUT       = 0x57,
-    WD_TRANS_WS                = 0x58,
-    WD_TRANS_WB                = 0x59,
-    WD_TRANS_DW0               = 0x5a,
-    WD_TRANS_DW1               = 0x5b,
-    AXI0_RD_TRANS_ACCEPTED     = 0x80,
-    AXI0_RD_TRANS_COMPLETED    = 0x81,
-    AXI0_RD_DATA_BEAT_RECEIVED = 0x82,
-    AXI0_RD_TRAN_REQ_STALLED   = 0x83,
-    AXI0_WR_TRANS_ACCEPTED     = 0x84,
-    AXI0_WR_TRANS_COMPLETED_M  = 0x85,
-    AXI0_WR_TRANS_COMPLETED_S  = 0x86,
-    AXI0_WR_DATA_BEAT_WRITTEN  = 0x87,
-    AXI0_WR_TRAN_REQ_STALLED   = 0x88,
-    AXI0_WR_DATA_BEAT_STALLED  = 0x89,
-    AXI0_ENABLED_CYCLES        = 0x8c,
-    AXI0_RD_STALL_LIMIT        = 0x8e,
-    AXI0_WR_STALL_LIMIT        = 0x8f,
-    AXI1_RD_TRANS_ACCEPTED     = 0x180,
-    AXI1_RD_TRANS_COMPLETED    = 0x181,
-    AXI1_RD_DATA_BEAT_RECEIVED = 0x182,
-    AXI1_RD_TRAN_REQ_STALLED   = 0x183,
-    AXI1_WR_TRANS_ACCEPTED     = 0x184,
-    AXI1_WR_TRANS_COMPLETED_M  = 0x185,
-    AXI1_WR_TRANS_COMPLETED_S  = 0x186,
-    AXI1_WR_DATA_BEAT_WRITTEN  = 0x187,
-    AXI1_WR_TRAN_REQ_STALLED   = 0x188,
-    AXI1_WR_DATA_BEAT_STALLED  = 0x189,
-    AXI1_ENABLED_CYCLES        = 0x18c,
-    AXI1_RD_STALL_LIMIT        = 0x18e,
-    AXI1_WR_STALL_LIMIT        = 0x18f,
-    AXI_LATENCY_ANY            = 0xa0,
-    AXI_LATENCY_32             = 0xa1,
-    AXI_LATENCY_64             = 0xa2,
-    AXI_LATENCY_128            = 0xa3,
-    AXI_LATENCY_256            = 0xa4,
-    AXI_LATENCY_512            = 0xa5,
-    AXI_LATENCY_1024           = 0xa6,
+    NO_EVENT                     = 0x00,
+    CYCLE                        = 0x11,
+    NPU_IDLE                     = 0x20,
+    CC_STALLED_ON_BLOCKDEP       = 0x21,
+    CC_STALLED_ON_SHRAM_RECONFIG = 0x22,
+    MAC_ACTIVE                   = 0x30,
+    MAC_ACTIVE_8BIT              = 0x31,
+    MAC_ACTIVE_16BIT             = 0x32,
+    MAC_DPU_ACTIVE               = 0x33,
+    MAC_STALLED_BY_WD_ACC        = 0x34,
+    MAC_STALLED_BY_WD            = 0x35,
+    MAC_STALLED_BY_ACC           = 0x36,
+    MAC_STALLED_BY_IB            = 0x37,
+    MAC_ACTIVE_32BIT             = 0x38,
+    MAC_STALLED_BY_INT_W         = 0x39,
+    MAC_STALLED_BY_INT_ACC       = 0x3A,
+    AO_ACTIVE                    = 0x40,
+    AO_ACTIVE_8BIT               = 0x41,
+    AO_ACTIVE_16BIT              = 0x42,
+    AO_STALLED_BY_OFMP_OB        = 0x43,
+    AO_STALLED_BY_OFMP           = 0x44,
+    AO_STALLED_BY_OB             = 0x45,
+    AO_STALLED_BY_ACC_IB         = 0x46,
+    AO_STALLED_BY_ACC            = 0x47,
+    AO_STALLED_BY_IB             = 0x48,
+    WD_ACTIVE                    = 0x50,
+    WD_STALLED                   = 0x51,
+    WD_STALLED_BY_WS             = 0x52,
+    WD_STALLED_BY_WD_BUF         = 0x53,
+    WD_PARSE_ACTIVE              = 0x54,
+    WD_PARSE_STALLED             = 0x55,
+    WD_PARSE_STALLED_IN          = 0x56,
+    WD_PARSE_STALLED_OUT         = 0x57,
+    WD_TRANS_WS                  = 0x58,
+    WD_TRANS_WB                  = 0x59,
+    WD_TRANS_DW0                 = 0x5a,
+    WD_TRANS_DW1                 = 0x5b,
+    AXI0_RD_TRANS_ACCEPTED       = 0x80,
+    AXI0_RD_TRANS_COMPLETED      = 0x81,
+    AXI0_RD_DATA_BEAT_RECEIVED   = 0x82,
+    AXI0_RD_TRAN_REQ_STALLED     = 0x83,
+    AXI0_WR_TRANS_ACCEPTED       = 0x84,
+    AXI0_WR_TRANS_COMPLETED_M    = 0x85,
+    AXI0_WR_TRANS_COMPLETED_S    = 0x86,
+    AXI0_WR_DATA_BEAT_WRITTEN    = 0x87,
+    AXI0_WR_TRAN_REQ_STALLED     = 0x88,
+    AXI0_WR_DATA_BEAT_STALLED    = 0x89,
+    AXI0_ENABLED_CYCLES          = 0x8c,
+    AXI0_RD_STALL_LIMIT          = 0x8e,
+    AXI0_WR_STALL_LIMIT          = 0x8f,
+    AXI1_RD_TRANS_ACCEPTED       = 0x180,
+    AXI1_RD_TRANS_COMPLETED      = 0x181,
+    AXI1_RD_DATA_BEAT_RECEIVED   = 0x182,
+    AXI1_RD_TRAN_REQ_STALLED     = 0x183,
+    AXI1_WR_TRANS_ACCEPTED       = 0x184,
+    AXI1_WR_TRANS_COMPLETED_M    = 0x185,
+    AXI1_WR_TRANS_COMPLETED_S    = 0x186,
+    AXI1_WR_DATA_BEAT_WRITTEN    = 0x187,
+    AXI1_WR_TRAN_REQ_STALLED     = 0x188,
+    AXI1_WR_DATA_BEAT_STALLED    = 0x189,
+    AXI1_ENABLED_CYCLES          = 0x18c,
+    AXI1_RD_STALL_LIMIT          = 0x18e,
+    AXI1_WR_STALL_LIMIT          = 0x18f,
+    AXI_LATENCY_ANY              = 0xa0,
+    AXI_LATENCY_32               = 0xa1,
+    AXI_LATENCY_64               = 0xa2,
+    AXI_LATENCY_128              = 0xa3,
+    AXI_LATENCY_256              = 0xa4,
+    AXI_LATENCY_512              = 0xa5,
+    AXI_LATENCY_1024             = 0xa6,
 };
 
-enum class pooling_mode : uint8_t
+enum class pooling_mode : uint16_t
 {
     MAX        = 0,
     AVERAGE    = 1,
@@ -1080,72 +1083,76 @@ enum ofm_precision
 
 enum pmu_event_type
 {
-    PMU_EVENT_TYPE_NO_EVENT                   = 0x00,
-    PMU_EVENT_TYPE_CYCLE                      = 0x11,
-    PMU_EVENT_TYPE_NPU_IDLE                   = 0x20,
-    PMU_EVENT_TYPE_MAC_ACTIVE                 = 0x30,
-    PMU_EVENT_TYPE_MAC_ACTIVE_8BIT            = 0x31,
-    PMU_EVENT_TYPE_MAC_ACTIVE_16BIT           = 0x32,
-    PMU_EVENT_TYPE_MAC_DPU_ACTIVE             = 0x33,
-    PMU_EVENT_TYPE_MAC_STALLED_BY_WD_ACC      = 0x34,
-    PMU_EVENT_TYPE_MAC_STALLED_BY_WD          = 0x35,
-    PMU_EVENT_TYPE_MAC_STALLED_BY_ACC         = 0x36,
-    PMU_EVENT_TYPE_MAC_STALLED_BY_IB          = 0x37,
-    PMU_EVENT_TYPE_MAC_ACTIVE_32BIT           = 0x38,
-    PMU_EVENT_TYPE_AO_ACTIVE                  = 0x40,
-    PMU_EVENT_TYPE_AO_ACTIVE_8BIT             = 0x41,
-    PMU_EVENT_TYPE_AO_ACTIVE_16BIT            = 0x42,
-    PMU_EVENT_TYPE_AO_STALLED_BY_OFMP_OB      = 0x43,
-    PMU_EVENT_TYPE_AO_STALLED_BY_OFMP         = 0x44,
-    PMU_EVENT_TYPE_AO_STALLED_BY_OB           = 0x45,
-    PMU_EVENT_TYPE_AO_STALLED_BY_ACC_IB       = 0x46,
-    PMU_EVENT_TYPE_AO_STALLED_BY_ACC          = 0x47,
-    PMU_EVENT_TYPE_AO_STALLED_BY_IB           = 0x48,
-    PMU_EVENT_TYPE_WD_ACTIVE                  = 0x50,
-    PMU_EVENT_TYPE_WD_STALLED                 = 0x51,
-    PMU_EVENT_TYPE_WD_STALLED_BY_WS           = 0x52,
-    PMU_EVENT_TYPE_WD_STALLED_BY_WD_BUF       = 0x53,
-    PMU_EVENT_TYPE_WD_PARSE_ACTIVE            = 0x54,
-    PMU_EVENT_TYPE_WD_PARSE_STALLED           = 0x55,
-    PMU_EVENT_TYPE_WD_PARSE_STALLED_IN        = 0x56,
-    PMU_EVENT_TYPE_WD_PARSE_STALLED_OUT       = 0x57,
-    PMU_EVENT_TYPE_WD_TRANS_WS                = 0x58,
-    PMU_EVENT_TYPE_WD_TRANS_WB                = 0x59,
-    PMU_EVENT_TYPE_WD_TRANS_DW0               = 0x5a,
-    PMU_EVENT_TYPE_WD_TRANS_DW1               = 0x5b,
-    PMU_EVENT_TYPE_AXI0_RD_TRANS_ACCEPTED     = 0x80,
-    PMU_EVENT_TYPE_AXI0_RD_TRANS_COMPLETED    = 0x81,
-    PMU_EVENT_TYPE_AXI0_RD_DATA_BEAT_RECEIVED = 0x82,
-    PMU_EVENT_TYPE_AXI0_RD_TRAN_REQ_STALLED   = 0x83,
-    PMU_EVENT_TYPE_AXI0_WR_TRANS_ACCEPTED     = 0x84,
-    PMU_EVENT_TYPE_AXI0_WR_TRANS_COMPLETED_M  = 0x85,
-    PMU_EVENT_TYPE_AXI0_WR_TRANS_COMPLETED_S  = 0x86,
-    PMU_EVENT_TYPE_AXI0_WR_DATA_BEAT_WRITTEN  = 0x87,
-    PMU_EVENT_TYPE_AXI0_WR_TRAN_REQ_STALLED   = 0x88,
-    PMU_EVENT_TYPE_AXI0_WR_DATA_BEAT_STALLED  = 0x89,
-    PMU_EVENT_TYPE_AXI0_ENABLED_CYCLES        = 0x8c,
-    PMU_EVENT_TYPE_AXI0_RD_STALL_LIMIT        = 0x8e,
-    PMU_EVENT_TYPE_AXI0_WR_STALL_LIMIT        = 0x8f,
-    PMU_EVENT_TYPE_AXI1_RD_TRANS_ACCEPTED     = 0x180,
-    PMU_EVENT_TYPE_AXI1_RD_TRANS_COMPLETED    = 0x181,
-    PMU_EVENT_TYPE_AXI1_RD_DATA_BEAT_RECEIVED = 0x182,
-    PMU_EVENT_TYPE_AXI1_RD_TRAN_REQ_STALLED   = 0x183,
-    PMU_EVENT_TYPE_AXI1_WR_TRANS_ACCEPTED     = 0x184,
-    PMU_EVENT_TYPE_AXI1_WR_TRANS_COMPLETED_M  = 0x185,
-    PMU_EVENT_TYPE_AXI1_WR_TRANS_COMPLETED_S  = 0x186,
-    PMU_EVENT_TYPE_AXI1_WR_DATA_BEAT_WRITTEN  = 0x187,
-    PMU_EVENT_TYPE_AXI1_WR_TRAN_REQ_STALLED   = 0x188,
-    PMU_EVENT_TYPE_AXI1_WR_DATA_BEAT_STALLED  = 0x189,
-    PMU_EVENT_TYPE_AXI1_ENABLED_CYCLES        = 0x18c,
-    PMU_EVENT_TYPE_AXI1_RD_STALL_LIMIT        = 0x18e,
-    PMU_EVENT_TYPE_AXI1_WR_STALL_LIMIT        = 0x18f,
-    PMU_EVENT_TYPE_AXI_LATENCY_ANY            = 0xa0,
-    PMU_EVENT_TYPE_AXI_LATENCY_32             = 0xa1,
-    PMU_EVENT_TYPE_AXI_LATENCY_64             = 0xa2,
-    PMU_EVENT_TYPE_AXI_LATENCY_128            = 0xa3,
-    PMU_EVENT_TYPE_AXI_LATENCY_256            = 0xa4,
-    PMU_EVENT_TYPE_AXI_LATENCY_512            = 0xa5,
-    PMU_EVENT_TYPE_AXI_LATENCY_1024           = 0xa6,
+    PMU_EVENT_TYPE_NO_EVENT                     = 0x00,
+    PMU_EVENT_TYPE_CYCLE                        = 0x11,
+    PMU_EVENT_TYPE_NPU_IDLE                     = 0x20,
+    PMU_EVENT_TYPE_CC_STALLED_ON_BLOCKDEP       = 0x21,
+    PMU_EVENT_TYPE_CC_STALLED_ON_SHRAM_RECONFIG = 0x22,
+    PMU_EVENT_TYPE_MAC_ACTIVE                   = 0x30,
+    PMU_EVENT_TYPE_MAC_ACTIVE_8BIT              = 0x31,
+    PMU_EVENT_TYPE_MAC_ACTIVE_16BIT             = 0x32,
+    PMU_EVENT_TYPE_MAC_DPU_ACTIVE               = 0x33,
+    PMU_EVENT_TYPE_MAC_STALLED_BY_WD_ACC        = 0x34,
+    PMU_EVENT_TYPE_MAC_STALLED_BY_WD            = 0x35,
+    PMU_EVENT_TYPE_MAC_STALLED_BY_ACC           = 0x36,
+    PMU_EVENT_TYPE_MAC_STALLED_BY_IB            = 0x37,
+    PMU_EVENT_TYPE_MAC_ACTIVE_32BIT             = 0x38,
+    PMU_EVENT_TYPE_MAC_STALLED_BY_INT_W         = 0x39,
+    PMU_EVENT_TYPE_MAC_STALLED_BY_INT_ACC       = 0x3A,
+    PMU_EVENT_TYPE_AO_ACTIVE                    = 0x40,
+    PMU_EVENT_TYPE_AO_ACTIVE_8BIT               = 0x41,
+    PMU_EVENT_TYPE_AO_ACTIVE_16BIT              = 0x42,
+    PMU_EVENT_TYPE_AO_STALLED_BY_OFMP_OB        = 0x43,
+    PMU_EVENT_TYPE_AO_STALLED_BY_OFMP           = 0x44,
+    PMU_EVENT_TYPE_AO_STALLED_BY_OB             = 0x45,
+    PMU_EVENT_TYPE_AO_STALLED_BY_ACC_IB         = 0x46,
+    PMU_EVENT_TYPE_AO_STALLED_BY_ACC            = 0x47,
+    PMU_EVENT_TYPE_AO_STALLED_BY_IB             = 0x48,
+    PMU_EVENT_TYPE_WD_ACTIVE                    = 0x50,
+    PMU_EVENT_TYPE_WD_STALLED                   = 0x51,
+    PMU_EVENT_TYPE_WD_STALLED_BY_WS             = 0x52,
+    PMU_EVENT_TYPE_WD_STALLED_BY_WD_BUF         = 0x53,
+    PMU_EVENT_TYPE_WD_PARSE_ACTIVE              = 0x54,
+    PMU_EVENT_TYPE_WD_PARSE_STALLED             = 0x55,
+    PMU_EVENT_TYPE_WD_PARSE_STALLED_IN          = 0x56,
+    PMU_EVENT_TYPE_WD_PARSE_STALLED_OUT         = 0x57,
+    PMU_EVENT_TYPE_WD_TRANS_WS                  = 0x58,
+    PMU_EVENT_TYPE_WD_TRANS_WB                  = 0x59,
+    PMU_EVENT_TYPE_WD_TRANS_DW0                 = 0x5a,
+    PMU_EVENT_TYPE_WD_TRANS_DW1                 = 0x5b,
+    PMU_EVENT_TYPE_AXI0_RD_TRANS_ACCEPTED       = 0x80,
+    PMU_EVENT_TYPE_AXI0_RD_TRANS_COMPLETED      = 0x81,
+    PMU_EVENT_TYPE_AXI0_RD_DATA_BEAT_RECEIVED   = 0x82,
+    PMU_EVENT_TYPE_AXI0_RD_TRAN_REQ_STALLED     = 0x83,
+    PMU_EVENT_TYPE_AXI0_WR_TRANS_ACCEPTED       = 0x84,
+    PMU_EVENT_TYPE_AXI0_WR_TRANS_COMPLETED_M    = 0x85,
+    PMU_EVENT_TYPE_AXI0_WR_TRANS_COMPLETED_S    = 0x86,
+    PMU_EVENT_TYPE_AXI0_WR_DATA_BEAT_WRITTEN    = 0x87,
+    PMU_EVENT_TYPE_AXI0_WR_TRAN_REQ_STALLED     = 0x88,
+    PMU_EVENT_TYPE_AXI0_WR_DATA_BEAT_STALLED    = 0x89,
+    PMU_EVENT_TYPE_AXI0_ENABLED_CYCLES          = 0x8c,
+    PMU_EVENT_TYPE_AXI0_RD_STALL_LIMIT          = 0x8e,
+    PMU_EVENT_TYPE_AXI0_WR_STALL_LIMIT          = 0x8f,
+    PMU_EVENT_TYPE_AXI1_RD_TRANS_ACCEPTED       = 0x180,
+    PMU_EVENT_TYPE_AXI1_RD_TRANS_COMPLETED      = 0x181,
+    PMU_EVENT_TYPE_AXI1_RD_DATA_BEAT_RECEIVED   = 0x182,
+    PMU_EVENT_TYPE_AXI1_RD_TRAN_REQ_STALLED     = 0x183,
+    PMU_EVENT_TYPE_AXI1_WR_TRANS_ACCEPTED       = 0x184,
+    PMU_EVENT_TYPE_AXI1_WR_TRANS_COMPLETED_M    = 0x185,
+    PMU_EVENT_TYPE_AXI1_WR_TRANS_COMPLETED_S    = 0x186,
+    PMU_EVENT_TYPE_AXI1_WR_DATA_BEAT_WRITTEN    = 0x187,
+    PMU_EVENT_TYPE_AXI1_WR_TRAN_REQ_STALLED     = 0x188,
+    PMU_EVENT_TYPE_AXI1_WR_DATA_BEAT_STALLED    = 0x189,
+    PMU_EVENT_TYPE_AXI1_ENABLED_CYCLES          = 0x18c,
+    PMU_EVENT_TYPE_AXI1_RD_STALL_LIMIT          = 0x18e,
+    PMU_EVENT_TYPE_AXI1_WR_STALL_LIMIT          = 0x18f,
+    PMU_EVENT_TYPE_AXI_LATENCY_ANY              = 0xa0,
+    PMU_EVENT_TYPE_AXI_LATENCY_32               = 0xa1,
+    PMU_EVENT_TYPE_AXI_LATENCY_64               = 0xa2,
+    PMU_EVENT_TYPE_AXI_LATENCY_128              = 0xa3,
+    PMU_EVENT_TYPE_AXI_LATENCY_256              = 0xa4,
+    PMU_EVENT_TYPE_AXI_LATENCY_512              = 0xa5,
+    PMU_EVENT_TYPE_AXI_LATENCY_1024             = 0xa6,
 };
 
 enum pooling_mode
@@ -1202,6 +1209,1747 @@ enum stride_mode
 };
 
 #endif
+
+// wd_status_r - WD_STATUS of core DEBUGCORE
+struct wd_status_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        struct
+        {
+            uint32_t core_slice_state : 2; // STATE_HEADER=0, STATE_PALETTE=1, STATE_WEIGHTS=2
+            uint32_t core_idle : 1;        // Core idle
+            uint32_t ctrl_state : 2;       // IDLE=0, DRAIN=1, OFD_INIT=2, OFD_RUN=3
+            uint32_t ctrl_idle : 1;        // All stripe jobs idle (all weights consumed)
+            uint32_t write_buf_index0 : 3; // current write index for next data from core
+            uint32_t write_buf_valid0 : 1; // write buf valid (full)
+            uint32_t write_buf_idle0 : 1;  // write buf idle (empty)
+            uint32_t write_buf_index1 : 3; // current write index for next data from core
+            uint32_t write_buf_valid1 : 1; // write buf valid (full)
+            uint32_t write_buf_idle1 : 1;  // write buf idle (empty)
+            uint32_t events : 12;          // WD events mapped as appendix A
+            uint32_t reserved0 : 4;
+        };
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR wd_status_r() :
+        core_slice_state(static_cast<uint32_t>(0)), core_idle(static_cast<uint32_t>(0)),
+        ctrl_state(static_cast<uint32_t>(0)), ctrl_idle(static_cast<uint32_t>(0)),
+        write_buf_index0(static_cast<uint32_t>(0)), write_buf_valid0(static_cast<uint32_t>(0)),
+        write_buf_idle0(static_cast<uint32_t>(0)), write_buf_index1(static_cast<uint32_t>(0)),
+        write_buf_valid1(static_cast<uint32_t>(0)), write_buf_idle1(static_cast<uint32_t>(0)),
+        events(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0))
+    {
+    }
+    CONSTEXPR wd_status_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    wd_status_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_core_slice_state() const
+    {
+        uint32_t value = static_cast<uint32_t>(core_slice_state);
+        return value;
+    }
+    uint32_t get_core_slice_state() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(core_slice_state);
+        return value;
+    }
+    CONSTEXPR wd_status_r &set_core_slice_state(uint32_t value)
+    {
+        core_slice_state = ((1u << 2) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_core_idle() const
+    {
+        uint32_t value = static_cast<uint32_t>(core_idle);
+        return value;
+    }
+    uint32_t get_core_idle() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(core_idle);
+        return value;
+    }
+    CONSTEXPR wd_status_r &set_core_idle(uint32_t value)
+    {
+        core_idle = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_ctrl_state() const
+    {
+        uint32_t value = static_cast<uint32_t>(ctrl_state);
+        return value;
+    }
+    uint32_t get_ctrl_state() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(ctrl_state);
+        return value;
+    }
+    CONSTEXPR wd_status_r &set_ctrl_state(uint32_t value)
+    {
+        ctrl_state = ((1u << 2) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_ctrl_idle() const
+    {
+        uint32_t value = static_cast<uint32_t>(ctrl_idle);
+        return value;
+    }
+    uint32_t get_ctrl_idle() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(ctrl_idle);
+        return value;
+    }
+    CONSTEXPR wd_status_r &set_ctrl_idle(uint32_t value)
+    {
+        ctrl_idle = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_write_buf_index0() const
+    {
+        uint32_t value = static_cast<uint32_t>(write_buf_index0);
+        return value;
+    }
+    uint32_t get_write_buf_index0() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(write_buf_index0);
+        return value;
+    }
+    CONSTEXPR wd_status_r &set_write_buf_index0(uint32_t value)
+    {
+        write_buf_index0 = ((1u << 3) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_write_buf_valid0() const
+    {
+        uint32_t value = static_cast<uint32_t>(write_buf_valid0);
+        return value;
+    }
+    uint32_t get_write_buf_valid0() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(write_buf_valid0);
+        return value;
+    }
+    CONSTEXPR wd_status_r &set_write_buf_valid0(uint32_t value)
+    {
+        write_buf_valid0 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_write_buf_idle0() const
+    {
+        uint32_t value = static_cast<uint32_t>(write_buf_idle0);
+        return value;
+    }
+    uint32_t get_write_buf_idle0() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(write_buf_idle0);
+        return value;
+    }
+    CONSTEXPR wd_status_r &set_write_buf_idle0(uint32_t value)
+    {
+        write_buf_idle0 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_write_buf_index1() const
+    {
+        uint32_t value = static_cast<uint32_t>(write_buf_index1);
+        return value;
+    }
+    uint32_t get_write_buf_index1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(write_buf_index1);
+        return value;
+    }
+    CONSTEXPR wd_status_r &set_write_buf_index1(uint32_t value)
+    {
+        write_buf_index1 = ((1u << 3) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_write_buf_valid1() const
+    {
+        uint32_t value = static_cast<uint32_t>(write_buf_valid1);
+        return value;
+    }
+    uint32_t get_write_buf_valid1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(write_buf_valid1);
+        return value;
+    }
+    CONSTEXPR wd_status_r &set_write_buf_valid1(uint32_t value)
+    {
+        write_buf_valid1 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_write_buf_idle1() const
+    {
+        uint32_t value = static_cast<uint32_t>(write_buf_idle1);
+        return value;
+    }
+    uint32_t get_write_buf_idle1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(write_buf_idle1);
+        return value;
+    }
+    CONSTEXPR wd_status_r &set_write_buf_idle1(uint32_t value)
+    {
+        write_buf_idle1 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_events() const
+    {
+        uint32_t value = static_cast<uint32_t>(events);
+        return value;
+    }
+    uint32_t get_events() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(events);
+        return value;
+    }
+    CONSTEXPR wd_status_r &set_events(uint32_t value)
+    {
+        events = ((1u << 12) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// mac_status_r - MAC_STATUS of core DEBUGCORE
+struct mac_status_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        struct
+        {
+            uint32_t block_cfg_valid : 1;     // MAC has a valid block configuration
+            uint32_t trav_en : 1;             // MAC is doing block traversal
+            uint32_t wait_for_ib : 1;         // MAC is waiting for an Input Buffer to become available
+            uint32_t wait_for_acc_buf : 1;    // MAC is waiting for an Accumulator Buffer to become available
+            uint32_t wait_for_weights : 1;    // MAC is waiting for a Weight Block to become available
+            uint32_t stall_stripe : 1;        // MAC is stalling between two stripes
+            uint32_t dw_sel : 1;              // Currently used weight interface in MAC AI
+            uint32_t wait_for_dw0_ready : 1;  // MAC AI is waiting for MAC DPU to send dw0_ready to WD
+            uint32_t wait_for_dw1_ready : 1;  // MAC AI is waiting for MAC DPU to send dw1_ready to WD
+            uint32_t acc_buf_sel_ai : 1;      // Currently used AccBuf interface in MAC AI
+            uint32_t wait_for_acc0_ready : 1; // MAC AI is waiting for acc0_ready from AO
+            uint32_t wait_for_acc1_ready : 1; // MAC AI is waiting for acc1_ready from AO
+            uint32_t acc_buf_sel_aa : 1;      // Currently used AccBuf interface in MAC ADDER_ARRAY
+            uint32_t acc0_valid : 1;          // MAC outgoing value of acc0_valid
+            uint32_t acc1_valid : 1;          // MAC outgoing value of acc1_valid
+            uint32_t reserved0 : 1;
+            uint32_t events : 11; // Mapped to MAC events described in Appendix A
+            uint32_t reserved1 : 5;
+        };
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR mac_status_r() :
+        block_cfg_valid(static_cast<uint32_t>(0)), trav_en(static_cast<uint32_t>(0)),
+        wait_for_ib(static_cast<uint32_t>(0)), wait_for_acc_buf(static_cast<uint32_t>(0)),
+        wait_for_weights(static_cast<uint32_t>(0)), stall_stripe(static_cast<uint32_t>(0)),
+        dw_sel(static_cast<uint32_t>(0)), wait_for_dw0_ready(static_cast<uint32_t>(0)),
+        wait_for_dw1_ready(static_cast<uint32_t>(0)), acc_buf_sel_ai(static_cast<uint32_t>(0)),
+        wait_for_acc0_ready(static_cast<uint32_t>(0)), wait_for_acc1_ready(static_cast<uint32_t>(0)),
+        acc_buf_sel_aa(static_cast<uint32_t>(0)), acc0_valid(static_cast<uint32_t>(0)),
+        acc1_valid(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)), events(static_cast<uint32_t>(0)),
+        reserved1(static_cast<uint32_t>(0))
+    {
+    }
+    CONSTEXPR mac_status_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    mac_status_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_block_cfg_valid() const
+    {
+        uint32_t value = static_cast<uint32_t>(block_cfg_valid);
+        return value;
+    }
+    uint32_t get_block_cfg_valid() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(block_cfg_valid);
+        return value;
+    }
+    CONSTEXPR mac_status_r &set_block_cfg_valid(uint32_t value)
+    {
+        block_cfg_valid = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_trav_en() const
+    {
+        uint32_t value = static_cast<uint32_t>(trav_en);
+        return value;
+    }
+    uint32_t get_trav_en() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(trav_en);
+        return value;
+    }
+    CONSTEXPR mac_status_r &set_trav_en(uint32_t value)
+    {
+        trav_en = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_wait_for_ib() const
+    {
+        uint32_t value = static_cast<uint32_t>(wait_for_ib);
+        return value;
+    }
+    uint32_t get_wait_for_ib() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(wait_for_ib);
+        return value;
+    }
+    CONSTEXPR mac_status_r &set_wait_for_ib(uint32_t value)
+    {
+        wait_for_ib = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_wait_for_acc_buf() const
+    {
+        uint32_t value = static_cast<uint32_t>(wait_for_acc_buf);
+        return value;
+    }
+    uint32_t get_wait_for_acc_buf() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(wait_for_acc_buf);
+        return value;
+    }
+    CONSTEXPR mac_status_r &set_wait_for_acc_buf(uint32_t value)
+    {
+        wait_for_acc_buf = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_wait_for_weights() const
+    {
+        uint32_t value = static_cast<uint32_t>(wait_for_weights);
+        return value;
+    }
+    uint32_t get_wait_for_weights() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(wait_for_weights);
+        return value;
+    }
+    CONSTEXPR mac_status_r &set_wait_for_weights(uint32_t value)
+    {
+        wait_for_weights = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_stall_stripe() const
+    {
+        uint32_t value = static_cast<uint32_t>(stall_stripe);
+        return value;
+    }
+    uint32_t get_stall_stripe() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(stall_stripe);
+        return value;
+    }
+    CONSTEXPR mac_status_r &set_stall_stripe(uint32_t value)
+    {
+        stall_stripe = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_dw_sel() const
+    {
+        uint32_t value = static_cast<uint32_t>(dw_sel);
+        return value;
+    }
+    uint32_t get_dw_sel() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(dw_sel);
+        return value;
+    }
+    CONSTEXPR mac_status_r &set_dw_sel(uint32_t value)
+    {
+        dw_sel = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_wait_for_dw0_ready() const
+    {
+        uint32_t value = static_cast<uint32_t>(wait_for_dw0_ready);
+        return value;
+    }
+    uint32_t get_wait_for_dw0_ready() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(wait_for_dw0_ready);
+        return value;
+    }
+    CONSTEXPR mac_status_r &set_wait_for_dw0_ready(uint32_t value)
+    {
+        wait_for_dw0_ready = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_wait_for_dw1_ready() const
+    {
+        uint32_t value = static_cast<uint32_t>(wait_for_dw1_ready);
+        return value;
+    }
+    uint32_t get_wait_for_dw1_ready() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(wait_for_dw1_ready);
+        return value;
+    }
+    CONSTEXPR mac_status_r &set_wait_for_dw1_ready(uint32_t value)
+    {
+        wait_for_dw1_ready = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_acc_buf_sel_ai() const
+    {
+        uint32_t value = static_cast<uint32_t>(acc_buf_sel_ai);
+        return value;
+    }
+    uint32_t get_acc_buf_sel_ai() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(acc_buf_sel_ai);
+        return value;
+    }
+    CONSTEXPR mac_status_r &set_acc_buf_sel_ai(uint32_t value)
+    {
+        acc_buf_sel_ai = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_wait_for_acc0_ready() const
+    {
+        uint32_t value = static_cast<uint32_t>(wait_for_acc0_ready);
+        return value;
+    }
+    uint32_t get_wait_for_acc0_ready() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(wait_for_acc0_ready);
+        return value;
+    }
+    CONSTEXPR mac_status_r &set_wait_for_acc0_ready(uint32_t value)
+    {
+        wait_for_acc0_ready = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_wait_for_acc1_ready() const
+    {
+        uint32_t value = static_cast<uint32_t>(wait_for_acc1_ready);
+        return value;
+    }
+    uint32_t get_wait_for_acc1_ready() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(wait_for_acc1_ready);
+        return value;
+    }
+    CONSTEXPR mac_status_r &set_wait_for_acc1_ready(uint32_t value)
+    {
+        wait_for_acc1_ready = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_acc_buf_sel_aa() const
+    {
+        uint32_t value = static_cast<uint32_t>(acc_buf_sel_aa);
+        return value;
+    }
+    uint32_t get_acc_buf_sel_aa() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(acc_buf_sel_aa);
+        return value;
+    }
+    CONSTEXPR mac_status_r &set_acc_buf_sel_aa(uint32_t value)
+    {
+        acc_buf_sel_aa = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_acc0_valid() const
+    {
+        uint32_t value = static_cast<uint32_t>(acc0_valid);
+        return value;
+    }
+    uint32_t get_acc0_valid() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(acc0_valid);
+        return value;
+    }
+    CONSTEXPR mac_status_r &set_acc0_valid(uint32_t value)
+    {
+        acc0_valid = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_acc1_valid() const
+    {
+        uint32_t value = static_cast<uint32_t>(acc1_valid);
+        return value;
+    }
+    uint32_t get_acc1_valid() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(acc1_valid);
+        return value;
+    }
+    CONSTEXPR mac_status_r &set_acc1_valid(uint32_t value)
+    {
+        acc1_valid = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_events() const
+    {
+        uint32_t value = static_cast<uint32_t>(events);
+        return value;
+    }
+    uint32_t get_events() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(events);
+        return value;
+    }
+    CONSTEXPR mac_status_r &set_events(uint32_t value)
+    {
+        events = ((1u << 11) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// ao_status_r - AO_STATUS of core DEBUGCORE
+struct ao_status_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        struct
+        {
+            uint32_t cmd_sbw_valid : 1; // Block command to shared buffer write module is valid.
+            uint32_t cmd_act_valid : 1; // Block command to activation function module is valid.
+            uint32_t cmd_ctl_valid : 1; // Block command to control module is valid.
+            uint32_t cmd_scl_valid : 1; // Block command to scale module is valid.
+            uint32_t cmd_sbr_valid : 1; // Block command to shared buffer read module is valid.
+            uint32_t cmd_ofm_valid : 1; // Block command to ofm parameter module is valid.
+            uint32_t blk_cmd_ready : 1; // Ready to accept block command.
+            uint32_t blk_cmd_valid : 1; // Block command from CC is valid.
+            uint32_t reserved0 : 8;
+            uint32_t events : 8; // Mapped to AO events described in Appendix A.
+            uint32_t reserved1 : 8;
+        };
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR ao_status_r() :
+        cmd_sbw_valid(static_cast<uint32_t>(0)), cmd_act_valid(static_cast<uint32_t>(0)),
+        cmd_ctl_valid(static_cast<uint32_t>(0)), cmd_scl_valid(static_cast<uint32_t>(0)),
+        cmd_sbr_valid(static_cast<uint32_t>(0)), cmd_ofm_valid(static_cast<uint32_t>(0)),
+        blk_cmd_ready(static_cast<uint32_t>(0)), blk_cmd_valid(static_cast<uint32_t>(0)),
+        reserved0(static_cast<uint32_t>(0)), events(static_cast<uint32_t>(0)), reserved1(static_cast<uint32_t>(0))
+    {
+    }
+    CONSTEXPR ao_status_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    ao_status_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_cmd_sbw_valid() const
+    {
+        uint32_t value = static_cast<uint32_t>(cmd_sbw_valid);
+        return value;
+    }
+    uint32_t get_cmd_sbw_valid() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(cmd_sbw_valid);
+        return value;
+    }
+    CONSTEXPR ao_status_r &set_cmd_sbw_valid(uint32_t value)
+    {
+        cmd_sbw_valid = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_cmd_act_valid() const
+    {
+        uint32_t value = static_cast<uint32_t>(cmd_act_valid);
+        return value;
+    }
+    uint32_t get_cmd_act_valid() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(cmd_act_valid);
+        return value;
+    }
+    CONSTEXPR ao_status_r &set_cmd_act_valid(uint32_t value)
+    {
+        cmd_act_valid = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_cmd_ctl_valid() const
+    {
+        uint32_t value = static_cast<uint32_t>(cmd_ctl_valid);
+        return value;
+    }
+    uint32_t get_cmd_ctl_valid() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(cmd_ctl_valid);
+        return value;
+    }
+    CONSTEXPR ao_status_r &set_cmd_ctl_valid(uint32_t value)
+    {
+        cmd_ctl_valid = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_cmd_scl_valid() const
+    {
+        uint32_t value = static_cast<uint32_t>(cmd_scl_valid);
+        return value;
+    }
+    uint32_t get_cmd_scl_valid() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(cmd_scl_valid);
+        return value;
+    }
+    CONSTEXPR ao_status_r &set_cmd_scl_valid(uint32_t value)
+    {
+        cmd_scl_valid = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_cmd_sbr_valid() const
+    {
+        uint32_t value = static_cast<uint32_t>(cmd_sbr_valid);
+        return value;
+    }
+    uint32_t get_cmd_sbr_valid() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(cmd_sbr_valid);
+        return value;
+    }
+    CONSTEXPR ao_status_r &set_cmd_sbr_valid(uint32_t value)
+    {
+        cmd_sbr_valid = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_cmd_ofm_valid() const
+    {
+        uint32_t value = static_cast<uint32_t>(cmd_ofm_valid);
+        return value;
+    }
+    uint32_t get_cmd_ofm_valid() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(cmd_ofm_valid);
+        return value;
+    }
+    CONSTEXPR ao_status_r &set_cmd_ofm_valid(uint32_t value)
+    {
+        cmd_ofm_valid = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_blk_cmd_ready() const
+    {
+        uint32_t value = static_cast<uint32_t>(blk_cmd_ready);
+        return value;
+    }
+    uint32_t get_blk_cmd_ready() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(blk_cmd_ready);
+        return value;
+    }
+    CONSTEXPR ao_status_r &set_blk_cmd_ready(uint32_t value)
+    {
+        blk_cmd_ready = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_blk_cmd_valid() const
+    {
+        uint32_t value = static_cast<uint32_t>(blk_cmd_valid);
+        return value;
+    }
+    uint32_t get_blk_cmd_valid() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(blk_cmd_valid);
+        return value;
+    }
+    CONSTEXPR ao_status_r &set_blk_cmd_valid(uint32_t value)
+    {
+        blk_cmd_valid = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_events() const
+    {
+        uint32_t value = static_cast<uint32_t>(events);
+        return value;
+    }
+    uint32_t get_events() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(events);
+        return value;
+    }
+    CONSTEXPR ao_status_r &set_events(uint32_t value)
+    {
+        events = ((1u << 8) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// dma_status0_r - DMA_STATUS0 of core DEBUGCORE
+struct dma_status0_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        struct
+        {
+            uint32_t CMD_IDLE : 1; // When this bit is high means that the CMD block is not busy in generating addresses
+                                   // for a CMD job.
+            uint32_t IFM_IDLE : 1; // When this bit is high means that there are no ongoing IFM jobs
+            uint32_t WGT_IDLE_C0 : 1; // When this bit is high means that the WGT block is not busy in generating
+                                      // addresses for a WGT job
+            uint32_t BAS_IDLE_C0 : 1; // When this bit is high means that the BAS block is not busy in generating
+                                      // addresses for a BAS job
+            uint32_t M2M_IDLE : 1;    // When this bit is high means that there are no ongoing M2M jobs
+            uint32_t OFM_IDLE : 1;    // When this bit is high means that there are no ongoing OFM jobs
+            uint32_t HALT_REQ : 1;    // CPM has requested to HALT AXI bus before soft reset
+            uint32_t HALT_ACK : 1;    // DMA is in condition to halt the AXI bus since there are no pending transactions
+            uint32_t PAUSE_REQ : 1;   // CC has requested to pause the AXI
+            uint32_t PAUSE_ACK : 1; // DMA is in condition to pause the AXI bus since there are no pending transactions
+            uint32_t IB0_AI_VALID_C0 : 1;       // Data for AI to be read in IFM input buffer 0 - Core 0
+            uint32_t IB0_AI_READY_C0 : 1;       // Data consumed from AI in IFM input buffer 0 - Core 0
+            uint32_t IB1_AI_VALID_C0 : 1;       // Data for AI to be read in IFM input buffer 1 - Core 0
+            uint32_t IB1_AI_READY_C0 : 1;       // Data consumed from AI in IFM input buffer 1 - Core 0
+            uint32_t IB0_AO_VALID_C0 : 1;       // Data for AO to be read in IFM input buffer 0 - Core 0
+            uint32_t IB0_AO_READY_C0 : 1;       // Data consumed from AO in IFM input buffer 0 - Core 0
+            uint32_t IB1_AO_VALID_C0 : 1;       // Data for AO to be read in IFM input buffer 0 - Core 0
+            uint32_t IB1_AO_READY_C0 : 1;       // Data consumed from AO in IFM input buffer 1 - Core 0
+            uint32_t OB0_VALID_C0 : 1;          // Data for DMA ready to be consumed in OFM output buffer 0 -  Core 0
+            uint32_t OB0_READY_C0 : 1;          // Data consumed from DMA in OFM output buffer 0 - Core 0
+            uint32_t OB1_VALID_C0 : 1;          // Data for DMA ready to be consumed in OFM output buffer 1 -  Core 0
+            uint32_t OB1_READY_C0 : 1;          // Data consumed from DMA in OFM output buffer 1 - Core 0
+            uint32_t CMD_VALID : 1;             // New command word for CC to be consumed
+            uint32_t CMD_READY : 1;             // command word consumed by CC
+            uint32_t WD_BITSTREAM_VALID_C0 : 1; // New weight word for WD to be consumed - Core 0
+            uint32_t WD_BITSTREAM_READY_C0 : 1; // Weight word consumed by WD - Core 0
+            uint32_t BS_BITSTREAM_VALID_C0 : 1; // New BaS word for AO to be consumed - Core 0
+            uint32_t BS_BITSTREAM_READY_C0 : 1; // BaS word consumed by AO - Core 0
+            uint32_t AXI0_AR_STALLED : 1; // Read transfer request stalled on arready low AXI0 (due to memory system)
+            uint32_t AXI0_RD_LIMIT_STALL : 1; // Read stalled due to one AXI0 limit counter being reached
+            uint32_t AXI0_AW_STALLED : 1; // Write transfer request stalled on awready low AXI0 (due to memory system)
+            uint32_t AXI0_W_STALLED : 1;  // Write transfer stalled on awready low AXI0 (due to memory system)
+        };
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR dma_status0_r() :
+        CMD_IDLE(static_cast<uint32_t>(0)), IFM_IDLE(static_cast<uint32_t>(0)), WGT_IDLE_C0(static_cast<uint32_t>(0)),
+        BAS_IDLE_C0(static_cast<uint32_t>(0)), M2M_IDLE(static_cast<uint32_t>(0)), OFM_IDLE(static_cast<uint32_t>(0)),
+        HALT_REQ(static_cast<uint32_t>(0)), HALT_ACK(static_cast<uint32_t>(0)), PAUSE_REQ(static_cast<uint32_t>(0)),
+        PAUSE_ACK(static_cast<uint32_t>(0)), IB0_AI_VALID_C0(static_cast<uint32_t>(0)),
+        IB0_AI_READY_C0(static_cast<uint32_t>(0)), IB1_AI_VALID_C0(static_cast<uint32_t>(0)),
+        IB1_AI_READY_C0(static_cast<uint32_t>(0)), IB0_AO_VALID_C0(static_cast<uint32_t>(0)),
+        IB0_AO_READY_C0(static_cast<uint32_t>(0)), IB1_AO_VALID_C0(static_cast<uint32_t>(0)),
+        IB1_AO_READY_C0(static_cast<uint32_t>(0)), OB0_VALID_C0(static_cast<uint32_t>(0)),
+        OB0_READY_C0(static_cast<uint32_t>(0)), OB1_VALID_C0(static_cast<uint32_t>(0)),
+        OB1_READY_C0(static_cast<uint32_t>(0)), CMD_VALID(static_cast<uint32_t>(0)),
+        CMD_READY(static_cast<uint32_t>(0)), WD_BITSTREAM_VALID_C0(static_cast<uint32_t>(0)),
+        WD_BITSTREAM_READY_C0(static_cast<uint32_t>(0)), BS_BITSTREAM_VALID_C0(static_cast<uint32_t>(0)),
+        BS_BITSTREAM_READY_C0(static_cast<uint32_t>(0)), AXI0_AR_STALLED(static_cast<uint32_t>(0)),
+        AXI0_RD_LIMIT_STALL(static_cast<uint32_t>(0)), AXI0_AW_STALLED(static_cast<uint32_t>(0)),
+        AXI0_W_STALLED(static_cast<uint32_t>(0))
+    {
+    }
+    CONSTEXPR dma_status0_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    dma_status0_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_CMD_IDLE() const
+    {
+        uint32_t value = static_cast<uint32_t>(CMD_IDLE);
+        return value;
+    }
+    uint32_t get_CMD_IDLE() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(CMD_IDLE);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_CMD_IDLE(uint32_t value)
+    {
+        CMD_IDLE = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_IFM_IDLE() const
+    {
+        uint32_t value = static_cast<uint32_t>(IFM_IDLE);
+        return value;
+    }
+    uint32_t get_IFM_IDLE() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(IFM_IDLE);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_IFM_IDLE(uint32_t value)
+    {
+        IFM_IDLE = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_WGT_IDLE_C0() const
+    {
+        uint32_t value = static_cast<uint32_t>(WGT_IDLE_C0);
+        return value;
+    }
+    uint32_t get_WGT_IDLE_C0() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(WGT_IDLE_C0);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_WGT_IDLE_C0(uint32_t value)
+    {
+        WGT_IDLE_C0 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_BAS_IDLE_C0() const
+    {
+        uint32_t value = static_cast<uint32_t>(BAS_IDLE_C0);
+        return value;
+    }
+    uint32_t get_BAS_IDLE_C0() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(BAS_IDLE_C0);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_BAS_IDLE_C0(uint32_t value)
+    {
+        BAS_IDLE_C0 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_M2M_IDLE() const
+    {
+        uint32_t value = static_cast<uint32_t>(M2M_IDLE);
+        return value;
+    }
+    uint32_t get_M2M_IDLE() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(M2M_IDLE);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_M2M_IDLE(uint32_t value)
+    {
+        M2M_IDLE = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_OFM_IDLE() const
+    {
+        uint32_t value = static_cast<uint32_t>(OFM_IDLE);
+        return value;
+    }
+    uint32_t get_OFM_IDLE() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(OFM_IDLE);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_OFM_IDLE(uint32_t value)
+    {
+        OFM_IDLE = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_HALT_REQ() const
+    {
+        uint32_t value = static_cast<uint32_t>(HALT_REQ);
+        return value;
+    }
+    uint32_t get_HALT_REQ() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(HALT_REQ);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_HALT_REQ(uint32_t value)
+    {
+        HALT_REQ = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_HALT_ACK() const
+    {
+        uint32_t value = static_cast<uint32_t>(HALT_ACK);
+        return value;
+    }
+    uint32_t get_HALT_ACK() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(HALT_ACK);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_HALT_ACK(uint32_t value)
+    {
+        HALT_ACK = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_PAUSE_REQ() const
+    {
+        uint32_t value = static_cast<uint32_t>(PAUSE_REQ);
+        return value;
+    }
+    uint32_t get_PAUSE_REQ() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(PAUSE_REQ);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_PAUSE_REQ(uint32_t value)
+    {
+        PAUSE_REQ = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_PAUSE_ACK() const
+    {
+        uint32_t value = static_cast<uint32_t>(PAUSE_ACK);
+        return value;
+    }
+    uint32_t get_PAUSE_ACK() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(PAUSE_ACK);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_PAUSE_ACK(uint32_t value)
+    {
+        PAUSE_ACK = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_IB0_AI_VALID_C0() const
+    {
+        uint32_t value = static_cast<uint32_t>(IB0_AI_VALID_C0);
+        return value;
+    }
+    uint32_t get_IB0_AI_VALID_C0() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(IB0_AI_VALID_C0);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_IB0_AI_VALID_C0(uint32_t value)
+    {
+        IB0_AI_VALID_C0 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_IB0_AI_READY_C0() const
+    {
+        uint32_t value = static_cast<uint32_t>(IB0_AI_READY_C0);
+        return value;
+    }
+    uint32_t get_IB0_AI_READY_C0() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(IB0_AI_READY_C0);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_IB0_AI_READY_C0(uint32_t value)
+    {
+        IB0_AI_READY_C0 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_IB1_AI_VALID_C0() const
+    {
+        uint32_t value = static_cast<uint32_t>(IB1_AI_VALID_C0);
+        return value;
+    }
+    uint32_t get_IB1_AI_VALID_C0() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(IB1_AI_VALID_C0);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_IB1_AI_VALID_C0(uint32_t value)
+    {
+        IB1_AI_VALID_C0 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_IB1_AI_READY_C0() const
+    {
+        uint32_t value = static_cast<uint32_t>(IB1_AI_READY_C0);
+        return value;
+    }
+    uint32_t get_IB1_AI_READY_C0() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(IB1_AI_READY_C0);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_IB1_AI_READY_C0(uint32_t value)
+    {
+        IB1_AI_READY_C0 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_IB0_AO_VALID_C0() const
+    {
+        uint32_t value = static_cast<uint32_t>(IB0_AO_VALID_C0);
+        return value;
+    }
+    uint32_t get_IB0_AO_VALID_C0() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(IB0_AO_VALID_C0);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_IB0_AO_VALID_C0(uint32_t value)
+    {
+        IB0_AO_VALID_C0 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_IB0_AO_READY_C0() const
+    {
+        uint32_t value = static_cast<uint32_t>(IB0_AO_READY_C0);
+        return value;
+    }
+    uint32_t get_IB0_AO_READY_C0() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(IB0_AO_READY_C0);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_IB0_AO_READY_C0(uint32_t value)
+    {
+        IB0_AO_READY_C0 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_IB1_AO_VALID_C0() const
+    {
+        uint32_t value = static_cast<uint32_t>(IB1_AO_VALID_C0);
+        return value;
+    }
+    uint32_t get_IB1_AO_VALID_C0() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(IB1_AO_VALID_C0);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_IB1_AO_VALID_C0(uint32_t value)
+    {
+        IB1_AO_VALID_C0 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_IB1_AO_READY_C0() const
+    {
+        uint32_t value = static_cast<uint32_t>(IB1_AO_READY_C0);
+        return value;
+    }
+    uint32_t get_IB1_AO_READY_C0() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(IB1_AO_READY_C0);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_IB1_AO_READY_C0(uint32_t value)
+    {
+        IB1_AO_READY_C0 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_OB0_VALID_C0() const
+    {
+        uint32_t value = static_cast<uint32_t>(OB0_VALID_C0);
+        return value;
+    }
+    uint32_t get_OB0_VALID_C0() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(OB0_VALID_C0);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_OB0_VALID_C0(uint32_t value)
+    {
+        OB0_VALID_C0 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_OB0_READY_C0() const
+    {
+        uint32_t value = static_cast<uint32_t>(OB0_READY_C0);
+        return value;
+    }
+    uint32_t get_OB0_READY_C0() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(OB0_READY_C0);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_OB0_READY_C0(uint32_t value)
+    {
+        OB0_READY_C0 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_OB1_VALID_C0() const
+    {
+        uint32_t value = static_cast<uint32_t>(OB1_VALID_C0);
+        return value;
+    }
+    uint32_t get_OB1_VALID_C0() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(OB1_VALID_C0);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_OB1_VALID_C0(uint32_t value)
+    {
+        OB1_VALID_C0 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_OB1_READY_C0() const
+    {
+        uint32_t value = static_cast<uint32_t>(OB1_READY_C0);
+        return value;
+    }
+    uint32_t get_OB1_READY_C0() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(OB1_READY_C0);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_OB1_READY_C0(uint32_t value)
+    {
+        OB1_READY_C0 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_CMD_VALID() const
+    {
+        uint32_t value = static_cast<uint32_t>(CMD_VALID);
+        return value;
+    }
+    uint32_t get_CMD_VALID() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(CMD_VALID);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_CMD_VALID(uint32_t value)
+    {
+        CMD_VALID = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_CMD_READY() const
+    {
+        uint32_t value = static_cast<uint32_t>(CMD_READY);
+        return value;
+    }
+    uint32_t get_CMD_READY() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(CMD_READY);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_CMD_READY(uint32_t value)
+    {
+        CMD_READY = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_WD_BITSTREAM_VALID_C0() const
+    {
+        uint32_t value = static_cast<uint32_t>(WD_BITSTREAM_VALID_C0);
+        return value;
+    }
+    uint32_t get_WD_BITSTREAM_VALID_C0() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(WD_BITSTREAM_VALID_C0);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_WD_BITSTREAM_VALID_C0(uint32_t value)
+    {
+        WD_BITSTREAM_VALID_C0 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_WD_BITSTREAM_READY_C0() const
+    {
+        uint32_t value = static_cast<uint32_t>(WD_BITSTREAM_READY_C0);
+        return value;
+    }
+    uint32_t get_WD_BITSTREAM_READY_C0() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(WD_BITSTREAM_READY_C0);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_WD_BITSTREAM_READY_C0(uint32_t value)
+    {
+        WD_BITSTREAM_READY_C0 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_BS_BITSTREAM_VALID_C0() const
+    {
+        uint32_t value = static_cast<uint32_t>(BS_BITSTREAM_VALID_C0);
+        return value;
+    }
+    uint32_t get_BS_BITSTREAM_VALID_C0() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(BS_BITSTREAM_VALID_C0);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_BS_BITSTREAM_VALID_C0(uint32_t value)
+    {
+        BS_BITSTREAM_VALID_C0 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_BS_BITSTREAM_READY_C0() const
+    {
+        uint32_t value = static_cast<uint32_t>(BS_BITSTREAM_READY_C0);
+        return value;
+    }
+    uint32_t get_BS_BITSTREAM_READY_C0() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(BS_BITSTREAM_READY_C0);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_BS_BITSTREAM_READY_C0(uint32_t value)
+    {
+        BS_BITSTREAM_READY_C0 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_AXI0_AR_STALLED() const
+    {
+        uint32_t value = static_cast<uint32_t>(AXI0_AR_STALLED);
+        return value;
+    }
+    uint32_t get_AXI0_AR_STALLED() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(AXI0_AR_STALLED);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_AXI0_AR_STALLED(uint32_t value)
+    {
+        AXI0_AR_STALLED = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_AXI0_RD_LIMIT_STALL() const
+    {
+        uint32_t value = static_cast<uint32_t>(AXI0_RD_LIMIT_STALL);
+        return value;
+    }
+    uint32_t get_AXI0_RD_LIMIT_STALL() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(AXI0_RD_LIMIT_STALL);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_AXI0_RD_LIMIT_STALL(uint32_t value)
+    {
+        AXI0_RD_LIMIT_STALL = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_AXI0_AW_STALLED() const
+    {
+        uint32_t value = static_cast<uint32_t>(AXI0_AW_STALLED);
+        return value;
+    }
+    uint32_t get_AXI0_AW_STALLED() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(AXI0_AW_STALLED);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_AXI0_AW_STALLED(uint32_t value)
+    {
+        AXI0_AW_STALLED = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_AXI0_W_STALLED() const
+    {
+        uint32_t value = static_cast<uint32_t>(AXI0_W_STALLED);
+        return value;
+    }
+    uint32_t get_AXI0_W_STALLED() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(AXI0_W_STALLED);
+        return value;
+    }
+    CONSTEXPR dma_status0_r &set_AXI0_W_STALLED(uint32_t value)
+    {
+        AXI0_W_STALLED = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// dma_status1_r - DMA_STATUS1 of core DEBUGCORE
+struct dma_status1_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        struct
+        {
+            uint32_t AXI0_WR_LIMIT_STALL : 1; // Write stalled due to one AXI0 limit counter being reached
+            uint32_t AXI1_AR_STALLED : 1; // Read transfer request stalled on arready low AXI1 (due to memory system)
+            uint32_t AXI1_RD_LIMIT_STALL : 1; // Read stalled due to one AXI1 limit counter being reached
+            uint32_t AXI1_WR_STALLED : 1; // Write transfer request stalled on awready low AXI1 (due to memory system)
+            uint32_t AXI1_W_STALLED : 1;  // Write transfer stalled on wready low AXI1 (due to memory system)
+            uint32_t AXI1_WR_LIMIT_STALL : 1; // Write stalled due to one AXI1 limit counter being reached
+            uint32_t WGT_IDLE_C1 : 1;     // When this bit is high means that the WGT block is not busy in generating
+                                          // addresses for a WGT job
+            uint32_t BAS_IDLE_C1 : 1;     // When this bit is high means that the BAS block is not busy in generating
+                                          // addresses for a BAS job.
+            uint32_t IB0_AI_VALID_C1 : 1; // Data for AI to be read in IFM input buffer 0 - Core 1
+            uint32_t IB0_AI_READY_C1 : 1; // Data consumed from AI in IFM input buffer 0 - Core 1
+            uint32_t IB1_AI_VALID_C1 : 1; // Data for AI to be read in IFM input buffer 1 - Core 1
+            uint32_t IB1_AI_READY_C1 : 1; // Data consumed from AI in IFM input buffer 1 - Core 1
+            uint32_t IB0_AO_VALID_C1 : 1; // Data for AO to be read in IFM input buffer 0 - Core 1
+            uint32_t IB0_AO_READY_C1 : 1; // Data consumed from AO in IFM input buffer 0 - Core 1
+            uint32_t IB1_AO_VALID_C1 : 1; // Data for AO to be read in IFM input buffer 0 - Core 1
+            uint32_t IB1_AO_READY_C1 : 1; // Data consumed from AO in IFM input buffer 1 - Core 1
+            uint32_t OB0_VALID_C1 : 1;    // Data for DMA ready to be consumed in OFM output buffer 0 - Core 1
+            uint32_t OB0_READY_C1 : 1;    // Data consumed from DMA in OFM output buffer 0 - Core 1
+            uint32_t OB1_VALID_C1 : 1;    // Data for DMA ready to be consumed in OFM output buffer 1 - Core 1
+            uint32_t OB1_READY_C1 : 1;    // Data consumed from DMA in OFM output buffer 1 - Core 1
+            uint32_t WD_BITSTREAM_VALID_C1 : 1; // New weight word for WD to be consumed - Core 1
+            uint32_t WD_BITSTREAM_READY_C1 : 1; // Weight word consumed by WD - Core 1
+            uint32_t BS_BITSTREAM_VALID_C1 : 1; // New BaS word for AO to be consumed - Core 1
+            uint32_t BS_BITSTREAM_READY_C1 : 1; // BaS word consumed by AO - Core 1
+            uint32_t reserved0 : 8;
+        };
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR dma_status1_r() :
+        AXI0_WR_LIMIT_STALL(static_cast<uint32_t>(0)), AXI1_AR_STALLED(static_cast<uint32_t>(0)),
+        AXI1_RD_LIMIT_STALL(static_cast<uint32_t>(0)), AXI1_WR_STALLED(static_cast<uint32_t>(0)),
+        AXI1_W_STALLED(static_cast<uint32_t>(0)), AXI1_WR_LIMIT_STALL(static_cast<uint32_t>(0)),
+        WGT_IDLE_C1(static_cast<uint32_t>(0)), BAS_IDLE_C1(static_cast<uint32_t>(0)),
+        IB0_AI_VALID_C1(static_cast<uint32_t>(0)), IB0_AI_READY_C1(static_cast<uint32_t>(0)),
+        IB1_AI_VALID_C1(static_cast<uint32_t>(0)), IB1_AI_READY_C1(static_cast<uint32_t>(0)),
+        IB0_AO_VALID_C1(static_cast<uint32_t>(0)), IB0_AO_READY_C1(static_cast<uint32_t>(0)),
+        IB1_AO_VALID_C1(static_cast<uint32_t>(0)), IB1_AO_READY_C1(static_cast<uint32_t>(0)),
+        OB0_VALID_C1(static_cast<uint32_t>(0)), OB0_READY_C1(static_cast<uint32_t>(0)),
+        OB1_VALID_C1(static_cast<uint32_t>(0)), OB1_READY_C1(static_cast<uint32_t>(0)),
+        WD_BITSTREAM_VALID_C1(static_cast<uint32_t>(0)), WD_BITSTREAM_READY_C1(static_cast<uint32_t>(0)),
+        BS_BITSTREAM_VALID_C1(static_cast<uint32_t>(0)), BS_BITSTREAM_READY_C1(static_cast<uint32_t>(0)),
+        reserved0(static_cast<uint32_t>(0))
+    {
+    }
+    CONSTEXPR dma_status1_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    dma_status1_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_AXI0_WR_LIMIT_STALL() const
+    {
+        uint32_t value = static_cast<uint32_t>(AXI0_WR_LIMIT_STALL);
+        return value;
+    }
+    uint32_t get_AXI0_WR_LIMIT_STALL() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(AXI0_WR_LIMIT_STALL);
+        return value;
+    }
+    CONSTEXPR dma_status1_r &set_AXI0_WR_LIMIT_STALL(uint32_t value)
+    {
+        AXI0_WR_LIMIT_STALL = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_AXI1_AR_STALLED() const
+    {
+        uint32_t value = static_cast<uint32_t>(AXI1_AR_STALLED);
+        return value;
+    }
+    uint32_t get_AXI1_AR_STALLED() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(AXI1_AR_STALLED);
+        return value;
+    }
+    CONSTEXPR dma_status1_r &set_AXI1_AR_STALLED(uint32_t value)
+    {
+        AXI1_AR_STALLED = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_AXI1_RD_LIMIT_STALL() const
+    {
+        uint32_t value = static_cast<uint32_t>(AXI1_RD_LIMIT_STALL);
+        return value;
+    }
+    uint32_t get_AXI1_RD_LIMIT_STALL() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(AXI1_RD_LIMIT_STALL);
+        return value;
+    }
+    CONSTEXPR dma_status1_r &set_AXI1_RD_LIMIT_STALL(uint32_t value)
+    {
+        AXI1_RD_LIMIT_STALL = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_AXI1_WR_STALLED() const
+    {
+        uint32_t value = static_cast<uint32_t>(AXI1_WR_STALLED);
+        return value;
+    }
+    uint32_t get_AXI1_WR_STALLED() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(AXI1_WR_STALLED);
+        return value;
+    }
+    CONSTEXPR dma_status1_r &set_AXI1_WR_STALLED(uint32_t value)
+    {
+        AXI1_WR_STALLED = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_AXI1_W_STALLED() const
+    {
+        uint32_t value = static_cast<uint32_t>(AXI1_W_STALLED);
+        return value;
+    }
+    uint32_t get_AXI1_W_STALLED() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(AXI1_W_STALLED);
+        return value;
+    }
+    CONSTEXPR dma_status1_r &set_AXI1_W_STALLED(uint32_t value)
+    {
+        AXI1_W_STALLED = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_AXI1_WR_LIMIT_STALL() const
+    {
+        uint32_t value = static_cast<uint32_t>(AXI1_WR_LIMIT_STALL);
+        return value;
+    }
+    uint32_t get_AXI1_WR_LIMIT_STALL() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(AXI1_WR_LIMIT_STALL);
+        return value;
+    }
+    CONSTEXPR dma_status1_r &set_AXI1_WR_LIMIT_STALL(uint32_t value)
+    {
+        AXI1_WR_LIMIT_STALL = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_WGT_IDLE_C1() const
+    {
+        uint32_t value = static_cast<uint32_t>(WGT_IDLE_C1);
+        return value;
+    }
+    uint32_t get_WGT_IDLE_C1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(WGT_IDLE_C1);
+        return value;
+    }
+    CONSTEXPR dma_status1_r &set_WGT_IDLE_C1(uint32_t value)
+    {
+        WGT_IDLE_C1 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_BAS_IDLE_C1() const
+    {
+        uint32_t value = static_cast<uint32_t>(BAS_IDLE_C1);
+        return value;
+    }
+    uint32_t get_BAS_IDLE_C1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(BAS_IDLE_C1);
+        return value;
+    }
+    CONSTEXPR dma_status1_r &set_BAS_IDLE_C1(uint32_t value)
+    {
+        BAS_IDLE_C1 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_IB0_AI_VALID_C1() const
+    {
+        uint32_t value = static_cast<uint32_t>(IB0_AI_VALID_C1);
+        return value;
+    }
+    uint32_t get_IB0_AI_VALID_C1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(IB0_AI_VALID_C1);
+        return value;
+    }
+    CONSTEXPR dma_status1_r &set_IB0_AI_VALID_C1(uint32_t value)
+    {
+        IB0_AI_VALID_C1 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_IB0_AI_READY_C1() const
+    {
+        uint32_t value = static_cast<uint32_t>(IB0_AI_READY_C1);
+        return value;
+    }
+    uint32_t get_IB0_AI_READY_C1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(IB0_AI_READY_C1);
+        return value;
+    }
+    CONSTEXPR dma_status1_r &set_IB0_AI_READY_C1(uint32_t value)
+    {
+        IB0_AI_READY_C1 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_IB1_AI_VALID_C1() const
+    {
+        uint32_t value = static_cast<uint32_t>(IB1_AI_VALID_C1);
+        return value;
+    }
+    uint32_t get_IB1_AI_VALID_C1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(IB1_AI_VALID_C1);
+        return value;
+    }
+    CONSTEXPR dma_status1_r &set_IB1_AI_VALID_C1(uint32_t value)
+    {
+        IB1_AI_VALID_C1 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_IB1_AI_READY_C1() const
+    {
+        uint32_t value = static_cast<uint32_t>(IB1_AI_READY_C1);
+        return value;
+    }
+    uint32_t get_IB1_AI_READY_C1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(IB1_AI_READY_C1);
+        return value;
+    }
+    CONSTEXPR dma_status1_r &set_IB1_AI_READY_C1(uint32_t value)
+    {
+        IB1_AI_READY_C1 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_IB0_AO_VALID_C1() const
+    {
+        uint32_t value = static_cast<uint32_t>(IB0_AO_VALID_C1);
+        return value;
+    }
+    uint32_t get_IB0_AO_VALID_C1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(IB0_AO_VALID_C1);
+        return value;
+    }
+    CONSTEXPR dma_status1_r &set_IB0_AO_VALID_C1(uint32_t value)
+    {
+        IB0_AO_VALID_C1 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_IB0_AO_READY_C1() const
+    {
+        uint32_t value = static_cast<uint32_t>(IB0_AO_READY_C1);
+        return value;
+    }
+    uint32_t get_IB0_AO_READY_C1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(IB0_AO_READY_C1);
+        return value;
+    }
+    CONSTEXPR dma_status1_r &set_IB0_AO_READY_C1(uint32_t value)
+    {
+        IB0_AO_READY_C1 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_IB1_AO_VALID_C1() const
+    {
+        uint32_t value = static_cast<uint32_t>(IB1_AO_VALID_C1);
+        return value;
+    }
+    uint32_t get_IB1_AO_VALID_C1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(IB1_AO_VALID_C1);
+        return value;
+    }
+    CONSTEXPR dma_status1_r &set_IB1_AO_VALID_C1(uint32_t value)
+    {
+        IB1_AO_VALID_C1 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_IB1_AO_READY_C1() const
+    {
+        uint32_t value = static_cast<uint32_t>(IB1_AO_READY_C1);
+        return value;
+    }
+    uint32_t get_IB1_AO_READY_C1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(IB1_AO_READY_C1);
+        return value;
+    }
+    CONSTEXPR dma_status1_r &set_IB1_AO_READY_C1(uint32_t value)
+    {
+        IB1_AO_READY_C1 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_OB0_VALID_C1() const
+    {
+        uint32_t value = static_cast<uint32_t>(OB0_VALID_C1);
+        return value;
+    }
+    uint32_t get_OB0_VALID_C1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(OB0_VALID_C1);
+        return value;
+    }
+    CONSTEXPR dma_status1_r &set_OB0_VALID_C1(uint32_t value)
+    {
+        OB0_VALID_C1 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_OB0_READY_C1() const
+    {
+        uint32_t value = static_cast<uint32_t>(OB0_READY_C1);
+        return value;
+    }
+    uint32_t get_OB0_READY_C1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(OB0_READY_C1);
+        return value;
+    }
+    CONSTEXPR dma_status1_r &set_OB0_READY_C1(uint32_t value)
+    {
+        OB0_READY_C1 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_OB1_VALID_C1() const
+    {
+        uint32_t value = static_cast<uint32_t>(OB1_VALID_C1);
+        return value;
+    }
+    uint32_t get_OB1_VALID_C1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(OB1_VALID_C1);
+        return value;
+    }
+    CONSTEXPR dma_status1_r &set_OB1_VALID_C1(uint32_t value)
+    {
+        OB1_VALID_C1 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_OB1_READY_C1() const
+    {
+        uint32_t value = static_cast<uint32_t>(OB1_READY_C1);
+        return value;
+    }
+    uint32_t get_OB1_READY_C1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(OB1_READY_C1);
+        return value;
+    }
+    CONSTEXPR dma_status1_r &set_OB1_READY_C1(uint32_t value)
+    {
+        OB1_READY_C1 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_WD_BITSTREAM_VALID_C1() const
+    {
+        uint32_t value = static_cast<uint32_t>(WD_BITSTREAM_VALID_C1);
+        return value;
+    }
+    uint32_t get_WD_BITSTREAM_VALID_C1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(WD_BITSTREAM_VALID_C1);
+        return value;
+    }
+    CONSTEXPR dma_status1_r &set_WD_BITSTREAM_VALID_C1(uint32_t value)
+    {
+        WD_BITSTREAM_VALID_C1 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_WD_BITSTREAM_READY_C1() const
+    {
+        uint32_t value = static_cast<uint32_t>(WD_BITSTREAM_READY_C1);
+        return value;
+    }
+    uint32_t get_WD_BITSTREAM_READY_C1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(WD_BITSTREAM_READY_C1);
+        return value;
+    }
+    CONSTEXPR dma_status1_r &set_WD_BITSTREAM_READY_C1(uint32_t value)
+    {
+        WD_BITSTREAM_READY_C1 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_BS_BITSTREAM_VALID_C1() const
+    {
+        uint32_t value = static_cast<uint32_t>(BS_BITSTREAM_VALID_C1);
+        return value;
+    }
+    uint32_t get_BS_BITSTREAM_VALID_C1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(BS_BITSTREAM_VALID_C1);
+        return value;
+    }
+    CONSTEXPR dma_status1_r &set_BS_BITSTREAM_VALID_C1(uint32_t value)
+    {
+        BS_BITSTREAM_VALID_C1 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_BS_BITSTREAM_READY_C1() const
+    {
+        uint32_t value = static_cast<uint32_t>(BS_BITSTREAM_READY_C1);
+        return value;
+    }
+    uint32_t get_BS_BITSTREAM_READY_C1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(BS_BITSTREAM_READY_C1);
+        return value;
+    }
+    CONSTEXPR dma_status1_r &set_BS_BITSTREAM_READY_C1(uint32_t value)
+    {
+        BS_BITSTREAM_READY_C1 = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
 
 // clkforce_r - Force clocks on for clock gating
 struct clkforce_r
@@ -2857,8 +4605,8 @@ struct id_r
     CONSTEXPR id_r() :
         version_status(static_cast<uint32_t>(1)), version_minor(static_cast<uint32_t>(0x0)),
         version_major(static_cast<uint32_t>(0x0)), product_major(static_cast<uint32_t>(4)),
-        arch_patch_rev(static_cast<uint32_t>(0)), arch_minor_rev(static_cast<uint32_t>(169)),
-        arch_major_rev(static_cast<uint32_t>(0))
+        arch_patch_rev(static_cast<uint32_t>(0)), arch_minor_rev(static_cast<uint32_t>(0)),
+        arch_major_rev(static_cast<uint32_t>(1))
     {
     }
     CONSTEXPR id_r(uint32_t init) : word(init) {}
@@ -4593,12 +6341,12 @@ struct pmcr_r
     {
         struct
         {
-            uint32_t cnt_en : 1;        // Enable counters (RW)
-            uint32_t event_cnt_rst : 1; // Reset event counters (WO)
-            uint32_t cycle_cnt_rst : 1; // Reset cycle counter (WO)
+            uint32_t cnt_en : 1;        // Enable counter
+            uint32_t event_cnt_rst : 1; // Reset event counter
+            uint32_t cycle_cnt_rst : 1; // Reset cycle counter
             uint32_t mask_en : 1;       // PMU can be enabled/disabled by command stream operation NPU_OP_PMU_MASK
             uint32_t reserved0 : 7;
-            uint32_t num_event_cnt : 5; // Number of event counters (RO)
+            uint32_t num_event_cnt : 5; // Number of event counters
             uint32_t reserved1 : 16;
         };
         uint32_t word;
@@ -5654,7 +7402,7 @@ struct pmccntr_cfg_r
 #endif //__cplusplus
 };
 
-// pmcaxi_chan_r - Set which AXI channel to monitor in PMU
+// pmcaxi_chan_r - Set which AXI channel to monitor for latency measurements in PMU
 struct pmcaxi_chan_r
 {
 #ifdef __cplusplus
@@ -5664,21 +7412,23 @@ struct pmcaxi_chan_r
     {
         struct
         {
-            uint32_t AXI_CHAN : 4; // Channel number to monitor (Read: 0=Cmd 1=IFM 2=Weights 3=Scale+Bias 4=Mem2Mem;
-                                   // Write: 8=OFM 9=Mem2Mem)
-            uint32_t reserved0 : 3;
-            uint32_t RW : 1;      // 0 for read, 1 for write
-            uint32_t AXI_CNT : 2; // AXI counter to monitor (0=AXI0 counter0, 1=AXI0 counter1, 2=AXI1 counter 2, 3=AXI
-                                  // counter3)
-            uint32_t reserved1 : 22;
+            uint32_t CH_SEL : 4; // Channel number to monitor for latency measurements (Read: 0=Cmd 1=IFM 2=Weights
+                                 // 3=Scale+Bias 4=Mem2Mem; Write: 8=OFM 9=Mem2Mem)
+            uint32_t reserved0 : 4;
+            uint32_t AXI_CNT_SEL : 2;  // AXI counter to monitor for latency measurements (0=AXI0 counter0, 1=AXI0
+                                       // counter1, 2=AXI1 counter 2, 3=AXI counter3)
+            uint32_t BW_CH_SEL_EN : 1; // Bandwidth channel selector enable: {0=AXI bw events measured for all channels,
+                                       // 1=AXI bw events measured for channel specified by CH_SEL
+            uint32_t reserved1 : 21;
         };
         uint32_t word;
     };
 #ifdef __cplusplus
   public:
     CONSTEXPR pmcaxi_chan_r() :
-        AXI_CHAN(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)), RW(static_cast<uint32_t>(0)),
-        AXI_CNT(static_cast<uint32_t>(0)), reserved1(static_cast<uint32_t>(0))
+        CH_SEL(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)),
+        AXI_CNT_SEL(static_cast<uint32_t>(0x000000)), BW_CH_SEL_EN(static_cast<uint32_t>(0x000000)),
+        reserved1(static_cast<uint32_t>(0))
     {
     }
     CONSTEXPR pmcaxi_chan_r(uint32_t init) : word(init) {}
@@ -5702,49 +7452,49 @@ struct pmcaxi_chan_r
     {
         return *this;
     }
-    CONSTEXPR uint32_t get_AXI_CHAN() const
+    CONSTEXPR uint32_t get_CH_SEL() const
     {
-        uint32_t value = static_cast<uint32_t>(AXI_CHAN);
+        uint32_t value = static_cast<uint32_t>(CH_SEL);
         return value;
     }
-    uint32_t get_AXI_CHAN() const volatile
+    uint32_t get_CH_SEL() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(AXI_CHAN);
+        uint32_t value = static_cast<uint32_t>(CH_SEL);
         return value;
     }
-    CONSTEXPR pmcaxi_chan_r &set_AXI_CHAN(uint32_t value)
+    CONSTEXPR pmcaxi_chan_r &set_CH_SEL(uint32_t value)
     {
-        AXI_CHAN = ((1u << 4) - 1) & static_cast<uint32_t>(value);
+        CH_SEL = ((1u << 4) - 1) & static_cast<uint32_t>(value);
         return *this;
     }
-    CONSTEXPR uint32_t get_RW() const
+    CONSTEXPR uint32_t get_AXI_CNT_SEL() const
     {
-        uint32_t value = static_cast<uint32_t>(RW);
+        uint32_t value = static_cast<uint32_t>(AXI_CNT_SEL);
         return value;
     }
-    uint32_t get_RW() const volatile
+    uint32_t get_AXI_CNT_SEL() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(RW);
+        uint32_t value = static_cast<uint32_t>(AXI_CNT_SEL);
         return value;
     }
-    CONSTEXPR pmcaxi_chan_r &set_RW(uint32_t value)
+    CONSTEXPR pmcaxi_chan_r &set_AXI_CNT_SEL(uint32_t value)
     {
-        RW = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        AXI_CNT_SEL = ((1u << 2) - 1) & static_cast<uint32_t>(value);
         return *this;
     }
-    CONSTEXPR uint32_t get_AXI_CNT() const
+    CONSTEXPR uint32_t get_BW_CH_SEL_EN() const
     {
-        uint32_t value = static_cast<uint32_t>(AXI_CNT);
+        uint32_t value = static_cast<uint32_t>(BW_CH_SEL_EN);
         return value;
     }
-    uint32_t get_AXI_CNT() const volatile
+    uint32_t get_BW_CH_SEL_EN() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(AXI_CNT);
+        uint32_t value = static_cast<uint32_t>(BW_CH_SEL_EN);
         return value;
     }
-    CONSTEXPR pmcaxi_chan_r &set_AXI_CNT(uint32_t value)
+    CONSTEXPR pmcaxi_chan_r &set_BW_CH_SEL_EN(uint32_t value)
     {
-        AXI_CNT = ((1u << 2) - 1) & static_cast<uint32_t>(value);
+        BW_CH_SEL_EN = ((1u << 1) - 1) & static_cast<uint32_t>(value);
         return *this;
     }
 #endif //__cplusplus
@@ -5767,7 +7517,10 @@ struct pmevtyper0_r
     };
 #ifdef __cplusplus
   public:
-    CONSTEXPR pmevtyper0_r() : EV_TYPE(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)) {}
+    CONSTEXPR pmevtyper0_r() :
+        EV_TYPE(static_cast<uint32_t>(::pmu_event_type::NO_EVENT)), reserved0(static_cast<uint32_t>(0))
+    {
+    }
     CONSTEXPR pmevtyper0_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
     {
@@ -5824,7 +7577,10 @@ struct pmevtyper1_r
     };
 #ifdef __cplusplus
   public:
-    CONSTEXPR pmevtyper1_r() : EV_TYPE(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)) {}
+    CONSTEXPR pmevtyper1_r() :
+        EV_TYPE(static_cast<uint32_t>(::pmu_event_type::NO_EVENT)), reserved0(static_cast<uint32_t>(0))
+    {
+    }
     CONSTEXPR pmevtyper1_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
     {
@@ -5881,7 +7637,10 @@ struct pmevtyper2_r
     };
 #ifdef __cplusplus
   public:
-    CONSTEXPR pmevtyper2_r() : EV_TYPE(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)) {}
+    CONSTEXPR pmevtyper2_r() :
+        EV_TYPE(static_cast<uint32_t>(::pmu_event_type::NO_EVENT)), reserved0(static_cast<uint32_t>(0))
+    {
+    }
     CONSTEXPR pmevtyper2_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
     {
@@ -5938,7 +7697,10 @@ struct pmevtyper3_r
     };
 #ifdef __cplusplus
   public:
-    CONSTEXPR pmevtyper3_r() : EV_TYPE(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)) {}
+    CONSTEXPR pmevtyper3_r() :
+        EV_TYPE(static_cast<uint32_t>(::pmu_event_type::NO_EVENT)), reserved0(static_cast<uint32_t>(0))
+    {
+    }
     CONSTEXPR pmevtyper3_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
     {
@@ -6016,15 +7778,16 @@ struct NPU_REG
     STRUCT basep14_r BASEP14; // 0xb8
     STRUCT basep15_r BASEP15; // 0xbc
     uint32_t unused2[16];
-    uint32_t WD_STATUS;  // 0x100
-    uint32_t MAC_STATUS; // 0x104
-    uint32_t DMA_STATUS; // 0x108
+    STRUCT wd_status_r WD_STATUS;   // 0x100
+    STRUCT mac_status_r MAC_STATUS; // 0x104
+    STRUCT ao_status_r AO_STATUS;   // 0x108
     uint32_t unused3[1];
-    uint32_t AO_STATUS; // 0x110
-    uint32_t unused4[11];
+    STRUCT dma_status0_r DMA_STATUS0; // 0x110
+    STRUCT dma_status1_r DMA_STATUS1; // 0x114
+    uint32_t unused4[10];
     STRUCT clkforce_r CLKFORCE; // 0x140
-    uint32_t DEBUG;             // 0x144
-    uint32_t DEBUG2;            // 0x148
+    uint32_t DEBUG_ADDR;        // 0x144
+    uint32_t DEBUG_MISC;        // 0x148
     uint32_t DEBUGCORE;         // 0x14c
     uint32_t unused5[12];
     STRUCT pmcr_r PMCR;             // 0x180
@@ -6175,20 +7938,20 @@ struct NPU_REG
     uint32_t OFM_STRIDE_C;    // 0xa70
     uint32_t OFM_STRIDE_C_HI; // 0xa74
     uint32_t unused26[2];
-    uint32_t WEIGHT_BASE;      // 0xa80
-    uint32_t WEIGHT_BASE_HI;   // 0xa84
-    uint32_t WEIGHT_LENGTH;    // 0xa88
-    uint32_t WEIGHT_LENGTH_HI; // 0xa8c
-    uint32_t SCALE_BASE;       // 0xa90
-    uint32_t SCALE_BASE_HI;    // 0xa94
-    uint32_t SCALE_LENGTH;     // 0xa98
+    uint32_t WEIGHT_BASE;    // 0xa80
+    uint32_t WEIGHT_BASE_HI; // 0xa84
+    uint32_t WEIGHT_LENGTH;  // 0xa88
     uint32_t unused27[1];
+    uint32_t SCALE_BASE;    // 0xa90
+    uint32_t SCALE_BASE_HI; // 0xa94
+    uint32_t SCALE_LENGTH;  // 0xa98
+    uint32_t unused28[1];
     uint32_t OFM_SCALE;       // 0xaa0
     uint32_t OFM_SCALE_SHIFT; // 0xaa4
     uint32_t OPA_SCALE;       // 0xaa8
     uint32_t OPA_SCALE_SHIFT; // 0xaac
     uint32_t OPB_SCALE;       // 0xab0
-    uint32_t unused28[3];
+    uint32_t unused29[3];
     uint32_t DMA0_SRC;      // 0xac0
     uint32_t DMA0_SRC_HI;   // 0xac4
     uint32_t DMA0_DST;      // 0xac8
@@ -6199,7 +7962,7 @@ struct NPU_REG
     uint32_t DMA0_SKIP0_HI; // 0xadc
     uint32_t DMA0_SKIP1;    // 0xae0
     uint32_t DMA0_SKIP1_HI; // 0xae4
-    uint32_t unused29[6];
+    uint32_t unused30[6];
     uint32_t IFM2_BASE0;       // 0xb00
     uint32_t IFM2_BASE0_HI;    // 0xb04
     uint32_t IFM2_BASE1;       // 0xb08
@@ -6214,17 +7977,17 @@ struct NPU_REG
     uint32_t IFM2_STRIDE_Y_HI; // 0xb2c
     uint32_t IFM2_STRIDE_C;    // 0xb30
     uint32_t IFM2_STRIDE_C_HI; // 0xb34
-    uint32_t unused30[2];
-    uint32_t WEIGHT1_BASE;      // 0xb40
-    uint32_t WEIGHT1_BASE_HI;   // 0xb44
-    uint32_t WEIGHT1_LENGTH;    // 0xb48
-    uint32_t WEIGHT1_LENGTH_HI; // 0xb4c
-    uint32_t SCALE1_BASE;       // 0xb50
-    uint32_t SCALE1_BASE_HI;    // 0xb54
-    uint32_t SCALE1_LENGTH;     // 0xb58
-    uint32_t unused31[281];
+    uint32_t unused31[2];
+    uint32_t WEIGHT1_BASE;    // 0xb40
+    uint32_t WEIGHT1_BASE_HI; // 0xb44
+    uint32_t WEIGHT1_LENGTH;  // 0xb48
+    uint32_t unused32[1];
+    uint32_t SCALE1_BASE;    // 0xb50
+    uint32_t SCALE1_BASE_HI; // 0xb54
+    uint32_t SCALE1_LENGTH;  // 0xb58
+    uint32_t unused33[281];
     uint32_t REVISION; // 0xfc0
-    uint32_t unused32[3];
+    uint32_t unused34[3];
     STRUCT pid4_r PID4; // 0xfd0
     STRUCT pid5_r PID5; // 0xfd4
     STRUCT pid6_r PID6; // 0xfd8
@@ -6244,7 +8007,7 @@ struct NPU_REG
     }
     void reset()
     {
-        ID                 = 177225729;
+        ID                 = 268451841;
         STATUS             = 8;
         CMD                = 0;
         RESET              = 0;
@@ -6292,11 +8055,12 @@ struct NPU_REG
         CID3               = 177;
         WD_STATUS          = 0;
         MAC_STATUS         = 0;
-        DMA_STATUS         = 0;
         AO_STATUS          = 0;
+        DMA_STATUS0        = 0;
+        DMA_STATUS1        = 0;
         CLKFORCE           = 0;
-        DEBUG              = 0;
-        DEBUG2             = 0;
+        DEBUG_ADDR         = 0;
+        DEBUG_MISC         = 0;
         DEBUGCORE          = 0;
         KERNEL_X           = 0;
         KERNEL_Y           = 0;
@@ -6414,7 +8178,6 @@ struct NPU_REG
         WEIGHT_BASE        = 0;
         WEIGHT_BASE_HI     = 0;
         WEIGHT_LENGTH      = 0;
-        WEIGHT_LENGTH_HI   = 0;
         SCALE_BASE         = 0;
         SCALE_BASE_HI      = 0;
         SCALE_LENGTH       = 0;
@@ -6450,7 +8213,6 @@ struct NPU_REG
         WEIGHT1_BASE       = 0;
         WEIGHT1_BASE_HI    = 0;
         WEIGHT1_LENGTH     = 0;
-        WEIGHT1_LENGTH_HI  = 0;
         SCALE1_BASE        = 0;
         SCALE1_BASE_HI     = 0;
         SCALE1_LENGTH      = 0;
@@ -6584,6 +8346,8 @@ struct NPU_REG
         case 264:
             return access_type_t::RO;
         case 272:
+            return access_type_t::RO;
+        case 276:
             return access_type_t::RO;
         case 320:
             return access_type_t::RW;
@@ -6825,8 +8589,6 @@ struct NPU_REG
             return access_type_t::RW;
         case 2696:
             return access_type_t::RW;
-        case 2700:
-            return access_type_t::RW;
         case 2704:
             return access_type_t::RW;
         case 2708:
@@ -6896,8 +8658,6 @@ struct NPU_REG
         case 2884:
             return access_type_t::RW;
         case 2888:
-            return access_type_t::RW;
-        case 2892:
             return access_type_t::RW;
         case 2896:
             return access_type_t::RW;
@@ -12146,72 +13906,89 @@ struct npu_set_scale1_length_t
     FUNC(ofm_precision, U8)                                                                                            \
     SEP FUNC(ofm_precision, S8) SEP FUNC(ofm_precision, U16) SEP FUNC(ofm_precision, S16) SEP FUNC(ofm_precision, S32)
 
-#define EXPAND_PMU_EVENT_TYPE(FUNC, SEP)                                                                                  \
-    FUNC(pmu_event_type, NO_EVENT)                                                                                        \
-    SEP FUNC(pmu_event_type, CYCLE) SEP FUNC(pmu_event_type, NPU_IDLE) SEP FUNC(pmu_event_type, MAC_ACTIVE) SEP FUNC(     \
-        pmu_event_type, MAC_ACTIVE_8BIT) SEP FUNC(pmu_event_type, MAC_ACTIVE_16BIT) SEP FUNC(pmu_event_type,              \
-                                                                                             MAC_DPU_ACTIVE)              \
-        SEP FUNC(pmu_event_type, MAC_STALLED_BY_WD_ACC) SEP FUNC(pmu_event_type, MAC_STALLED_BY_WD) SEP FUNC(             \
-            pmu_event_type, MAC_STALLED_BY_ACC) SEP FUNC(pmu_event_type, MAC_STALLED_BY_IB) SEP FUNC(pmu_event_type,      \
-                                                                                                     MAC_ACTIVE_32BIT)    \
-            SEP FUNC(pmu_event_type, AO_ACTIVE) SEP FUNC(pmu_event_type, AO_ACTIVE_8BIT) SEP FUNC(                        \
-                pmu_event_type, AO_ACTIVE_16BIT) SEP FUNC(pmu_event_type, AO_STALLED_BY_OFMP_OB)                          \
-                SEP FUNC(pmu_event_type, AO_STALLED_BY_OFMP) SEP FUNC(pmu_event_type, AO_STALLED_BY_OB) SEP FUNC(         \
-                    pmu_event_type, AO_STALLED_BY_ACC_IB) SEP FUNC(pmu_event_type, AO_STALLED_BY_ACC)                     \
-                    SEP FUNC(pmu_event_type, AO_STALLED_BY_IB) SEP FUNC(pmu_event_type, WD_ACTIVE) SEP FUNC(              \
-                        pmu_event_type, WD_STALLED) SEP FUNC(pmu_event_type,                                              \
-                                                             WD_STALLED_BY_WS) SEP FUNC(pmu_event_type,                   \
-                                                                                        WD_STALLED_BY_WD_BUF)             \
-                        SEP FUNC(pmu_event_type, WD_PARSE_ACTIVE) SEP FUNC(pmu_event_type, WD_PARSE_STALLED) SEP FUNC(    \
-                            pmu_event_type,                                                                               \
-                            WD_PARSE_STALLED_IN) SEP FUNC(pmu_event_type,                                                 \
-                                                          WD_PARSE_STALLED_OUT) SEP FUNC(pmu_event_type, WD_TRANS_WS)     \
-                            SEP FUNC(pmu_event_type, WD_TRANS_WB) SEP FUNC(pmu_event_type, WD_TRANS_DW0) SEP FUNC(        \
-                                pmu_event_type,                                                                           \
-                                WD_TRANS_DW1) SEP FUNC(pmu_event_type, AXI0_RD_TRANS_ACCEPTED)                            \
-                                SEP FUNC(pmu_event_type, AXI0_RD_TRANS_COMPLETED) SEP FUNC(                               \
-                                    pmu_event_type,                                                                       \
-                                    AXI0_RD_DATA_BEAT_RECEIVED) SEP FUNC(pmu_event_type, AXI0_RD_TRAN_REQ_STALLED)        \
-                                    SEP FUNC(pmu_event_type, AXI0_WR_TRANS_ACCEPTED) SEP FUNC(                            \
-                                        pmu_event_type,                                                                   \
-                                        AXI0_WR_TRANS_COMPLETED_M) SEP FUNC(pmu_event_type, AXI0_WR_TRANS_COMPLETED_S)    \
-                                        SEP FUNC(pmu_event_type, AXI0_WR_DATA_BEAT_WRITTEN) SEP FUNC(                     \
-                                            pmu_event_type,                                                               \
-                                            AXI0_WR_TRAN_REQ_STALLED) SEP FUNC(pmu_event_type,                            \
-                                                                               AXI0_WR_DATA_BEAT_STALLED)                 \
-                                            SEP FUNC(pmu_event_type, AXI0_ENABLED_CYCLES) SEP FUNC(                       \
-                                                pmu_event_type,                                                           \
-                                                AXI0_RD_STALL_LIMIT) SEP FUNC(pmu_event_type, AXI0_WR_STALL_LIMIT)        \
-                                                SEP FUNC(pmu_event_type,                                                  \
-                                                         AXI1_RD_TRANS_ACCEPTED) SEP FUNC(pmu_event_type,                 \
-                                                                                          AXI1_RD_TRANS_COMPLETED)        \
-                                                    SEP FUNC(pmu_event_type, AXI1_RD_DATA_BEAT_RECEIVED) SEP FUNC(        \
-                                                        pmu_event_type,                                                   \
-                                                        AXI1_RD_TRAN_REQ_STALLED) SEP FUNC(pmu_event_type,                \
-                                                                                           AXI1_WR_TRANS_ACCEPTED)        \
-                                                        SEP FUNC(pmu_event_type, AXI1_WR_TRANS_COMPLETED_M) SEP FUNC(     \
-                                                            pmu_event_type,                                               \
-                                                            AXI1_WR_TRANS_COMPLETED_S) SEP                                \
-                                                            FUNC(pmu_event_type, AXI1_WR_DATA_BEAT_WRITTEN) SEP FUNC(     \
-                                                                pmu_event_type,                                           \
-                                                                AXI1_WR_TRAN_REQ_STALLED) SEP                             \
-                                                                FUNC(pmu_event_type, AXI1_WR_DATA_BEAT_STALLED) SEP FUNC( \
-                                                                    pmu_event_type,                                       \
-                                                                    AXI1_ENABLED_CYCLES) SEP                              \
-                                                                    FUNC(pmu_event_type, AXI1_RD_STALL_LIMIT) SEP FUNC(   \
-                                                                        pmu_event_type,                                   \
-                                                                        AXI1_WR_STALL_LIMIT) SEP FUNC(pmu_event_type,     \
-                                                                                                      AXI_LATENCY_ANY)    \
-                                                                        SEP FUNC(pmu_event_type, AXI_LATENCY_32)          \
-                                                                            SEP FUNC(pmu_event_type, AXI_LATENCY_64)      \
-                                                                                SEP FUNC(pmu_event_type,                  \
-                                                                                         AXI_LATENCY_128)                 \
-                                                                                    SEP FUNC(pmu_event_type,              \
-                                                                                             AXI_LATENCY_256)             \
-                                                                                        SEP FUNC(pmu_event_type,          \
-                                                                                                 AXI_LATENCY_512)         \
-                                                                                            SEP FUNC(pmu_event_type,      \
-                                                                                                     AXI_LATENCY_1024)
+#define EXPAND_PMU_EVENT_TYPE(FUNC, SEP)                                                                                          \
+    FUNC(pmu_event_type, NO_EVENT)                                                                                                \
+    SEP FUNC(pmu_event_type, CYCLE) SEP FUNC(pmu_event_type, NPU_IDLE) SEP FUNC(                                                  \
+        pmu_event_type, CC_STALLED_ON_BLOCKDEP) SEP FUNC(pmu_event_type, CC_STALLED_ON_SHRAM_RECONFIG)                            \
+        SEP FUNC(pmu_event_type, MAC_ACTIVE) SEP FUNC(pmu_event_type, MAC_ACTIVE_8BIT) SEP FUNC(                                  \
+            pmu_event_type, MAC_ACTIVE_16BIT) SEP FUNC(pmu_event_type, MAC_DPU_ACTIVE) SEP FUNC(pmu_event_type,                   \
+                                                                                                MAC_STALLED_BY_WD_ACC)            \
+            SEP FUNC(pmu_event_type, MAC_STALLED_BY_WD) SEP FUNC(pmu_event_type, MAC_STALLED_BY_ACC) SEP FUNC(                    \
+                pmu_event_type, MAC_STALLED_BY_IB) SEP FUNC(pmu_event_type,                                                       \
+                                                            MAC_ACTIVE_32BIT) SEP FUNC(pmu_event_type,                            \
+                                                                                       MAC_STALLED_BY_INT_W)                      \
+                SEP FUNC(pmu_event_type, MAC_STALLED_BY_INT_ACC) SEP FUNC(pmu_event_type, AO_ACTIVE) SEP FUNC(                    \
+                    pmu_event_type, AO_ACTIVE_8BIT) SEP FUNC(pmu_event_type,                                                      \
+                                                             AO_ACTIVE_16BIT) SEP FUNC(pmu_event_type,                            \
+                                                                                       AO_STALLED_BY_OFMP_OB)                     \
+                    SEP FUNC(pmu_event_type, AO_STALLED_BY_OFMP) SEP FUNC(pmu_event_type, AO_STALLED_BY_OB) SEP FUNC(             \
+                        pmu_event_type,                                                                                           \
+                        AO_STALLED_BY_ACC_IB) SEP FUNC(pmu_event_type,                                                            \
+                                                       AO_STALLED_BY_ACC) SEP FUNC(pmu_event_type,                                \
+                                                                                   AO_STALLED_BY_IB) SEP FUNC(pmu_event_type,     \
+                                                                                                              WD_ACTIVE) SEP      \
+                        FUNC(pmu_event_type, WD_STALLED) SEP FUNC(pmu_event_type, WD_STALLED_BY_WS) SEP FUNC(                     \
+                            pmu_event_type,                                                                                       \
+                            WD_STALLED_BY_WD_BUF) SEP                                                                             \
+                            FUNC(pmu_event_type, WD_PARSE_ACTIVE) SEP FUNC(pmu_event_type, WD_PARSE_STALLED) SEP FUNC(            \
+                                pmu_event_type,                                                                                   \
+                                WD_PARSE_STALLED_IN) SEP FUNC(pmu_event_type,                                                     \
+                                                              WD_PARSE_STALLED_OUT) SEP                                           \
+                                FUNC(pmu_event_type, WD_TRANS_WS) SEP FUNC(pmu_event_type, WD_TRANS_WB) SEP FUNC(                 \
+                                    pmu_event_type,                                                                               \
+                                    WD_TRANS_DW0) SEP FUNC(pmu_event_type,                                                        \
+                                                           WD_TRANS_DW1) SEP FUNC(pmu_event_type,                                 \
+                                                                                  AXI0_RD_TRANS_ACCEPTED) SEP                     \
+                                    FUNC(pmu_event_type, AXI0_RD_TRANS_COMPLETED) SEP FUNC(                                       \
+                                        pmu_event_type,                                                                           \
+                                        AXI0_RD_DATA_BEAT_RECEIVED) SEP FUNC(pmu_event_type, AXI0_RD_TRAN_REQ_STALLED)            \
+                                        SEP FUNC(pmu_event_type,                                                                  \
+                                                 AXI0_WR_TRANS_ACCEPTED) SEP FUNC(pmu_event_type,                                 \
+                                                                                  AXI0_WR_TRANS_COMPLETED_M)                      \
+                                            SEP FUNC(pmu_event_type, AXI0_WR_TRANS_COMPLETED_S) SEP FUNC(                         \
+                                                pmu_event_type,                                                                   \
+                                                AXI0_WR_DATA_BEAT_WRITTEN)                                                        \
+                                                SEP FUNC(pmu_event_type, AXI0_WR_TRAN_REQ_STALLED) SEP FUNC(                      \
+                                                    pmu_event_type,                                                               \
+                                                    AXI0_WR_DATA_BEAT_STALLED) SEP                                                \
+                                                    FUNC(pmu_event_type, AXI0_ENABLED_CYCLES) SEP FUNC(                           \
+                                                        pmu_event_type,                                                           \
+                                                        AXI0_RD_STALL_LIMIT) SEP FUNC(pmu_event_type,                             \
+                                                                                      AXI0_WR_STALL_LIMIT) SEP                    \
+                                                        FUNC(pmu_event_type, AXI1_RD_TRANS_ACCEPTED) SEP FUNC(                    \
+                                                            pmu_event_type,                                                       \
+                                                            AXI1_RD_TRANS_COMPLETED) SEP FUNC(pmu_event_type,                     \
+                                                                                              AXI1_RD_DATA_BEAT_RECEIVED) SEP     \
+                                                            FUNC(pmu_event_type, AXI1_RD_TRAN_REQ_STALLED) SEP FUNC(              \
+                                                                pmu_event_type,                                                   \
+                                                                AXI1_WR_TRANS_ACCEPTED) SEP                                       \
+                                                                FUNC(pmu_event_type, AXI1_WR_TRANS_COMPLETED_M) SEP FUNC(         \
+                                                                    pmu_event_type,                                               \
+                                                                    AXI1_WR_TRANS_COMPLETED_S) SEP                                \
+                                                                    FUNC(pmu_event_type, AXI1_WR_DATA_BEAT_WRITTEN) SEP FUNC(     \
+                                                                        pmu_event_type,                                           \
+                                                                        AXI1_WR_TRAN_REQ_STALLED) SEP                             \
+                                                                        FUNC(pmu_event_type, AXI1_WR_DATA_BEAT_STALLED) SEP FUNC( \
+                                                                            pmu_event_type,                                       \
+                                                                            AXI1_ENABLED_CYCLES) SEP                              \
+                                                                            FUNC(pmu_event_type, AXI1_RD_STALL_LIMIT) SEP FUNC(   \
+                                                                                pmu_event_type,                                   \
+                                                                                AXI1_WR_STALL_LIMIT) SEP                          \
+                                                                                FUNC(pmu_event_type, AXI_LATENCY_ANY) SEP FUNC(   \
+                                                                                    pmu_event_type,                               \
+                                                                                    AXI_LATENCY_32) SEP                           \
+                                                                                    FUNC(pmu_event_type,                          \
+                                                                                         AXI_LATENCY_64) SEP                      \
+                                                                                        FUNC(pmu_event_type,                      \
+                                                                                             AXI_LATENCY_128) SEP                 \
+                                                                                            FUNC(pmu_event_type,                  \
+                                                                                                 AXI_LATENCY_256) SEP             \
+                                                                                                FUNC(                             \
+                                                                                                    pmu_event_type,               \
+                                                                                                    AXI_LATENCY_512) SEP          \
+                                                                                                    FUNC(                         \
+                                                                                                        pmu_event_type,           \
+                                                                                                        AXI_LATENCY_1024)
 
 #define EXPAND_POOLING_MODE(FUNC, SEP)                                                                                 \
     FUNC(pooling_mode, MAX) SEP FUNC(pooling_mode, AVERAGE) SEP FUNC(pooling_mode, REDUCE_SUM)

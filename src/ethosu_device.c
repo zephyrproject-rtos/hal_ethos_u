@@ -422,7 +422,7 @@ enum ethosu_error_codes ethosu_get_shram_data(int section, uint32_t *shram_p)
 #if !defined(ARM_NPU_STUB)
     int i            = 0;
     uint32_t address = NPU_REG_SHARED_BUFFER0;
-    write_reg(NPU_REG_DEBUG, section * BYTES_1KB);
+    write_reg(NPU_REG_DEBUG_ADDR, section * BYTES_1KB);
 
     while (address <= NPU_REG_SHARED_BUFFER255)
     {
