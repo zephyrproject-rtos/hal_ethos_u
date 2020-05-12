@@ -403,6 +403,7 @@ enum ethosu_error_codes ethosu_clear_irq_history_mask(uint16_t irq_history_clear
 #if !defined(ARM_NPU_STUB)
     write_reg(NPU_REG_CMD, (uint32_t)irq_history_clear_mask << 16);
 #else
+    UNUSED(irq_history_clear_mask);
 #endif
     return ETHOSU_SUCCESS;
 }
