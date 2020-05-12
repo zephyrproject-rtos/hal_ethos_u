@@ -189,9 +189,8 @@ int ethosu_init(void)
     int return_code = 0;
     LOG_INFO("ethosu_init calling NPU embed driver ethosu_dev_init\n");
 
-#ifdef FPGA
     ethosu_soft_reset();
-#endif
+
     if (ETHOSU_SUCCESS != ethosu_wait_for_reset())
     {
         LOG_ERR("Failed reset of Ethos-U\n");
