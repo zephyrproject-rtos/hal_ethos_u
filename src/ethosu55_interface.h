@@ -45,7 +45,106 @@
 // Register offsets
 
 //
-// Register subpage DEBUG_INTERNAL
+// Register subpage BASE
+//
+#define NPU_REG_ID 0x0000
+#define NPU_REG_STATUS 0x0004
+#define NPU_REG_CMD 0x0008
+#define NPU_REG_RESET 0x000C
+#define NPU_REG_QBASE0 0x0010
+#define NPU_REG_QBASE1 0x0014
+#define NPU_REG_QREAD 0x0018
+#define NPU_REG_QCONFIG 0x001C
+#define NPU_REG_QSIZE 0x0020
+#define NPU_REG_PROT 0x0024
+#define NPU_REG_CONFIG 0x0028
+#define NPU_REG_LOCK 0x002C
+#define NPU_REG_REGIONCFG 0x003C
+#define NPU_REG_AXI_LIMIT0 0x0040
+#define NPU_REG_AXI_LIMIT1 0x0044
+#define NPU_REG_AXI_LIMIT2 0x0048
+#define NPU_REG_AXI_LIMIT3 0x004C
+#define BASE_REGISTERS_SIZE 0x0050
+
+//
+// Register subpage BASE_POINTERS
+//
+#define NPU_REG_BASEP0 0x0080
+#define NPU_REG_BASEP1 0x0084
+#define NPU_REG_BASEP2 0x0088
+#define NPU_REG_BASEP3 0x008C
+#define NPU_REG_BASEP4 0x0090
+#define NPU_REG_BASEP5 0x0094
+#define NPU_REG_BASEP6 0x0098
+#define NPU_REG_BASEP7 0x009C
+#define NPU_REG_BASEP8 0x00A0
+#define NPU_REG_BASEP9 0x00A4
+#define NPU_REG_BASEP10 0x00A8
+#define NPU_REG_BASEP11 0x00AC
+#define NPU_REG_BASEP12 0x00B0
+#define NPU_REG_BASEP13 0x00B4
+#define NPU_REG_BASEP14 0x00B8
+#define NPU_REG_BASEP15 0x00BC
+#define BASE_POINTERS_REGISTERS_SIZE 0x00C0
+
+//
+// Register subpage DEBUG
+//
+#define NPU_REG_WD_STATUS 0x0100
+#define NPU_REG_MAC_STATUS 0x0104
+#define NPU_REG_AO_STATUS 0x0108
+#define NPU_REG_DMA_STATUS0 0x0110
+#define NPU_REG_DMA_STATUS1 0x0114
+#define NPU_REG_CLKFORCE 0x0140
+#define NPU_REG_DEBUG_ADDRESS 0x0144
+#define NPU_REG_DEBUG_MISC 0x0148
+#define NPU_REG_DEBUGCORE 0x014C
+#define DEBUG_REGISTERS_SIZE 0x0150
+
+//
+// Register subpage ID
+//
+#define NPU_REG_REVISION 0x0FC0
+#define NPU_REG_PID4 0x0FD0
+#define NPU_REG_PID5 0x0FD4
+#define NPU_REG_PID6 0x0FD8
+#define NPU_REG_PID7 0x0FDC
+#define NPU_REG_PID0 0x0FE0
+#define NPU_REG_PID1 0x0FE4
+#define NPU_REG_PID2 0x0FE8
+#define NPU_REG_PID3 0x0FEC
+#define NPU_REG_CID0 0x0FF0
+#define NPU_REG_CID1 0x0FF4
+#define NPU_REG_CID2 0x0FF8
+#define NPU_REG_CID3 0x0FFC
+#define ID_REGISTERS_SIZE 0x1000
+
+//
+// Register subpage PMU
+//
+#define NPU_REG_PMCR 0x0180
+#define NPU_REG_PMCNTENSET 0x0184
+#define NPU_REG_PMCNTENCLR 0x0188
+#define NPU_REG_PMOVSSET 0x018C
+#define NPU_REG_PMOVSCLR 0x0190
+#define NPU_REG_PMINTSET 0x0194
+#define NPU_REG_PMINTCLR 0x0198
+#define NPU_REG_PMCCNTR_LO 0x01A0
+#define NPU_REG_PMCCNTR_HI 0x01A4
+#define NPU_REG_PMCCNTR_CFG 0x01A8
+#define NPU_REG_PMCAXI_CHAN 0x01AC
+#define NPU_REG_PMEVCNTR0 0x0300
+#define NPU_REG_PMEVCNTR1 0x0304
+#define NPU_REG_PMEVCNTR2 0x0308
+#define NPU_REG_PMEVCNTR3 0x030C
+#define NPU_REG_PMEVTYPER0 0x0380
+#define NPU_REG_PMEVTYPER1 0x0384
+#define NPU_REG_PMEVTYPER2 0x0388
+#define NPU_REG_PMEVTYPER3 0x038C
+#define PMU_REGISTERS_SIZE 0x0390
+
+//
+// Register subpage SHARED_BUFFER
 //
 #define NPU_REG_SHARED_BUFFER0 0x0400
 #define NPU_REG_SHARED_BUFFER1 0x0404
@@ -303,109 +402,10 @@
 #define NPU_REG_SHARED_BUFFER253 0x07F4
 #define NPU_REG_SHARED_BUFFER254 0x07F8
 #define NPU_REG_SHARED_BUFFER255 0x07FC
-#define DEBUG_INTERNAL_REGISTERS_SIZE 0x0800
+#define SHARED_BUFFER_REGISTERS_SIZE 0x0800
 
 //
-// Register subpage HW_DEBUG_INTERNAL
-//
-#define NPU_REG_WD_STATUS 0x0100
-#define NPU_REG_MAC_STATUS 0x0104
-#define NPU_REG_AO_STATUS 0x0108
-#define NPU_REG_DMA_STATUS0 0x0110
-#define NPU_REG_DMA_STATUS1 0x0114
-#define NPU_REG_CLKFORCE 0x0140
-#define NPU_REG_DEBUG_ADDR 0x0144
-#define NPU_REG_DEBUG_MISC 0x0148
-#define NPU_REG_DEBUGCORE 0x014C
-#define HW_DEBUG_INTERNAL_REGISTERS_SIZE 0x0150
-
-//
-// Register subpage NPU_BP
-//
-#define NPU_REG_BASEP0 0x0080
-#define NPU_REG_BASEP1 0x0084
-#define NPU_REG_BASEP2 0x0088
-#define NPU_REG_BASEP3 0x008C
-#define NPU_REG_BASEP4 0x0090
-#define NPU_REG_BASEP5 0x0094
-#define NPU_REG_BASEP6 0x0098
-#define NPU_REG_BASEP7 0x009C
-#define NPU_REG_BASEP8 0x00A0
-#define NPU_REG_BASEP9 0x00A4
-#define NPU_REG_BASEP10 0x00A8
-#define NPU_REG_BASEP11 0x00AC
-#define NPU_REG_BASEP12 0x00B0
-#define NPU_REG_BASEP13 0x00B4
-#define NPU_REG_BASEP14 0x00B8
-#define NPU_REG_BASEP15 0x00BC
-#define NPU_BP_REGISTERS_SIZE 0x00C0
-
-//
-// Register subpage NPU_IDS
-//
-#define NPU_REG_REVISION 0x0FC0
-#define NPU_REG_PID4 0x0FD0
-#define NPU_REG_PID5 0x0FD4
-#define NPU_REG_PID6 0x0FD8
-#define NPU_REG_PID7 0x0FDC
-#define NPU_REG_PID0 0x0FE0
-#define NPU_REG_PID1 0x0FE4
-#define NPU_REG_PID2 0x0FE8
-#define NPU_REG_PID3 0x0FEC
-#define NPU_REG_CID0 0x0FF0
-#define NPU_REG_CID1 0x0FF4
-#define NPU_REG_CID2 0x0FF8
-#define NPU_REG_CID3 0x0FFC
-#define NPU_IDS_REGISTERS_SIZE 0x1000
-
-//
-// Register subpage NPU_REG
-//
-#define NPU_REG_ID 0x0000
-#define NPU_REG_STATUS 0x0004
-#define NPU_REG_CMD 0x0008
-#define NPU_REG_RESET 0x000C
-#define NPU_REG_QBASE0 0x0010
-#define NPU_REG_QBASE1 0x0014
-#define NPU_REG_QREAD 0x0018
-#define NPU_REG_QCONFIG 0x001C
-#define NPU_REG_QSIZE 0x0020
-#define NPU_REG_PROT 0x0024
-#define NPU_REG_CONFIG 0x0028
-#define NPU_REG_LOCK 0x002C
-#define NPU_REG_REGIONCFG 0x003C
-#define NPU_REG_AXI_LIMIT0 0x0040
-#define NPU_REG_AXI_LIMIT1 0x0044
-#define NPU_REG_AXI_LIMIT2 0x0048
-#define NPU_REG_AXI_LIMIT3 0x004C
-#define NPU_REG_REGISTERS_SIZE 0x0050
-
-//
-// Register subpage PMU
-//
-#define NPU_REG_PMCR 0x0180
-#define NPU_REG_PMCNTENSET 0x0184
-#define NPU_REG_PMCNTENCLR 0x0188
-#define NPU_REG_PMOVSSET 0x018C
-#define NPU_REG_PMOVSCLR 0x0190
-#define NPU_REG_PMINTSET 0x0194
-#define NPU_REG_PMINTCLR 0x0198
-#define NPU_REG_PMCCNTR_LO 0x01A0
-#define NPU_REG_PMCCNTR_HI 0x01A4
-#define NPU_REG_PMCCNTR_CFG 0x01A8
-#define NPU_REG_PMCAXI_CHAN 0x01AC
-#define NPU_REG_PMEVCNTR0 0x0300
-#define NPU_REG_PMEVCNTR1 0x0304
-#define NPU_REG_PMEVCNTR2 0x0308
-#define NPU_REG_PMEVCNTR3 0x030C
-#define NPU_REG_PMEVTYPER0 0x0380
-#define NPU_REG_PMEVTYPER1 0x0384
-#define NPU_REG_PMEVTYPER2 0x0388
-#define NPU_REG_PMEVTYPER3 0x038C
-#define PMU_REGISTERS_SIZE 0x0390
-
-//
-// Register subpage TSU_DEBUG_INTERNAL
+// Register subpage TSU
 //
 #define NPU_REG_IFM_PAD_TOP 0x0800
 #define NPU_REG_IFM_PAD_LEFT 0x0804
@@ -526,10 +526,10 @@
 #define NPU_REG_SCALE1_BASE 0x0B50
 #define NPU_REG_SCALE1_BASE_HI 0x0B54
 #define NPU_REG_SCALE1_LENGTH 0x0B58
-#define TSU_DEBUG_INTERNAL_REGISTERS_SIZE 0x0B5C
+#define TSU_REGISTERS_SIZE 0x0B5C
 
 //
-// Register subpage TSU_DEBUG_RO_INTERNAL
+// Register subpage TSU_DEBUG
 //
 #define NPU_REG_KERNEL_X 0x0200
 #define NPU_REG_KERNEL_Y 0x0204
@@ -566,7 +566,7 @@
 #define NPU_REG_DMA_SCALE_SRC 0x0280
 #define NPU_REG_DMA_SCALE_SRC_HI 0x0284
 #define NPU_REG_CURRENT_CMD 0x02BC
-#define TSU_DEBUG_RO_INTERNAL_REGISTERS_SIZE 0x02C0
+#define TSU_DEBUG_REGISTERS_SIZE 0x02C0
 
 #ifdef __cplusplus
 
@@ -1209,6 +1209,2607 @@ enum stride_mode
 };
 
 #endif
+
+// id_r - ID register
+struct id_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        struct
+        {
+            uint32_t version_status : 4; // This is the version of the product
+            uint32_t version_minor : 4;  // This is the n for the P part of an RnPn release number
+            uint32_t version_major : 4;  // This is the n for the R part of an RnPn release number
+            uint32_t product_major : 4;  // This is the X part of the ML00X product number
+            uint32_t arch_patch_rev : 4; // This is the patch number of the architecture version a.b
+            uint32_t
+                arch_minor_rev : 8; // This is the minor architecture version number, b in the architecture version a.b
+            uint32_t
+                arch_major_rev : 4; // This is the major architecture version number, a in the architecture version a.b
+        };
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR id_r() :
+        version_status(static_cast<uint32_t>(1)), version_minor(static_cast<uint32_t>(0x0)),
+        version_major(static_cast<uint32_t>(0x0)), product_major(static_cast<uint32_t>(4)),
+        arch_patch_rev(static_cast<uint32_t>(0)), arch_minor_rev(static_cast<uint32_t>(0)),
+        arch_major_rev(static_cast<uint32_t>(1))
+    {
+    }
+    CONSTEXPR id_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    id_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_version_status() const
+    {
+        uint32_t value = static_cast<uint32_t>(version_status);
+        return value;
+    }
+    uint32_t get_version_status() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(version_status);
+        return value;
+    }
+    CONSTEXPR id_r &set_version_status(uint32_t value)
+    {
+        version_status = ((1u << 4) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_version_minor() const
+    {
+        uint32_t value = static_cast<uint32_t>(version_minor);
+        return value;
+    }
+    uint32_t get_version_minor() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(version_minor);
+        return value;
+    }
+    CONSTEXPR id_r &set_version_minor(uint32_t value)
+    {
+        version_minor = ((1u << 4) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_version_major() const
+    {
+        uint32_t value = static_cast<uint32_t>(version_major);
+        return value;
+    }
+    uint32_t get_version_major() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(version_major);
+        return value;
+    }
+    CONSTEXPR id_r &set_version_major(uint32_t value)
+    {
+        version_major = ((1u << 4) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_product_major() const
+    {
+        uint32_t value = static_cast<uint32_t>(product_major);
+        return value;
+    }
+    uint32_t get_product_major() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(product_major);
+        return value;
+    }
+    CONSTEXPR id_r &set_product_major(uint32_t value)
+    {
+        product_major = ((1u << 4) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_arch_patch_rev() const
+    {
+        uint32_t value = static_cast<uint32_t>(arch_patch_rev);
+        return value;
+    }
+    uint32_t get_arch_patch_rev() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(arch_patch_rev);
+        return value;
+    }
+    CONSTEXPR id_r &set_arch_patch_rev(uint32_t value)
+    {
+        arch_patch_rev = ((1u << 4) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_arch_minor_rev() const
+    {
+        uint32_t value = static_cast<uint32_t>(arch_minor_rev);
+        return value;
+    }
+    uint32_t get_arch_minor_rev() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(arch_minor_rev);
+        return value;
+    }
+    CONSTEXPR id_r &set_arch_minor_rev(uint32_t value)
+    {
+        arch_minor_rev = ((1u << 8) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_arch_major_rev() const
+    {
+        uint32_t value = static_cast<uint32_t>(arch_major_rev);
+        return value;
+    }
+    uint32_t get_arch_major_rev() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(arch_major_rev);
+        return value;
+    }
+    CONSTEXPR id_r &set_arch_major_rev(uint32_t value)
+    {
+        arch_major_rev = ((1u << 4) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// status_r - Register describes the current operating status of the NPU
+struct status_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        struct
+        {
+            uint32_t state : 1;      // NPU state, 0 = Stopped, 1 = Running
+            uint32_t irq_raised : 1; // Raw IRQ status, 0 = IRQ not raised, 1 = IRQ raised. IRQ is cleared using command
+                                     // register bit 1
+            uint32_t
+                bus_status : 1; // 0=OK, 1=Bus abort detected and processing halted (NPU will reach IDLE state and not
+                                // to start process any more commands/AXI transactions). Can only be cleared by a reset
+            uint32_t reset_status : 1; // Reset is ongoing and only this register can be read (other registers read as 0
+                                       // and writes are ignored.) A value of 0 means NPU is not being reset and can be
+                                       // accessed as normal
+            uint32_t
+                cmd_parse_error : 1; // 0=No error 1=Command stream parsing error detected. Can only be cleared by reset
+            uint32_t cmd_end_reached : 1; // 0=Not reached, 1=Reached. Cleared by writing QBASE or QSIZE when NPU is in
+                                          // stopped state
+            uint32_t pmu_irq_raised : 1;  // 0=No PMU IRQ, 1=PMU IRQ raised. Cleared by using command register bit 1
+            uint32_t wd_fault : 1; // Weight decoder state: 0=no fault 1=weight decoder decompression fault. Can only be
+                                   // cleared by reset
+            uint32_t reserved0 : 3;
+            uint32_t faulting_interface : 1; // Faulting interface on bus abort. 0=AXI-M0 1=AXI-M1
+            uint32_t faulting_channel : 4;  // Faulting channel on a bus abort. Read: 0=Cmd 1=IFM 2=Weights 3=Scale+Bias
+                                            // 4=Mem2Mem; Write: 8=OFM 9=Mem2Mem
+            uint32_t irq_history_mask : 16; // IRQ History mask
+        };
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR status_r() :
+        state(static_cast<uint32_t>(::state::STOPPED)), irq_raised(static_cast<uint32_t>(0x0)),
+        bus_status(static_cast<uint32_t>(0x0)), reset_status(static_cast<uint32_t>(0x1)),
+        cmd_parse_error(static_cast<uint32_t>(0x0)), cmd_end_reached(static_cast<uint32_t>(0x0)),
+        pmu_irq_raised(static_cast<uint32_t>(0x0)), wd_fault(static_cast<uint32_t>(0x0)),
+        reserved0(static_cast<uint32_t>(0)), faulting_interface(static_cast<uint32_t>(0x0)),
+        faulting_channel(static_cast<uint32_t>(0x0)), irq_history_mask(static_cast<uint32_t>(0x0))
+    {
+    }
+    CONSTEXPR status_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    status_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR ::state get_state() const
+    {
+        ::state value = static_cast<::state>(state);
+        return value;
+    }
+    ::state get_state() const volatile
+    {
+        ::state value = static_cast<::state>(state);
+        return value;
+    }
+    CONSTEXPR status_r &set_state(::state value)
+    {
+        state = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_irq_raised() const
+    {
+        uint32_t value = static_cast<uint32_t>(irq_raised);
+        return value;
+    }
+    uint32_t get_irq_raised() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(irq_raised);
+        return value;
+    }
+    CONSTEXPR status_r &set_irq_raised(uint32_t value)
+    {
+        irq_raised = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_bus_status() const
+    {
+        uint32_t value = static_cast<uint32_t>(bus_status);
+        return value;
+    }
+    uint32_t get_bus_status() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(bus_status);
+        return value;
+    }
+    CONSTEXPR status_r &set_bus_status(uint32_t value)
+    {
+        bus_status = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_reset_status() const
+    {
+        uint32_t value = static_cast<uint32_t>(reset_status);
+        return value;
+    }
+    uint32_t get_reset_status() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(reset_status);
+        return value;
+    }
+    CONSTEXPR status_r &set_reset_status(uint32_t value)
+    {
+        reset_status = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_cmd_parse_error() const
+    {
+        uint32_t value = static_cast<uint32_t>(cmd_parse_error);
+        return value;
+    }
+    uint32_t get_cmd_parse_error() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(cmd_parse_error);
+        return value;
+    }
+    CONSTEXPR status_r &set_cmd_parse_error(uint32_t value)
+    {
+        cmd_parse_error = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_cmd_end_reached() const
+    {
+        uint32_t value = static_cast<uint32_t>(cmd_end_reached);
+        return value;
+    }
+    uint32_t get_cmd_end_reached() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(cmd_end_reached);
+        return value;
+    }
+    CONSTEXPR status_r &set_cmd_end_reached(uint32_t value)
+    {
+        cmd_end_reached = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_pmu_irq_raised() const
+    {
+        uint32_t value = static_cast<uint32_t>(pmu_irq_raised);
+        return value;
+    }
+    uint32_t get_pmu_irq_raised() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(pmu_irq_raised);
+        return value;
+    }
+    CONSTEXPR status_r &set_pmu_irq_raised(uint32_t value)
+    {
+        pmu_irq_raised = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_wd_fault() const
+    {
+        uint32_t value = static_cast<uint32_t>(wd_fault);
+        return value;
+    }
+    uint32_t get_wd_fault() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(wd_fault);
+        return value;
+    }
+    CONSTEXPR status_r &set_wd_fault(uint32_t value)
+    {
+        wd_fault = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_faulting_interface() const
+    {
+        uint32_t value = static_cast<uint32_t>(faulting_interface);
+        return value;
+    }
+    uint32_t get_faulting_interface() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(faulting_interface);
+        return value;
+    }
+    CONSTEXPR status_r &set_faulting_interface(uint32_t value)
+    {
+        faulting_interface = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_faulting_channel() const
+    {
+        uint32_t value = static_cast<uint32_t>(faulting_channel);
+        return value;
+    }
+    uint32_t get_faulting_channel() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(faulting_channel);
+        return value;
+    }
+    CONSTEXPR status_r &set_faulting_channel(uint32_t value)
+    {
+        faulting_channel = ((1u << 4) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_irq_history_mask() const
+    {
+        uint32_t value = static_cast<uint32_t>(irq_history_mask);
+        return value;
+    }
+    uint32_t get_irq_history_mask() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(irq_history_mask);
+        return value;
+    }
+    CONSTEXPR status_r &set_irq_history_mask(uint32_t value)
+    {
+        irq_history_mask = ((1u << 16) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// cmd_r - Command register, reads as last written command
+struct cmd_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        struct
+        {
+            uint32_t transition_to_running_state : 1; // Write 1 to transition the NPU to running state. Writing 0 has
+                                                      // no effect
+            uint32_t clear_irq : 1; // Write 1 to clear the IRQ status in the STATUS register. Writing 0 has no effect
+            uint32_t clock_q_enable : 1; // Write 1 to this bit to enable clock off using clock q-interface and enable
+                                         // the master clock gate
+            uint32_t power_q_enable : 1; // Write 1 to this bit to enable power off using power q-interface
+            uint32_t
+                stop_request : 1; // Write 1 to this bit to request STOP after completing any already-started commands
+            uint32_t reserved0 : 11;
+            uint32_t clear_irq_history : 16; // Clears the IRQ history mask
+        };
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR cmd_r() :
+        transition_to_running_state(static_cast<uint32_t>(0x0)), clear_irq(static_cast<uint32_t>(0x0)),
+        clock_q_enable(static_cast<uint32_t>(0x0)), power_q_enable(static_cast<uint32_t>(0x0)),
+        stop_request(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)),
+        clear_irq_history(static_cast<uint32_t>(0x0))
+    {
+    }
+    CONSTEXPR cmd_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    cmd_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_transition_to_running_state() const
+    {
+        uint32_t value = static_cast<uint32_t>(transition_to_running_state);
+        return value;
+    }
+    uint32_t get_transition_to_running_state() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(transition_to_running_state);
+        return value;
+    }
+    CONSTEXPR cmd_r &set_transition_to_running_state(uint32_t value)
+    {
+        transition_to_running_state = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_clear_irq() const
+    {
+        uint32_t value = static_cast<uint32_t>(clear_irq);
+        return value;
+    }
+    uint32_t get_clear_irq() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(clear_irq);
+        return value;
+    }
+    CONSTEXPR cmd_r &set_clear_irq(uint32_t value)
+    {
+        clear_irq = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_clock_q_enable() const
+    {
+        uint32_t value = static_cast<uint32_t>(clock_q_enable);
+        return value;
+    }
+    uint32_t get_clock_q_enable() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(clock_q_enable);
+        return value;
+    }
+    CONSTEXPR cmd_r &set_clock_q_enable(uint32_t value)
+    {
+        clock_q_enable = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_power_q_enable() const
+    {
+        uint32_t value = static_cast<uint32_t>(power_q_enable);
+        return value;
+    }
+    uint32_t get_power_q_enable() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(power_q_enable);
+        return value;
+    }
+    CONSTEXPR cmd_r &set_power_q_enable(uint32_t value)
+    {
+        power_q_enable = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_stop_request() const
+    {
+        uint32_t value = static_cast<uint32_t>(stop_request);
+        return value;
+    }
+    uint32_t get_stop_request() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(stop_request);
+        return value;
+    }
+    CONSTEXPR cmd_r &set_stop_request(uint32_t value)
+    {
+        stop_request = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_clear_irq_history() const
+    {
+        uint32_t value = static_cast<uint32_t>(clear_irq_history);
+        return value;
+    }
+    uint32_t get_clear_irq_history() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(clear_irq_history);
+        return value;
+    }
+    CONSTEXPR cmd_r &set_clear_irq_history(uint32_t value)
+    {
+        clear_irq_history = ((1u << 16) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// reset_r - Request Reset and new security mode
+struct reset_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        struct
+        {
+            uint32_t pending_CPL : 1; // Current privilege level 0=User 1=Privileged
+            uint32_t pending_CSL : 1; // Current security level 0=Secure 1=Non secure
+            uint32_t reserved0 : 30;
+        };
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR reset_r() :
+        pending_CPL(static_cast<uint32_t>(::privilege_level::USER)),
+        pending_CSL(static_cast<uint32_t>(::security_level::SECURE)), reserved0(static_cast<uint32_t>(0))
+    {
+    }
+    CONSTEXPR reset_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    reset_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR ::privilege_level get_pending_CPL() const
+    {
+        ::privilege_level value = static_cast<::privilege_level>(pending_CPL);
+        return value;
+    }
+    ::privilege_level get_pending_CPL() const volatile
+    {
+        ::privilege_level value = static_cast<::privilege_level>(pending_CPL);
+        return value;
+    }
+    CONSTEXPR reset_r &set_pending_CPL(::privilege_level value)
+    {
+        pending_CPL = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR ::security_level get_pending_CSL() const
+    {
+        ::security_level value = static_cast<::security_level>(pending_CSL);
+        return value;
+    }
+    ::security_level get_pending_CSL() const volatile
+    {
+        ::security_level value = static_cast<::security_level>(pending_CSL);
+        return value;
+    }
+    CONSTEXPR reset_r &set_pending_CSL(::security_level value)
+    {
+        pending_CSL = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// qbase0_r - Base address of command queue bits [31:0]. The address is 4 byte aligned
+struct qbase0_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        uint32_t QBASE0; // The 4 byte aligned lower bytes of the base address value for the command stream
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR qbase0_r() : QBASE0(static_cast<uint32_t>(0x00000000)) {}
+    CONSTEXPR qbase0_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    qbase0_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_QBASE0() const
+    {
+        uint32_t value = static_cast<uint32_t>(QBASE0);
+        return value;
+    }
+    uint32_t get_QBASE0() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(QBASE0);
+        return value;
+    }
+    CONSTEXPR qbase0_r &set_QBASE0(uint32_t value)
+    {
+        QBASE0 = static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// qbase1_r - Address extension bits [47:32] bits for queue base
+struct qbase1_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        uint32_t QBASE1; // The 4 byte aligned upper bytes of the base address value for the command stream
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR qbase1_r() : QBASE1(static_cast<uint32_t>(0x00000000)) {}
+    CONSTEXPR qbase1_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    qbase1_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_QBASE1() const
+    {
+        uint32_t value = static_cast<uint32_t>(QBASE1);
+        return value;
+    }
+    uint32_t get_QBASE1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(QBASE1);
+        return value;
+    }
+    CONSTEXPR qbase1_r &set_QBASE1(uint32_t value)
+    {
+        QBASE1 = static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// qread_r - Read offset in the command stream in bytes. Multiple of 4 in the range 0 to 16 MB
+struct qread_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        uint32_t QREAD; // The read offset of the current command under execution
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR qread_r() : QREAD(static_cast<uint32_t>(0x00000000)) {}
+    CONSTEXPR qread_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    qread_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_QREAD() const
+    {
+        uint32_t value = static_cast<uint32_t>(QREAD);
+        return value;
+    }
+    uint32_t get_QREAD() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(QREAD);
+        return value;
+    }
+    CONSTEXPR qread_r &set_QREAD(uint32_t value)
+    {
+        QREAD = static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// qconfig_r - AXI configuration for the command stream in the range 0-3. Same encoding as for REGIONCFG
+struct qconfig_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        uint32_t QCONFIG; // AXI configuration for the command stream in the range 0-3
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR qconfig_r() : QCONFIG(static_cast<uint32_t>(0x00000000)) {}
+    CONSTEXPR qconfig_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    qconfig_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_QCONFIG() const
+    {
+        uint32_t value = static_cast<uint32_t>(QCONFIG);
+        return value;
+    }
+    uint32_t get_QCONFIG() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(QCONFIG);
+        return value;
+    }
+    CONSTEXPR qconfig_r &set_QCONFIG(uint32_t value)
+    {
+        QCONFIG = static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// qsize_r - Size of the command stream in bytes. Multiple of 4 in the range 0 to 16 MB
+struct qsize_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        uint32_t QSIZE; // Size of the next command stream to be executed by the NPU
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR qsize_r() : QSIZE(static_cast<uint32_t>(0x00000000)) {}
+    CONSTEXPR qsize_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    qsize_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_QSIZE() const
+    {
+        uint32_t value = static_cast<uint32_t>(QSIZE);
+        return value;
+    }
+    uint32_t get_QSIZE() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(QSIZE);
+        return value;
+    }
+    CONSTEXPR qsize_r &set_QSIZE(uint32_t value)
+    {
+        QSIZE = static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// prot_r - Protection level configured for the NPU when acting as an AXI master
+struct prot_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        struct
+        {
+            uint32_t active_CPL : 1; // Current privilege level 0=User 1=Privileged
+            uint32_t active_CSL : 1; // Current security level 0=Secure 1=Non secure
+            uint32_t reserved0 : 30;
+        };
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR prot_r() :
+        active_CPL(static_cast<uint32_t>(::privilege_level::USER)),
+        active_CSL(static_cast<uint32_t>(::security_level::SECURE)), reserved0(static_cast<uint32_t>(0))
+    {
+    }
+    CONSTEXPR prot_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    prot_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR ::privilege_level get_active_CPL() const
+    {
+        ::privilege_level value = static_cast<::privilege_level>(active_CPL);
+        return value;
+    }
+    ::privilege_level get_active_CPL() const volatile
+    {
+        ::privilege_level value = static_cast<::privilege_level>(active_CPL);
+        return value;
+    }
+    CONSTEXPR prot_r &set_active_CPL(::privilege_level value)
+    {
+        active_CPL = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR ::security_level get_active_CSL() const
+    {
+        ::security_level value = static_cast<::security_level>(active_CSL);
+        return value;
+    }
+    ::security_level get_active_CSL() const volatile
+    {
+        ::security_level value = static_cast<::security_level>(active_CSL);
+        return value;
+    }
+    CONSTEXPR prot_r &set_active_CSL(::security_level value)
+    {
+        active_CSL = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// config_r - RTL configuration
+struct config_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        struct
+        {
+            uint32_t macs_per_cc : 4;        // The log2(macs/clock cycle). Valid encoding range is 5 to 8 for 32 to 256
+                                             // MACs/clock cycle.
+            uint32_t cmd_stream_version : 4; // command stream version accepted by this NPU. Set to 0 for Ethos-U55 EAC.
+            uint32_t shram_size : 8;         // Size in KB of SHRAM in the range 8 to 48.
+            uint32_t reserved0 : 12;
+            uint32_t product : 4; // Product configuration
+        };
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR config_r() :
+        macs_per_cc(static_cast<uint32_t>(0)), cmd_stream_version(static_cast<uint32_t>(0x0)),
+        shram_size(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)), product(static_cast<uint32_t>(0))
+    {
+    }
+    CONSTEXPR config_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    config_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR ::macs_per_cc get_macs_per_cc() const
+    {
+        ::macs_per_cc value = static_cast<::macs_per_cc>(macs_per_cc);
+        return value;
+    }
+    ::macs_per_cc get_macs_per_cc() const volatile
+    {
+        ::macs_per_cc value = static_cast<::macs_per_cc>(macs_per_cc);
+        return value;
+    }
+    CONSTEXPR config_r &set_macs_per_cc(::macs_per_cc value)
+    {
+        macs_per_cc = ((1u << 4) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_cmd_stream_version() const
+    {
+        uint32_t value = static_cast<uint32_t>(cmd_stream_version);
+        return value;
+    }
+    uint32_t get_cmd_stream_version() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(cmd_stream_version);
+        return value;
+    }
+    CONSTEXPR config_r &set_cmd_stream_version(uint32_t value)
+    {
+        cmd_stream_version = ((1u << 4) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR ::shram_size get_shram_size() const
+    {
+        ::shram_size value = static_cast<::shram_size>(shram_size);
+        return value;
+    }
+    ::shram_size get_shram_size() const volatile
+    {
+        ::shram_size value = static_cast<::shram_size>(shram_size);
+        return value;
+    }
+    CONSTEXPR config_r &set_shram_size(::shram_size value)
+    {
+        shram_size = ((1u << 8) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_product() const
+    {
+        uint32_t value = static_cast<uint32_t>(product);
+        return value;
+    }
+    uint32_t get_product() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(product);
+        return value;
+    }
+    CONSTEXPR config_r &set_product(uint32_t value)
+    {
+        product = ((1u << 4) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// lock_r - Lock register. This register is designed for driver use and does not affect NPU functionality
+struct lock_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        uint32_t LOCK; // 32 bit value for LOCK configuration
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR lock_r() : LOCK(static_cast<uint32_t>(0x00000000)) {}
+    CONSTEXPR lock_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    lock_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_LOCK() const
+    {
+        uint32_t value = static_cast<uint32_t>(LOCK);
+        return value;
+    }
+    uint32_t get_LOCK() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(LOCK);
+        return value;
+    }
+    CONSTEXPR lock_r &set_LOCK(uint32_t value)
+    {
+        LOCK = static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// regioncfg_r - Base pointer configuration. Bits[2*k+1:2*k] give the memory type for REGION[k]
+struct regioncfg_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        struct
+        {
+            uint32_t region0 : 2; // Bits for Region0 Configurion
+            uint32_t region1 : 2; // Bits for Region1 Configurion
+            uint32_t region2 : 2; // Bits for Region2 Configurion
+            uint32_t region3 : 2; // Bits for Region3 Configurion
+            uint32_t region4 : 2; // Bits for Region4 Configurion
+            uint32_t region5 : 2; // Bits for Region5 Configurion
+            uint32_t region6 : 2; // Bits for Region6 Configurion
+            uint32_t region7 : 2; // Bits for Region7 Configurion
+            uint32_t reserved0 : 16;
+        };
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR regioncfg_r() :
+        region0(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)),
+        region1(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)),
+        region2(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)),
+        region3(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)),
+        region4(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)),
+        region5(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)),
+        region6(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)),
+        region7(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)), reserved0(static_cast<uint32_t>(0))
+    {
+    }
+    CONSTEXPR regioncfg_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    regioncfg_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR ::memory_type get_region0() const
+    {
+        ::memory_type value = static_cast<::memory_type>(region0);
+        return value;
+    }
+    ::memory_type get_region0() const volatile
+    {
+        ::memory_type value = static_cast<::memory_type>(region0);
+        return value;
+    }
+    CONSTEXPR regioncfg_r &set_region0(::memory_type value)
+    {
+        region0 = ((1u << 2) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR ::memory_type get_region1() const
+    {
+        ::memory_type value = static_cast<::memory_type>(region1);
+        return value;
+    }
+    ::memory_type get_region1() const volatile
+    {
+        ::memory_type value = static_cast<::memory_type>(region1);
+        return value;
+    }
+    CONSTEXPR regioncfg_r &set_region1(::memory_type value)
+    {
+        region1 = ((1u << 2) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR ::memory_type get_region2() const
+    {
+        ::memory_type value = static_cast<::memory_type>(region2);
+        return value;
+    }
+    ::memory_type get_region2() const volatile
+    {
+        ::memory_type value = static_cast<::memory_type>(region2);
+        return value;
+    }
+    CONSTEXPR regioncfg_r &set_region2(::memory_type value)
+    {
+        region2 = ((1u << 2) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR ::memory_type get_region3() const
+    {
+        ::memory_type value = static_cast<::memory_type>(region3);
+        return value;
+    }
+    ::memory_type get_region3() const volatile
+    {
+        ::memory_type value = static_cast<::memory_type>(region3);
+        return value;
+    }
+    CONSTEXPR regioncfg_r &set_region3(::memory_type value)
+    {
+        region3 = ((1u << 2) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR ::memory_type get_region4() const
+    {
+        ::memory_type value = static_cast<::memory_type>(region4);
+        return value;
+    }
+    ::memory_type get_region4() const volatile
+    {
+        ::memory_type value = static_cast<::memory_type>(region4);
+        return value;
+    }
+    CONSTEXPR regioncfg_r &set_region4(::memory_type value)
+    {
+        region4 = ((1u << 2) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR ::memory_type get_region5() const
+    {
+        ::memory_type value = static_cast<::memory_type>(region5);
+        return value;
+    }
+    ::memory_type get_region5() const volatile
+    {
+        ::memory_type value = static_cast<::memory_type>(region5);
+        return value;
+    }
+    CONSTEXPR regioncfg_r &set_region5(::memory_type value)
+    {
+        region5 = ((1u << 2) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR ::memory_type get_region6() const
+    {
+        ::memory_type value = static_cast<::memory_type>(region6);
+        return value;
+    }
+    ::memory_type get_region6() const volatile
+    {
+        ::memory_type value = static_cast<::memory_type>(region6);
+        return value;
+    }
+    CONSTEXPR regioncfg_r &set_region6(::memory_type value)
+    {
+        region6 = ((1u << 2) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR ::memory_type get_region7() const
+    {
+        ::memory_type value = static_cast<::memory_type>(region7);
+        return value;
+    }
+    ::memory_type get_region7() const volatile
+    {
+        ::memory_type value = static_cast<::memory_type>(region7);
+        return value;
+    }
+    CONSTEXPR regioncfg_r &set_region7(::memory_type value)
+    {
+        region7 = ((1u << 2) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// axi_limit0_r - AXI limits for port 0 counter 0
+struct axi_limit0_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        struct
+        {
+            uint32_t max_beats : 2; // Burst split alignment: 0=64 bytes, 1=128 bytes, 2=256 bytes, 3=reserved
+            uint32_t reserved0 : 2;
+            uint32_t memtype : 4; // Memtype
+            uint32_t reserved1 : 8;
+            uint32_t
+                max_outstanding_read_m1 : 8; // Maximum number of outstanding AXI read transactions - 1 in range 0 to 31
+            uint32_t max_outstanding_write_m1 : 8; // Maximum number of outstanding AXI write transactions - 1 in range
+                                                   // 0 to 15
+        };
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR axi_limit0_r() :
+        max_beats(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
+        reserved1(static_cast<uint32_t>(0)), max_outstanding_read_m1(static_cast<uint32_t>(0x00)),
+        max_outstanding_write_m1(static_cast<uint32_t>(0x00))
+    {
+    }
+    CONSTEXPR axi_limit0_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    axi_limit0_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_max_beats() const
+    {
+        uint32_t value = static_cast<uint32_t>(max_beats);
+        return value;
+    }
+    uint32_t get_max_beats() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(max_beats);
+        return value;
+    }
+    CONSTEXPR axi_limit0_r &set_max_beats(uint32_t value)
+    {
+        max_beats = ((1u << 2) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_memtype() const
+    {
+        uint32_t value = static_cast<uint32_t>(memtype);
+        return value;
+    }
+    uint32_t get_memtype() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(memtype);
+        return value;
+    }
+    CONSTEXPR axi_limit0_r &set_memtype(uint32_t value)
+    {
+        memtype = ((1u << 4) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_max_outstanding_read_m1() const
+    {
+        uint32_t value = static_cast<uint32_t>(max_outstanding_read_m1);
+        return value;
+    }
+    uint32_t get_max_outstanding_read_m1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(max_outstanding_read_m1);
+        return value;
+    }
+    CONSTEXPR axi_limit0_r &set_max_outstanding_read_m1(uint32_t value)
+    {
+        max_outstanding_read_m1 = ((1u << 8) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_max_outstanding_write_m1() const
+    {
+        uint32_t value = static_cast<uint32_t>(max_outstanding_write_m1);
+        return value;
+    }
+    uint32_t get_max_outstanding_write_m1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(max_outstanding_write_m1);
+        return value;
+    }
+    CONSTEXPR axi_limit0_r &set_max_outstanding_write_m1(uint32_t value)
+    {
+        max_outstanding_write_m1 = ((1u << 8) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// axi_limit1_r - AXI limits for port 0 counter 1
+struct axi_limit1_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        struct
+        {
+            uint32_t max_beats : 2; // Burst split alignment: 0=64 bytes, 1=128 bytes, 2=256 bytes, 3=reserved
+            uint32_t reserved0 : 2;
+            uint32_t memtype : 4; // Memtype
+            uint32_t reserved1 : 8;
+            uint32_t
+                max_outstanding_read_m1 : 8; // Maximum number of outstanding AXI read transactions - 1 in range 0 to 31
+            uint32_t max_outstanding_write_m1 : 8; // Maximum number of outstanding AXI write transactions - 1 in range
+                                                   // 0 to 15
+        };
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR axi_limit1_r() :
+        max_beats(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
+        reserved1(static_cast<uint32_t>(0)), max_outstanding_read_m1(static_cast<uint32_t>(0x00)),
+        max_outstanding_write_m1(static_cast<uint32_t>(0x00))
+    {
+    }
+    CONSTEXPR axi_limit1_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    axi_limit1_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_max_beats() const
+    {
+        uint32_t value = static_cast<uint32_t>(max_beats);
+        return value;
+    }
+    uint32_t get_max_beats() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(max_beats);
+        return value;
+    }
+    CONSTEXPR axi_limit1_r &set_max_beats(uint32_t value)
+    {
+        max_beats = ((1u << 2) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_memtype() const
+    {
+        uint32_t value = static_cast<uint32_t>(memtype);
+        return value;
+    }
+    uint32_t get_memtype() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(memtype);
+        return value;
+    }
+    CONSTEXPR axi_limit1_r &set_memtype(uint32_t value)
+    {
+        memtype = ((1u << 4) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_max_outstanding_read_m1() const
+    {
+        uint32_t value = static_cast<uint32_t>(max_outstanding_read_m1);
+        return value;
+    }
+    uint32_t get_max_outstanding_read_m1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(max_outstanding_read_m1);
+        return value;
+    }
+    CONSTEXPR axi_limit1_r &set_max_outstanding_read_m1(uint32_t value)
+    {
+        max_outstanding_read_m1 = ((1u << 8) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_max_outstanding_write_m1() const
+    {
+        uint32_t value = static_cast<uint32_t>(max_outstanding_write_m1);
+        return value;
+    }
+    uint32_t get_max_outstanding_write_m1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(max_outstanding_write_m1);
+        return value;
+    }
+    CONSTEXPR axi_limit1_r &set_max_outstanding_write_m1(uint32_t value)
+    {
+        max_outstanding_write_m1 = ((1u << 8) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// axi_limit2_r - AXI limits for port 1 counter 2
+struct axi_limit2_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        struct
+        {
+            uint32_t max_beats : 2; // Burst split alignment: 0=64 bytes, 1=128 bytes, 2=256 bytes, 3=reserved
+            uint32_t reserved0 : 2;
+            uint32_t memtype : 4; // Memtype
+            uint32_t reserved1 : 8;
+            uint32_t
+                max_outstanding_read_m1 : 8; // Maximum number of outstanding AXI read transactions - 1 in range 0 to 31
+            uint32_t max_outstanding_write_m1 : 8; // Maximum number of outstanding AXI write transactions - 1 in range
+                                                   // 0 to 15
+        };
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR axi_limit2_r() :
+        max_beats(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
+        reserved1(static_cast<uint32_t>(0)), max_outstanding_read_m1(static_cast<uint32_t>(0x00)),
+        max_outstanding_write_m1(static_cast<uint32_t>(0x00))
+    {
+    }
+    CONSTEXPR axi_limit2_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    axi_limit2_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_max_beats() const
+    {
+        uint32_t value = static_cast<uint32_t>(max_beats);
+        return value;
+    }
+    uint32_t get_max_beats() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(max_beats);
+        return value;
+    }
+    CONSTEXPR axi_limit2_r &set_max_beats(uint32_t value)
+    {
+        max_beats = ((1u << 2) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_memtype() const
+    {
+        uint32_t value = static_cast<uint32_t>(memtype);
+        return value;
+    }
+    uint32_t get_memtype() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(memtype);
+        return value;
+    }
+    CONSTEXPR axi_limit2_r &set_memtype(uint32_t value)
+    {
+        memtype = ((1u << 4) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_max_outstanding_read_m1() const
+    {
+        uint32_t value = static_cast<uint32_t>(max_outstanding_read_m1);
+        return value;
+    }
+    uint32_t get_max_outstanding_read_m1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(max_outstanding_read_m1);
+        return value;
+    }
+    CONSTEXPR axi_limit2_r &set_max_outstanding_read_m1(uint32_t value)
+    {
+        max_outstanding_read_m1 = ((1u << 8) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_max_outstanding_write_m1() const
+    {
+        uint32_t value = static_cast<uint32_t>(max_outstanding_write_m1);
+        return value;
+    }
+    uint32_t get_max_outstanding_write_m1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(max_outstanding_write_m1);
+        return value;
+    }
+    CONSTEXPR axi_limit2_r &set_max_outstanding_write_m1(uint32_t value)
+    {
+        max_outstanding_write_m1 = ((1u << 8) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// axi_limit3_r - AXI limits for port 1 counter 3
+struct axi_limit3_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        struct
+        {
+            uint32_t max_beats : 2; // Burst split alignment: 0=64 bytes, 1=128 bytes, 2=256 bytes, 3=reserved
+            uint32_t reserved0 : 2;
+            uint32_t memtype : 4; // Memtype
+            uint32_t reserved1 : 8;
+            uint32_t
+                max_outstanding_read_m1 : 8; // Maximum number of outstanding AXI read transactions - 1 in range 0 to 31
+            uint32_t max_outstanding_write_m1 : 8; // Maximum number of outstanding AXI write transactions - 1 in range
+                                                   // 0 to 15
+        };
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR axi_limit3_r() :
+        max_beats(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
+        reserved1(static_cast<uint32_t>(0)), max_outstanding_read_m1(static_cast<uint32_t>(0x00)),
+        max_outstanding_write_m1(static_cast<uint32_t>(0x00))
+    {
+    }
+    CONSTEXPR axi_limit3_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    axi_limit3_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_max_beats() const
+    {
+        uint32_t value = static_cast<uint32_t>(max_beats);
+        return value;
+    }
+    uint32_t get_max_beats() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(max_beats);
+        return value;
+    }
+    CONSTEXPR axi_limit3_r &set_max_beats(uint32_t value)
+    {
+        max_beats = ((1u << 2) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_memtype() const
+    {
+        uint32_t value = static_cast<uint32_t>(memtype);
+        return value;
+    }
+    uint32_t get_memtype() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(memtype);
+        return value;
+    }
+    CONSTEXPR axi_limit3_r &set_memtype(uint32_t value)
+    {
+        memtype = ((1u << 4) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_max_outstanding_read_m1() const
+    {
+        uint32_t value = static_cast<uint32_t>(max_outstanding_read_m1);
+        return value;
+    }
+    uint32_t get_max_outstanding_read_m1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(max_outstanding_read_m1);
+        return value;
+    }
+    CONSTEXPR axi_limit3_r &set_max_outstanding_read_m1(uint32_t value)
+    {
+        max_outstanding_read_m1 = ((1u << 8) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_max_outstanding_write_m1() const
+    {
+        uint32_t value = static_cast<uint32_t>(max_outstanding_write_m1);
+        return value;
+    }
+    uint32_t get_max_outstanding_write_m1() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(max_outstanding_write_m1);
+        return value;
+    }
+    CONSTEXPR axi_limit3_r &set_max_outstanding_write_m1(uint32_t value)
+    {
+        max_outstanding_write_m1 = ((1u << 8) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// basep0_r - Lower 32 bits of the Base pointer for region index 0
+struct basep0_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        uint32_t addr_word; // The low word of the 64-bit address
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR basep0_r() : addr_word(static_cast<uint32_t>(0)) {}
+    CONSTEXPR basep0_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    basep0_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_addr_word() const
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    uint32_t get_addr_word() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    CONSTEXPR basep0_r &set_addr_word(uint32_t value)
+    {
+        addr_word = static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// basep1_r - Upper 32 bits of the Base pointer for region index 0
+struct basep1_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        uint32_t addr_word; // The high word of the 64-bit address
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR basep1_r() : addr_word(static_cast<uint32_t>(0)) {}
+    CONSTEXPR basep1_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    basep1_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_addr_word() const
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    uint32_t get_addr_word() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    CONSTEXPR basep1_r &set_addr_word(uint32_t value)
+    {
+        addr_word = static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// basep2_r - Lower 32 bits of the Base pointer for region index 1
+struct basep2_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        uint32_t addr_word; // The low word of the 64-bit address
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR basep2_r() : addr_word(static_cast<uint32_t>(0)) {}
+    CONSTEXPR basep2_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    basep2_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_addr_word() const
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    uint32_t get_addr_word() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    CONSTEXPR basep2_r &set_addr_word(uint32_t value)
+    {
+        addr_word = static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// basep3_r - Upper 32 bits of the Base pointer for region index 1
+struct basep3_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        uint32_t addr_word; // The high word of the 64-bit address
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR basep3_r() : addr_word(static_cast<uint32_t>(0)) {}
+    CONSTEXPR basep3_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    basep3_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_addr_word() const
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    uint32_t get_addr_word() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    CONSTEXPR basep3_r &set_addr_word(uint32_t value)
+    {
+        addr_word = static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// basep4_r - Lower 32 bits of the Base pointer for region index 2
+struct basep4_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        uint32_t addr_word; // The low word of the 64-bit address
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR basep4_r() : addr_word(static_cast<uint32_t>(0)) {}
+    CONSTEXPR basep4_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    basep4_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_addr_word() const
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    uint32_t get_addr_word() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    CONSTEXPR basep4_r &set_addr_word(uint32_t value)
+    {
+        addr_word = static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// basep5_r - Upper 32 bits of the Base pointer for region index 2
+struct basep5_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        uint32_t addr_word; // The high word of the 64-bit address
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR basep5_r() : addr_word(static_cast<uint32_t>(0)) {}
+    CONSTEXPR basep5_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    basep5_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_addr_word() const
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    uint32_t get_addr_word() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    CONSTEXPR basep5_r &set_addr_word(uint32_t value)
+    {
+        addr_word = static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// basep6_r - Lower 32 bits of the Base pointer for region index 3
+struct basep6_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        uint32_t addr_word; // The low word of the 64-bit address
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR basep6_r() : addr_word(static_cast<uint32_t>(0)) {}
+    CONSTEXPR basep6_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    basep6_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_addr_word() const
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    uint32_t get_addr_word() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    CONSTEXPR basep6_r &set_addr_word(uint32_t value)
+    {
+        addr_word = static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// basep7_r - Upper 32 bits of the Base pointer for region index 3
+struct basep7_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        uint32_t addr_word; // The high word of the 64-bit address
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR basep7_r() : addr_word(static_cast<uint32_t>(0)) {}
+    CONSTEXPR basep7_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    basep7_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_addr_word() const
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    uint32_t get_addr_word() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    CONSTEXPR basep7_r &set_addr_word(uint32_t value)
+    {
+        addr_word = static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// basep8_r - Lower 32 bits of the Base pointer for region index 4
+struct basep8_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        uint32_t addr_word; // The low word of the 64-bit address
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR basep8_r() : addr_word(static_cast<uint32_t>(0)) {}
+    CONSTEXPR basep8_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    basep8_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_addr_word() const
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    uint32_t get_addr_word() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    CONSTEXPR basep8_r &set_addr_word(uint32_t value)
+    {
+        addr_word = static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// basep9_r - Upper 32 bits of the Base pointer for region index 4
+struct basep9_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        uint32_t addr_word; // The high word of the 64-bit address
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR basep9_r() : addr_word(static_cast<uint32_t>(0)) {}
+    CONSTEXPR basep9_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    basep9_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_addr_word() const
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    uint32_t get_addr_word() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    CONSTEXPR basep9_r &set_addr_word(uint32_t value)
+    {
+        addr_word = static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// basep10_r - Lower 32 bits of the Base pointer for region index 5
+struct basep10_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        uint32_t addr_word; // The low word of the 64-bit address
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR basep10_r() : addr_word(static_cast<uint32_t>(0)) {}
+    CONSTEXPR basep10_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    basep10_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_addr_word() const
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    uint32_t get_addr_word() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    CONSTEXPR basep10_r &set_addr_word(uint32_t value)
+    {
+        addr_word = static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// basep11_r - Upper 32 bits of the Base pointer for region index 5
+struct basep11_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        uint32_t addr_word; // The high word of the 64-bit address
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR basep11_r() : addr_word(static_cast<uint32_t>(0)) {}
+    CONSTEXPR basep11_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    basep11_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_addr_word() const
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    uint32_t get_addr_word() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    CONSTEXPR basep11_r &set_addr_word(uint32_t value)
+    {
+        addr_word = static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// basep12_r - Lower 32 bits of the Base pointer for region index 6
+struct basep12_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        uint32_t addr_word; // The low word of the 64-bit address
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR basep12_r() : addr_word(static_cast<uint32_t>(0)) {}
+    CONSTEXPR basep12_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    basep12_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_addr_word() const
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    uint32_t get_addr_word() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    CONSTEXPR basep12_r &set_addr_word(uint32_t value)
+    {
+        addr_word = static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// basep13_r - Upper 32 bits of the Base pointer for region index 6
+struct basep13_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        uint32_t addr_word; // The high word of the 64-bit address
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR basep13_r() : addr_word(static_cast<uint32_t>(0)) {}
+    CONSTEXPR basep13_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    basep13_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_addr_word() const
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    uint32_t get_addr_word() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    CONSTEXPR basep13_r &set_addr_word(uint32_t value)
+    {
+        addr_word = static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// basep14_r - Lower 32 bits of the Base pointer for region index 7
+struct basep14_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        uint32_t addr_word; // The low word of the 64-bit address
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR basep14_r() : addr_word(static_cast<uint32_t>(0)) {}
+    CONSTEXPR basep14_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    basep14_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_addr_word() const
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    uint32_t get_addr_word() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    CONSTEXPR basep14_r &set_addr_word(uint32_t value)
+    {
+        addr_word = static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
+
+// basep15_r - Upper 32 bits of the Base pointer for region index 7
+struct basep15_r
+{
+#ifdef __cplusplus
+  private:
+#endif //__cplusplus
+    union
+    {
+        uint32_t addr_word; // The high word of the 64-bit address
+        uint32_t word;
+    };
+#ifdef __cplusplus
+  public:
+    CONSTEXPR basep15_r() : addr_word(static_cast<uint32_t>(0)) {}
+    CONSTEXPR basep15_r(uint32_t init) : word(init) {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word = value;
+    }
+    void operator=(uint32_t value) volatile
+    {
+        word = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word;
+    }
+    operator uint32_t() volatile
+    {
+        return word;
+    }
+    basep15_r copy() volatile
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_addr_word() const
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    uint32_t get_addr_word() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(addr_word);
+        return value;
+    }
+    CONSTEXPR basep15_r &set_addr_word(uint32_t value)
+    {
+        addr_word = static_cast<uint32_t>(value);
+        return *this;
+    }
+#endif //__cplusplus
+};
 
 // wd_status_r - WD_STATUS of core DEBUGCORE
 struct wd_status_r
@@ -3093,854 +5694,6 @@ struct clkforce_r
 #endif //__cplusplus
 };
 
-// basep0_r - Lower 32 bits of the Base pointer for region index 0
-struct basep0_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        uint32_t addr_word; // The low word of the 64-bit address
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR basep0_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep0_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    basep0_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_addr_word() const
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    uint32_t get_addr_word() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    CONSTEXPR basep0_r &set_addr_word(uint32_t value)
-    {
-        addr_word = static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// basep1_r - Upper 32 bits of the Base pointer for region index 0
-struct basep1_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        uint32_t addr_word; // The high word of the 64-bit address
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR basep1_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep1_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    basep1_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_addr_word() const
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    uint32_t get_addr_word() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    CONSTEXPR basep1_r &set_addr_word(uint32_t value)
-    {
-        addr_word = static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// basep2_r - Lower 32 bits of the Base pointer for region index 1
-struct basep2_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        uint32_t addr_word; // The low word of the 64-bit address
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR basep2_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep2_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    basep2_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_addr_word() const
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    uint32_t get_addr_word() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    CONSTEXPR basep2_r &set_addr_word(uint32_t value)
-    {
-        addr_word = static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// basep3_r - Upper 32 bits of the Base pointer for region index 1
-struct basep3_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        uint32_t addr_word; // The high word of the 64-bit address
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR basep3_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep3_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    basep3_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_addr_word() const
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    uint32_t get_addr_word() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    CONSTEXPR basep3_r &set_addr_word(uint32_t value)
-    {
-        addr_word = static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// basep4_r - Lower 32 bits of the Base pointer for region index 2
-struct basep4_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        uint32_t addr_word; // The low word of the 64-bit address
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR basep4_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep4_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    basep4_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_addr_word() const
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    uint32_t get_addr_word() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    CONSTEXPR basep4_r &set_addr_word(uint32_t value)
-    {
-        addr_word = static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// basep5_r - Upper 32 bits of the Base pointer for region index 2
-struct basep5_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        uint32_t addr_word; // The high word of the 64-bit address
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR basep5_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep5_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    basep5_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_addr_word() const
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    uint32_t get_addr_word() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    CONSTEXPR basep5_r &set_addr_word(uint32_t value)
-    {
-        addr_word = static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// basep6_r - Lower 32 bits of the Base pointer for region index 3
-struct basep6_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        uint32_t addr_word; // The low word of the 64-bit address
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR basep6_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep6_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    basep6_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_addr_word() const
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    uint32_t get_addr_word() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    CONSTEXPR basep6_r &set_addr_word(uint32_t value)
-    {
-        addr_word = static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// basep7_r - Upper 32 bits of the Base pointer for region index 3
-struct basep7_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        uint32_t addr_word; // The high word of the 64-bit address
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR basep7_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep7_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    basep7_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_addr_word() const
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    uint32_t get_addr_word() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    CONSTEXPR basep7_r &set_addr_word(uint32_t value)
-    {
-        addr_word = static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// basep8_r - Lower 32 bits of the Base pointer for region index 4
-struct basep8_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        uint32_t addr_word; // The low word of the 64-bit address
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR basep8_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep8_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    basep8_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_addr_word() const
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    uint32_t get_addr_word() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    CONSTEXPR basep8_r &set_addr_word(uint32_t value)
-    {
-        addr_word = static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// basep9_r - Upper 32 bits of the Base pointer for region index 4
-struct basep9_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        uint32_t addr_word; // The high word of the 64-bit address
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR basep9_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep9_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    basep9_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_addr_word() const
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    uint32_t get_addr_word() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    CONSTEXPR basep9_r &set_addr_word(uint32_t value)
-    {
-        addr_word = static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// basep10_r - Lower 32 bits of the Base pointer for region index 5
-struct basep10_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        uint32_t addr_word; // The low word of the 64-bit address
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR basep10_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep10_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    basep10_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_addr_word() const
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    uint32_t get_addr_word() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    CONSTEXPR basep10_r &set_addr_word(uint32_t value)
-    {
-        addr_word = static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// basep11_r - Upper 32 bits of the Base pointer for region index 5
-struct basep11_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        uint32_t addr_word; // The high word of the 64-bit address
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR basep11_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep11_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    basep11_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_addr_word() const
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    uint32_t get_addr_word() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    CONSTEXPR basep11_r &set_addr_word(uint32_t value)
-    {
-        addr_word = static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// basep12_r - Lower 32 bits of the Base pointer for region index 6
-struct basep12_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        uint32_t addr_word; // The low word of the 64-bit address
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR basep12_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep12_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    basep12_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_addr_word() const
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    uint32_t get_addr_word() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    CONSTEXPR basep12_r &set_addr_word(uint32_t value)
-    {
-        addr_word = static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// basep13_r - Upper 32 bits of the Base pointer for region index 6
-struct basep13_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        uint32_t addr_word; // The high word of the 64-bit address
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR basep13_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep13_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    basep13_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_addr_word() const
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    uint32_t get_addr_word() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    CONSTEXPR basep13_r &set_addr_word(uint32_t value)
-    {
-        addr_word = static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// basep14_r - Lower 32 bits of the Base pointer for region index 7
-struct basep14_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        uint32_t addr_word; // The low word of the 64-bit address
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR basep14_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep14_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    basep14_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_addr_word() const
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    uint32_t get_addr_word() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    CONSTEXPR basep14_r &set_addr_word(uint32_t value)
-    {
-        addr_word = static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// basep15_r - Upper 32 bits of the Base pointer for region index 7
-struct basep15_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        uint32_t addr_word; // The high word of the 64-bit address
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR basep15_r() : addr_word(static_cast<uint32_t>(0)) {}
-    CONSTEXPR basep15_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    basep15_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_addr_word() const
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    uint32_t get_addr_word() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(addr_word);
-        return value;
-    }
-    CONSTEXPR basep15_r &set_addr_word(uint32_t value)
-    {
-        addr_word = static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
 // pid4_r - Peripheral ID byte 4 (Arm=code 4)
 struct pid4_r
 {
@@ -4578,1759 +6331,6 @@ struct cid3_r
 #endif //__cplusplus
 };
 
-// id_r - ID register
-struct id_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        struct
-        {
-            uint32_t version_status : 4; // This is the version of the product
-            uint32_t version_minor : 4;  // This is the n for the P part of an RnPn release number
-            uint32_t version_major : 4;  // This is the n for the R part of an RnPn release number
-            uint32_t product_major : 4;  // This is the X part of the ML00X product number
-            uint32_t arch_patch_rev : 4; // This is the patch number of the architecture version a.b
-            uint32_t
-                arch_minor_rev : 8; // This is the minor architecture version number, b in the architecture version a.b
-            uint32_t
-                arch_major_rev : 4; // This is the major architecture version number, a in the architecture version a.b
-        };
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR id_r() :
-        version_status(static_cast<uint32_t>(1)), version_minor(static_cast<uint32_t>(0x0)),
-        version_major(static_cast<uint32_t>(0x0)), product_major(static_cast<uint32_t>(4)),
-        arch_patch_rev(static_cast<uint32_t>(0)), arch_minor_rev(static_cast<uint32_t>(0)),
-        arch_major_rev(static_cast<uint32_t>(1))
-    {
-    }
-    CONSTEXPR id_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    id_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_version_status() const
-    {
-        uint32_t value = static_cast<uint32_t>(version_status);
-        return value;
-    }
-    uint32_t get_version_status() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(version_status);
-        return value;
-    }
-    CONSTEXPR id_r &set_version_status(uint32_t value)
-    {
-        version_status = ((1u << 4) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_version_minor() const
-    {
-        uint32_t value = static_cast<uint32_t>(version_minor);
-        return value;
-    }
-    uint32_t get_version_minor() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(version_minor);
-        return value;
-    }
-    CONSTEXPR id_r &set_version_minor(uint32_t value)
-    {
-        version_minor = ((1u << 4) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_version_major() const
-    {
-        uint32_t value = static_cast<uint32_t>(version_major);
-        return value;
-    }
-    uint32_t get_version_major() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(version_major);
-        return value;
-    }
-    CONSTEXPR id_r &set_version_major(uint32_t value)
-    {
-        version_major = ((1u << 4) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_product_major() const
-    {
-        uint32_t value = static_cast<uint32_t>(product_major);
-        return value;
-    }
-    uint32_t get_product_major() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(product_major);
-        return value;
-    }
-    CONSTEXPR id_r &set_product_major(uint32_t value)
-    {
-        product_major = ((1u << 4) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_arch_patch_rev() const
-    {
-        uint32_t value = static_cast<uint32_t>(arch_patch_rev);
-        return value;
-    }
-    uint32_t get_arch_patch_rev() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(arch_patch_rev);
-        return value;
-    }
-    CONSTEXPR id_r &set_arch_patch_rev(uint32_t value)
-    {
-        arch_patch_rev = ((1u << 4) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_arch_minor_rev() const
-    {
-        uint32_t value = static_cast<uint32_t>(arch_minor_rev);
-        return value;
-    }
-    uint32_t get_arch_minor_rev() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(arch_minor_rev);
-        return value;
-    }
-    CONSTEXPR id_r &set_arch_minor_rev(uint32_t value)
-    {
-        arch_minor_rev = ((1u << 8) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_arch_major_rev() const
-    {
-        uint32_t value = static_cast<uint32_t>(arch_major_rev);
-        return value;
-    }
-    uint32_t get_arch_major_rev() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(arch_major_rev);
-        return value;
-    }
-    CONSTEXPR id_r &set_arch_major_rev(uint32_t value)
-    {
-        arch_major_rev = ((1u << 4) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// status_r - Register describes the current operating status of the NPU
-struct status_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        struct
-        {
-            uint32_t state : 1;      // NPU state, 0 = Stopped, 1 = Running
-            uint32_t irq_raised : 1; // Raw IRQ status, 0 = IRQ not raised, 1 = IRQ raised. IRQ is cleared using command
-                                     // register bit 1
-            uint32_t
-                bus_status : 1; // 0=OK, 1=Bus abort detected and processing halted (NPU will reach IDLE state and not
-                                // to start process any more commands/AXI transactions). Can only be cleared by a reset
-            uint32_t reset_status : 1; // Reset is ongoing and only this register can be read (other registers read as 0
-                                       // and writes are ignored.) A value of 0 means NPU is not being reset and can be
-                                       // accessed as normal
-            uint32_t
-                cmd_parse_error : 1; // 0=No error 1=Command stream parsing error detected. Can only be cleared by reset
-            uint32_t cmd_end_reached : 1; // 0=Not reached, 1=Reached. Cleared by writing QBASE or QSIZE when NPU is in
-                                          // stopped state
-            uint32_t pmu_irq_raised : 1;  // 0=No PMU IRQ, 1=PMU IRQ raised. Cleared by using command register bit 1
-            uint32_t wd_fault : 1; // Weight decoder state: 0=no fault 1=weight decoder decompression fault. Can only be
-                                   // cleared by reset
-            uint32_t reserved0 : 3;
-            uint32_t faulting_interface : 1; // Faulting interface on bus abort. 0=AXI-M0 1=AXI-M1
-            uint32_t faulting_channel : 4;  // Faulting channel on a bus abort. Read: 0=Cmd 1=IFM 2=Weights 3=Scale+Bias
-                                            // 4=Mem2Mem; Write: 8=OFM 9=Mem2Mem
-            uint32_t irq_history_mask : 16; // IRQ History mask
-        };
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR status_r() :
-        state(static_cast<uint32_t>(::state::STOPPED)), irq_raised(static_cast<uint32_t>(0x0)),
-        bus_status(static_cast<uint32_t>(0x0)), reset_status(static_cast<uint32_t>(0x1)),
-        cmd_parse_error(static_cast<uint32_t>(0x0)), cmd_end_reached(static_cast<uint32_t>(0x0)),
-        pmu_irq_raised(static_cast<uint32_t>(0x0)), wd_fault(static_cast<uint32_t>(0x0)),
-        reserved0(static_cast<uint32_t>(0)), faulting_interface(static_cast<uint32_t>(0x0)),
-        faulting_channel(static_cast<uint32_t>(0x0)), irq_history_mask(static_cast<uint32_t>(0x0))
-    {
-    }
-    CONSTEXPR status_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    status_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR ::state get_state() const
-    {
-        ::state value = static_cast<::state>(state);
-        return value;
-    }
-    ::state get_state() const volatile
-    {
-        ::state value = static_cast<::state>(state);
-        return value;
-    }
-    CONSTEXPR status_r &set_state(::state value)
-    {
-        state = ((1u << 1) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_irq_raised() const
-    {
-        uint32_t value = static_cast<uint32_t>(irq_raised);
-        return value;
-    }
-    uint32_t get_irq_raised() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(irq_raised);
-        return value;
-    }
-    CONSTEXPR status_r &set_irq_raised(uint32_t value)
-    {
-        irq_raised = ((1u << 1) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_bus_status() const
-    {
-        uint32_t value = static_cast<uint32_t>(bus_status);
-        return value;
-    }
-    uint32_t get_bus_status() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(bus_status);
-        return value;
-    }
-    CONSTEXPR status_r &set_bus_status(uint32_t value)
-    {
-        bus_status = ((1u << 1) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_reset_status() const
-    {
-        uint32_t value = static_cast<uint32_t>(reset_status);
-        return value;
-    }
-    uint32_t get_reset_status() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(reset_status);
-        return value;
-    }
-    CONSTEXPR status_r &set_reset_status(uint32_t value)
-    {
-        reset_status = ((1u << 1) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_cmd_parse_error() const
-    {
-        uint32_t value = static_cast<uint32_t>(cmd_parse_error);
-        return value;
-    }
-    uint32_t get_cmd_parse_error() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(cmd_parse_error);
-        return value;
-    }
-    CONSTEXPR status_r &set_cmd_parse_error(uint32_t value)
-    {
-        cmd_parse_error = ((1u << 1) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_cmd_end_reached() const
-    {
-        uint32_t value = static_cast<uint32_t>(cmd_end_reached);
-        return value;
-    }
-    uint32_t get_cmd_end_reached() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(cmd_end_reached);
-        return value;
-    }
-    CONSTEXPR status_r &set_cmd_end_reached(uint32_t value)
-    {
-        cmd_end_reached = ((1u << 1) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_pmu_irq_raised() const
-    {
-        uint32_t value = static_cast<uint32_t>(pmu_irq_raised);
-        return value;
-    }
-    uint32_t get_pmu_irq_raised() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(pmu_irq_raised);
-        return value;
-    }
-    CONSTEXPR status_r &set_pmu_irq_raised(uint32_t value)
-    {
-        pmu_irq_raised = ((1u << 1) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_wd_fault() const
-    {
-        uint32_t value = static_cast<uint32_t>(wd_fault);
-        return value;
-    }
-    uint32_t get_wd_fault() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(wd_fault);
-        return value;
-    }
-    CONSTEXPR status_r &set_wd_fault(uint32_t value)
-    {
-        wd_fault = ((1u << 1) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_faulting_interface() const
-    {
-        uint32_t value = static_cast<uint32_t>(faulting_interface);
-        return value;
-    }
-    uint32_t get_faulting_interface() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(faulting_interface);
-        return value;
-    }
-    CONSTEXPR status_r &set_faulting_interface(uint32_t value)
-    {
-        faulting_interface = ((1u << 1) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_faulting_channel() const
-    {
-        uint32_t value = static_cast<uint32_t>(faulting_channel);
-        return value;
-    }
-    uint32_t get_faulting_channel() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(faulting_channel);
-        return value;
-    }
-    CONSTEXPR status_r &set_faulting_channel(uint32_t value)
-    {
-        faulting_channel = ((1u << 4) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_irq_history_mask() const
-    {
-        uint32_t value = static_cast<uint32_t>(irq_history_mask);
-        return value;
-    }
-    uint32_t get_irq_history_mask() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(irq_history_mask);
-        return value;
-    }
-    CONSTEXPR status_r &set_irq_history_mask(uint32_t value)
-    {
-        irq_history_mask = ((1u << 16) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// cmd_r - Command register, reads as last written command
-struct cmd_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        struct
-        {
-            uint32_t transition_to_running_state : 1; // Write 1 to transition the NPU to running state. Writing 0 has
-                                                      // no effect
-            uint32_t clear_irq : 1; // Write 1 to clear the IRQ status in the STATUS register. Writing 0 has no effect
-            uint32_t clock_q_enable : 1; // Write 1 to this bit to enable clock off using clock q-interface and enable
-                                         // the master clock gate
-            uint32_t power_q_enable : 1; // Write 1 to this bit to enable power off using power q-interface
-            uint32_t
-                stop_request : 1; // Write 1 to this bit to request STOP after completing any already-started commands
-            uint32_t reserved0 : 11;
-            uint32_t clear_irq_history : 16; // Clears the IRQ history mask
-        };
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR cmd_r() :
-        transition_to_running_state(static_cast<uint32_t>(0x0)), clear_irq(static_cast<uint32_t>(0x0)),
-        clock_q_enable(static_cast<uint32_t>(0x0)), power_q_enable(static_cast<uint32_t>(0x0)),
-        stop_request(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)),
-        clear_irq_history(static_cast<uint32_t>(0x0))
-    {
-    }
-    CONSTEXPR cmd_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    cmd_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_transition_to_running_state() const
-    {
-        uint32_t value = static_cast<uint32_t>(transition_to_running_state);
-        return value;
-    }
-    uint32_t get_transition_to_running_state() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(transition_to_running_state);
-        return value;
-    }
-    CONSTEXPR cmd_r &set_transition_to_running_state(uint32_t value)
-    {
-        transition_to_running_state = ((1u << 1) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_clear_irq() const
-    {
-        uint32_t value = static_cast<uint32_t>(clear_irq);
-        return value;
-    }
-    uint32_t get_clear_irq() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(clear_irq);
-        return value;
-    }
-    CONSTEXPR cmd_r &set_clear_irq(uint32_t value)
-    {
-        clear_irq = ((1u << 1) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_clock_q_enable() const
-    {
-        uint32_t value = static_cast<uint32_t>(clock_q_enable);
-        return value;
-    }
-    uint32_t get_clock_q_enable() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(clock_q_enable);
-        return value;
-    }
-    CONSTEXPR cmd_r &set_clock_q_enable(uint32_t value)
-    {
-        clock_q_enable = ((1u << 1) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_power_q_enable() const
-    {
-        uint32_t value = static_cast<uint32_t>(power_q_enable);
-        return value;
-    }
-    uint32_t get_power_q_enable() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(power_q_enable);
-        return value;
-    }
-    CONSTEXPR cmd_r &set_power_q_enable(uint32_t value)
-    {
-        power_q_enable = ((1u << 1) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_stop_request() const
-    {
-        uint32_t value = static_cast<uint32_t>(stop_request);
-        return value;
-    }
-    uint32_t get_stop_request() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(stop_request);
-        return value;
-    }
-    CONSTEXPR cmd_r &set_stop_request(uint32_t value)
-    {
-        stop_request = ((1u << 1) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_clear_irq_history() const
-    {
-        uint32_t value = static_cast<uint32_t>(clear_irq_history);
-        return value;
-    }
-    uint32_t get_clear_irq_history() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(clear_irq_history);
-        return value;
-    }
-    CONSTEXPR cmd_r &set_clear_irq_history(uint32_t value)
-    {
-        clear_irq_history = ((1u << 16) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// reset_r - Request Reset and new security mode
-struct reset_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        struct
-        {
-            uint32_t pending_CPL : 1; // Current privilege level 0=User 1=Privileged
-            uint32_t pending_CSL : 1; // Current security level 0=Secure 1=Non secure
-            uint32_t reserved0 : 30;
-        };
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR reset_r() :
-        pending_CPL(static_cast<uint32_t>(::privilege_level::USER)),
-        pending_CSL(static_cast<uint32_t>(::security_level::SECURE)), reserved0(static_cast<uint32_t>(0))
-    {
-    }
-    CONSTEXPR reset_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    reset_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR ::privilege_level get_pending_CPL() const
-    {
-        ::privilege_level value = static_cast<::privilege_level>(pending_CPL);
-        return value;
-    }
-    ::privilege_level get_pending_CPL() const volatile
-    {
-        ::privilege_level value = static_cast<::privilege_level>(pending_CPL);
-        return value;
-    }
-    CONSTEXPR reset_r &set_pending_CPL(::privilege_level value)
-    {
-        pending_CPL = ((1u << 1) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR ::security_level get_pending_CSL() const
-    {
-        ::security_level value = static_cast<::security_level>(pending_CSL);
-        return value;
-    }
-    ::security_level get_pending_CSL() const volatile
-    {
-        ::security_level value = static_cast<::security_level>(pending_CSL);
-        return value;
-    }
-    CONSTEXPR reset_r &set_pending_CSL(::security_level value)
-    {
-        pending_CSL = ((1u << 1) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// qbase0_r - Base address of command queue bits [31:0]. The address is 4 byte aligned
-struct qbase0_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        uint32_t QBASE0; // The 4 byte aligned lower bytes of the base address value for the command stream
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR qbase0_r() : QBASE0(static_cast<uint32_t>(0x00000000)) {}
-    CONSTEXPR qbase0_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    qbase0_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_QBASE0() const
-    {
-        uint32_t value = static_cast<uint32_t>(QBASE0);
-        return value;
-    }
-    uint32_t get_QBASE0() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(QBASE0);
-        return value;
-    }
-    CONSTEXPR qbase0_r &set_QBASE0(uint32_t value)
-    {
-        QBASE0 = static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// qbase1_r - Address extension bits [47:32] bits for queue base
-struct qbase1_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        uint32_t QBASE1; // The 4 byte aligned upper bytes of the base address value for the command stream
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR qbase1_r() : QBASE1(static_cast<uint32_t>(0x00000000)) {}
-    CONSTEXPR qbase1_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    qbase1_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_QBASE1() const
-    {
-        uint32_t value = static_cast<uint32_t>(QBASE1);
-        return value;
-    }
-    uint32_t get_QBASE1() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(QBASE1);
-        return value;
-    }
-    CONSTEXPR qbase1_r &set_QBASE1(uint32_t value)
-    {
-        QBASE1 = static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// qread_r - Read offset in the command stream in bytes. Multiple of 4 in the range 0 to 16 MB
-struct qread_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        uint32_t QREAD; // The read offset of the current command under execution
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR qread_r() : QREAD(static_cast<uint32_t>(0x00000000)) {}
-    CONSTEXPR qread_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    qread_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_QREAD() const
-    {
-        uint32_t value = static_cast<uint32_t>(QREAD);
-        return value;
-    }
-    uint32_t get_QREAD() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(QREAD);
-        return value;
-    }
-    CONSTEXPR qread_r &set_QREAD(uint32_t value)
-    {
-        QREAD = static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// qconfig_r - AXI configuration for the command stream in the range 0-3. Same encoding as for REGIONCFG
-struct qconfig_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        uint32_t QCONFIG; // AXI configuration for the command stream in the range 0-3
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR qconfig_r() : QCONFIG(static_cast<uint32_t>(0x00000000)) {}
-    CONSTEXPR qconfig_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    qconfig_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_QCONFIG() const
-    {
-        uint32_t value = static_cast<uint32_t>(QCONFIG);
-        return value;
-    }
-    uint32_t get_QCONFIG() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(QCONFIG);
-        return value;
-    }
-    CONSTEXPR qconfig_r &set_QCONFIG(uint32_t value)
-    {
-        QCONFIG = static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// qsize_r - Size of the command stream in bytes. Multiple of 4 in the range 0 to 16 MB
-struct qsize_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        uint32_t QSIZE; // Size of the next command stream to be executed by the NPU
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR qsize_r() : QSIZE(static_cast<uint32_t>(0x00000000)) {}
-    CONSTEXPR qsize_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    qsize_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_QSIZE() const
-    {
-        uint32_t value = static_cast<uint32_t>(QSIZE);
-        return value;
-    }
-    uint32_t get_QSIZE() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(QSIZE);
-        return value;
-    }
-    CONSTEXPR qsize_r &set_QSIZE(uint32_t value)
-    {
-        QSIZE = static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// prot_r - Protection level configured for the NPU when acting as an AXI master
-struct prot_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        struct
-        {
-            uint32_t active_CPL : 1; // Current privilege level 0=User 1=Privileged
-            uint32_t active_CSL : 1; // Current security level 0=Secure 1=Non secure
-            uint32_t reserved0 : 30;
-        };
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR prot_r() :
-        active_CPL(static_cast<uint32_t>(::privilege_level::USER)),
-        active_CSL(static_cast<uint32_t>(::security_level::SECURE)), reserved0(static_cast<uint32_t>(0))
-    {
-    }
-    CONSTEXPR prot_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    prot_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR ::privilege_level get_active_CPL() const
-    {
-        ::privilege_level value = static_cast<::privilege_level>(active_CPL);
-        return value;
-    }
-    ::privilege_level get_active_CPL() const volatile
-    {
-        ::privilege_level value = static_cast<::privilege_level>(active_CPL);
-        return value;
-    }
-    CONSTEXPR prot_r &set_active_CPL(::privilege_level value)
-    {
-        active_CPL = ((1u << 1) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR ::security_level get_active_CSL() const
-    {
-        ::security_level value = static_cast<::security_level>(active_CSL);
-        return value;
-    }
-    ::security_level get_active_CSL() const volatile
-    {
-        ::security_level value = static_cast<::security_level>(active_CSL);
-        return value;
-    }
-    CONSTEXPR prot_r &set_active_CSL(::security_level value)
-    {
-        active_CSL = ((1u << 1) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// config_r - RTL configuration
-struct config_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        struct
-        {
-            uint32_t macs_per_cc : 4;        // The log2(macs/clock cycle). Valid encoding range is 5 to 8 for 32 to 256
-                                             // MACs/clock cycle.
-            uint32_t cmd_stream_version : 4; // command stream version accepted by this NPU. Set to 0 for Ethos-U55 EAC.
-            uint32_t shram_size : 8;         // Size in KB of SHRAM in the range 8 to 48.
-            uint32_t reserved0 : 12;
-            uint32_t product : 4; // Product configuration
-        };
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR config_r() :
-        macs_per_cc(static_cast<uint32_t>(0)), cmd_stream_version(static_cast<uint32_t>(0x0)),
-        shram_size(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)), product(static_cast<uint32_t>(0))
-    {
-    }
-    CONSTEXPR config_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    config_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR ::macs_per_cc get_macs_per_cc() const
-    {
-        ::macs_per_cc value = static_cast<::macs_per_cc>(macs_per_cc);
-        return value;
-    }
-    ::macs_per_cc get_macs_per_cc() const volatile
-    {
-        ::macs_per_cc value = static_cast<::macs_per_cc>(macs_per_cc);
-        return value;
-    }
-    CONSTEXPR config_r &set_macs_per_cc(::macs_per_cc value)
-    {
-        macs_per_cc = ((1u << 4) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_cmd_stream_version() const
-    {
-        uint32_t value = static_cast<uint32_t>(cmd_stream_version);
-        return value;
-    }
-    uint32_t get_cmd_stream_version() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(cmd_stream_version);
-        return value;
-    }
-    CONSTEXPR config_r &set_cmd_stream_version(uint32_t value)
-    {
-        cmd_stream_version = ((1u << 4) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR ::shram_size get_shram_size() const
-    {
-        ::shram_size value = static_cast<::shram_size>(shram_size);
-        return value;
-    }
-    ::shram_size get_shram_size() const volatile
-    {
-        ::shram_size value = static_cast<::shram_size>(shram_size);
-        return value;
-    }
-    CONSTEXPR config_r &set_shram_size(::shram_size value)
-    {
-        shram_size = ((1u << 8) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_product() const
-    {
-        uint32_t value = static_cast<uint32_t>(product);
-        return value;
-    }
-    uint32_t get_product() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(product);
-        return value;
-    }
-    CONSTEXPR config_r &set_product(uint32_t value)
-    {
-        product = ((1u << 4) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// lock_r - Lock register. This register is designed for driver use and does not affect NPU functionality
-struct lock_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        uint32_t LOCK; // 32 bit value for LOCK configuration
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR lock_r() : LOCK(static_cast<uint32_t>(0x00000000)) {}
-    CONSTEXPR lock_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    lock_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_LOCK() const
-    {
-        uint32_t value = static_cast<uint32_t>(LOCK);
-        return value;
-    }
-    uint32_t get_LOCK() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(LOCK);
-        return value;
-    }
-    CONSTEXPR lock_r &set_LOCK(uint32_t value)
-    {
-        LOCK = static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// regioncfg_r - Base pointer configuration. Bits[2*k+1:2*k] give the memory type for REGION[k]
-struct regioncfg_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        struct
-        {
-            uint32_t region0 : 2; // Bits for Region0 Configurion
-            uint32_t region1 : 2; // Bits for Region1 Configurion
-            uint32_t region2 : 2; // Bits for Region2 Configurion
-            uint32_t region3 : 2; // Bits for Region3 Configurion
-            uint32_t region4 : 2; // Bits for Region4 Configurion
-            uint32_t region5 : 2; // Bits for Region5 Configurion
-            uint32_t region6 : 2; // Bits for Region6 Configurion
-            uint32_t region7 : 2; // Bits for Region7 Configurion
-            uint32_t reserved0 : 16;
-        };
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR regioncfg_r() :
-        region0(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)),
-        region1(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)),
-        region2(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)),
-        region3(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)),
-        region4(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)),
-        region5(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)),
-        region6(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)),
-        region7(static_cast<uint32_t>(::memory_type::AXI0_OUTSTANDING_COUNTER0)), reserved0(static_cast<uint32_t>(0))
-    {
-    }
-    CONSTEXPR regioncfg_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    regioncfg_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR ::memory_type get_region0() const
-    {
-        ::memory_type value = static_cast<::memory_type>(region0);
-        return value;
-    }
-    ::memory_type get_region0() const volatile
-    {
-        ::memory_type value = static_cast<::memory_type>(region0);
-        return value;
-    }
-    CONSTEXPR regioncfg_r &set_region0(::memory_type value)
-    {
-        region0 = ((1u << 2) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR ::memory_type get_region1() const
-    {
-        ::memory_type value = static_cast<::memory_type>(region1);
-        return value;
-    }
-    ::memory_type get_region1() const volatile
-    {
-        ::memory_type value = static_cast<::memory_type>(region1);
-        return value;
-    }
-    CONSTEXPR regioncfg_r &set_region1(::memory_type value)
-    {
-        region1 = ((1u << 2) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR ::memory_type get_region2() const
-    {
-        ::memory_type value = static_cast<::memory_type>(region2);
-        return value;
-    }
-    ::memory_type get_region2() const volatile
-    {
-        ::memory_type value = static_cast<::memory_type>(region2);
-        return value;
-    }
-    CONSTEXPR regioncfg_r &set_region2(::memory_type value)
-    {
-        region2 = ((1u << 2) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR ::memory_type get_region3() const
-    {
-        ::memory_type value = static_cast<::memory_type>(region3);
-        return value;
-    }
-    ::memory_type get_region3() const volatile
-    {
-        ::memory_type value = static_cast<::memory_type>(region3);
-        return value;
-    }
-    CONSTEXPR regioncfg_r &set_region3(::memory_type value)
-    {
-        region3 = ((1u << 2) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR ::memory_type get_region4() const
-    {
-        ::memory_type value = static_cast<::memory_type>(region4);
-        return value;
-    }
-    ::memory_type get_region4() const volatile
-    {
-        ::memory_type value = static_cast<::memory_type>(region4);
-        return value;
-    }
-    CONSTEXPR regioncfg_r &set_region4(::memory_type value)
-    {
-        region4 = ((1u << 2) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR ::memory_type get_region5() const
-    {
-        ::memory_type value = static_cast<::memory_type>(region5);
-        return value;
-    }
-    ::memory_type get_region5() const volatile
-    {
-        ::memory_type value = static_cast<::memory_type>(region5);
-        return value;
-    }
-    CONSTEXPR regioncfg_r &set_region5(::memory_type value)
-    {
-        region5 = ((1u << 2) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR ::memory_type get_region6() const
-    {
-        ::memory_type value = static_cast<::memory_type>(region6);
-        return value;
-    }
-    ::memory_type get_region6() const volatile
-    {
-        ::memory_type value = static_cast<::memory_type>(region6);
-        return value;
-    }
-    CONSTEXPR regioncfg_r &set_region6(::memory_type value)
-    {
-        region6 = ((1u << 2) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR ::memory_type get_region7() const
-    {
-        ::memory_type value = static_cast<::memory_type>(region7);
-        return value;
-    }
-    ::memory_type get_region7() const volatile
-    {
-        ::memory_type value = static_cast<::memory_type>(region7);
-        return value;
-    }
-    CONSTEXPR regioncfg_r &set_region7(::memory_type value)
-    {
-        region7 = ((1u << 2) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// axi_limit0_r - AXI limits for port 0 counter 0
-struct axi_limit0_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        struct
-        {
-            uint32_t max_beats : 2; // Burst split alignment: 0=64 bytes, 1=128 bytes, 2=256 bytes, 3=reserved
-            uint32_t reserved0 : 2;
-            uint32_t memtype : 4; // Memtype
-            uint32_t reserved1 : 8;
-            uint32_t
-                max_outstanding_read_m1 : 8; // Maximum number of outstanding AXI read transactions - 1 in range 0 to 31
-            uint32_t max_outstanding_write_m1 : 8; // Maximum number of outstanding AXI write transactions - 1 in range
-                                                   // 0 to 15
-        };
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR axi_limit0_r() :
-        max_beats(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
-        reserved1(static_cast<uint32_t>(0)), max_outstanding_read_m1(static_cast<uint32_t>(0x00)),
-        max_outstanding_write_m1(static_cast<uint32_t>(0x000000))
-    {
-    }
-    CONSTEXPR axi_limit0_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    axi_limit0_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_max_beats() const
-    {
-        uint32_t value = static_cast<uint32_t>(max_beats);
-        return value;
-    }
-    uint32_t get_max_beats() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(max_beats);
-        return value;
-    }
-    CONSTEXPR axi_limit0_r &set_max_beats(uint32_t value)
-    {
-        max_beats = ((1u << 2) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_memtype() const
-    {
-        uint32_t value = static_cast<uint32_t>(memtype);
-        return value;
-    }
-    uint32_t get_memtype() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(memtype);
-        return value;
-    }
-    CONSTEXPR axi_limit0_r &set_memtype(uint32_t value)
-    {
-        memtype = ((1u << 4) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_max_outstanding_read_m1() const
-    {
-        uint32_t value = static_cast<uint32_t>(max_outstanding_read_m1);
-        return value;
-    }
-    uint32_t get_max_outstanding_read_m1() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(max_outstanding_read_m1);
-        return value;
-    }
-    CONSTEXPR axi_limit0_r &set_max_outstanding_read_m1(uint32_t value)
-    {
-        max_outstanding_read_m1 = ((1u << 8) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_max_outstanding_write_m1() const
-    {
-        uint32_t value = static_cast<uint32_t>(max_outstanding_write_m1);
-        return value;
-    }
-    uint32_t get_max_outstanding_write_m1() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(max_outstanding_write_m1);
-        return value;
-    }
-    CONSTEXPR axi_limit0_r &set_max_outstanding_write_m1(uint32_t value)
-    {
-        max_outstanding_write_m1 = ((1u << 8) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// axi_limit1_r - AXI limits for port 0 counter 1
-struct axi_limit1_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        struct
-        {
-            uint32_t max_beats : 2; // Burst split alignment: 0=64 bytes, 1=128 bytes, 2=256 bytes, 3=reserved
-            uint32_t reserved0 : 2;
-            uint32_t memtype : 4; // Memtype
-            uint32_t reserved1 : 8;
-            uint32_t
-                max_outstanding_read_m1 : 8; // Maximum number of outstanding AXI read transactions - 1 in range 0 to 31
-            uint32_t max_outstanding_write_m1 : 8; // Maximum number of outstanding AXI write transactions - 1 in range
-                                                   // 0 to 15
-        };
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR axi_limit1_r() :
-        max_beats(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
-        reserved1(static_cast<uint32_t>(0)), max_outstanding_read_m1(static_cast<uint32_t>(0x00)),
-        max_outstanding_write_m1(static_cast<uint32_t>(0x000000))
-    {
-    }
-    CONSTEXPR axi_limit1_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    axi_limit1_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_max_beats() const
-    {
-        uint32_t value = static_cast<uint32_t>(max_beats);
-        return value;
-    }
-    uint32_t get_max_beats() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(max_beats);
-        return value;
-    }
-    CONSTEXPR axi_limit1_r &set_max_beats(uint32_t value)
-    {
-        max_beats = ((1u << 2) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_memtype() const
-    {
-        uint32_t value = static_cast<uint32_t>(memtype);
-        return value;
-    }
-    uint32_t get_memtype() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(memtype);
-        return value;
-    }
-    CONSTEXPR axi_limit1_r &set_memtype(uint32_t value)
-    {
-        memtype = ((1u << 4) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_max_outstanding_read_m1() const
-    {
-        uint32_t value = static_cast<uint32_t>(max_outstanding_read_m1);
-        return value;
-    }
-    uint32_t get_max_outstanding_read_m1() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(max_outstanding_read_m1);
-        return value;
-    }
-    CONSTEXPR axi_limit1_r &set_max_outstanding_read_m1(uint32_t value)
-    {
-        max_outstanding_read_m1 = ((1u << 8) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_max_outstanding_write_m1() const
-    {
-        uint32_t value = static_cast<uint32_t>(max_outstanding_write_m1);
-        return value;
-    }
-    uint32_t get_max_outstanding_write_m1() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(max_outstanding_write_m1);
-        return value;
-    }
-    CONSTEXPR axi_limit1_r &set_max_outstanding_write_m1(uint32_t value)
-    {
-        max_outstanding_write_m1 = ((1u << 8) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// axi_limit2_r - AXI limits for port 1 counter 2
-struct axi_limit2_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        struct
-        {
-            uint32_t max_beats : 2; // Burst split alignment: 0=64 bytes, 1=128 bytes, 2=256 bytes, 3=reserved
-            uint32_t reserved0 : 2;
-            uint32_t memtype : 4; // Memtype
-            uint32_t reserved1 : 8;
-            uint32_t
-                max_outstanding_read_m1 : 8; // Maximum number of outstanding AXI read transactions - 1 in range 0 to 31
-            uint32_t max_outstanding_write_m1 : 8; // Maximum number of outstanding AXI write transactions - 1 in range
-                                                   // 0 to 15
-        };
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR axi_limit2_r() :
-        max_beats(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
-        reserved1(static_cast<uint32_t>(0)), max_outstanding_read_m1(static_cast<uint32_t>(0x00)),
-        max_outstanding_write_m1(static_cast<uint32_t>(0x000000))
-    {
-    }
-    CONSTEXPR axi_limit2_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    axi_limit2_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_max_beats() const
-    {
-        uint32_t value = static_cast<uint32_t>(max_beats);
-        return value;
-    }
-    uint32_t get_max_beats() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(max_beats);
-        return value;
-    }
-    CONSTEXPR axi_limit2_r &set_max_beats(uint32_t value)
-    {
-        max_beats = ((1u << 2) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_memtype() const
-    {
-        uint32_t value = static_cast<uint32_t>(memtype);
-        return value;
-    }
-    uint32_t get_memtype() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(memtype);
-        return value;
-    }
-    CONSTEXPR axi_limit2_r &set_memtype(uint32_t value)
-    {
-        memtype = ((1u << 4) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_max_outstanding_read_m1() const
-    {
-        uint32_t value = static_cast<uint32_t>(max_outstanding_read_m1);
-        return value;
-    }
-    uint32_t get_max_outstanding_read_m1() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(max_outstanding_read_m1);
-        return value;
-    }
-    CONSTEXPR axi_limit2_r &set_max_outstanding_read_m1(uint32_t value)
-    {
-        max_outstanding_read_m1 = ((1u << 8) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_max_outstanding_write_m1() const
-    {
-        uint32_t value = static_cast<uint32_t>(max_outstanding_write_m1);
-        return value;
-    }
-    uint32_t get_max_outstanding_write_m1() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(max_outstanding_write_m1);
-        return value;
-    }
-    CONSTEXPR axi_limit2_r &set_max_outstanding_write_m1(uint32_t value)
-    {
-        max_outstanding_write_m1 = ((1u << 8) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
-// axi_limit3_r - AXI limits for port 1 counter 3
-struct axi_limit3_r
-{
-#ifdef __cplusplus
-  private:
-#endif //__cplusplus
-    union
-    {
-        struct
-        {
-            uint32_t max_beats : 2; // Burst split alignment: 0=64 bytes, 1=128 bytes, 2=256 bytes, 3=reserved
-            uint32_t reserved0 : 2;
-            uint32_t memtype : 4; // Memtype
-            uint32_t reserved1 : 8;
-            uint32_t
-                max_outstanding_read_m1 : 8; // Maximum number of outstanding AXI read transactions - 1 in range 0 to 31
-            uint32_t max_outstanding_write_m1 : 8; // Maximum number of outstanding AXI write transactions - 1 in range
-                                                   // 0 to 15
-        };
-        uint32_t word;
-    };
-#ifdef __cplusplus
-  public:
-    CONSTEXPR axi_limit3_r() :
-        max_beats(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
-        reserved1(static_cast<uint32_t>(0)), max_outstanding_read_m1(static_cast<uint32_t>(0x00)),
-        max_outstanding_write_m1(static_cast<uint32_t>(0x000000))
-    {
-    }
-    CONSTEXPR axi_limit3_r(uint32_t init) : word(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word;
-    }
-    operator uint32_t() volatile
-    {
-        return word;
-    }
-    axi_limit3_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_max_beats() const
-    {
-        uint32_t value = static_cast<uint32_t>(max_beats);
-        return value;
-    }
-    uint32_t get_max_beats() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(max_beats);
-        return value;
-    }
-    CONSTEXPR axi_limit3_r &set_max_beats(uint32_t value)
-    {
-        max_beats = ((1u << 2) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_memtype() const
-    {
-        uint32_t value = static_cast<uint32_t>(memtype);
-        return value;
-    }
-    uint32_t get_memtype() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(memtype);
-        return value;
-    }
-    CONSTEXPR axi_limit3_r &set_memtype(uint32_t value)
-    {
-        memtype = ((1u << 4) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_max_outstanding_read_m1() const
-    {
-        uint32_t value = static_cast<uint32_t>(max_outstanding_read_m1);
-        return value;
-    }
-    uint32_t get_max_outstanding_read_m1() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(max_outstanding_read_m1);
-        return value;
-    }
-    CONSTEXPR axi_limit3_r &set_max_outstanding_read_m1(uint32_t value)
-    {
-        max_outstanding_read_m1 = ((1u << 8) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-    CONSTEXPR uint32_t get_max_outstanding_write_m1() const
-    {
-        uint32_t value = static_cast<uint32_t>(max_outstanding_write_m1);
-        return value;
-    }
-    uint32_t get_max_outstanding_write_m1() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(max_outstanding_write_m1);
-        return value;
-    }
-    CONSTEXPR axi_limit3_r &set_max_outstanding_write_m1(uint32_t value)
-    {
-        max_outstanding_write_m1 = ((1u << 8) - 1) & static_cast<uint32_t>(value);
-        return *this;
-    }
-#endif //__cplusplus
-};
-
 // pmcr_r - PMU Register control
 struct pmcr_r
 {
@@ -6354,9 +6354,10 @@ struct pmcr_r
 #ifdef __cplusplus
   public:
     CONSTEXPR pmcr_r() :
-        cnt_en(static_cast<uint32_t>(0)), event_cnt_rst(static_cast<uint32_t>(0)),
-        cycle_cnt_rst(static_cast<uint32_t>(0)), mask_en(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)),
-        num_event_cnt(static_cast<uint32_t>(4)), reserved1(static_cast<uint32_t>(0))
+        cnt_en(static_cast<uint32_t>(0x0)), event_cnt_rst(static_cast<uint32_t>(0)),
+        cycle_cnt_rst(static_cast<uint32_t>(0)), mask_en(static_cast<uint32_t>(0x0)),
+        reserved0(static_cast<uint32_t>(0)), num_event_cnt(static_cast<uint32_t>(0x04)),
+        reserved1(static_cast<uint32_t>(0))
     {
     }
     CONSTEXPR pmcr_r(uint32_t init) : word(init) {}
@@ -7227,7 +7228,7 @@ struct pmccntr_lo_r
     };
 #ifdef __cplusplus
   public:
-    CONSTEXPR pmccntr_lo_r() : CYCLE_CNT_LO(static_cast<uint32_t>(0)) {}
+    CONSTEXPR pmccntr_lo_r() : CYCLE_CNT_LO(static_cast<uint32_t>(0x00000000)) {}
     CONSTEXPR pmccntr_lo_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
     {
@@ -7284,7 +7285,7 @@ struct pmccntr_hi_r
     };
 #ifdef __cplusplus
   public:
-    CONSTEXPR pmccntr_hi_r() : CYCLE_CNT_HI(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)) {}
+    CONSTEXPR pmccntr_hi_r() : CYCLE_CNT_HI(static_cast<uint32_t>(0x0000)), reserved0(static_cast<uint32_t>(0)) {}
     CONSTEXPR pmccntr_hi_r(uint32_t init) : word(init) {}
     CONSTEXPR void operator=(uint32_t value)
     {
@@ -7344,8 +7345,8 @@ struct pmccntr_cfg_r
 #ifdef __cplusplus
   public:
     CONSTEXPR pmccntr_cfg_r() :
-        CYCLE_CNT_CFG_START(static_cast<uint32_t>(0)), reserved0(static_cast<uint32_t>(0)),
-        CYCLE_CNT_CFG_STOP(static_cast<uint32_t>(0)), reserved1(static_cast<uint32_t>(0))
+        CYCLE_CNT_CFG_START(static_cast<uint32_t>(0x00)), reserved0(static_cast<uint32_t>(0)),
+        CYCLE_CNT_CFG_STOP(static_cast<uint32_t>(0x00)), reserved1(static_cast<uint32_t>(0))
     {
     }
     CONSTEXPR pmccntr_cfg_r(uint32_t init) : word(init) {}
@@ -7786,7 +7787,7 @@ struct NPU_REG
     STRUCT dma_status1_r DMA_STATUS1; // 0x114
     uint32_t unused4[10];
     STRUCT clkforce_r CLKFORCE; // 0x140
-    uint32_t DEBUG_ADDR;        // 0x144
+    uint32_t DEBUG_ADDRESS;     // 0x144
     uint32_t DEBUG_MISC;        // 0x148
     uint32_t DEBUGCORE;         // 0x14c
     uint32_t unused5[12];
@@ -8059,7 +8060,7 @@ struct NPU_REG
         DMA_STATUS0        = 0;
         DMA_STATUS1        = 0;
         CLKFORCE           = 0;
-        DEBUG_ADDR         = 0;
+        DEBUG_ADDRESS      = 0;
         DEBUG_MISC         = 0;
         DEBUGCORE          = 0;
         KERNEL_X           = 0;

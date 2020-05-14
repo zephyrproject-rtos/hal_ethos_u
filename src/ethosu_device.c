@@ -204,7 +204,7 @@ enum ethosu_error_codes ethosu_read_apb_reg(uint32_t start_address, uint16_t num
 #if !defined(ARM_NPU_STUB)
     uint32_t address = start_address;
 
-    ASSERT((start_address + num_reg) < NPU_IDS_REGISTERS_SIZE);
+    ASSERT((start_address + num_reg) < ID_REGISTERS_SIZE);
 
     for (int i = 0; i < num_reg; i++)
     {
@@ -422,7 +422,7 @@ enum ethosu_error_codes ethosu_get_shram_data(int section, uint32_t *shram_p)
 #if !defined(ARM_NPU_STUB)
     int i            = 0;
     uint32_t address = NPU_REG_SHARED_BUFFER0;
-    write_reg(NPU_REG_DEBUG_ADDR, section * BYTES_1KB);
+    write_reg(NPU_REG_DEBUG_ADDRESS, section * BYTES_1KB);
 
     while (address <= NPU_REG_SHARED_BUFFER255)
     {
