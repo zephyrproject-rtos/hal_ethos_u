@@ -65,32 +65,56 @@ include_directories(${CMSIS_PATH}/CMSIS/Core/Include)
 # Build driver library
 add_library(ethosu_core_driver STATIC)
 target_include_directories(ethosu_core_driver PUBLIC include)
+target_include_directories(ethosu_core_driver PRIVATE "${PROJECT_BINARY_DIR}/src")
 target_sources(ethosu_core_driver PRIVATE src/ethosu_driver.c src/ethosu_device.c src/ethosu_pmu.c)
 
-# Build PMU
-if(DRIVER_PMU_AUTOINIT)
-    set(NPU_PMCR        "0x0" CACHE STRING "Register control b0 = CNT_EN = Enable counters (RW), b1 = EVENT_CNT_RST = Reset event counters (WO), b2 = CYCLE_CNT_RST = Reset cycle counter (WO), b[15:11] = Number of event counters (RO)")
-    set(NPU_PMCNTENSET  "0x0" CACHE STRING "Bit k enables event counter k. k=31 enables the cycle counter. Read value is current status.")
-    set(NPU_PMCNTENCLR  "0x0" CACHE STRING "Bit k disables event counter k. k=31 disables the cycle counter. Reda value is current status.")
-    set(NPU_PMOVSSET    "0x0" CACHE STRING "Overflow detection set. Bit k is for counter k. k=31 is cycle counter.")
-    set(NPU_PMOVSCLR    "0x0" CACHE STRING "Overflow detection clear. Bit k is for counter k. k=31 is cycle counter.")
-    set(NPU_PMINTSET    "0x0" CACHE STRING "Interrupt set. Bit k is for counter k. k=31 is cycle counter.")
-    set(NPU_PMINTCLR    "0x8003" CACHE STRING "Interrupt clear. Bit k is for counter k. k=31 is cycle counter.")
-    set(NPU_PMCCNTR     "0x0" CACHE STRING "Cycle counter, 48 bits value")
-    set(NPU_PMCCNTR_CFG "0x0" CACHE STRING "b[9:0] Start Event – this event number starts the cycle counter b[25:16] Stop Event – this event number stops the cycle counter")
+# Configurables
+set(NPU_QCONFIG     "2"     CACHE STRING "Default QCONFIG")
+set(NPU_REGIONCFG_0 "3"     CACHE STRING "Default region config 0")
+set(NPU_REGIONCFG_1 "0"     CACHE STRING "Default region config 1")
+set(NPU_REGIONCFG_2 "1"     CACHE STRING "Default region config 2")
+set(NPU_REGIONCFG_3 "1"     CACHE STRING "Default region config 3")
+set(NPU_REGIONCFG_4 "1"     CACHE STRING "Default region config 4")
+set(NPU_REGIONCFG_5 "1"     CACHE STRING "Default region config 5")
+set(NPU_REGIONCFG_6 "1"     CACHE STRING "Default region config 6")
+set(NPU_REGIONCFG_7 "1"     CACHE STRING "Default region config 7")
 
-    target_compile_definitions(ethosu_core_driver PRIVATE
-        PMU_AUTOINIT
-        INIT_PMCR=${NPU_PMCR}
-        INIT_PMCNTENSET=${NPU_PMCNTENSET}
-        INIT_PMCNTENCLR=${NPU_PMCNTENCLR}
-        INIT_PMOVSSET=${NPU_PMOVSSET}
-        INIT_PMOVSCLR=${NPU_PMOVSCLR}
-        INIT_PMINTSET=${NPU_PMINTSET}
-        INIT_PMINTCLR=${NPU_PMINTCLR}
-        INIT_PMCCNTR=${NPU_PMCCNTR}
-        INIT_PMCCNTR_CFG=${NPU_PMCCNTR_CFG})
+set(AXI_LIMIT0_MAX_BEATS_BYTES        "0x0"  CACHE STRING "Default AXI_LIMIT0_MAX_BEATS_BYTES        ")
+set(AXI_LIMIT0_MEM_TYPE               "0x0"  CACHE STRING "Default AXI_LIMIT0_MEM_TYPE               ")
+set(AXI_LIMIT0_MAX_OUTSTANDING_READS  "32"   CACHE STRING "Default AXI_LIMIT0_MAX_OUTSTANDING_READS  ")
+set(AXI_LIMIT0_MAX_OUTSTANDING_WRITES "16"   CACHE STRING "Default AXI_LIMIT0_MAX_OUTSTANDING_WRITES ")
+set(AXI_LIMIT1_MAX_BEATS_BYTES        "0x0"  CACHE STRING "Default AXI_LIMIT1_MAX_BEATS_BYTES        ")
+set(AXI_LIMIT1_MEM_TYPE               "0x0"  CACHE STRING "Default AXI_LIMIT1_MEM_TYPE               ")
+set(AXI_LIMIT1_MAX_OUTSTANDING_READS  "32"   CACHE STRING "Default AXI_LIMIT1_MAX_OUTSTANDING_READS  ")
+set(AXI_LIMIT1_MAX_OUTSTANDING_WRITES "16"   CACHE STRING "Default AXI_LIMIT1_MAX_OUTSTANDING_WRITES ")
+set(AXI_LIMIT2_MAX_BEATS_BYTES        "0x0"  CACHE STRING "Default AXI_LIMIT2_MAX_BEATS_BYTES        ")
+set(AXI_LIMIT2_MEM_TYPE               "0x0"  CACHE STRING "Default AXI_LIMIT2_MEM_TYPE               ")
+set(AXI_LIMIT2_MAX_OUTSTANDING_READS  "32"   CACHE STRING "Default AXI_LIMIT2_MAX_OUTSTANDING_READS  ")
+set(AXI_LIMIT2_MAX_OUTSTANDING_WRITES "16"   CACHE STRING "Default AXI_LIMIT2_MAX_OUTSTANDING_WRITES ")
+set(AXI_LIMIT3_MAX_BEATS_BYTES        "0x0"  CACHE STRING "Default AXI_LIMIT3_MAX_BEATS_BYTES        ")
+set(AXI_LIMIT3_MEM_TYPE               "0x0"  CACHE STRING "Default AXI_LIMIT3_MEM_TYPE               ")
+set(AXI_LIMIT3_MAX_OUTSTANDING_READS  "32"   CACHE STRING "Default AXI_LIMIT3_MAX_OUTSTANDING_READS  ")
+set(AXI_LIMIT3_MAX_OUTSTANDING_WRITES "16"   CACHE STRING "Default AXI_LIMIT3_MAX_OUTSTANDING_WRITES ")
+
+
+# PMU
+if(DRIVER_PMU_AUTOINIT)
+    set(PMU_AUTOINIT     TRUE)
+    set(INIT_PMCR        "0x0"    CACHE STRING "Register control b0 = CNT_EN = Enable counters (RW), b1 = EVENT_CNT_RST = Reset event counters (WO), b2 = CYCLE_CNT_RST = Reset cycle counter (WO), b[15:11] = Number of event counters (RO)")
+    set(INIT_PMCNTENSET  "0x0"    CACHE STRING "Bit k enables event counter k. k=31 enables the cycle counter. Read value is current status.")
+    set(INIT_PMCNTENCLR  "0x0"    CACHE STRING "Bit k disables event counter k. k=31 disables the cycle counter. Reda value is current status.")
+    set(INIT_PMOVSSET    "0x0"    CACHE STRING "Overflow detection set. Bit k is for counter k. k=31 is cycle counter.")
+    set(INIT_PMOVSCLR    "0x0"    CACHE STRING "Overflow detection clear. Bit k is for counter k. k=31 is cycle counter.")
+    set(INIT_PMINTSET    "0x0"    CACHE STRING "Interrupt set. Bit k is for counter k. k=31 is cycle counter.")
+    set(INIT_PMINTCLR    "0x8003" CACHE STRING "Interrupt clear. Bit k is for counter k. k=31 is cycle counter.")
+    set(INIT_PMCCNTR     "0x0"    CACHE STRING "Cycle counter, 48 bits value")
+    set(INIT_PMCCNTR_CFG "0x0"    CACHE STRING "b[9:0] Start Event – this event number starts the cycle counter b[25:16] Stop Event – this event number stops the cycle counter")
 endif()
+
+configure_file (
+    "${PROJECT_SOURCE_DIR}/src/ethosu_config.h.in"
+    "${PROJECT_BINARY_DIR}/src/ethosu_config.h"
+)
 
 #
 # Print build status

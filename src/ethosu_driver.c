@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+#include "ethosu_config.h"
 #include "ethosu_driver.h"
 
 #include "ethosu_common.h"
@@ -397,22 +398,39 @@ static int handle_optimizer_config(struct opt_cfg_s *opt_cfg_p)
     return return_code;
 }
 
-void __attribute__((weak)) npu_axi_init()
+void npu_axi_init()
 {
-    // TODO Power on
+    ethosu_set_qconfig(NPU_QCONFIG);
 
-    // TODO Set qconfig
-    ethosu_set_qconfig(0);
+    ethosu_set_regioncfg(0, NPU_REGIONCFG_0);
+    ethosu_set_regioncfg(1, NPU_REGIONCFG_1);
+    ethosu_set_regioncfg(2, NPU_REGIONCFG_2);
+    ethosu_set_regioncfg(3, NPU_REGIONCFG_3);
+    ethosu_set_regioncfg(4, NPU_REGIONCFG_4);
+    ethosu_set_regioncfg(5, NPU_REGIONCFG_5);
+    ethosu_set_regioncfg(6, NPU_REGIONCFG_6);
+    ethosu_set_regioncfg(7, NPU_REGIONCFG_7);
 
-    // TODO Set region config
-    ethosu_set_regioncfg(0, 0);
-    ethosu_set_regioncfg(1, 0);
-    ethosu_set_regioncfg(2, 0);
-    ethosu_set_regioncfg(3, 0);
-    ethosu_set_regioncfg(4, 0);
-    ethosu_set_regioncfg(5, 0);
-    ethosu_set_regioncfg(6, 0);
-    ethosu_set_regioncfg(7, 0);
+    (void)ethosu_set_axi_limit0(
+        AXI_LIMIT0_MAX_BEATS_BYTES,
+        AXI_LIMIT0_MEM_TYPE,
+        AXI_LIMIT0_MAX_OUTSTANDING_READS,
+        AXI_LIMIT0_MAX_OUTSTANDING_WRITES);
+    (void)ethosu_set_axi_limit1(
+        AXI_LIMIT1_MAX_BEATS_BYTES,
+        AXI_LIMIT1_MEM_TYPE,
+        AXI_LIMIT1_MAX_OUTSTANDING_READS,
+        AXI_LIMIT1_MAX_OUTSTANDING_WRITES);
+    (void)ethosu_set_axi_limit2(
+        AXI_LIMIT2_MAX_BEATS_BYTES,
+        AXI_LIMIT2_MEM_TYPE,
+        AXI_LIMIT2_MAX_OUTSTANDING_READS,
+        AXI_LIMIT2_MAX_OUTSTANDING_WRITES);
+    (void)ethosu_set_axi_limit3(
+        AXI_LIMIT3_MAX_BEATS_BYTES,
+        AXI_LIMIT3_MEM_TYPE,
+        AXI_LIMIT3_MAX_OUTSTANDING_READS,
+        AXI_LIMIT3_MAX_OUTSTANDING_WRITES);
 }
 
 static int handle_command_stream(const uint8_t *cmd_stream,
