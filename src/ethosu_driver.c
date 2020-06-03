@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#include "ethosu_config.h"
 #include "ethosu_driver.h"
+#include "ethosu_config.h"
 
 #include "ethosu_common.h"
 #include "ethosu_device.h"
@@ -95,6 +95,7 @@ static inline void wait_for_irq(void)
 #define APB_NUM_REG_BIT_SHIFT 12
 #define CMS_ALIGNMENT 16
 #define BYTES_1KB 1024
+#define PRODUCT_MAJOR_ETHOSU55 (4)
 
 // Driver actions
 enum DRIVER_ACTION_e
@@ -378,18 +379,18 @@ static int handle_optimizer_config(struct opt_cfg_s *opt_cfg_p)
         return_code = -1;
     }
 
-    if ((id.arch_major_rev != opt_cfg_p->arch_major_rev) || (id.arch_minor_rev != opt_cfg_p->arch_minor_rev) ||
-        (id.arch_patch_rev != opt_cfg_p->arch_patch_rev))
+    if ((id.product_major == PRODUCT_MAJOR_ETHOSU55) &&
+        ((id.arch_major_rev != opt_cfg_p->arch_major_rev) || (id.arch_minor_rev != opt_cfg_p->arch_minor_rev) ||
+         (id.arch_patch_rev != opt_cfg_p->arch_patch_rev)))
     {
-        // fLOG_INFO(stderr,
-        //         "NPU arch mismatch: npu.arch=%d.%d.%d optimizer.arch=%d.%d.%d\n",
-        //         id.arch_major_rev,
-        //         id.arch_minor_rev,
-        //         id.arch_patch_rev,
-        //         opt_cfg_p->arch_major_rev,
-        //         opt_cfg_p->arch_minor_rev,
-        //         opt_cfg_p->arch_patch_rev);
-        // return_code = -1;
+        LOG_ERR("NPU arch mismatch: npu.arch=%d.%d.%d optimizer.arch=%d.%d.%d\n",
+                id.arch_major_rev,
+                id.arch_minor_rev,
+                id.arch_patch_rev,
+                opt_cfg_p->arch_major_rev,
+                opt_cfg_p->arch_minor_rev,
+                opt_cfg_p->arch_patch_rev);
+        return_code = -1;
     }
 
 #if !defined(LOG_ENABLED)
@@ -411,26 +412,22 @@ void npu_axi_init()
     ethosu_set_regioncfg(6, NPU_REGIONCFG_6);
     ethosu_set_regioncfg(7, NPU_REGIONCFG_7);
 
-    (void)ethosu_set_axi_limit0(
-        AXI_LIMIT0_MAX_BEATS_BYTES,
-        AXI_LIMIT0_MEM_TYPE,
-        AXI_LIMIT0_MAX_OUTSTANDING_READS,
-        AXI_LIMIT0_MAX_OUTSTANDING_WRITES);
-    (void)ethosu_set_axi_limit1(
-        AXI_LIMIT1_MAX_BEATS_BYTES,
-        AXI_LIMIT1_MEM_TYPE,
-        AXI_LIMIT1_MAX_OUTSTANDING_READS,
-        AXI_LIMIT1_MAX_OUTSTANDING_WRITES);
-    (void)ethosu_set_axi_limit2(
-        AXI_LIMIT2_MAX_BEATS_BYTES,
-        AXI_LIMIT2_MEM_TYPE,
-        AXI_LIMIT2_MAX_OUTSTANDING_READS,
-        AXI_LIMIT2_MAX_OUTSTANDING_WRITES);
-    (void)ethosu_set_axi_limit3(
-        AXI_LIMIT3_MAX_BEATS_BYTES,
-        AXI_LIMIT3_MEM_TYPE,
-        AXI_LIMIT3_MAX_OUTSTANDING_READS,
-        AXI_LIMIT3_MAX_OUTSTANDING_WRITES);
+    (void)ethosu_set_axi_limit0(AXI_LIMIT0_MAX_BEATS_BYTES,
+                                AXI_LIMIT0_MEM_TYPE,
+                                AXI_LIMIT0_MAX_OUTSTANDING_READS,
+                                AXI_LIMIT0_MAX_OUTSTANDING_WRITES);
+    (void)ethosu_set_axi_limit1(AXI_LIMIT1_MAX_BEATS_BYTES,
+                                AXI_LIMIT1_MEM_TYPE,
+                                AXI_LIMIT1_MAX_OUTSTANDING_READS,
+                                AXI_LIMIT1_MAX_OUTSTANDING_WRITES);
+    (void)ethosu_set_axi_limit2(AXI_LIMIT2_MAX_BEATS_BYTES,
+                                AXI_LIMIT2_MEM_TYPE,
+                                AXI_LIMIT2_MAX_OUTSTANDING_READS,
+                                AXI_LIMIT2_MAX_OUTSTANDING_WRITES);
+    (void)ethosu_set_axi_limit3(AXI_LIMIT3_MAX_BEATS_BYTES,
+                                AXI_LIMIT3_MEM_TYPE,
+                                AXI_LIMIT3_MAX_OUTSTANDING_READS,
+                                AXI_LIMIT3_MAX_OUTSTANDING_WRITES);
 }
 
 static int handle_command_stream(const uint8_t *cmd_stream,
@@ -449,7 +446,10 @@ static int handle_command_stream(const uint8_t *cmd_stream,
     }
     npu_axi_init();
 
-    ethosu_run_command_stream(cmd_stream, cms_bytes, base_addr, num_base_addr);
+    if (ETHOSU_SUCCESS != ethosu_run_command_stream(cmd_stream, cms_bytes, base_addr, num_base_addr))
+    {
+        return -1;
+    }
 
     wait_for_irq();
 

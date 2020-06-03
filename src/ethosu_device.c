@@ -15,15 +15,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "ethosu_device.h"
-
 #include "ethosu_common.h"
+
 #include <assert.h>
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 
 #define MASK_0_31_BITS 0xFFFFFFFF
 #define MASK_32_47_BITS 0xFFFF00000000
+#define MASK_16_BYTE_ALIGN 0xF
 #define BASEP_OFFSET 4
 #define REG_OFFSET 4
 #define BYTES_1KB 1024
@@ -89,6 +91,26 @@ enum ethosu_error_codes ethosu_run_command_stream(const uint8_t *cmd_stream_ptr,
     int num_base_reg;
 
     ASSERT(num_base_addr <= ETHOSU_DRIVER_BASEP_INDEXES);
+
+    if (0 != ((ptrdiff_t)cmd_stream_ptr & MASK_16_BYTE_ALIGN))
+    {
+        LOG_ERR("Error: Command stream addr %p not aligned to 16 bytes\n", cmd_stream_ptr);
+        return ETHOSU_INVALID_PARAM;
+    }
+
+    bool base_addr_invalid = false;
+    for (int i = 0; i < num_base_addr; i++)
+    {
+        if (0 != (base_addr[i] & MASK_16_BYTE_ALIGN))
+        {
+            LOG_ERR("Error: Base addr %d: %p not aligned to 16 bytes\n", i, (void *)(base_addr[i]));
+            base_addr_invalid = true;
+        }
+    }
+    if (base_addr_invalid)
+    {
+        return ETHOSU_INVALID_PARAM;
+    }
 
     qbase0       = ((uint64_t)cmd_stream_ptr) & MASK_0_31_BITS;
     qbase1       = (((uint64_t)cmd_stream_ptr) & MASK_32_47_BITS) >> 32;
