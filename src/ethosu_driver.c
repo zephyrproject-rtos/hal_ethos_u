@@ -25,6 +25,7 @@
 #include <assert.h>
 #include <cmsis_compiler.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -93,9 +94,9 @@ static inline void wait_for_irq(void)
 #define ETHOSU_FOURCC ('1' << 24 | 'P' << 16 | 'O' << 8 | 'C') // "Custom Operator Payload 1"
 #define APB_START_ADDR_MASK 0x0FFF
 #define APB_NUM_REG_BIT_SHIFT 12
-#define CMS_ALIGNMENT 16
 #define BYTES_1KB 1024
 #define PRODUCT_MAJOR_ETHOSU55 (4)
+#define MASK_16_BYTE_ALIGN (0xF)
 
 // Driver actions
 enum DRIVER_ACTION_e
@@ -439,9 +440,23 @@ static int handle_command_stream(const uint8_t *cmd_stream,
     uint32_t cms_bytes = cms_length * BYTES_IN_32_BITS;
     LOG_INFO("handle_command_stream cms_length %d\n", cms_length);
 
-    if (((uint32_t)cmd_stream % CMS_ALIGNMENT) != 0)
+    if (0 != ((ptrdiff_t)cmd_stream & MASK_16_BYTE_ALIGN))
     {
-        LOG_ERR("Failure: Command stream addr %p not aligned to 16 bytes\n", cmd_stream);
+        LOG_ERR("Error: Command stream addr %p not aligned to 16 bytes\n", cmd_stream);
+        return -1;
+    }
+
+    bool base_addr_invalid = false;
+    for (int i = 0; i < num_base_addr; i++)
+    {
+        if (0 != (base_addr[i] & MASK_16_BYTE_ALIGN))
+        {
+            LOG_ERR("Error: Base addr %d: %p not aligned to 16 bytes\n", i, (void *)(base_addr[i]));
+            base_addr_invalid = true;
+        }
+    }
+    if (base_addr_invalid)
+    {
         return -1;
     }
     npu_axi_init();
