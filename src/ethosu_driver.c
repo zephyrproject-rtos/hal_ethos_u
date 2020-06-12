@@ -192,6 +192,12 @@ int ethosu_init(void)
     int return_code = 0;
     LOG_INFO("ethosu_init calling NPU embed driver ethosu_dev_init\n");
 
+    if (ETHOSU_SUCCESS != ethosu_set_clock_and_power(ETHOSU_CLOCK_Q_DISABLE, ETHOSU_POWER_Q_DISABLE))
+    {
+        LOG_ERR("Failed to disable clock-q & power-q for Ethos-U\n");
+        return -1;
+    }
+
     ethosu_soft_reset();
 
     if (ETHOSU_SUCCESS != ethosu_wait_for_reset())
@@ -264,15 +270,17 @@ int ethosu_invoke(const void *custom_data_ptr,
     }
     int custom_data_32bit_size = (custom_data_size / BYTES_IN_32_BITS - CUSTOM_OPTION_LENGTH_32_BIT_WORD);
 
+    ethosu_set_clock_and_power(ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_DISABLE);
     while (data_ptr < (data_start_ptr + custom_data_32bit_size))
     {
+        int ret = 0;
         switch (data_ptr->driver_action_command)
         {
         case OPTIMIZER_CONFIG:
             LOG_INFO("ethosu_invoke OPTIMIZER_CONFIG\n");
             struct opt_cfg_s *opt_cfg_p = (struct opt_cfg_s *)data_ptr;
 
-            return_code = handle_optimizer_config(opt_cfg_p);
+            ret = handle_optimizer_config(opt_cfg_p);
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD + OPTIMIZER_CONFIG_LENGTH_32_BIT_WORD;
             break;
         case COMMAND_STREAM:
@@ -284,9 +292,9 @@ int ethosu_invoke(const void *custom_data_ptr,
             // It is safe to clear this flag without atomic, because npu is not running.
             irq_triggered = false;
 
-            return_code = handle_command_stream(command_stream, cms_length, base_addr, num_base_addr);
+            ret = handle_command_stream(command_stream, cms_length, base_addr, num_base_addr);
 
-            if (return_code == -1 && abort_inference)
+            if (ret == -1 && abort_inference)
             {
                 uint32_t qread = 0;
                 ethosu_get_qread(&qread);
@@ -301,12 +309,12 @@ int ethosu_invoke(const void *custom_data_ptr,
             break;
         case READ_APB_REG:
             LOG_INFO("ethosu_invoke READ_APB_REG\n");
-            return_code = read_apb_reg(data_ptr->driver_action_data);
+            ret = read_apb_reg(data_ptr->driver_action_data);
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD;
             break;
         case DUMP_SHRAM:
             LOG_INFO("ethosu_invoke DUMP_SHRAM\n");
-            return_code = dump_shram();
+            ret = dump_shram();
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD;
             break;
         case NOP:
@@ -315,15 +323,17 @@ int ethosu_invoke(const void *custom_data_ptr,
             break;
         default:
             LOG_ERR("ethosu_invoke UNSUPPORTED driver_action_command %d \n", data_ptr->driver_action_command);
-            return -1;
+            ret = -1;
             break;
         }
-        if (return_code != 0)
+        if (ret != 0)
         {
-            return -1;
+            return_code = -1;
+            break;
         }
     }
-    return 0;
+    ethosu_set_clock_and_power(ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
+    return return_code;
 }
 
 void ethosu_abort(void)

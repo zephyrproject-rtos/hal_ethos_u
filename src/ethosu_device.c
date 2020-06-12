@@ -80,6 +80,8 @@ enum ethosu_error_codes ethosu_run_command_stream(const uint8_t *cmd_stream_ptr,
                                                   const uint64_t *base_addr,
                                                   int num_base_addr)
 {
+    enum ethosu_error_codes ret_code = ETHOSU_SUCCESS;
+
 #if !defined(ARM_NPU_STUB)
     uint32_t qbase0;
     uint32_t qbase1;
@@ -103,7 +105,8 @@ enum ethosu_error_codes ethosu_run_command_stream(const uint8_t *cmd_stream_ptr,
     write_reg(NPU_REG_QBASE0, qbase0);
     write_reg(NPU_REG_QBASE1, qbase1);
     write_reg(NPU_REG_QSIZE, qsize);
-    write_reg(NPU_REG_CMD, 1);
+
+    ret_code = ethosu_set_command_run();
 #else
     // NPU stubbed
     stream_length = cms_length;
@@ -115,7 +118,7 @@ enum ethosu_error_codes ethosu_run_command_stream(const uint8_t *cmd_stream_ptr,
 #endif
 #endif
 
-    return ETHOSU_SUCCESS;
+    return ret_code;
 }
 
 enum ethosu_error_codes ethosu_is_irq_raised(uint8_t *irq_raised)
@@ -140,13 +143,21 @@ enum ethosu_error_codes ethosu_is_irq_raised(uint8_t *irq_raised)
 enum ethosu_error_codes ethosu_clear_irq_status(void)
 {
 #if !defined(ARM_NPU_STUB)
-    write_reg(NPU_REG_CMD, 2);
+    struct cmd_r oldcmd;
+    oldcmd.word = read_reg(NPU_REG_CMD);
+
+    struct cmd_r cmd;
+    cmd.word           = 0;
+    cmd.clear_irq      = 1;
+    cmd.clock_q_enable = oldcmd.clock_q_enable;
+    cmd.power_q_enable = oldcmd.power_q_enable;
+    write_reg(NPU_REG_CMD, cmd.word);
 #else
 #endif
     return ETHOSU_SUCCESS;
 }
 
-// TODO Understand settings of privilege/sequrity level and update API.
+// TODO Understand settings of privilege/security level and update API.
 enum ethosu_error_codes ethosu_soft_reset(void)
 {
     enum ethosu_error_codes return_code = ETHOSU_SUCCESS;
@@ -400,7 +411,15 @@ enum ethosu_error_codes ethosu_get_irq_history_mask(uint16_t *irq_history_mask)
 enum ethosu_error_codes ethosu_clear_irq_history_mask(uint16_t irq_history_clear_mask)
 {
 #if !defined(ARM_NPU_STUB)
-    write_reg(NPU_REG_CMD, (uint32_t)irq_history_clear_mask << 16);
+    struct cmd_r oldcmd;
+    oldcmd.word = read_reg(NPU_REG_CMD);
+
+    struct cmd_r cmd;
+    cmd.word              = 0;
+    cmd.clock_q_enable    = oldcmd.clock_q_enable;
+    cmd.power_q_enable    = oldcmd.power_q_enable;
+    cmd.clear_irq_history = irq_history_clear_mask;
+    write_reg(NPU_REG_CMD, cmd.word);
 #else
     UNUSED(irq_history_clear_mask);
 #endif
@@ -410,7 +429,15 @@ enum ethosu_error_codes ethosu_clear_irq_history_mask(uint16_t irq_history_clear
 enum ethosu_error_codes ethosu_set_command_run(void)
 {
 #if !defined(ARM_NPU_STUB)
-    write_reg(NPU_REG_CMD, 1);
+    struct cmd_r oldcmd;
+    oldcmd.word = read_reg(NPU_REG_CMD);
+
+    struct cmd_r cmd;
+    cmd.word                        = 0;
+    cmd.transition_to_running_state = 1;
+    cmd.clock_q_enable              = oldcmd.clock_q_enable;
+    cmd.power_q_enable              = oldcmd.power_q_enable;
+    write_reg(NPU_REG_CMD, cmd.word);
 #else
 #endif
     return ETHOSU_SUCCESS;
