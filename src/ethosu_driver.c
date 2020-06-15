@@ -381,8 +381,7 @@ static int handle_optimizer_config(struct opt_cfg_s *opt_cfg_p)
     }
 
     if ((id.product_major == PRODUCT_MAJOR_ETHOSU55) &&
-        ((id.arch_major_rev != opt_cfg_p->arch_major_rev) || (id.arch_minor_rev != opt_cfg_p->arch_minor_rev) ||
-         (id.arch_patch_rev != opt_cfg_p->arch_patch_rev)))
+        ((id.arch_major_rev != opt_cfg_p->arch_major_rev) || (id.arch_minor_rev != opt_cfg_p->arch_minor_rev)))
     {
         LOG_ERR("NPU arch mismatch: npu.arch=%d.%d.%d optimizer.arch=%d.%d.%d\n",
                 id.arch_major_rev,
