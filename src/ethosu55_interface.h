@@ -40,7 +40,7 @@
 
 #define NNX_ARCH_VERSION_MAJOR 1
 #define NNX_ARCH_VERSION_MINOR 0
-#define NNX_ARCH_VERSION_PATCH 0
+#define NNX_ARCH_VERSION_PATCH 1
 
 // Register offsets
 
@@ -769,6 +769,7 @@ enum class pmu_event_type : uint16_t
     NPU_IDLE                     = 0x20,
     CC_STALLED_ON_BLOCKDEP       = 0x21,
     CC_STALLED_ON_SHRAM_RECONFIG = 0x22,
+    NPU_ACTIVE                   = 0x23,
     MAC_ACTIVE                   = 0x30,
     MAC_ACTIVE_8BIT              = 0x31,
     MAC_ACTIVE_16BIT             = 0x32,
@@ -1088,6 +1089,7 @@ enum pmu_event_type
     PMU_EVENT_TYPE_NPU_IDLE                     = 0x20,
     PMU_EVENT_TYPE_CC_STALLED_ON_BLOCKDEP       = 0x21,
     PMU_EVENT_TYPE_CC_STALLED_ON_SHRAM_RECONFIG = 0x22,
+    PMU_EVENT_TYPE_NPU_ACTIVE                   = 0x23,
     PMU_EVENT_TYPE_MAC_ACTIVE                   = 0x30,
     PMU_EVENT_TYPE_MAC_ACTIVE_8BIT              = 0x31,
     PMU_EVENT_TYPE_MAC_ACTIVE_16BIT             = 0x32,
@@ -1237,7 +1239,7 @@ struct id_r
     CONSTEXPR id_r() :
         version_status(static_cast<uint32_t>(1)), version_minor(static_cast<uint32_t>(0x0)),
         version_major(static_cast<uint32_t>(0x0)), product_major(static_cast<uint32_t>(4)),
-        arch_patch_rev(static_cast<uint32_t>(0)), arch_minor_rev(static_cast<uint32_t>(0)),
+        arch_patch_rev(static_cast<uint32_t>(1)), arch_minor_rev(static_cast<uint32_t>(0)),
         arch_major_rev(static_cast<uint32_t>(1))
     {
     }
@@ -8008,7 +8010,7 @@ struct NPU_REG
     }
     void reset()
     {
-        ID                 = 268451841;
+        ID                 = 268517377;
         STATUS             = 8;
         CMD                = 0;
         RESET              = 0;
@@ -13910,7 +13912,9 @@ struct npu_set_scale1_length_t
 #define EXPAND_PMU_EVENT_TYPE(FUNC, SEP)                                                                                          \
     FUNC(pmu_event_type, NO_EVENT)                                                                                                \
     SEP FUNC(pmu_event_type, CYCLE) SEP FUNC(pmu_event_type, NPU_IDLE) SEP FUNC(                                                  \
-        pmu_event_type, CC_STALLED_ON_BLOCKDEP) SEP FUNC(pmu_event_type, CC_STALLED_ON_SHRAM_RECONFIG)                            \
+        pmu_event_type, CC_STALLED_ON_BLOCKDEP) SEP FUNC(pmu_event_type,                                                          \
+                                                         CC_STALLED_ON_SHRAM_RECONFIG) SEP FUNC(pmu_event_type,                   \
+                                                                                                NPU_ACTIVE)                       \
         SEP FUNC(pmu_event_type, MAC_ACTIVE) SEP FUNC(pmu_event_type, MAC_ACTIVE_8BIT) SEP FUNC(                                  \
             pmu_event_type, MAC_ACTIVE_16BIT) SEP FUNC(pmu_event_type, MAC_DPU_ACTIVE) SEP FUNC(pmu_event_type,                   \
                                                                                                 MAC_STALLED_BY_WD_ACC)            \
