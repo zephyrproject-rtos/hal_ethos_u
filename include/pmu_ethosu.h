@@ -136,6 +136,8 @@ extern PMU_Ethosu_evnt_Type *ethosu_pmu_evnt;
 #define ETHOSU_PMU_CNT3_Msk (1UL << 2)
 #define ETHOSU_PMU_CNT4_Msk (1UL << 3)
 #define ETHOSU_PMU_CCNT_Msk (1UL << 31)
+#define ETHOSU_PMCCNTR_CFG_START_EVENT_MASK (0x3FF)
+#define ETHOSU_PMCCNTR_CFG_STOP_EVENT_MASK (0x3FF << 16)
 
 /* Transpose functions between HW-event-type and event-id*/
 enum ethosu_pmu_event_type pmu_event_type(uint32_t);
@@ -424,6 +426,32 @@ static inline void ETHOSU_PMU_CNTR_Increment(uint32_t mask)
             }
         }
     }
+}
+
+/**
+  \brief   Set start event number for the cycle counter
+  \param [in]   start_event   Event number
+            - Start event (bits [9:0])
+  \note   Sets the event number that starts the cycle counter.
+            - Event number in the range 0..1023
+*/
+static inline void ETHOSU_PMU_PMCCNTR_CFG_Set_Start_Event(uint32_t start_event)
+{
+    uint32_t val                 = ethosu_pmu_ctrl->PMCCNTR_CFG & ~ETHOSU_PMCCNTR_CFG_START_EVENT_MASK;
+    ethosu_pmu_ctrl->PMCCNTR_CFG = val | (start_event & ETHOSU_PMCCNTR_CFG_START_EVENT_MASK);
+}
+
+/**
+  \brief   Set stop event number for the cycle counter
+  \param [in]   stop_event   Event number
+            - Stop event (bits [25:16])
+  \note   Sets the event number that stops the cycle counter.
+            - Event number in the range 0..1023
+*/
+static inline void ETHOSU_PMU_PMCCNTR_CFG_Set_Stop_Event(uint32_t stop_event)
+{
+    uint32_t val                 = ethosu_pmu_ctrl->PMCCNTR_CFG & ~ETHOSU_PMCCNTR_CFG_STOP_EVENT_MASK;
+    ethosu_pmu_ctrl->PMCCNTR_CFG = val | ((stop_event << 16) & ETHOSU_PMCCNTR_CFG_STOP_EVENT_MASK);
 }
 
 #ifdef __cplusplus
