@@ -17,9 +17,8 @@
  */
 
 #include "ethosu_driver.h"
-#include "ethosu_config.h"
-
 #include "ethosu_common.h"
+#include "ethosu_config.h"
 #include "ethosu_device.h"
 
 #include <assert.h>
@@ -30,8 +29,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Abort flag
-static int abort_inference = false;
+struct ethosu_driver ethosu_drv = {.dev = {.base_address = NULL}, .abort_inference = false};
 
 // IRQ
 static volatile bool irq_triggered = false;
@@ -40,20 +38,20 @@ static volatile bool irq_triggered = false;
 void ethosu_irq_handler(void)
 {
     uint8_t irq_raised = 0;
-    (void)ethosu_is_irq_raised(&irq_raised);
+    (void)ethosu_is_irq_raised(&ethosu_drv.dev, &irq_raised);
     ASSERT(irq_raised == 1);
     irq_triggered = true;
-    (void)ethosu_clear_irq_status();
-    (void)ethosu_is_irq_raised(&irq_raised);
+    (void)ethosu_clear_irq_status(&ethosu_drv.dev);
+    (void)ethosu_is_irq_raised(&ethosu_drv.dev, &irq_raised);
     ASSERT(irq_raised == 0);
 }
 
-static inline void wait_for_irq(void)
+static inline void wait_for_irq(struct ethosu_driver *drv)
 {
     while (1)
     {
         __disable_irq();
-        if (irq_triggered || abort_inference)
+        if (irq_triggered || drv->abort_inference)
         {
             __enable_irq();
             break;
@@ -66,13 +64,13 @@ static inline void wait_for_irq(void)
 }
 #else
 // Just polling the status register
-static inline void wait_for_irq(void)
+static inline void wait_for_irq(struct ethosu_driver *drv)
 {
     uint8_t irq_raised = 0;
 
     for (int i = 0; i < 5000; ++i)
     {
-        (void)ethosu_is_irq_raised(&irq_raised);
+        (void)ethosu_is_irq_raised(&drv->dev, &irq_raised);
         if (1 == irq_raised)
         {
             break;
@@ -177,36 +175,43 @@ struct opt_cfg_s
     };
 };
 
-static int handle_optimizer_config(struct opt_cfg_s *opt_cfg_p);
-static int handle_command_stream(const uint8_t *cmd_stream,
+static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s *opt_cfg_p);
+static int handle_command_stream(struct ethosu_driver *drv,
+                                 const uint8_t *cmd_stream,
                                  const int cms_length,
                                  const uint64_t *base_addr,
                                  const int num_base_addr);
-static int read_apb_reg(uint16_t);
-static int dump_shram();
-static void dump_npu_register(int npu_reg, int npu_reg_end);
+static int read_apb_reg(struct ethosu_driver *drv, uint16_t);
+static int dump_shram(struct ethosu_driver *drv);
+static void dump_npu_register(struct ethosu_driver *drv, int npu_reg, int npu_reg_end);
 static void dump_command_stream(const uint32_t *cmd_stream, const int cms_length, int qread);
+static void npu_axi_init(struct ethosu_driver *drv);
 
-int ethosu_init(void)
+int ethosu_init(const void *base_address)
 {
     int return_code = 0;
+
     LOG_INFO("ethosu_init calling NPU embed driver ethosu_dev_init\n");
 
-    if (ETHOSU_SUCCESS != ethosu_set_clock_and_power(ETHOSU_CLOCK_Q_DISABLE, ETHOSU_POWER_Q_DISABLE))
+    if (ETHOSU_SUCCESS != ethosu_dev_init(&ethosu_drv.dev, base_address))
+    {
+        LOG_ERR("Failed in ethosu_dev_init");
+        return -1;
+    }
+
+    if (ETHOSU_SUCCESS != ethosu_set_clock_and_power(&ethosu_drv.dev, ETHOSU_CLOCK_Q_DISABLE, ETHOSU_POWER_Q_DISABLE))
     {
         LOG_ERR("Failed to disable clock-q & power-q for Ethos-U\n");
         return -1;
     }
 
-    ethosu_soft_reset();
+    ethosu_soft_reset(&ethosu_drv.dev);
 
-    if (ETHOSU_SUCCESS != ethosu_wait_for_reset())
+    if (ETHOSU_SUCCESS != ethosu_wait_for_reset(&ethosu_drv.dev))
     {
         LOG_ERR("Failed reset of Ethos-U\n");
         return -1;
     }
-
-    return_code = ethosu_dev_init();
 
     return return_code;
 }
@@ -219,8 +224,8 @@ int ethosu_get_version(struct ethosu_version *version)
     {
         struct ethosu_id id;
         struct ethosu_config cfg;
-        (void)ethosu_get_id(&id);
-        (void)ethosu_get_config(&cfg);
+        (void)ethosu_get_id(&ethosu_drv.dev, &id);
+        (void)ethosu_get_config(&ethosu_drv.dev, &cfg);
 
         version->id.version_status      = id.version_status;
         version->id.version_minor       = id.version_minor;
@@ -270,7 +275,7 @@ int ethosu_invoke(const void *custom_data_ptr,
     }
     int custom_data_32bit_size = (custom_data_size / BYTES_IN_32_BITS - CUSTOM_OPTION_LENGTH_32_BIT_WORD);
 
-    ethosu_set_clock_and_power(ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_DISABLE);
+    ethosu_set_clock_and_power(&ethosu_drv.dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_DISABLE);
     while (data_ptr < (data_start_ptr + custom_data_32bit_size))
     {
         int ret = 0;
@@ -280,7 +285,7 @@ int ethosu_invoke(const void *custom_data_ptr,
             LOG_INFO("ethosu_invoke OPTIMIZER_CONFIG\n");
             struct opt_cfg_s *opt_cfg_p = (struct opt_cfg_s *)data_ptr;
 
-            ret = handle_optimizer_config(opt_cfg_p);
+            ret = handle_optimizer_config(&ethosu_drv, opt_cfg_p);
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD + OPTIMIZER_CONFIG_LENGTH_32_BIT_WORD;
             break;
         case COMMAND_STREAM:
@@ -288,33 +293,33 @@ int ethosu_invoke(const void *custom_data_ptr,
             void *command_stream = (uint8_t *)(data_ptr) + sizeof(struct custom_data_s);
             int cms_length       = (data_ptr->reserved << 16) | data_ptr->length;
 
-            abort_inference = false;
+            ethosu_drv.abort_inference = false;
             // It is safe to clear this flag without atomic, because npu is not running.
             irq_triggered = false;
 
-            ret = handle_command_stream(command_stream, cms_length, base_addr, num_base_addr);
+            ret = handle_command_stream(&ethosu_drv, command_stream, cms_length, base_addr, num_base_addr);
 
-            if (ret == -1 && abort_inference)
+            if (return_code == -1 && ethosu_drv.abort_inference)
             {
                 uint32_t qread = 0;
-                ethosu_get_qread(&qread);
+                ethosu_get_qread(&ethosu_drv.dev, &qread);
                 LOG_ERR("NPU timeout\n");
                 dump_command_stream(command_stream, cms_length, qread);
-                dump_npu_register(0x200, 0x2BF);
-                dump_npu_register(0x800, 0xB3F);
-                dump_shram();
+                dump_npu_register(&ethosu_drv, 0x200, 0x2BF);
+                dump_npu_register(&ethosu_drv, 0x800, 0xB3F);
+                dump_shram(&ethosu_drv);
             }
 
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD + cms_length;
             break;
         case READ_APB_REG:
             LOG_INFO("ethosu_invoke READ_APB_REG\n");
-            ret = read_apb_reg(data_ptr->driver_action_data);
+            ret = read_apb_reg(&ethosu_drv, data_ptr->driver_action_data);
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD;
             break;
         case DUMP_SHRAM:
             LOG_INFO("ethosu_invoke DUMP_SHRAM\n");
-            ret = dump_shram();
+            ret = dump_shram(&ethosu_drv);
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD;
             break;
         case NOP:
@@ -332,16 +337,16 @@ int ethosu_invoke(const void *custom_data_ptr,
             break;
         }
     }
-    ethosu_set_clock_and_power(ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
+    ethosu_set_clock_and_power(&ethosu_drv.dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
     return return_code;
 }
 
 void ethosu_abort(void)
 {
-    abort_inference = true;
+    ethosu_drv.abort_inference = true;
 }
 
-static int handle_optimizer_config(struct opt_cfg_s *opt_cfg_p)
+static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s *opt_cfg_p)
 {
     struct ethosu_config cfg;
     struct ethosu_id id;
@@ -358,8 +363,8 @@ static int handle_optimizer_config(struct opt_cfg_s *opt_cfg_p)
              opt_cfg_p->arch_minor_rev,
              opt_cfg_p->arch_patch_rev);
 
-    (void)ethosu_get_config(&cfg);
-    (void)ethosu_get_id(&id);
+    (void)ethosu_get_config(&drv->dev, &cfg);
+    (void)ethosu_get_id(&drv->dev, &id);
     LOG_INFO("Ethos-U config cmd_stream_version: %d macs_per_cc: %d shram_size: %d\n",
              cfg.cmd_stream_version,
              cfg.macs_per_cc,
@@ -409,38 +414,43 @@ static int handle_optimizer_config(struct opt_cfg_s *opt_cfg_p)
     return return_code;
 }
 
-void npu_axi_init()
+static void npu_axi_init(struct ethosu_driver *drv)
 {
-    ethosu_set_qconfig(NPU_QCONFIG);
+    ethosu_set_qconfig(&drv->dev, NPU_QCONFIG);
 
-    ethosu_set_regioncfg(0, NPU_REGIONCFG_0);
-    ethosu_set_regioncfg(1, NPU_REGIONCFG_1);
-    ethosu_set_regioncfg(2, NPU_REGIONCFG_2);
-    ethosu_set_regioncfg(3, NPU_REGIONCFG_3);
-    ethosu_set_regioncfg(4, NPU_REGIONCFG_4);
-    ethosu_set_regioncfg(5, NPU_REGIONCFG_5);
-    ethosu_set_regioncfg(6, NPU_REGIONCFG_6);
-    ethosu_set_regioncfg(7, NPU_REGIONCFG_7);
+    ethosu_set_regioncfg(&drv->dev, 0, NPU_REGIONCFG_0);
+    ethosu_set_regioncfg(&drv->dev, 1, NPU_REGIONCFG_1);
+    ethosu_set_regioncfg(&drv->dev, 2, NPU_REGIONCFG_2);
+    ethosu_set_regioncfg(&drv->dev, 3, NPU_REGIONCFG_3);
+    ethosu_set_regioncfg(&drv->dev, 4, NPU_REGIONCFG_4);
+    ethosu_set_regioncfg(&drv->dev, 5, NPU_REGIONCFG_5);
+    ethosu_set_regioncfg(&drv->dev, 6, NPU_REGIONCFG_6);
+    ethosu_set_regioncfg(&drv->dev, 7, NPU_REGIONCFG_7);
 
-    (void)ethosu_set_axi_limit0(AXI_LIMIT0_MAX_BEATS_BYTES,
+    (void)ethosu_set_axi_limit0(&drv->dev,
+                                AXI_LIMIT0_MAX_BEATS_BYTES,
                                 AXI_LIMIT0_MEM_TYPE,
                                 AXI_LIMIT0_MAX_OUTSTANDING_READS,
                                 AXI_LIMIT0_MAX_OUTSTANDING_WRITES);
-    (void)ethosu_set_axi_limit1(AXI_LIMIT1_MAX_BEATS_BYTES,
+    (void)ethosu_set_axi_limit1(&drv->dev,
+                                AXI_LIMIT1_MAX_BEATS_BYTES,
                                 AXI_LIMIT1_MEM_TYPE,
                                 AXI_LIMIT1_MAX_OUTSTANDING_READS,
                                 AXI_LIMIT1_MAX_OUTSTANDING_WRITES);
-    (void)ethosu_set_axi_limit2(AXI_LIMIT2_MAX_BEATS_BYTES,
+    (void)ethosu_set_axi_limit2(&drv->dev,
+                                AXI_LIMIT2_MAX_BEATS_BYTES,
                                 AXI_LIMIT2_MEM_TYPE,
                                 AXI_LIMIT2_MAX_OUTSTANDING_READS,
                                 AXI_LIMIT2_MAX_OUTSTANDING_WRITES);
-    (void)ethosu_set_axi_limit3(AXI_LIMIT3_MAX_BEATS_BYTES,
+    (void)ethosu_set_axi_limit3(&drv->dev,
+                                AXI_LIMIT3_MAX_BEATS_BYTES,
                                 AXI_LIMIT3_MEM_TYPE,
                                 AXI_LIMIT3_MAX_OUTSTANDING_READS,
                                 AXI_LIMIT3_MAX_OUTSTANDING_WRITES);
 }
 
-static int handle_command_stream(const uint8_t *cmd_stream,
+static int handle_command_stream(struct ethosu_driver *drv,
+                                 const uint8_t *cmd_stream,
                                  const int cms_length,
                                  const uint64_t *base_addr,
                                  const int num_base_addr)
@@ -468,16 +478,16 @@ static int handle_command_stream(const uint8_t *cmd_stream,
     {
         return -1;
     }
-    npu_axi_init();
+    npu_axi_init(drv);
 
-    if (ETHOSU_SUCCESS != ethosu_run_command_stream(cmd_stream, cms_bytes, base_addr, num_base_addr))
+    if (ETHOSU_SUCCESS != ethosu_run_command_stream(&drv->dev, cmd_stream, cms_bytes, base_addr, num_base_addr))
     {
         return -1;
     }
 
-    wait_for_irq();
+    wait_for_irq(drv);
 
-    (void)ethosu_get_qread(&qread);
+    (void)ethosu_get_qread(&drv->dev, &qread);
     if (qread != cms_bytes)
     {
         LOG_ERR("Failure: IRQ received but qread (%d) not at end of stream (%d).\n", qread, cms_bytes);
@@ -488,7 +498,7 @@ static int handle_command_stream(const uint8_t *cmd_stream,
     return 0;
 }
 
-static int read_apb_reg(uint16_t da_data)
+static int read_apb_reg(struct ethosu_driver *drv, uint16_t da_data)
 {
     uint32_t *reg_p;
     uint32_t start_address = (uint32_t)(da_data & APB_START_ADDR_MASK);
@@ -501,7 +511,7 @@ static int read_apb_reg(uint16_t da_data)
         return -1;
     }
 
-    if (ETHOSU_SUCCESS == ethosu_read_apb_reg(start_address, num_reg, reg_p))
+    if (ETHOSU_SUCCESS == ethosu_read_apb_reg(&drv->dev, start_address, num_reg, reg_p))
     {
         for (int i = 0; i < num_reg; i++)
         {
@@ -518,11 +528,11 @@ static int read_apb_reg(uint16_t da_data)
     return 0;
 }
 
-static int dump_shram()
+static int dump_shram(struct ethosu_driver *drv)
 {
     struct ethosu_config cfg;
     uint32_t *shram_p;
-    (void)ethosu_get_config(&cfg);
+    (void)ethosu_get_config(&drv->dev, &cfg);
 
     LOG_INFO("dump_shram size = %d KB\n", cfg.shram_size);
 
@@ -535,7 +545,7 @@ static int dump_shram()
 
     for (uint32_t i = 0; i < cfg.shram_size; i++)
     {
-        ethosu_get_shram_data(i, (uint32_t *)shram_p);
+        ethosu_get_shram_data(&drv->dev, i, (uint32_t *)shram_p);
         // Output 1KB of SHRAM
         LOG_INFO("***SHRAM SECTION %d***\n", i);
         for (int j = 0; j < (BYTES_1KB / BYTES_IN_32_BITS); j++)
@@ -725,7 +735,7 @@ static const char *lookup_name(const name_lookup_t *lookup_table, int lookup_tab
     return 0;
 }
 
-static void dump_npu_register(int npu_reg, int npu_reg_end)
+static void dump_npu_register(struct ethosu_driver *drv, int npu_reg, int npu_reg_end)
 {
     unsigned int reg_val;
     const char *reg_name;
@@ -734,7 +744,7 @@ static void dump_npu_register(int npu_reg, int npu_reg_end)
     LOG_INFO("dump_register %X - %X\n", npu_reg, npu_reg_end);
     for (; npu_reg <= npu_reg_end; npu_reg += sizeof(int))
     {
-        reg_val  = read_reg(npu_reg);
+        reg_val  = ethosu_read_reg(&drv->dev, npu_reg);
         reg_name = lookup_name(npu_reg_name_tbl, npu_reg_name_tbl_count, npu_reg);
         LOG_INFO("[0x%.4X] 0x%.8X\t%s\n", npu_reg, reg_val, (reg_name) ? reg_name : "");
     }

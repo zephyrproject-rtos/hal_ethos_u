@@ -19,6 +19,7 @@
 #ifndef PMU_ETHOSU_H
 #define PMU_ETHOSU_H
 
+#include "ethosu_device.h"
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -122,6 +123,8 @@ uint32_t pmu_event_value(enum ethosu_pmu_event_type);
 /* Initialize the PMU driver */
 void ethosu_pmu_driver_init(void);
 
+void ethosu_pmu_driver_exit(void);
+
 // CMSIS ref API
 /** \brief PMU Functions */
 
@@ -187,7 +190,7 @@ void ETHOSU_PMU_CNTR_Disable(uint32_t mask);
           - cycle counter  activate  (bit 31)
   \note   ETHOSU specific. Usage breaks CMSIS complience
 */
-uint32_t ETHOSU_PMU_CNTR_Status();
+uint32_t ETHOSU_PMU_CNTR_Status(void);
 
 /**
   \brief  Read cycle counter (64 bit)
@@ -265,9 +268,9 @@ void ETHOSU_PMU_Set_CNTR_IRQ_Disable(uint32_t mask);
   \note    Sets overflow interrupt request bits for one or more of the following:
            - event counters (bit 0-ETHOSU_PMU_NCOUNTERS)
            - cycle counter  (bit 31)
-  \note   ETHOSU specific. Usage breaks CMSIS complience
+  \note   ETHOSU specific. Usage breaks CMSIS compliance
 */
-uint32_t ETHOSU_PMU_Get_IRQ_Enable();
+uint32_t ETHOSU_PMU_Get_IRQ_Enable(void);
 
 /**
   \brief   Software increment event counter

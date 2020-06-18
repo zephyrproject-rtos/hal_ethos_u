@@ -19,6 +19,7 @@
 #include "ethosu_common.h"
 
 #include <assert.h>
+#include <stddef.h>
 #include <stdio.h>
 
 #define BASEP_OFFSET 4
@@ -29,18 +30,26 @@
 static uint32_t stream_length = 0;
 #endif
 
-enum ethosu_error_codes ethosu_dev_init(void)
+enum ethosu_error_codes ethosu_dev_init(struct ethosu_device *dev, const void *base_address)
 {
+#if !defined(ARM_NPU_STUB)
+    dev->base_address = (uintptr_t)base_address;
+#else
+    UNUSED(dev);
+    UNUSED(base_address);
+#endif
     return ETHOSU_SUCCESS;
 }
 
-enum ethosu_error_codes ethosu_get_id(struct ethosu_id *id)
+enum ethosu_error_codes ethosu_get_id(struct ethosu_device *dev, struct ethosu_id *id)
 {
     struct id_r _id;
 
 #if !defined(ARM_NPU_STUB)
-    _id.word = read_reg(NPU_REG_ID);
+    _id.word = ethosu_read_reg(dev, NPU_REG_ID);
 #else
+    UNUSED(dev);
+
     _id.word           = 0;
     _id.arch_patch_rev = NNX_ARCH_VERSION_PATCH;
     _id.arch_minor_rev = NNX_ARCH_VERSION_MINOR;
@@ -58,12 +67,14 @@ enum ethosu_error_codes ethosu_get_id(struct ethosu_id *id)
     return ETHOSU_SUCCESS;
 }
 
-enum ethosu_error_codes ethosu_get_config(struct ethosu_config *config)
+enum ethosu_error_codes ethosu_get_config(struct ethosu_device *dev, struct ethosu_config *config)
 {
     struct config_r cfg = {.word = 0};
 
 #if !defined(ARM_NPU_STUB)
-    cfg.word = read_reg(NPU_REG_CONFIG);
+    cfg.word = ethosu_read_reg(dev, NPU_REG_CONFIG);
+#else
+    UNUSED(dev);
 #endif
 
     config->macs_per_cc        = cfg.macs_per_cc;
@@ -73,7 +84,8 @@ enum ethosu_error_codes ethosu_get_config(struct ethosu_config *config)
     return ETHOSU_SUCCESS;
 }
 
-enum ethosu_error_codes ethosu_run_command_stream(const uint8_t *cmd_stream_ptr,
+enum ethosu_error_codes ethosu_run_command_stream(struct ethosu_device *dev,
+                                                  const uint8_t *cmd_stream_ptr,
                                                   uint32_t cms_length,
                                                   const uint64_t *base_addr,
                                                   int num_base_addr)
@@ -97,16 +109,17 @@ enum ethosu_error_codes ethosu_run_command_stream(const uint8_t *cmd_stream_ptr,
 
     for (int i = 0; i < num_base_reg; i++)
     {
-        write_reg(NPU_REG_BASEP0 + (i * BASEP_OFFSET), reg_basep[i]);
+        ethosu_write_reg(dev, NPU_REG_BASEP0 + (i * BASEP_OFFSET), reg_basep[i]);
     }
 
-    write_reg(NPU_REG_QBASE0, qbase0);
-    write_reg(NPU_REG_QBASE1, qbase1);
-    write_reg(NPU_REG_QSIZE, qsize);
+    ethosu_write_reg(dev, NPU_REG_QBASE0, qbase0);
+    ethosu_write_reg(dev, NPU_REG_QBASE1, qbase1);
+    ethosu_write_reg(dev, NPU_REG_QSIZE, qsize);
 
-    ret_code = ethosu_set_command_run();
+    ret_code = ethosu_set_command_run(dev);
 #else
     // NPU stubbed
+    UNUSED(dev);
     stream_length = cms_length;
     UNUSED(cmd_stream_ptr);
     UNUSED(base_addr);
@@ -119,11 +132,11 @@ enum ethosu_error_codes ethosu_run_command_stream(const uint8_t *cmd_stream_ptr,
     return ret_code;
 }
 
-enum ethosu_error_codes ethosu_is_irq_raised(uint8_t *irq_raised)
+enum ethosu_error_codes ethosu_is_irq_raised(struct ethosu_device *dev, uint8_t *irq_raised)
 {
 #if !defined(ARM_NPU_STUB)
     struct status_r status;
-    status.word = read_reg(NPU_REG_STATUS);
+    status.word = ethosu_read_reg(dev, NPU_REG_STATUS);
     if (status.irq_raised == 1)
     {
         *irq_raised = 1;
@@ -133,30 +146,32 @@ enum ethosu_error_codes ethosu_is_irq_raised(uint8_t *irq_raised)
         *irq_raised = 0;
     }
 #else
+    UNUSED(dev);
     *irq_raised = 1;
 #endif
     return ETHOSU_SUCCESS;
 }
 
-enum ethosu_error_codes ethosu_clear_irq_status(void)
+enum ethosu_error_codes ethosu_clear_irq_status(struct ethosu_device *dev)
 {
 #if !defined(ARM_NPU_STUB)
     struct cmd_r oldcmd;
-    oldcmd.word = read_reg(NPU_REG_CMD);
+    oldcmd.word = ethosu_read_reg(dev, NPU_REG_CMD);
 
     struct cmd_r cmd;
     cmd.word           = 0;
     cmd.clear_irq      = 1;
     cmd.clock_q_enable = oldcmd.clock_q_enable;
     cmd.power_q_enable = oldcmd.power_q_enable;
-    write_reg(NPU_REG_CMD, cmd.word);
+    ethosu_write_reg(dev, NPU_REG_CMD, cmd.word);
 #else
+    UNUSED(dev);
 #endif
     return ETHOSU_SUCCESS;
 }
 
 // TODO Understand settings of privilege/security level and update API.
-enum ethosu_error_codes ethosu_soft_reset(void)
+enum ethosu_error_codes ethosu_soft_reset(struct ethosu_device *dev)
 {
     enum ethosu_error_codes return_code = ETHOSU_SUCCESS;
 #if !defined(ARM_NPU_STUB)
@@ -164,10 +179,10 @@ enum ethosu_error_codes ethosu_soft_reset(void)
     struct prot_r prot;
 
     reset.word        = 0;
-    reset.pending_CPL = PRIVILEGE_LEVEL_USER;      // TODO, how to get the host priviledge level
+    reset.pending_CPL = PRIVILEGE_LEVEL_USER;      // TODO, how to get the host privilege level
     reset.pending_CSL = SECURITY_LEVEL_NON_SECURE; // TODO, how to get Security level
 
-    prot.word = read_reg(NPU_REG_PROT);
+    prot.word = ethosu_read_reg(dev, NPU_REG_PROT);
 
     if (prot.active_CPL < reset.pending_CPL && prot.active_CSL > reset.pending_CSL)
     {
@@ -175,15 +190,17 @@ enum ethosu_error_codes ethosu_soft_reset(void)
         return ETHOSU_GENERIC_FAILURE;
     }
     // Reset and set security level
-    write_reg(NPU_REG_RESET, reset.word);
+    ethosu_write_reg(dev, NPU_REG_RESET, reset.word);
 
-    return_code = ethosu_wait_for_reset();
+    return_code = ethosu_wait_for_reset(dev);
+#else
+    UNUSED(dev);
 #endif
 
     return return_code;
 }
 
-enum ethosu_error_codes ethosu_wait_for_reset(void)
+enum ethosu_error_codes ethosu_wait_for_reset(struct ethosu_device *dev)
 {
 #if !defined(ARM_NPU_STUB)
     struct status_r status;
@@ -191,7 +208,7 @@ enum ethosu_error_codes ethosu_wait_for_reset(void)
     // Wait until reset status indicates that reset has been completed
     for (int i = 0; i < 100000; i++)
     {
-        status.word = read_reg(NPU_REG_STATUS);
+        status.word = ethosu_read_reg(dev, NPU_REG_STATUS);
         if (0 == status.reset_status)
         {
             break;
@@ -202,12 +219,17 @@ enum ethosu_error_codes ethosu_wait_for_reset(void)
     {
         return ETHOSU_GENERIC_FAILURE;
     }
+#else
+    UNUSED(dev);
 #endif
 
     return ETHOSU_SUCCESS;
 }
 
-enum ethosu_error_codes ethosu_read_apb_reg(uint32_t start_address, uint16_t num_reg, uint32_t *reg)
+enum ethosu_error_codes ethosu_read_apb_reg(struct ethosu_device *dev,
+                                            uint32_t start_address,
+                                            uint16_t num_reg,
+                                            uint32_t *reg)
 {
 #if !defined(ARM_NPU_STUB)
     uint32_t address = start_address;
@@ -216,11 +238,12 @@ enum ethosu_error_codes ethosu_read_apb_reg(uint32_t start_address, uint16_t num
 
     for (int i = 0; i < num_reg; i++)
     {
-        reg[i] = read_reg(address);
+        reg[i] = ethosu_read_reg(dev, address);
         address += REG_OFFSET;
     }
 #else
     // NPU stubbed
+    UNUSED(dev);
     UNUSED(start_address);
     UNUSED(num_reg);
     UNUSED(reg);
@@ -229,22 +252,25 @@ enum ethosu_error_codes ethosu_read_apb_reg(uint32_t start_address, uint16_t num
     return ETHOSU_SUCCESS;
 }
 
-enum ethosu_error_codes ethosu_set_qconfig(enum ethosu_memory_type memory_type)
+enum ethosu_error_codes ethosu_set_qconfig(struct ethosu_device *dev, enum ethosu_memory_type memory_type)
 {
     if (memory_type > ETHOSU_AXI1_OUTSTANDING_COUNTER3)
     {
         return ETHOSU_INVALID_PARAM;
     }
 #if !defined(ARM_NPU_STUB)
-    write_reg(NPU_REG_QCONFIG, memory_type);
+    ethosu_write_reg(dev, NPU_REG_QCONFIG, memory_type);
 #else
     // NPU stubbed
+    UNUSED(dev);
     UNUSED(memory_type);
 #endif
     return ETHOSU_SUCCESS;
 }
 
-enum ethosu_error_codes ethosu_set_regioncfg(uint8_t region, enum ethosu_memory_type memory_type)
+enum ethosu_error_codes ethosu_set_regioncfg(struct ethosu_device *dev,
+                                             uint8_t region,
+                                             enum ethosu_memory_type memory_type)
 {
     if (region > 7)
     {
@@ -252,19 +278,21 @@ enum ethosu_error_codes ethosu_set_regioncfg(uint8_t region, enum ethosu_memory_
     }
 #if !defined(ARM_NPU_STUB)
     struct regioncfg_r regioncfg;
-    regioncfg.word = read_reg(NPU_REG_REGIONCFG);
+    regioncfg.word = ethosu_read_reg(dev, NPU_REG_REGIONCFG);
     regioncfg.word &= ~(0x3 << (2 * region));
     regioncfg.word |= (memory_type & 0x3) << (2 * region);
-    write_reg(NPU_REG_REGIONCFG, regioncfg.word);
+    ethosu_write_reg(dev, NPU_REG_REGIONCFG, regioncfg.word);
 #else
     // NPU stubbed
+    UNUSED(dev);
     UNUSED(region);
     UNUSED(memory_type);
 #endif
     return ETHOSU_SUCCESS;
 }
 
-enum ethosu_error_codes ethosu_set_axi_limit0(enum ethosu_axi_limit_beats max_beats,
+enum ethosu_error_codes ethosu_set_axi_limit0(struct ethosu_device *dev,
+                                              enum ethosu_axi_limit_beats max_beats,
                                               enum ethosu_axi_limit_mem_type memtype,
                                               uint8_t max_reads,
                                               uint8_t max_writes)
@@ -276,9 +304,10 @@ enum ethosu_error_codes ethosu_set_axi_limit0(enum ethosu_axi_limit_beats max_be
     axi_limit0.max_outstanding_read_m1  = max_reads - 1;
     axi_limit0.max_outstanding_write_m1 = max_writes - 1;
 
-    write_reg(NPU_REG_AXI_LIMIT0, axi_limit0.word);
+    ethosu_write_reg(dev, NPU_REG_AXI_LIMIT0, axi_limit0.word);
 #else
     // NPU stubbed
+    UNUSED(dev);
     UNUSED(max_beats);
     UNUSED(memtype);
     UNUSED(max_reads);
@@ -288,7 +317,8 @@ enum ethosu_error_codes ethosu_set_axi_limit0(enum ethosu_axi_limit_beats max_be
     return ETHOSU_SUCCESS;
 }
 
-enum ethosu_error_codes ethosu_set_axi_limit1(enum ethosu_axi_limit_beats max_beats,
+enum ethosu_error_codes ethosu_set_axi_limit1(struct ethosu_device *dev,
+                                              enum ethosu_axi_limit_beats max_beats,
                                               enum ethosu_axi_limit_mem_type memtype,
                                               uint8_t max_reads,
                                               uint8_t max_writes)
@@ -300,9 +330,10 @@ enum ethosu_error_codes ethosu_set_axi_limit1(enum ethosu_axi_limit_beats max_be
     axi_limit1.max_outstanding_read_m1  = max_reads - 1;
     axi_limit1.max_outstanding_write_m1 = max_writes - 1;
 
-    write_reg(NPU_REG_AXI_LIMIT1, axi_limit1.word);
+    ethosu_write_reg(dev, NPU_REG_AXI_LIMIT1, axi_limit1.word);
 #else
     // NPU stubbed
+    UNUSED(dev);
     UNUSED(max_beats);
     UNUSED(memtype);
     UNUSED(max_reads);
@@ -312,7 +343,8 @@ enum ethosu_error_codes ethosu_set_axi_limit1(enum ethosu_axi_limit_beats max_be
     return ETHOSU_SUCCESS;
 }
 
-enum ethosu_error_codes ethosu_set_axi_limit2(enum ethosu_axi_limit_beats max_beats,
+enum ethosu_error_codes ethosu_set_axi_limit2(struct ethosu_device *dev,
+                                              enum ethosu_axi_limit_beats max_beats,
                                               enum ethosu_axi_limit_mem_type memtype,
                                               uint8_t max_reads,
                                               uint8_t max_writes)
@@ -324,9 +356,10 @@ enum ethosu_error_codes ethosu_set_axi_limit2(enum ethosu_axi_limit_beats max_be
     axi_limit2.max_outstanding_read_m1  = max_reads - 1;
     axi_limit2.max_outstanding_write_m1 = max_writes - 1;
 
-    write_reg(NPU_REG_AXI_LIMIT2, axi_limit2.word);
+    ethosu_write_reg(dev, NPU_REG_AXI_LIMIT2, axi_limit2.word);
 #else
     // NPU stubbed
+    UNUSED(dev);
     UNUSED(max_beats);
     UNUSED(memtype);
     UNUSED(max_reads);
@@ -336,7 +369,8 @@ enum ethosu_error_codes ethosu_set_axi_limit2(enum ethosu_axi_limit_beats max_be
     return ETHOSU_SUCCESS;
 }
 
-enum ethosu_error_codes ethosu_set_axi_limit3(enum ethosu_axi_limit_beats max_beats,
+enum ethosu_error_codes ethosu_set_axi_limit3(struct ethosu_device *dev,
+                                              enum ethosu_axi_limit_beats max_beats,
                                               enum ethosu_axi_limit_mem_type memtype,
                                               uint8_t max_reads,
                                               uint8_t max_writes)
@@ -348,9 +382,10 @@ enum ethosu_error_codes ethosu_set_axi_limit3(enum ethosu_axi_limit_beats max_be
     axi_limit3.max_outstanding_read_m1  = max_reads - 1;
     axi_limit3.max_outstanding_write_m1 = max_writes - 1;
 
-    write_reg(NPU_REG_AXI_LIMIT3, axi_limit3.word);
+    ethosu_write_reg(dev, NPU_REG_AXI_LIMIT3, axi_limit3.word);
 #else
     // NPU stubbed
+    UNUSED(dev);
     UNUSED(max_beats);
     UNUSED(memtype);
     UNUSED(max_reads);
@@ -360,102 +395,109 @@ enum ethosu_error_codes ethosu_set_axi_limit3(enum ethosu_axi_limit_beats max_be
     return ETHOSU_SUCCESS;
 }
 
-enum ethosu_error_codes ethosu_get_revision(uint32_t *revision)
+enum ethosu_error_codes ethosu_get_revision(struct ethosu_device *dev, uint32_t *revision)
 {
 #if !defined(ARM_NPU_STUB)
-    *revision = read_reg(NPU_REG_REVISION);
+    *revision = ethosu_read_reg(dev, NPU_REG_REVISION);
 #else
-    *revision         = 0xDEADC0DE;
+    UNUSED(dev);
+    *revision = 0xDEADC0DE;
 #endif
     return ETHOSU_SUCCESS;
 }
 
-enum ethosu_error_codes ethosu_get_qread(uint32_t *qread)
+enum ethosu_error_codes ethosu_get_qread(struct ethosu_device *dev, uint32_t *qread)
 {
 #if !defined(ARM_NPU_STUB)
-    *qread = read_reg(NPU_REG_QREAD);
+    *qread = ethosu_read_reg(dev, NPU_REG_QREAD);
 #else
-    *qread            = stream_length;
+    UNUSED(dev);
+    *qread = stream_length;
 #endif
     return ETHOSU_SUCCESS;
 }
 
-enum ethosu_error_codes ethosu_get_status_mask(uint16_t *status_mask)
+enum ethosu_error_codes ethosu_get_status_mask(struct ethosu_device *dev, uint16_t *status_mask)
 {
 #if !defined(ARM_NPU_STUB)
     struct status_r status;
 
-    status.word  = read_reg(NPU_REG_STATUS);
+    status.word  = ethosu_read_reg(dev, NPU_REG_STATUS);
     *status_mask = status.word & 0xFFFF;
 #else
-    *status_mask      = 0x0000;
+    UNUSED(dev);
+    *status_mask = 0x0000;
 #endif
     return ETHOSU_SUCCESS;
 }
 
-enum ethosu_error_codes ethosu_get_irq_history_mask(uint16_t *irq_history_mask)
+enum ethosu_error_codes ethosu_get_irq_history_mask(struct ethosu_device *dev, uint16_t *irq_history_mask)
 {
 #if !defined(ARM_NPU_STUB)
     struct status_r status;
 
-    status.word       = read_reg(NPU_REG_STATUS);
+    status.word       = ethosu_read_reg(dev, NPU_REG_STATUS);
     *irq_history_mask = status.irq_history_mask;
 #else
+    UNUSED(dev);
     *irq_history_mask = 0xffff;
 #endif
     return ETHOSU_SUCCESS;
 }
 
-enum ethosu_error_codes ethosu_clear_irq_history_mask(uint16_t irq_history_clear_mask)
+enum ethosu_error_codes ethosu_clear_irq_history_mask(struct ethosu_device *dev, uint16_t irq_history_clear_mask)
 {
 #if !defined(ARM_NPU_STUB)
     struct cmd_r oldcmd;
-    oldcmd.word = read_reg(NPU_REG_CMD);
+    oldcmd.word = ethosu_read_reg(dev, NPU_REG_CMD);
 
     struct cmd_r cmd;
     cmd.word              = 0;
     cmd.clock_q_enable    = oldcmd.clock_q_enable;
     cmd.power_q_enable    = oldcmd.power_q_enable;
     cmd.clear_irq_history = irq_history_clear_mask;
-    write_reg(NPU_REG_CMD, cmd.word);
+    ethosu_write_reg(dev, NPU_REG_CMD, cmd.word);
 #else
+    UNUSED(dev);
     UNUSED(irq_history_clear_mask);
 #endif
     return ETHOSU_SUCCESS;
 }
 
-enum ethosu_error_codes ethosu_set_command_run(void)
+enum ethosu_error_codes ethosu_set_command_run(struct ethosu_device *dev)
 {
 #if !defined(ARM_NPU_STUB)
     struct cmd_r oldcmd;
-    oldcmd.word = read_reg(NPU_REG_CMD);
+    oldcmd.word = ethosu_read_reg(dev, NPU_REG_CMD);
 
     struct cmd_r cmd;
     cmd.word                        = 0;
     cmd.transition_to_running_state = 1;
     cmd.clock_q_enable              = oldcmd.clock_q_enable;
     cmd.power_q_enable              = oldcmd.power_q_enable;
-    write_reg(NPU_REG_CMD, cmd.word);
+    ethosu_write_reg(dev, NPU_REG_CMD, cmd.word);
 #else
+    UNUSED(dev);
 #endif
     return ETHOSU_SUCCESS;
 }
 
-enum ethosu_error_codes ethosu_get_shram_data(int section, uint32_t *shram_p)
+enum ethosu_error_codes ethosu_get_shram_data(struct ethosu_device *dev, int section, uint32_t *shram_p)
 {
 #if !defined(ARM_NPU_STUB)
     int i            = 0;
     uint32_t address = NPU_REG_SHARED_BUFFER0;
-    write_reg(NPU_REG_DEBUG_ADDRESS, section * BYTES_1KB);
+    ethosu_write_reg(dev, NPU_REG_DEBUG_ADDRESS, section * BYTES_1KB);
 
     while (address <= NPU_REG_SHARED_BUFFER255)
     {
-        shram_p[i] = read_reg(address);
+        shram_p[i] = ethosu_read_reg(dev, address);
         address += REG_OFFSET;
         i++;
     }
 #else
     // NPU stubbed
+    UNUSED(dev);
     UNUSED(section);
     UNUSED(shram_p);
 #endif
@@ -463,7 +505,8 @@ enum ethosu_error_codes ethosu_get_shram_data(int section, uint32_t *shram_p)
     return ETHOSU_SUCCESS;
 }
 
-enum ethosu_error_codes ethosu_set_clock_and_power(enum ethosu_clock_q_request clock_q,
+enum ethosu_error_codes ethosu_set_clock_and_power(struct ethosu_device *dev,
+                                                   enum ethosu_clock_q_request clock_q,
                                                    enum ethosu_power_q_request power_q)
 {
 #if !defined(ARM_NPU_STUB)
@@ -471,10 +514,40 @@ enum ethosu_error_codes ethosu_set_clock_and_power(enum ethosu_clock_q_request c
     cmd.word           = 0;
     cmd.clock_q_enable = clock_q;
     cmd.power_q_enable = power_q;
-    write_reg(NPU_REG_CMD, cmd.word);
+    ethosu_write_reg(dev, NPU_REG_CMD, cmd.word);
 #else
+    UNUSED(dev);
     UNUSED(clock_q);
     UNUSED(power_q);
 #endif
     return ETHOSU_SUCCESS;
+}
+
+uint32_t ethosu_read_reg(struct ethosu_device *dev, uint32_t address)
+{
+#if !defined(ARM_NPU_STUB)
+    ASSERT(dev->base_address != NULL);
+
+    volatile uint32_t *reg = (uint32_t *)(uintptr_t)(dev->base_address + address);
+    return *reg;
+#else
+    UNUSED(dev);
+    UNUSED(address);
+
+    return 0;
+#endif
+}
+
+void ethosu_write_reg(struct ethosu_device *dev, uint32_t address, uint32_t value)
+{
+#if !defined(ARM_NPU_STUB)
+    ASSERT(dev->base_address != NULL);
+
+    volatile uint32_t *reg = (uint32_t *)(uintptr_t)(dev->base_address + address);
+    *reg                   = value;
+#else
+    UNUSED(dev);
+    UNUSED(address);
+    UNUSED(value);
+#endif
 }

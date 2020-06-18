@@ -22,6 +22,9 @@
  * Includes
  ******************************************************************************/
 
+#include "ethosu_device.h"
+
+#include <stdbool.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -35,6 +38,12 @@ extern "C" {
 /******************************************************************************
  * Types
  ******************************************************************************/
+
+struct ethosu_driver
+{
+    struct ethosu_device dev;
+    bool abort_inference;
+};
 
 struct ethosu_version_id
 {
@@ -73,7 +82,7 @@ struct ethosu_version
 /**
  * Initialize the Ethos-U driver.
  */
-int ethosu_init(void);
+int ethosu_init(const void *base_address);
 
 /**
  * Get Ethos-U version.

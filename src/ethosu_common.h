@@ -20,6 +20,7 @@
 #define ETHOSU_COMMON_H
 
 #include "ethosu55_interface.h"
+#include "ethosu_device.h"
 
 #if !defined(LOG_ENABLED)
 #define LOG_INFO(format, ...)
@@ -38,11 +39,6 @@
 #define ASSERT(args) assert(args)
 #endif
 
-#if defined(CPU_CORTEX_M55)
-#define NPU_BASE ((uint32_t)0x41700000)
-#else
-#define NPU_BASE ((uint32_t)0x41105000)
-#endif
 #define UNUSED(x) ((void)x)
 
 #define VER_STR(X) VNUM_STR(X)
@@ -56,17 +52,5 @@ static const __attribute__((section("npu_driver_version"))) char driver_version_
 
 static const __attribute__((section("npu_driver_arch_version"))) char driver_arch_version_str[] =
     VER_STR(NNX_ARCH_VERSION_MAJOR) "." VER_STR(NNX_ARCH_VERSION_MINOR) "." VER_STR(NNX_ARCH_VERSION_PATCH);
-
-static inline uint32_t read_reg(uint32_t address)
-{
-    volatile uint32_t *reg = (uint32_t *)(uintptr_t)(NPU_BASE + address);
-    return *reg;
-}
-
-static inline void write_reg(uint32_t address, uint32_t value)
-{
-    volatile uint32_t *reg = (uint32_t *)(uintptr_t)(NPU_BASE + address);
-    *reg                   = value;
-}
 
 #endif // ETHOSU_COMMON_H
