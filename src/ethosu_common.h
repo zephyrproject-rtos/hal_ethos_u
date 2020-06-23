@@ -48,6 +48,9 @@
 #define VER_STR(X) VNUM_STR(X)
 #define VNUM_STR(X) #X
 
+#define MASK_0_31_BITS (0xFFFFFFFF)
+#define MASK_32_47_BITS (0xFFFF00000000)
+
 static const __attribute__((section("npu_driver_version"))) char driver_version_str[] = VER_STR(
     ETHOSU_DRIVER_VERSION_MAJOR) "." VER_STR(ETHOSU_DRIVER_VERSION_MINOR) "." VER_STR(ETHOSU_DRIVER_VERSION_PATCH);
 

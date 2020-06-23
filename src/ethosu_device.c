@@ -21,8 +21,6 @@
 #include <assert.h>
 #include <stdio.h>
 
-#define MASK_0_31_BITS 0xFFFFFFFF
-#define MASK_32_47_BITS 0xFFFF00000000
 #define BASEP_OFFSET 4
 #define REG_OFFSET 4
 #define BYTES_1KB 1024
