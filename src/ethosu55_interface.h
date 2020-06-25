@@ -1633,7 +1633,7 @@ struct cmd_r
   public:
     CONSTEXPR cmd_r() :
         transition_to_running_state(static_cast<uint32_t>(0x0)), clear_irq(static_cast<uint32_t>(0x0)),
-        clock_q_enable(static_cast<uint32_t>(0x0)), power_q_enable(static_cast<uint32_t>(0x0)),
+        clock_q_enable(static_cast<uint32_t>(0x1)), power_q_enable(static_cast<uint32_t>(0x1)),
         stop_request(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)),
         clear_irq_history(static_cast<uint32_t>(0x0))
     {
@@ -8012,7 +8012,7 @@ struct NPU_REG
     {
         ID                 = 268517377;
         STATUS             = 8;
-        CMD                = 0;
+        CMD                = 12;
         RESET              = 0;
         QBASE0             = 0;
         QBASE1             = 0;
