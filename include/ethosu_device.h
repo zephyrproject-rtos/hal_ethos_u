@@ -22,6 +22,9 @@
  * Includes
  ******************************************************************************/
 
+#include "pmu_ethosu.h"
+
+#include <stdbool.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -51,6 +54,10 @@ enum ethosu_error_codes
 struct ethosu_device
 {
     uintptr_t base_address;
+    bool restore_pmu_config;
+    uint64_t pmccntr;
+    uint32_t pmu_evcntr[ETHOSU_PMU_NCOUNTERS];
+    enum ethosu_pmu_event_type pmu_evtypr[ETHOSU_PMU_NCOUNTERS];
 };
 
 struct ethosu_id
@@ -354,6 +361,22 @@ enum ethosu_error_codes ethosu_set_clock_and_power(struct ethosu_device *dev,
 uint32_t ethosu_read_reg(struct ethosu_device *dev, uint32_t address);
 
 void ethosu_write_reg(struct ethosu_device *dev, uint32_t address, uint32_t value);
+
+/**
+ * Save the PMU configuration to ethosu_device struct.
+ * \param[in] dev              Ethos-U device where the PMU configuration is
+ *                             saved.
+ * \return                     \ref ethosu_error_codes
+ */
+enum ethosu_error_codes ethosu_save_pmu_config(struct ethosu_device *dev);
+
+/**
+ * Restore the PMU configuration from a ethosu_device struct.
+ * \param[in] dev              Ethos-U device where the PMU configuration is
+ *                             stored.
+ * \return                     \ref ethosu_error_codes
+ */
+enum ethosu_error_codes ethosu_restore_pmu_config(struct ethosu_device *dev);
 
 #ifdef __cplusplus
 }

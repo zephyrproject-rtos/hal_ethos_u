@@ -551,3 +551,42 @@ void ethosu_write_reg(struct ethosu_device *dev, uint32_t address, uint32_t valu
     UNUSED(value);
 #endif
 }
+
+enum ethosu_error_codes ethosu_save_pmu_config(struct ethosu_device *dev)
+{
+#if !defined(ARM_NPU_STUB)
+    dev->pmccntr = ETHOSU_PMU_Get_CCNTR();
+    for (uint32_t i = 0; i < ETHOSU_PMU_NCOUNTERS; i++)
+    {
+        dev->pmu_evcntr[i] = ETHOSU_PMU_Get_EVCNTR(i);
+        dev->pmu_evtypr[i] = ETHOSU_PMU_Get_EVTYPER(i);
+    }
+    if (!dev->restore_pmu_config)
+    {
+        dev->restore_pmu_config = true;
+    }
+#else
+    UNUSED(dev);
+#endif
+
+    return ETHOSU_SUCCESS;
+}
+
+enum ethosu_error_codes ethosu_restore_pmu_config(struct ethosu_device *dev)
+{
+#if !defined(ARM_NPU_STUB)
+    if (dev->restore_pmu_config)
+    {
+        ETHOSU_PMU_Set_CCNTR(dev->pmccntr);
+        for (uint32_t i = 0; i < ETHOSU_PMU_NCOUNTERS; i++)
+        {
+            ETHOSU_PMU_Set_EVCNTR(i, dev->pmu_evcntr[i]);
+            ETHOSU_PMU_Set_EVTYPER(i, dev->pmu_evtypr[i]);
+        }
+    }
+#else
+    UNUSED(dev);
+#endif
+
+    return ETHOSU_SUCCESS;
+}

@@ -29,7 +29,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct ethosu_driver ethosu_drv = {.dev = {.base_address = NULL}, .abort_inference = false};
+struct ethosu_driver ethosu_drv = {.dev             = {.base_address       = NULL,
+                                           .restore_pmu_config = false,
+                                           .pmccntr            = 0,
+                                           .pmu_evcntr         = {0, 0, 0, 0},
+                                           .pmu_evtypr         = {0, 0, 0, 0}},
+                                   .abort_inference = false};
 
 // IRQ
 static volatile bool irq_triggered = false;
@@ -276,6 +281,7 @@ int ethosu_invoke(const void *custom_data_ptr,
     int custom_data_32bit_size = (custom_data_size / BYTES_IN_32_BITS - CUSTOM_OPTION_LENGTH_32_BIT_WORD);
 
     ethosu_set_clock_and_power(&ethosu_drv.dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_DISABLE);
+    ethosu_restore_pmu_config(&ethosu_drv.dev);
     while (data_ptr < (data_start_ptr + custom_data_32bit_size))
     {
         int ret = 0;
@@ -337,6 +343,7 @@ int ethosu_invoke(const void *custom_data_ptr,
             break;
         }
     }
+    ethosu_save_pmu_config(&ethosu_drv.dev);
     ethosu_set_clock_and_power(&ethosu_drv.dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
     return return_code;
 }

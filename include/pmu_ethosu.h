@@ -19,7 +19,6 @@
 #ifndef PMU_ETHOSU_H
 #define PMU_ETHOSU_H
 
-#include "ethosu_device.h"
 #include <stdint.h>
 
 #ifdef __cplusplus
