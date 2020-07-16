@@ -22,15 +22,65 @@
 #include "ethosu55_interface.h"
 #include "ethosu_device.h"
 
-#if !defined(LOG_ENABLED)
-#define LOG_INFO(format, ...)
-#define LOG_ERR(format, ...)
+#include <stdio.h>
+
+#if defined(DRIVER_LOG_SEVERITY) && (DRIVER_LOG_SEVERITY >= LOG_SEVERITY_EMERG)
+#define LOG_EMERG(format, ...)                                                                                         \
+    fprintf(stderr, format, ##__VA_ARGS__);                                                                            \
+    fflush(stderr);                                                                                                    \
+    exit(-1)
 #else
-#define LOG_INFO(format, ...) fprintf(stdout, format, ##__VA_ARGS__)
+#define LOG_EMERG(format, ...)
+#endif
+
+#if defined(DRIVER_LOG_SEVERITY) && (DRIVER_LOG_SEVERITY >= LOG_SEVERITY_ALERT)
+#define LOG_ALERT(format, ...)                                                                                         \
+    fprintf(stderr, format, ##__VA_ARGS__);                                                                            \
+    fflush(stderr);                                                                                                    \
+    exit(-1)
+#else
+#define LOG_ALERT(format, ...)
+#endif
+
+#if defined(DRIVER_LOG_SEVERITY) && (DRIVER_LOG_SEVERITY >= LOG_SEVERITY_CRIT)
+#define LOG_CRIT(format, ...)                                                                                          \
+    fprintf(stderr, format, ##__VA_ARGS__);                                                                            \
+    fflush(stderr);                                                                                                    \
+    exit(-1)
+#else
+#define LOG_CRIT(format, ...)
+#endif
+
+#if defined(DRIVER_LOG_SEVERITY) && (DRIVER_LOG_SEVERITY >= LOG_SEVERITY_ERR)
 #define LOG_ERR(format, ...)                                                                                           \
     fprintf(stderr, format, ##__VA_ARGS__);                                                                            \
     fflush(stderr)
+#else
+#define LOG_ERR(format, ...)
+#endif
 
+#if defined(DRIVER_LOG_SEVERITY) && (DRIVER_LOG_SEVERITY >= LOG_SEVERITY_WARN)
+#define LOG_WARN(format, ...) fprintf(stdout, format, ##__VA_ARGS__)
+#else
+#define LOG_WARN(format, ...)
+#endif
+
+#if defined(DRIVER_LOG_SEVERITY) && (DRIVER_LOG_SEVERITY >= LOG_SEVERITY_NOTICE)
+#define LOG_NOTICE(format, ...) fprintf(stdout, format, ##__VA_ARGS__)
+#else
+#define LOG_NOTICE(format, ...)
+#endif
+
+#if defined(DRIVER_LOG_SEVERITY) && (DRIVER_LOG_SEVERITY >= LOG_SEVERITY_INFO)
+#define LOG_INFO(format, ...) fprintf(stdout, format, ##__VA_ARGS__)
+#else
+#define LOG_INFO(format, ...)
+#endif
+
+#if defined(DRIVER_LOG_SEVERITY) && (DRIVER_LOG_SEVERITY >= LOG_SEVERITY_DEBUG)
+#define LOG_DEBUG(format, ...) fprintf(stdout, format, ##__VA_ARGS__)
+#else
+#define LOG_DEBUG(format, ...)
 #endif
 
 #if defined(ASSERT_DISABLE)
