@@ -38,6 +38,10 @@ set_property(CACHE ETHOSU_LOG_SEVERITY PROPERTY STRINGS ${LOG_NAMES})
 
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m0")
     add_compile_definitions(CPU_CORTEX_M0)
+elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m1")
+    add_compile_definitions(CPU_CORTEX_M1)
+elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m23")
+    add_compile_definitions(CPU_CORTEX_M23)
 elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m3")
     add_compile_definitions(CPU_CORTEX_M3)
 elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m33")
@@ -78,6 +82,11 @@ target_sources(ethosu_core_driver PRIVATE src/ethosu_driver.c src/ethosu_device.
 
 # Set the log level for the target
 target_compile_definitions(ethosu_core_driver PRIVATE ETHOSU_LOG_SEVERITY=${LOG_SEVERITY})
+
+# Install library and include files
+install(TARGETS ethosu_core_driver LIBRARY DESTINATION "lib")
+install(FILES include/ethosu_device.h include/ethosu_driver.h include/pmu_ethosu.h
+        DESTINATION "include")
 
 #
 # Print build status
