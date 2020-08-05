@@ -32,7 +32,22 @@
  * Defines
  ******************************************************************************/
 
-#if defined(DRIVER_LOG_SEVERITY) && (DRIVER_LOG_SEVERITY >= LOG_SEVERITY_EMERG)
+// Log severity levels
+#define ETHOSU_LOG_EMERG 0
+#define ETHOSU_LOG_ALERT 1
+#define ETHOSU_LOG_CRIT 2
+#define ETHOSU_LOG_ERR 3
+#define ETHOSU_LOG_WARN 4
+#define ETHOSU_LOG_NOTICE 5
+#define ETHOSU_LOG_INFO 6
+#define ETHOSU_LOG_DEBUG 7
+
+// Define default log severity
+#ifndef ETHOSU_LOG_SEVERITY
+#define ETHOSU_LOG_SEVERITY ETHOSU_LOG_WARN
+#endif
+
+#if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_EMERG
 #define LOG_EMERG(format, ...)                                                                                         \
     fprintf(stderr, format, ##__VA_ARGS__);                                                                            \
     fflush(stderr);                                                                                                    \
@@ -41,7 +56,7 @@
 #define LOG_EMERG(format, ...)
 #endif
 
-#if defined(DRIVER_LOG_SEVERITY) && (DRIVER_LOG_SEVERITY >= LOG_SEVERITY_ALERT)
+#if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_ALERT
 #define LOG_ALERT(format, ...)                                                                                         \
     fprintf(stderr, format, ##__VA_ARGS__);                                                                            \
     fflush(stderr);                                                                                                    \
@@ -50,7 +65,7 @@
 #define LOG_ALERT(format, ...)
 #endif
 
-#if defined(DRIVER_LOG_SEVERITY) && (DRIVER_LOG_SEVERITY >= LOG_SEVERITY_CRIT)
+#if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_CRIT
 #define LOG_CRIT(format, ...)                                                                                          \
     fprintf(stderr, format, ##__VA_ARGS__);                                                                            \
     fflush(stderr);                                                                                                    \
@@ -59,7 +74,7 @@
 #define LOG_CRIT(format, ...)
 #endif
 
-#if defined(DRIVER_LOG_SEVERITY) && (DRIVER_LOG_SEVERITY >= LOG_SEVERITY_ERR)
+#if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_ERR
 #define LOG_ERR(format, ...)                                                                                           \
     fprintf(stderr, format, ##__VA_ARGS__);                                                                            \
     fflush(stderr)
@@ -67,25 +82,25 @@
 #define LOG_ERR(format, ...)
 #endif
 
-#if defined(DRIVER_LOG_SEVERITY) && (DRIVER_LOG_SEVERITY >= LOG_SEVERITY_WARN)
+#if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_WARN
 #define LOG_WARN(format, ...) fprintf(stdout, format, ##__VA_ARGS__)
 #else
 #define LOG_WARN(format, ...)
 #endif
 
-#if defined(DRIVER_LOG_SEVERITY) && (DRIVER_LOG_SEVERITY >= LOG_SEVERITY_NOTICE)
+#if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_NOTICE
 #define LOG_NOTICE(format, ...) fprintf(stdout, format, ##__VA_ARGS__)
 #else
 #define LOG_NOTICE(format, ...)
 #endif
 
-#if defined(DRIVER_LOG_SEVERITY) && (DRIVER_LOG_SEVERITY >= LOG_SEVERITY_INFO)
+#if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_INFO
 #define LOG_INFO(format, ...) fprintf(stdout, format, ##__VA_ARGS__)
 #else
 #define LOG_INFO(format, ...)
 #endif
 
-#if defined(DRIVER_LOG_SEVERITY) && (DRIVER_LOG_SEVERITY >= LOG_SEVERITY_DEBUG)
+#if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_DEBUG
 #define LOG_DEBUG(format, ...) fprintf(stdout, format, ##__VA_ARGS__)
 #else
 #define LOG_DEBUG(format, ...)
