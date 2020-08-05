@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-#pragma once
+#ifndef ETHOSU_DEVICE_H
+#define ETHOSU_DEVICE_H
 
 /******************************************************************************
  * Includes
@@ -358,8 +359,18 @@ enum ethosu_error_codes ethosu_set_clock_and_power(struct ethosu_device *dev,
                                                    enum ethosu_clock_q_request clock_q,
                                                    enum ethosu_power_q_request power_q);
 
+/**
+ * Read register.
+ * \param[in] address          Address to read.
+ * \return                     Register value.
+ */
 uint32_t ethosu_read_reg(struct ethosu_device *dev, uint32_t address);
 
+/**
+ * Write register.
+ * \param[in] address          Address to read.
+ * \param[in] value            Value to be written.
+ */
 void ethosu_write_reg(struct ethosu_device *dev, uint32_t address, uint32_t value);
 
 /**
@@ -381,3 +392,5 @@ enum ethosu_error_codes ethosu_restore_pmu_config(struct ethosu_device *dev);
 #ifdef __cplusplus
 }
 #endif
+
+#endif // ETHOSU_DEVICE_H

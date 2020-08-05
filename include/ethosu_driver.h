@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-#pragma once
+#ifndef ETHOSU_DRIVER_H
+#define ETHOSU_DRIVER_H
 
 /******************************************************************************
  * Includes
@@ -30,10 +31,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/******************************************************************************
- * Defines
- ******************************************************************************/
 
 /******************************************************************************
  * Types
@@ -109,3 +106,5 @@ void ethosu_irq_handler(void);
 #ifdef __cplusplus
 }
 #endif
+
+#endif // ETHOSU_DRIVER_H

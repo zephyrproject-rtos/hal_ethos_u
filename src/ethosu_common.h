@@ -16,13 +16,21 @@
  * limitations under the License.
  */
 
-#if !defined ETHOSU_COMMON_H
+#ifndef ETHOSU_COMMON_H
 #define ETHOSU_COMMON_H
+
+/******************************************************************************
+ * Includes
+ ******************************************************************************/
 
 #include "ethosu55_interface.h"
 #include "ethosu_device.h"
 
 #include <stdio.h>
+
+/******************************************************************************
+ * Defines
+ ******************************************************************************/
 
 #if defined(DRIVER_LOG_SEVERITY) && (DRIVER_LOG_SEVERITY >= LOG_SEVERITY_EMERG)
 #define LOG_EMERG(format, ...)                                                                                         \
@@ -96,6 +104,10 @@
 
 #define MASK_0_31_BITS (0xFFFFFFFF)
 #define MASK_32_47_BITS (0xFFFF00000000)
+
+/******************************************************************************
+ * Inline functions
+ ******************************************************************************/
 
 static const __attribute__((section("npu_driver_version"))) char driver_version_str[] = VER_STR(
     ETHOSU_DRIVER_VERSION_MAJOR) "." VER_STR(ETHOSU_DRIVER_VERSION_MINOR) "." VER_STR(ETHOSU_DRIVER_VERSION_PATCH);
