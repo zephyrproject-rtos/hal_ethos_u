@@ -105,6 +105,9 @@ enum ethosu_pmu_event_type
     ETHOSU_PMU_AXI_LATENCY_256,
     ETHOSU_PMU_AXI_LATENCY_512,
     ETHOSU_PMU_AXI_LATENCY_1024,
+    ETHOSU_PMU_ECC_DMA,
+    ETHOSU_PMU_ECC_SB0,
+    ETHOSU_PMU_ECC_SB1,
 
     ETHOSU_PMU_SENTINEL // End-marker (not event)
 };

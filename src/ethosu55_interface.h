@@ -40,7 +40,7 @@
 
 #define NNX_ARCH_VERSION_MAJOR 1
 #define NNX_ARCH_VERSION_MINOR 0
-#define NNX_ARCH_VERSION_PATCH 1
+#define NNX_ARCH_VERSION_PATCH 6
 
 // Register offsets
 
@@ -99,7 +99,8 @@
 #define NPU_REG_DEBUG_ADDRESS 0x0144
 #define NPU_REG_DEBUG_MISC 0x0148
 #define NPU_REG_DEBUGCORE 0x014C
-#define DEBUG_REGISTERS_SIZE 0x0150
+#define NPU_REG_DEBUG_BLOCK 0x0150
+#define DEBUG_REGISTERS_SIZE 0x0154
 
 //
 // Register subpage ID
@@ -565,6 +566,8 @@
 #define NPU_REG_CURRENT_QREAD 0x027C
 #define NPU_REG_DMA_SCALE_SRC 0x0280
 #define NPU_REG_DMA_SCALE_SRC_HI 0x0284
+#define NPU_REG_CURRENT_BLOCK 0x02B4
+#define NPU_REG_CURRENT_OP 0x02B8
 #define NPU_REG_CURRENT_CMD 0x02BC
 #define TSU_DEBUG_REGISTERS_SIZE 0x02C0
 
@@ -586,6 +589,26 @@ enum class activation : uint16_t
     SIGMOID   = 4,
     LUT_START = 16,
     LUT_END   = 23,
+};
+
+enum class axi_mem_encoding_type : uint8_t
+{
+    DEVICE_NON_BUFFERABLE                 = 0x0,
+    DEVICE_BUFFERABLE                     = 0x1,
+    NORMAL_NON_CACHEABLE_NON_BUFFERABLE   = 0x2,
+    NORMAL_NON_CACHEABLE_BUFFERABLE       = 0x3,
+    WRITE_THROUGH_NO_ALLOCATE             = 0x4,
+    WRITE_THROUGH_READ_ALLOCATE           = 0x5,
+    WRITE_THROUGH_WRITE_ALLOCATE          = 0x6,
+    WRITE_THROUGH_READ_AND_WRITE_ALLOCATE = 0x7,
+    WRITE_BACK_NO_ALLOCATE                = 0x8,
+    WRITE_BACK_READ_ALLOCATE              = 0x9,
+    WRITE_BACK_WRITE_ALLOCATE             = 0xA,
+    WRITE_BACK_READ_AND_WRITE_ALLOCATE    = 0xB,
+    RESERVED_12                           = 0xC,
+    RESERVED_13                           = 0xD,
+    RESERVED_14                           = 0xE,
+    RESERVED_15                           = 0xF,
 };
 
 enum class clip_range : uint8_t
@@ -835,6 +858,9 @@ enum class pmu_event_type : uint16_t
     AXI_LATENCY_256              = 0xa4,
     AXI_LATENCY_512              = 0xa5,
     AXI_LATENCY_1024             = 0xa6,
+    ECC_DMA                      = 0xb0,
+    ECC_SB0                      = 0xb1,
+    ECC_SB1                      = 0x1b1,
 };
 
 enum class pooling_mode : uint16_t
@@ -872,6 +898,7 @@ enum class security_level : uint8_t
 
 enum class shram_size : uint8_t
 {
+    SHRAM_96KB = 0x60,
     SHRAM_48KB = 0x30,
     SHRAM_24KB = 0x18,
     SHRAM_16KB = 0x10,
@@ -906,6 +933,26 @@ enum activation
     ACTIVATION_SIGMOID   = 4,
     ACTIVATION_LUT_START = 16,
     ACTIVATION_LUT_END   = 23,
+};
+
+enum axi_mem_encoding_type
+{
+    AXI_MEM_ENCODING_TYPE_DEVICE_NON_BUFFERABLE                 = 0x0,
+    AXI_MEM_ENCODING_TYPE_DEVICE_BUFFERABLE                     = 0x1,
+    AXI_MEM_ENCODING_TYPE_NORMAL_NON_CACHEABLE_NON_BUFFERABLE   = 0x2,
+    AXI_MEM_ENCODING_TYPE_NORMAL_NON_CACHEABLE_BUFFERABLE       = 0x3,
+    AXI_MEM_ENCODING_TYPE_WRITE_THROUGH_NO_ALLOCATE             = 0x4,
+    AXI_MEM_ENCODING_TYPE_WRITE_THROUGH_READ_ALLOCATE           = 0x5,
+    AXI_MEM_ENCODING_TYPE_WRITE_THROUGH_WRITE_ALLOCATE          = 0x6,
+    AXI_MEM_ENCODING_TYPE_WRITE_THROUGH_READ_AND_WRITE_ALLOCATE = 0x7,
+    AXI_MEM_ENCODING_TYPE_WRITE_BACK_NO_ALLOCATE                = 0x8,
+    AXI_MEM_ENCODING_TYPE_WRITE_BACK_READ_ALLOCATE              = 0x9,
+    AXI_MEM_ENCODING_TYPE_WRITE_BACK_WRITE_ALLOCATE             = 0xA,
+    AXI_MEM_ENCODING_TYPE_WRITE_BACK_READ_AND_WRITE_ALLOCATE    = 0xB,
+    AXI_MEM_ENCODING_TYPE_RESERVED_12                           = 0xC,
+    AXI_MEM_ENCODING_TYPE_RESERVED_13                           = 0xD,
+    AXI_MEM_ENCODING_TYPE_RESERVED_14                           = 0xE,
+    AXI_MEM_ENCODING_TYPE_RESERVED_15                           = 0xF,
 };
 
 enum clip_range
@@ -1155,6 +1202,9 @@ enum pmu_event_type
     PMU_EVENT_TYPE_AXI_LATENCY_256              = 0xa4,
     PMU_EVENT_TYPE_AXI_LATENCY_512              = 0xa5,
     PMU_EVENT_TYPE_AXI_LATENCY_1024             = 0xa6,
+    PMU_EVENT_TYPE_ECC_DMA                      = 0xb0,
+    PMU_EVENT_TYPE_ECC_SB0                      = 0xb1,
+    PMU_EVENT_TYPE_ECC_SB1                      = 0x1b1,
 };
 
 enum pooling_mode
@@ -1192,6 +1242,7 @@ enum security_level
 
 enum shram_size
 {
+    SHRAM_SIZE_SHRAM_96KB = 0x60,
     SHRAM_SIZE_SHRAM_48KB = 0x30,
     SHRAM_SIZE_SHRAM_24KB = 0x18,
     SHRAM_SIZE_SHRAM_16KB = 0x10,
@@ -1238,8 +1289,8 @@ struct id_r
   public:
     CONSTEXPR id_r() :
         version_status(static_cast<uint32_t>(1)), version_minor(static_cast<uint32_t>(0x0)),
-        version_major(static_cast<uint32_t>(0x0)), product_major(static_cast<uint32_t>(4)),
-        arch_patch_rev(static_cast<uint32_t>(1)), arch_minor_rev(static_cast<uint32_t>(0)),
+        version_major(static_cast<uint32_t>(0x1)), product_major(static_cast<uint32_t>(4)),
+        arch_patch_rev(static_cast<uint32_t>(6)), arch_minor_rev(static_cast<uint32_t>(0)),
         arch_major_rev(static_cast<uint32_t>(1))
     {
     }
@@ -1398,7 +1449,9 @@ struct status_r
             uint32_t pmu_irq_raised : 1;  // 0=No PMU IRQ, 1=PMU IRQ raised. Cleared by using command register bit 1
             uint32_t wd_fault : 1; // Weight decoder state: 0=no fault 1=weight decoder decompression fault. Can only be
                                    // cleared by reset
-            uint32_t reserved0 : 3;
+            uint32_t ecc_fault : 1; // ECC state for internal RAMs: 0=no fault 1=ECC fault signalled. Can only be
+                                    // cleared by reset
+            uint32_t reserved0 : 2;
             uint32_t faulting_interface : 1; // Faulting interface on bus abort. 0=AXI-M0 1=AXI-M1
             uint32_t faulting_channel : 4;  // Faulting channel on a bus abort. Read: 0=Cmd 1=IFM 2=Weights 3=Scale+Bias
                                             // 4=Mem2Mem; Write: 8=OFM 9=Mem2Mem
@@ -1413,8 +1466,9 @@ struct status_r
         bus_status(static_cast<uint32_t>(0x0)), reset_status(static_cast<uint32_t>(0x1)),
         cmd_parse_error(static_cast<uint32_t>(0x0)), cmd_end_reached(static_cast<uint32_t>(0x0)),
         pmu_irq_raised(static_cast<uint32_t>(0x0)), wd_fault(static_cast<uint32_t>(0x0)),
-        reserved0(static_cast<uint32_t>(0)), faulting_interface(static_cast<uint32_t>(0x0)),
-        faulting_channel(static_cast<uint32_t>(0x0)), irq_history_mask(static_cast<uint32_t>(0x0))
+        ecc_fault(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)),
+        faulting_interface(static_cast<uint32_t>(0x0)), faulting_channel(static_cast<uint32_t>(0x0)),
+        irq_history_mask(static_cast<uint32_t>(0x0))
     {
     }
     CONSTEXPR status_r(uint32_t init) : word(init) {}
@@ -1556,6 +1610,21 @@ struct status_r
     CONSTEXPR status_r &set_wd_fault(uint32_t value)
     {
         wd_fault = ((1u << 1) - 1) & static_cast<uint32_t>(value);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_ecc_fault() const
+    {
+        uint32_t value = static_cast<uint32_t>(ecc_fault);
+        return value;
+    }
+    uint32_t get_ecc_fault() const volatile
+    {
+        uint32_t value = static_cast<uint32_t>(ecc_fault);
+        return value;
+    }
+    CONSTEXPR status_r &set_ecc_fault(uint32_t value)
+    {
+        ecc_fault = ((1u << 1) - 1) & static_cast<uint32_t>(value);
         return *this;
     }
     CONSTEXPR uint32_t get_faulting_interface() const
@@ -2183,7 +2252,7 @@ struct config_r
         {
             uint32_t macs_per_cc : 4;        // The log2(macs/clock cycle). Valid encoding range is 5 to 8 for 32 to 256
                                              // MACs/clock cycle.
-            uint32_t cmd_stream_version : 4; // command stream version accepted by this NPU. Set to 0 for Ethos-U55 EAC.
+            uint32_t cmd_stream_version : 4; // command stream version accepted by this NPU.
             uint32_t shram_size : 8;         // Size in KB of SHRAM in the range 8 to 48.
             uint32_t reserved0 : 12;
             uint32_t product : 4; // Product configuration
@@ -2334,7 +2403,7 @@ struct lock_r
 #endif //__cplusplus
 };
 
-// regioncfg_r - Base pointer configuration. Bits[2*k+1:2*k] give the memory type for REGION[k]
+// regioncfg_r - Region memory type configuration. Bits[2*k+1:2*k] give the memory type for REGION[k]
 struct regioncfg_r
 {
 #ifdef __cplusplus
@@ -2525,7 +2594,7 @@ struct axi_limit0_r
         {
             uint32_t max_beats : 2; // Burst split alignment: 0=64 bytes, 1=128 bytes, 2=256 bytes, 3=reserved
             uint32_t reserved0 : 2;
-            uint32_t memtype : 4; // Memtype
+            uint32_t memtype : 4; // Memtype to be used to encode AxCACHE signals
             uint32_t reserved1 : 8;
             uint32_t
                 max_outstanding_read_m1 : 8; // Maximum number of outstanding AXI read transactions - 1 in range 0 to 31
@@ -2537,7 +2606,8 @@ struct axi_limit0_r
 #ifdef __cplusplus
   public:
     CONSTEXPR axi_limit0_r() :
-        max_beats(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
+        max_beats(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)),
+        memtype(static_cast<uint32_t>(::axi_mem_encoding_type::DEVICE_NON_BUFFERABLE)),
         reserved1(static_cast<uint32_t>(0)), max_outstanding_read_m1(static_cast<uint32_t>(0x00)),
         max_outstanding_write_m1(static_cast<uint32_t>(0x00))
     {
@@ -2578,17 +2648,17 @@ struct axi_limit0_r
         max_beats = ((1u << 2) - 1) & static_cast<uint32_t>(value);
         return *this;
     }
-    CONSTEXPR uint32_t get_memtype() const
+    CONSTEXPR ::axi_mem_encoding_type get_memtype() const
     {
-        uint32_t value = static_cast<uint32_t>(memtype);
+        ::axi_mem_encoding_type value = static_cast<::axi_mem_encoding_type>(memtype);
         return value;
     }
-    uint32_t get_memtype() const volatile
+    ::axi_mem_encoding_type get_memtype() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(memtype);
+        ::axi_mem_encoding_type value = static_cast<::axi_mem_encoding_type>(memtype);
         return value;
     }
-    CONSTEXPR axi_limit0_r &set_memtype(uint32_t value)
+    CONSTEXPR axi_limit0_r &set_memtype(::axi_mem_encoding_type value)
     {
         memtype = ((1u << 4) - 1) & static_cast<uint32_t>(value);
         return *this;
@@ -2638,7 +2708,7 @@ struct axi_limit1_r
         {
             uint32_t max_beats : 2; // Burst split alignment: 0=64 bytes, 1=128 bytes, 2=256 bytes, 3=reserved
             uint32_t reserved0 : 2;
-            uint32_t memtype : 4; // Memtype
+            uint32_t memtype : 4; // Memtype to be used to encode AxCACHE signals
             uint32_t reserved1 : 8;
             uint32_t
                 max_outstanding_read_m1 : 8; // Maximum number of outstanding AXI read transactions - 1 in range 0 to 31
@@ -2650,7 +2720,8 @@ struct axi_limit1_r
 #ifdef __cplusplus
   public:
     CONSTEXPR axi_limit1_r() :
-        max_beats(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
+        max_beats(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)),
+        memtype(static_cast<uint32_t>(::axi_mem_encoding_type::DEVICE_NON_BUFFERABLE)),
         reserved1(static_cast<uint32_t>(0)), max_outstanding_read_m1(static_cast<uint32_t>(0x00)),
         max_outstanding_write_m1(static_cast<uint32_t>(0x00))
     {
@@ -2691,17 +2762,17 @@ struct axi_limit1_r
         max_beats = ((1u << 2) - 1) & static_cast<uint32_t>(value);
         return *this;
     }
-    CONSTEXPR uint32_t get_memtype() const
+    CONSTEXPR ::axi_mem_encoding_type get_memtype() const
     {
-        uint32_t value = static_cast<uint32_t>(memtype);
+        ::axi_mem_encoding_type value = static_cast<::axi_mem_encoding_type>(memtype);
         return value;
     }
-    uint32_t get_memtype() const volatile
+    ::axi_mem_encoding_type get_memtype() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(memtype);
+        ::axi_mem_encoding_type value = static_cast<::axi_mem_encoding_type>(memtype);
         return value;
     }
-    CONSTEXPR axi_limit1_r &set_memtype(uint32_t value)
+    CONSTEXPR axi_limit1_r &set_memtype(::axi_mem_encoding_type value)
     {
         memtype = ((1u << 4) - 1) & static_cast<uint32_t>(value);
         return *this;
@@ -2751,7 +2822,7 @@ struct axi_limit2_r
         {
             uint32_t max_beats : 2; // Burst split alignment: 0=64 bytes, 1=128 bytes, 2=256 bytes, 3=reserved
             uint32_t reserved0 : 2;
-            uint32_t memtype : 4; // Memtype
+            uint32_t memtype : 4; // Memtype to be used to encode AxCACHE signals
             uint32_t reserved1 : 8;
             uint32_t
                 max_outstanding_read_m1 : 8; // Maximum number of outstanding AXI read transactions - 1 in range 0 to 31
@@ -2763,7 +2834,8 @@ struct axi_limit2_r
 #ifdef __cplusplus
   public:
     CONSTEXPR axi_limit2_r() :
-        max_beats(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
+        max_beats(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)),
+        memtype(static_cast<uint32_t>(::axi_mem_encoding_type::DEVICE_NON_BUFFERABLE)),
         reserved1(static_cast<uint32_t>(0)), max_outstanding_read_m1(static_cast<uint32_t>(0x00)),
         max_outstanding_write_m1(static_cast<uint32_t>(0x00))
     {
@@ -2804,17 +2876,17 @@ struct axi_limit2_r
         max_beats = ((1u << 2) - 1) & static_cast<uint32_t>(value);
         return *this;
     }
-    CONSTEXPR uint32_t get_memtype() const
+    CONSTEXPR ::axi_mem_encoding_type get_memtype() const
     {
-        uint32_t value = static_cast<uint32_t>(memtype);
+        ::axi_mem_encoding_type value = static_cast<::axi_mem_encoding_type>(memtype);
         return value;
     }
-    uint32_t get_memtype() const volatile
+    ::axi_mem_encoding_type get_memtype() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(memtype);
+        ::axi_mem_encoding_type value = static_cast<::axi_mem_encoding_type>(memtype);
         return value;
     }
-    CONSTEXPR axi_limit2_r &set_memtype(uint32_t value)
+    CONSTEXPR axi_limit2_r &set_memtype(::axi_mem_encoding_type value)
     {
         memtype = ((1u << 4) - 1) & static_cast<uint32_t>(value);
         return *this;
@@ -2864,7 +2936,7 @@ struct axi_limit3_r
         {
             uint32_t max_beats : 2; // Burst split alignment: 0=64 bytes, 1=128 bytes, 2=256 bytes, 3=reserved
             uint32_t reserved0 : 2;
-            uint32_t memtype : 4; // Memtype
+            uint32_t memtype : 4; // Memtype to be used to encode AxCACHE signals
             uint32_t reserved1 : 8;
             uint32_t
                 max_outstanding_read_m1 : 8; // Maximum number of outstanding AXI read transactions - 1 in range 0 to 31
@@ -2876,7 +2948,8 @@ struct axi_limit3_r
 #ifdef __cplusplus
   public:
     CONSTEXPR axi_limit3_r() :
-        max_beats(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)), memtype(static_cast<uint32_t>(0)),
+        max_beats(static_cast<uint32_t>(0x0)), reserved0(static_cast<uint32_t>(0)),
+        memtype(static_cast<uint32_t>(::axi_mem_encoding_type::DEVICE_NON_BUFFERABLE)),
         reserved1(static_cast<uint32_t>(0)), max_outstanding_read_m1(static_cast<uint32_t>(0x00)),
         max_outstanding_write_m1(static_cast<uint32_t>(0x00))
     {
@@ -2917,17 +2990,17 @@ struct axi_limit3_r
         max_beats = ((1u << 2) - 1) & static_cast<uint32_t>(value);
         return *this;
     }
-    CONSTEXPR uint32_t get_memtype() const
+    CONSTEXPR ::axi_mem_encoding_type get_memtype() const
     {
-        uint32_t value = static_cast<uint32_t>(memtype);
+        ::axi_mem_encoding_type value = static_cast<::axi_mem_encoding_type>(memtype);
         return value;
     }
-    uint32_t get_memtype() const volatile
+    ::axi_mem_encoding_type get_memtype() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(memtype);
+        ::axi_mem_encoding_type value = static_cast<::axi_mem_encoding_type>(memtype);
         return value;
     }
-    CONSTEXPR axi_limit3_r &set_memtype(uint32_t value)
+    CONSTEXPR axi_limit3_r &set_memtype(::axi_mem_encoding_type value)
     {
         memtype = ((1u << 4) - 1) & static_cast<uint32_t>(value);
         return *this;
@@ -7792,7 +7865,8 @@ struct NPU_REG
     uint32_t DEBUG_ADDRESS;     // 0x144
     uint32_t DEBUG_MISC;        // 0x148
     uint32_t DEBUGCORE;         // 0x14c
-    uint32_t unused5[12];
+    uint32_t DEBUG_BLOCK;       // 0x150
+    uint32_t unused5[11];
     STRUCT pmcr_r PMCR;             // 0x180
     STRUCT pmcntenset_r PMCNTENSET; // 0x184
     STRUCT pmcntenclr_r PMCNTENCLR; // 0x188
@@ -7840,8 +7914,10 @@ struct NPU_REG
     uint32_t CURRENT_QREAD;      // 0x27c
     uint32_t DMA_SCALE_SRC;      // 0x280
     uint32_t DMA_SCALE_SRC_HI;   // 0x284
-    uint32_t unused8[13];
-    uint32_t CURRENT_CMD; // 0x2bc
+    uint32_t unused8[11];
+    uint32_t CURRENT_BLOCK; // 0x2b4
+    uint32_t CURRENT_OP;    // 0x2b8
+    uint32_t CURRENT_CMD;   // 0x2bc
     uint32_t unused9[16];
     uint32_t PMEVCNTR[4]; // 0x300
     uint32_t unused10[28];
@@ -8010,7 +8086,7 @@ struct NPU_REG
     }
     void reset()
     {
-        ID                 = 268517377;
+        ID                 = 268845313;
         STATUS             = 8;
         CMD                = 12;
         RESET              = 0;
@@ -8065,6 +8141,7 @@ struct NPU_REG
         DEBUG_ADDRESS      = 0;
         DEBUG_MISC         = 0;
         DEBUGCORE          = 0;
+        DEBUG_BLOCK        = 0;
         KERNEL_X           = 0;
         KERNEL_Y           = 0;
         KERNEL_W_M1        = 0;
@@ -8099,6 +8176,8 @@ struct NPU_REG
         CURRENT_QREAD      = 0;
         DMA_SCALE_SRC      = 0;
         DMA_SCALE_SRC_HI   = 0;
+        CURRENT_BLOCK      = 0;
+        CURRENT_OP         = 0;
         CURRENT_CMD        = 0;
         IFM_PAD_TOP        = 0;
         IFM_PAD_LEFT       = 0;
@@ -8360,6 +8439,8 @@ struct NPU_REG
             return access_type_t::RW;
         case 332:
             return access_type_t::RW;
+        case 336:
+            return access_type_t::RW;
         case 512:
             return access_type_t::RO;
         case 516:
@@ -8427,6 +8508,10 @@ struct NPU_REG
         case 640:
             return access_type_t::RO;
         case 644:
+            return access_type_t::RO;
+        case 692:
+            return access_type_t::RO;
+        case 696:
             return access_type_t::RO;
         case 700:
             return access_type_t::RO;
@@ -10773,7 +10858,7 @@ struct npu_set_kernel_stride_t
 #endif //__cplusplus
 };
 
-// 0=1-core, 1=2-core depth
+// 0=1-core, 1=2-core depth (this command is Ethos-U65 only and UNPREDICTABLE for Ethos-U55)
 struct npu_set_parallel_mode_t
 {
     uint32_t cmd_code : 10;     // NPU_SET_PARALLEL_MODE
@@ -13815,6 +13900,24 @@ struct npu_set_scale1_length_t
     SEP FUNC(activation, TANH) SEP FUNC(activation, SIGMOID) SEP FUNC(activation, LUT_START)                           \
         SEP FUNC(activation, LUT_END)
 
+#define EXPAND_AXI_MEM_ENCODING_TYPE(FUNC, SEP)                                                                        \
+    FUNC(axi_mem_encoding_type, DEVICE_NON_BUFFERABLE)                                                                 \
+    SEP FUNC(axi_mem_encoding_type, DEVICE_BUFFERABLE)                                                                 \
+        SEP FUNC(axi_mem_encoding_type, NORMAL_NON_CACHEABLE_NON_BUFFERABLE)                                           \
+            SEP FUNC(axi_mem_encoding_type, NORMAL_NON_CACHEABLE_BUFFERABLE)                                           \
+                SEP FUNC(axi_mem_encoding_type, WRITE_THROUGH_NO_ALLOCATE)                                             \
+                    SEP FUNC(axi_mem_encoding_type, WRITE_THROUGH_READ_ALLOCATE)                                       \
+                        SEP FUNC(axi_mem_encoding_type, WRITE_THROUGH_WRITE_ALLOCATE)                                  \
+                            SEP FUNC(axi_mem_encoding_type, WRITE_THROUGH_READ_AND_WRITE_ALLOCATE)                     \
+                                SEP FUNC(axi_mem_encoding_type, WRITE_BACK_NO_ALLOCATE)                                \
+                                    SEP FUNC(axi_mem_encoding_type, WRITE_BACK_READ_ALLOCATE)                          \
+                                        SEP FUNC(axi_mem_encoding_type, WRITE_BACK_WRITE_ALLOCATE)                     \
+                                            SEP FUNC(axi_mem_encoding_type, WRITE_BACK_READ_AND_WRITE_ALLOCATE)        \
+                                                SEP FUNC(axi_mem_encoding_type, RESERVED_12)                           \
+                                                    SEP FUNC(axi_mem_encoding_type, RESERVED_13)                       \
+                                                        SEP FUNC(axi_mem_encoding_type, RESERVED_14)                   \
+                                                            SEP FUNC(axi_mem_encoding_type, RESERVED_15)
+
 #define EXPAND_CLIP_RANGE(FUNC, SEP)                                                                                   \
     FUNC(clip_range, OFM_PRECISION)                                                                                    \
     SEP FUNC(clip_range, FORCE_UINT8) SEP FUNC(clip_range, FORCE_INT8) SEP FUNC(clip_range, FORCE_INT16)
@@ -13909,91 +14012,95 @@ struct npu_set_scale1_length_t
     FUNC(ofm_precision, U8)                                                                                            \
     SEP FUNC(ofm_precision, S8) SEP FUNC(ofm_precision, U16) SEP FUNC(ofm_precision, S16) SEP FUNC(ofm_precision, S32)
 
-#define EXPAND_PMU_EVENT_TYPE(FUNC, SEP)                                                                                          \
-    FUNC(pmu_event_type, NO_EVENT)                                                                                                \
-    SEP FUNC(pmu_event_type, CYCLE) SEP FUNC(pmu_event_type, NPU_IDLE) SEP FUNC(                                                  \
-        pmu_event_type, CC_STALLED_ON_BLOCKDEP) SEP FUNC(pmu_event_type,                                                          \
-                                                         CC_STALLED_ON_SHRAM_RECONFIG) SEP FUNC(pmu_event_type,                   \
-                                                                                                NPU_ACTIVE)                       \
-        SEP FUNC(pmu_event_type, MAC_ACTIVE) SEP FUNC(pmu_event_type, MAC_ACTIVE_8BIT) SEP FUNC(                                  \
-            pmu_event_type, MAC_ACTIVE_16BIT) SEP FUNC(pmu_event_type, MAC_DPU_ACTIVE) SEP FUNC(pmu_event_type,                   \
-                                                                                                MAC_STALLED_BY_WD_ACC)            \
-            SEP FUNC(pmu_event_type, MAC_STALLED_BY_WD) SEP FUNC(pmu_event_type, MAC_STALLED_BY_ACC) SEP FUNC(                    \
-                pmu_event_type, MAC_STALLED_BY_IB) SEP FUNC(pmu_event_type,                                                       \
-                                                            MAC_ACTIVE_32BIT) SEP FUNC(pmu_event_type,                            \
-                                                                                       MAC_STALLED_BY_INT_W)                      \
-                SEP FUNC(pmu_event_type, MAC_STALLED_BY_INT_ACC) SEP FUNC(pmu_event_type, AO_ACTIVE) SEP FUNC(                    \
-                    pmu_event_type, AO_ACTIVE_8BIT) SEP FUNC(pmu_event_type,                                                      \
-                                                             AO_ACTIVE_16BIT) SEP FUNC(pmu_event_type,                            \
-                                                                                       AO_STALLED_BY_OFMP_OB)                     \
-                    SEP FUNC(pmu_event_type, AO_STALLED_BY_OFMP) SEP FUNC(pmu_event_type, AO_STALLED_BY_OB) SEP FUNC(             \
-                        pmu_event_type,                                                                                           \
-                        AO_STALLED_BY_ACC_IB) SEP FUNC(pmu_event_type,                                                            \
-                                                       AO_STALLED_BY_ACC) SEP FUNC(pmu_event_type,                                \
-                                                                                   AO_STALLED_BY_IB) SEP FUNC(pmu_event_type,     \
-                                                                                                              WD_ACTIVE) SEP      \
-                        FUNC(pmu_event_type, WD_STALLED) SEP FUNC(pmu_event_type, WD_STALLED_BY_WS) SEP FUNC(                     \
-                            pmu_event_type,                                                                                       \
-                            WD_STALLED_BY_WD_BUF) SEP                                                                             \
-                            FUNC(pmu_event_type, WD_PARSE_ACTIVE) SEP FUNC(pmu_event_type, WD_PARSE_STALLED) SEP FUNC(            \
-                                pmu_event_type,                                                                                   \
-                                WD_PARSE_STALLED_IN) SEP FUNC(pmu_event_type,                                                     \
-                                                              WD_PARSE_STALLED_OUT) SEP                                           \
-                                FUNC(pmu_event_type, WD_TRANS_WS) SEP FUNC(pmu_event_type, WD_TRANS_WB) SEP FUNC(                 \
-                                    pmu_event_type,                                                                               \
-                                    WD_TRANS_DW0) SEP FUNC(pmu_event_type,                                                        \
-                                                           WD_TRANS_DW1) SEP FUNC(pmu_event_type,                                 \
-                                                                                  AXI0_RD_TRANS_ACCEPTED) SEP                     \
-                                    FUNC(pmu_event_type, AXI0_RD_TRANS_COMPLETED) SEP FUNC(                                       \
-                                        pmu_event_type,                                                                           \
-                                        AXI0_RD_DATA_BEAT_RECEIVED) SEP FUNC(pmu_event_type, AXI0_RD_TRAN_REQ_STALLED)            \
-                                        SEP FUNC(pmu_event_type,                                                                  \
-                                                 AXI0_WR_TRANS_ACCEPTED) SEP FUNC(pmu_event_type,                                 \
-                                                                                  AXI0_WR_TRANS_COMPLETED_M)                      \
-                                            SEP FUNC(pmu_event_type, AXI0_WR_TRANS_COMPLETED_S) SEP FUNC(                         \
-                                                pmu_event_type,                                                                   \
-                                                AXI0_WR_DATA_BEAT_WRITTEN)                                                        \
-                                                SEP FUNC(pmu_event_type, AXI0_WR_TRAN_REQ_STALLED) SEP FUNC(                      \
-                                                    pmu_event_type,                                                               \
-                                                    AXI0_WR_DATA_BEAT_STALLED) SEP                                                \
-                                                    FUNC(pmu_event_type, AXI0_ENABLED_CYCLES) SEP FUNC(                           \
-                                                        pmu_event_type,                                                           \
-                                                        AXI0_RD_STALL_LIMIT) SEP FUNC(pmu_event_type,                             \
-                                                                                      AXI0_WR_STALL_LIMIT) SEP                    \
-                                                        FUNC(pmu_event_type, AXI1_RD_TRANS_ACCEPTED) SEP FUNC(                    \
-                                                            pmu_event_type,                                                       \
-                                                            AXI1_RD_TRANS_COMPLETED) SEP FUNC(pmu_event_type,                     \
-                                                                                              AXI1_RD_DATA_BEAT_RECEIVED) SEP     \
-                                                            FUNC(pmu_event_type, AXI1_RD_TRAN_REQ_STALLED) SEP FUNC(              \
-                                                                pmu_event_type,                                                   \
-                                                                AXI1_WR_TRANS_ACCEPTED) SEP                                       \
-                                                                FUNC(pmu_event_type, AXI1_WR_TRANS_COMPLETED_M) SEP FUNC(         \
-                                                                    pmu_event_type,                                               \
-                                                                    AXI1_WR_TRANS_COMPLETED_S) SEP                                \
-                                                                    FUNC(pmu_event_type, AXI1_WR_DATA_BEAT_WRITTEN) SEP FUNC(     \
-                                                                        pmu_event_type,                                           \
-                                                                        AXI1_WR_TRAN_REQ_STALLED) SEP                             \
-                                                                        FUNC(pmu_event_type, AXI1_WR_DATA_BEAT_STALLED) SEP FUNC( \
-                                                                            pmu_event_type,                                       \
-                                                                            AXI1_ENABLED_CYCLES) SEP                              \
-                                                                            FUNC(pmu_event_type, AXI1_RD_STALL_LIMIT) SEP FUNC(   \
-                                                                                pmu_event_type,                                   \
-                                                                                AXI1_WR_STALL_LIMIT) SEP                          \
-                                                                                FUNC(pmu_event_type, AXI_LATENCY_ANY) SEP FUNC(   \
-                                                                                    pmu_event_type,                               \
-                                                                                    AXI_LATENCY_32) SEP                           \
-                                                                                    FUNC(pmu_event_type,                          \
-                                                                                         AXI_LATENCY_64) SEP                      \
-                                                                                        FUNC(pmu_event_type,                      \
-                                                                                             AXI_LATENCY_128) SEP                 \
-                                                                                            FUNC(pmu_event_type,                  \
-                                                                                                 AXI_LATENCY_256) SEP             \
-                                                                                                FUNC(                             \
-                                                                                                    pmu_event_type,               \
-                                                                                                    AXI_LATENCY_512) SEP          \
-                                                                                                    FUNC(                         \
-                                                                                                        pmu_event_type,           \
-                                                                                                        AXI_LATENCY_1024)
+#define EXPAND_PMU_EVENT_TYPE(FUNC, SEP)                                                                                           \
+    FUNC(pmu_event_type, NO_EVENT)                                                                                                 \
+    SEP FUNC(pmu_event_type, CYCLE) SEP FUNC(pmu_event_type, NPU_IDLE) SEP FUNC(                                                   \
+        pmu_event_type, CC_STALLED_ON_BLOCKDEP) SEP FUNC(pmu_event_type,                                                           \
+                                                         CC_STALLED_ON_SHRAM_RECONFIG) SEP FUNC(pmu_event_type,                    \
+                                                                                                NPU_ACTIVE)                        \
+        SEP FUNC(pmu_event_type, MAC_ACTIVE) SEP FUNC(pmu_event_type, MAC_ACTIVE_8BIT) SEP FUNC(                                   \
+            pmu_event_type, MAC_ACTIVE_16BIT) SEP FUNC(pmu_event_type, MAC_DPU_ACTIVE) SEP FUNC(pmu_event_type,                    \
+                                                                                                MAC_STALLED_BY_WD_ACC)             \
+            SEP FUNC(pmu_event_type, MAC_STALLED_BY_WD) SEP FUNC(pmu_event_type, MAC_STALLED_BY_ACC) SEP FUNC(                     \
+                pmu_event_type, MAC_STALLED_BY_IB) SEP FUNC(pmu_event_type,                                                        \
+                                                            MAC_ACTIVE_32BIT) SEP FUNC(pmu_event_type,                             \
+                                                                                       MAC_STALLED_BY_INT_W)                       \
+                SEP FUNC(pmu_event_type, MAC_STALLED_BY_INT_ACC) SEP FUNC(pmu_event_type, AO_ACTIVE) SEP FUNC(                     \
+                    pmu_event_type, AO_ACTIVE_8BIT) SEP FUNC(pmu_event_type,                                                       \
+                                                             AO_ACTIVE_16BIT) SEP FUNC(pmu_event_type,                             \
+                                                                                       AO_STALLED_BY_OFMP_OB)                      \
+                    SEP FUNC(pmu_event_type, AO_STALLED_BY_OFMP) SEP FUNC(pmu_event_type, AO_STALLED_BY_OB) SEP FUNC(              \
+                        pmu_event_type,                                                                                            \
+                        AO_STALLED_BY_ACC_IB) SEP FUNC(pmu_event_type,                                                             \
+                                                       AO_STALLED_BY_ACC) SEP FUNC(pmu_event_type,                                 \
+                                                                                   AO_STALLED_BY_IB) SEP FUNC(pmu_event_type,      \
+                                                                                                              WD_ACTIVE) SEP       \
+                        FUNC(pmu_event_type, WD_STALLED) SEP FUNC(pmu_event_type, WD_STALLED_BY_WS) SEP FUNC(                      \
+                            pmu_event_type,                                                                                        \
+                            WD_STALLED_BY_WD_BUF) SEP                                                                              \
+                            FUNC(pmu_event_type, WD_PARSE_ACTIVE) SEP FUNC(pmu_event_type, WD_PARSE_STALLED) SEP FUNC(             \
+                                pmu_event_type,                                                                                    \
+                                WD_PARSE_STALLED_IN) SEP FUNC(pmu_event_type,                                                      \
+                                                              WD_PARSE_STALLED_OUT) SEP                                            \
+                                FUNC(pmu_event_type, WD_TRANS_WS) SEP FUNC(pmu_event_type, WD_TRANS_WB) SEP FUNC(                  \
+                                    pmu_event_type,                                                                                \
+                                    WD_TRANS_DW0) SEP FUNC(pmu_event_type,                                                         \
+                                                           WD_TRANS_DW1) SEP FUNC(pmu_event_type,                                  \
+                                                                                  AXI0_RD_TRANS_ACCEPTED) SEP                      \
+                                    FUNC(pmu_event_type, AXI0_RD_TRANS_COMPLETED) SEP FUNC(                                        \
+                                        pmu_event_type,                                                                            \
+                                        AXI0_RD_DATA_BEAT_RECEIVED) SEP FUNC(pmu_event_type, AXI0_RD_TRAN_REQ_STALLED)             \
+                                        SEP FUNC(pmu_event_type,                                                                   \
+                                                 AXI0_WR_TRANS_ACCEPTED) SEP FUNC(pmu_event_type,                                  \
+                                                                                  AXI0_WR_TRANS_COMPLETED_M)                       \
+                                            SEP FUNC(pmu_event_type, AXI0_WR_TRANS_COMPLETED_S) SEP FUNC(                          \
+                                                pmu_event_type,                                                                    \
+                                                AXI0_WR_DATA_BEAT_WRITTEN)                                                         \
+                                                SEP FUNC(pmu_event_type, AXI0_WR_TRAN_REQ_STALLED) SEP FUNC(                       \
+                                                    pmu_event_type,                                                                \
+                                                    AXI0_WR_DATA_BEAT_STALLED) SEP                                                 \
+                                                    FUNC(pmu_event_type, AXI0_ENABLED_CYCLES) SEP FUNC(                            \
+                                                        pmu_event_type,                                                            \
+                                                        AXI0_RD_STALL_LIMIT) SEP FUNC(pmu_event_type,                              \
+                                                                                      AXI0_WR_STALL_LIMIT) SEP                     \
+                                                        FUNC(pmu_event_type, AXI1_RD_TRANS_ACCEPTED) SEP FUNC(                     \
+                                                            pmu_event_type,                                                        \
+                                                            AXI1_RD_TRANS_COMPLETED) SEP FUNC(pmu_event_type,                      \
+                                                                                              AXI1_RD_DATA_BEAT_RECEIVED) SEP      \
+                                                            FUNC(pmu_event_type, AXI1_RD_TRAN_REQ_STALLED) SEP FUNC(               \
+                                                                pmu_event_type,                                                    \
+                                                                AXI1_WR_TRANS_ACCEPTED) SEP                                        \
+                                                                FUNC(pmu_event_type, AXI1_WR_TRANS_COMPLETED_M) SEP FUNC(          \
+                                                                    pmu_event_type,                                                \
+                                                                    AXI1_WR_TRANS_COMPLETED_S) SEP                                 \
+                                                                    FUNC(pmu_event_type, AXI1_WR_DATA_BEAT_WRITTEN) SEP FUNC(      \
+                                                                        pmu_event_type,                                            \
+                                                                        AXI1_WR_TRAN_REQ_STALLED) SEP                              \
+                                                                        FUNC(pmu_event_type, AXI1_WR_DATA_BEAT_STALLED) SEP FUNC(  \
+                                                                            pmu_event_type,                                        \
+                                                                            AXI1_ENABLED_CYCLES) SEP FUNC(pmu_event_type,          \
+                                                                                                          AXI1_RD_STALL_LIMIT) SEP \
+                                                                            FUNC(pmu_event_type, AXI1_WR_STALL_LIMIT) SEP FUNC(    \
+                                                                                pmu_event_type,                                    \
+                                                                                AXI_LATENCY_ANY) SEP FUNC(pmu_event_type,          \
+                                                                                                          AXI_LATENCY_32) SEP      \
+                                                                                FUNC(pmu_event_type, AXI_LATENCY_64) SEP FUNC(     \
+                                                                                    pmu_event_type,                                \
+                                                                                    AXI_LATENCY_128) SEP                           \
+                                                                                    FUNC(pmu_event_type,                           \
+                                                                                         AXI_LATENCY_256) SEP                      \
+                                                                                        FUNC(pmu_event_type,                       \
+                                                                                             AXI_LATENCY_512) SEP                  \
+                                                                                            FUNC(pmu_event_type,                   \
+                                                                                                 AXI_LATENCY_1024) SEP             \
+                                                                                                FUNC(pmu_event_type,               \
+                                                                                                     ECC_DMA) SEP                  \
+                                                                                                    FUNC(                          \
+                                                                                                        pmu_event_type,            \
+                                                                                                        ECC_SB0) SEP               \
+                                                                                                        FUNC(                      \
+                                                                                                            pmu_event_type,        \
+                                                                                                            ECC_SB1)
 
 #define EXPAND_POOLING_MODE(FUNC, SEP)                                                                                 \
     FUNC(pooling_mode, MAX) SEP FUNC(pooling_mode, AVERAGE) SEP FUNC(pooling_mode, REDUCE_SUM)
@@ -14008,7 +14115,8 @@ struct npu_set_scale1_length_t
 #define EXPAND_SECURITY_LEVEL(FUNC, SEP) FUNC(security_level, SECURE) SEP FUNC(security_level, NON_SECURE)
 
 #define EXPAND_SHRAM_SIZE(FUNC, SEP)                                                                                   \
-    FUNC(shram_size, SHRAM_48KB) SEP FUNC(shram_size, SHRAM_24KB) SEP FUNC(shram_size, SHRAM_16KB)
+    FUNC(shram_size, SHRAM_96KB)                                                                                       \
+    SEP FUNC(shram_size, SHRAM_48KB) SEP FUNC(shram_size, SHRAM_24KB) SEP FUNC(shram_size, SHRAM_16KB)
 
 #define EXPAND_STATE(FUNC, SEP) FUNC(state, STOPPED) SEP FUNC(state, RUNNING)
 
