@@ -156,8 +156,8 @@ enum ethosu_error_codes ethosu_clear_irq_status(struct ethosu_device *dev)
 #if !defined(ARM_NPU_STUB)
     struct cmd_r oldcmd;
     oldcmd.word = ethosu_read_reg(dev, NPU_REG_CMD);
-
     struct cmd_r cmd;
+
     cmd.word           = 0;
     cmd.clear_irq      = 1;
     cmd.clock_q_enable = oldcmd.clock_q_enable;
@@ -299,6 +299,7 @@ enum ethosu_error_codes ethosu_set_axi_limit0(struct ethosu_device *dev,
 {
 #if !defined(ARM_NPU_STUB)
     struct axi_limit0_r axi_limit0;
+    axi_limit0.word                     = 0;
     axi_limit0.max_beats                = max_beats;
     axi_limit0.memtype                  = memtype;
     axi_limit0.max_outstanding_read_m1  = max_reads - 1;
@@ -325,6 +326,7 @@ enum ethosu_error_codes ethosu_set_axi_limit1(struct ethosu_device *dev,
 {
 #if !defined(ARM_NPU_STUB)
     struct axi_limit1_r axi_limit1;
+    axi_limit1.word                     = 0;
     axi_limit1.max_beats                = max_beats;
     axi_limit1.memtype                  = memtype;
     axi_limit1.max_outstanding_read_m1  = max_reads - 1;
@@ -351,6 +353,7 @@ enum ethosu_error_codes ethosu_set_axi_limit2(struct ethosu_device *dev,
 {
 #if !defined(ARM_NPU_STUB)
     struct axi_limit2_r axi_limit2;
+    axi_limit2.word                     = 0;
     axi_limit2.max_beats                = max_beats;
     axi_limit2.memtype                  = memtype;
     axi_limit2.max_outstanding_read_m1  = max_reads - 1;
@@ -377,6 +380,7 @@ enum ethosu_error_codes ethosu_set_axi_limit3(struct ethosu_device *dev,
 {
 #if !defined(ARM_NPU_STUB)
     struct axi_limit3_r axi_limit3;
+    axi_limit3.word                     = 0;
     axi_limit3.max_beats                = max_beats;
     axi_limit3.memtype                  = memtype;
     axi_limit3.max_outstanding_read_m1  = max_reads - 1;
