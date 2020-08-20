@@ -17,6 +17,7 @@
  */
 #include "ethosu_device.h"
 #include "ethosu_common.h"
+#include "ethosu_config.h"
 
 #include <assert.h>
 #include <stddef.h>
@@ -25,6 +26,9 @@
 #define BASEP_OFFSET 4
 #define REG_OFFSET 4
 #define BYTES_1KB 1024
+
+#define ADDRESS_BITS 48
+#define ADDRESS_MASK ((1ull << ADDRESS_BITS) - 1)
 
 #if defined(ARM_NPU_STUB)
 static uint32_t stream_length = 0;
@@ -93,28 +97,23 @@ enum ethosu_error_codes ethosu_run_command_stream(struct ethosu_device *dev,
     enum ethosu_error_codes ret_code = ETHOSU_SUCCESS;
 
 #if !defined(ARM_NPU_STUB)
-    uint32_t qbase0;
-    uint32_t qbase1;
-    uint32_t qsize;
-    uint32_t *reg_basep;
-    int num_base_reg;
-
     ASSERT(num_base_addr <= ETHOSU_DRIVER_BASEP_INDEXES);
 
-    qbase0       = ((uint64_t)cmd_stream_ptr) & MASK_0_31_BITS;
-    qbase1       = (((uint64_t)cmd_stream_ptr) & MASK_32_47_BITS) >> 32;
-    qsize        = cms_length;
-    num_base_reg = num_base_addr * 2;
-    reg_basep    = (uint32_t *)base_addr;
+    uint64_t qbase = (uint64_t)cmd_stream_ptr + BASE_POINTER_OFFSET;
+    ASSERT(qbase <= ADDRESS_MASK);
+    LOG_DEBUG("QBASE=0x%016llx, QSIZE=%u, base_pointer_offset=0x%08x\n", qbase, cms_length, BASE_POINTER_OFFSET);
+    ethosu_write_reg(dev, NPU_REG_QBASE0, qbase & 0xffffffff);
+    ethosu_write_reg(dev, NPU_REG_QBASE1, qbase >> 32);
+    ethosu_write_reg(dev, NPU_REG_QSIZE, cms_length);
 
-    for (int i = 0; i < num_base_reg; i++)
+    for (int i = 0; i < num_base_addr; i++)
     {
-        ethosu_write_reg(dev, NPU_REG_BASEP0 + (i * BASEP_OFFSET), reg_basep[i]);
+        uint64_t addr = base_addr[i] + BASE_POINTER_OFFSET;
+        ASSERT(addr <= ADDRESS_MASK);
+        LOG_DEBUG("BASEP%d=0x%016llx\n", i, addr);
+        ethosu_write_reg(dev, NPU_REG_BASEP0 + (2 * i) * BASEP_OFFSET, addr & 0xffffffff);
+        ethosu_write_reg(dev, NPU_REG_BASEP0 + (2 * i + 1) * BASEP_OFFSET, addr >> 32);
     }
-
-    ethosu_write_reg(dev, NPU_REG_QBASE0, qbase0);
-    ethosu_write_reg(dev, NPU_REG_QBASE1, qbase1);
-    ethosu_write_reg(dev, NPU_REG_QSIZE, qsize);
 
     ret_code = ethosu_set_command_run(dev);
 #else
@@ -282,6 +281,7 @@ enum ethosu_error_codes ethosu_set_regioncfg(struct ethosu_device *dev,
     regioncfg.word &= ~(0x3 << (2 * region));
     regioncfg.word |= (memory_type & 0x3) << (2 * region);
     ethosu_write_reg(dev, NPU_REG_REGIONCFG, regioncfg.word);
+    LOG_DEBUG("REGIONCFG%u=0x%08x\n", region, regioncfg.word);
 #else
     // NPU stubbed
     UNUSED(dev);

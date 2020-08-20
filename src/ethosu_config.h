@@ -108,6 +108,14 @@
 #define AXI_LIMIT3_MAX_OUTSTANDING_WRITES 16
 #endif
 
+/*
+ * Address offset between the CPU and the NPU. The offset is
+ * applied to the QBASE and BASEP registers.
+ */
+#ifndef BASE_POINTER_OFFSET
+#define BASE_POINTER_OFFSET 0
+#endif
+
 #ifdef PMU_AUTOINIT
 /*
  * Register control

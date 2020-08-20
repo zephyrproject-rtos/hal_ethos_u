@@ -43,10 +43,20 @@ static volatile bool irq_triggered = false;
 void ethosu_irq_handler(void)
 {
     uint8_t irq_raised = 0;
+
+    LOG_DEBUG("Interrupt. status=0x%08x, qread=%d\n",
+              ethosu_read_reg(&ethosu_drv.dev, NPU_REG_STATUS),
+              ethosu_read_reg(&ethosu_drv.dev, NPU_REG_QREAD));
+
+    // Verify that interrupt has been raised
     (void)ethosu_is_irq_raised(&ethosu_drv.dev, &irq_raised);
     ASSERT(irq_raised == 1);
     irq_triggered = true;
+
+    // Clear interrupt
     (void)ethosu_clear_irq_status(&ethosu_drv.dev);
+
+    // Verify that interrupt has been successfully cleard
     (void)ethosu_is_irq_raised(&ethosu_drv.dev, &irq_raised);
     ASSERT(irq_raised == 0);
 }
@@ -280,8 +290,10 @@ int ethosu_invoke(const void *custom_data_ptr,
     }
     int custom_data_32bit_size = (custom_data_size / BYTES_IN_32_BITS - CUSTOM_OPTION_LENGTH_32_BIT_WORD);
 
+    ethosu_soft_reset(&ethosu_drv.dev);
     ethosu_set_clock_and_power(&ethosu_drv.dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_DISABLE);
     ethosu_restore_pmu_config(&ethosu_drv.dev);
+
     while (data_ptr < (data_start_ptr + custom_data_32bit_size))
     {
         int ret = 0;
@@ -464,7 +476,7 @@ static int handle_command_stream(struct ethosu_driver *drv,
 {
     uint32_t qread     = 0;
     uint32_t cms_bytes = cms_length * BYTES_IN_32_BITS;
-    LOG_INFO("handle_command_stream cms_length %d\n", cms_length);
+    LOG_INFO("handle_command_stream: cmd_stream=%p, cms_length %d\n", cmd_stream, cms_length);
 
     if (0 != ((ptrdiff_t)cmd_stream & MASK_16_BYTE_ALIGN))
     {
