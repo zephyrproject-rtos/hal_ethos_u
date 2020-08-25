@@ -38,6 +38,7 @@ enum ethosu_error_codes ethosu_dev_init(struct ethosu_device *dev, const void *b
 {
 #if !defined(ARM_NPU_STUB)
     dev->base_address = (uintptr_t)base_address;
+    ethosu_save_pmu_config(dev);
 #else
     UNUSED(dev);
     UNUSED(base_address);
@@ -559,15 +560,26 @@ void ethosu_write_reg(struct ethosu_device *dev, uint32_t address, uint32_t valu
 enum ethosu_error_codes ethosu_save_pmu_config(struct ethosu_device *dev)
 {
 #if !defined(ARM_NPU_STUB)
+    // Save the PMU control register
+    dev->pmcr = ethosu_read_reg(dev, NPU_REG_PMCR);
+
+    // Save IRQ control
+    dev->pmint = ethosu_read_reg(dev, NPU_REG_PMINTSET);
+
+    // Save the enabled events mask
+    dev->pmcnten = ethosu_read_reg(dev, NPU_REG_PMCNTENSET);
+
+    // Save start and stop event
+    dev->pmccntr_cfg = ethosu_read_reg(dev, NPU_REG_PMCCNTR_CFG);
+
+    // Save the cycle counter
     dev->pmccntr = ETHOSU_PMU_Get_CCNTR();
+
+    // Save the event settings and counters
     for (uint32_t i = 0; i < ETHOSU_PMU_NCOUNTERS; i++)
     {
-        dev->pmu_evcntr[i] = ETHOSU_PMU_Get_EVCNTR(i);
-        dev->pmu_evtypr[i] = ETHOSU_PMU_Get_EVTYPER(i);
-    }
-    if (!dev->restore_pmu_config)
-    {
-        dev->restore_pmu_config = true;
+        dev->pmu_evcntr[i] = ethosu_read_reg(dev, NPU_REG_PMEVCNTR0 + i * sizeof(uint32_t));
+        dev->pmu_evtypr[i] = ethosu_read_reg(dev, NPU_REG_PMEVTYPER0 + i * sizeof(uint32_t));
     }
 #else
     UNUSED(dev);
@@ -579,14 +591,26 @@ enum ethosu_error_codes ethosu_save_pmu_config(struct ethosu_device *dev)
 enum ethosu_error_codes ethosu_restore_pmu_config(struct ethosu_device *dev)
 {
 #if !defined(ARM_NPU_STUB)
-    if (dev->restore_pmu_config)
+    // Restore PMU control register
+    ethosu_write_reg(dev, NPU_REG_PMCR, dev->pmcr);
+
+    // Restore IRQ control
+    ethosu_write_reg(dev, NPU_REG_PMINTSET, dev->pmint);
+
+    // Restore enabled event mask
+    ethosu_write_reg(dev, NPU_REG_PMCNTENSET, dev->pmcnten);
+
+    // Restore start and stop event
+    ethosu_write_reg(dev, NPU_REG_PMCCNTR_CFG, dev->pmccntr_cfg);
+
+    // Restore the cycle counter
+    ETHOSU_PMU_Set_CCNTR(dev->pmccntr);
+
+    // Restore event settings and counters
+    for (uint32_t i = 0; i < ETHOSU_PMU_NCOUNTERS; i++)
     {
-        ETHOSU_PMU_Set_CCNTR(dev->pmccntr);
-        for (uint32_t i = 0; i < ETHOSU_PMU_NCOUNTERS; i++)
-        {
-            ETHOSU_PMU_Set_EVCNTR(i, dev->pmu_evcntr[i]);
-            ETHOSU_PMU_Set_EVTYPER(i, dev->pmu_evtypr[i]);
-        }
+        ethosu_write_reg(dev, NPU_REG_PMEVCNTR0 + i * sizeof(uint32_t), dev->pmu_evcntr[i]);
+        ethosu_write_reg(dev, NPU_REG_PMEVTYPER0 + i * sizeof(uint32_t), dev->pmu_evtypr[i]);
     }
 #else
     UNUSED(dev);

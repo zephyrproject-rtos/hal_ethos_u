@@ -29,12 +29,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct ethosu_driver ethosu_drv = {.dev             = {.base_address       = NULL,
-                                           .restore_pmu_config = false,
-                                           .pmccntr            = 0,
-                                           .pmu_evcntr         = {0, 0, 0, 0},
-                                           .pmu_evtypr         = {0, 0, 0, 0}},
-                                   .abort_inference = false};
+struct ethosu_driver ethosu_drv = {
+    .dev             = {.base_address = NULL, .pmccntr = 0, .pmu_evcntr = {0, 0, 0, 0}, .pmu_evtypr = {0, 0, 0, 0}},
+    .abort_inference = false};
 
 // IRQ
 static volatile bool irq_triggered = false;

@@ -55,8 +55,11 @@ enum ethosu_error_codes
 struct ethosu_device
 {
     uintptr_t base_address;
-    bool restore_pmu_config;
+    uint32_t pmcr;
     uint64_t pmccntr;
+    uint32_t pmcnten;
+    uint32_t pmint;
+    uint32_t pmccntr_cfg;
     uint32_t pmu_evcntr[ETHOSU_PMU_NCOUNTERS];
     enum ethosu_pmu_event_type pmu_evtypr[ETHOSU_PMU_NCOUNTERS];
 };
