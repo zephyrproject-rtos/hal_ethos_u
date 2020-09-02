@@ -16,6 +16,10 @@
  * limitations under the License.
  */
 
+/******************************************************************************
+ * Includes
+ ******************************************************************************/
+
 #include "ethosu_driver.h"
 #include "ethosu_common.h"
 #include "ethosu_config.h"
@@ -28,6 +32,121 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+/******************************************************************************
+ * Defines
+ ******************************************************************************/
+
+#define MACS_PER_CYCLE_LOG2_MASK 0x000F
+#define SHRAM_SIZE_MASK 0xFF00
+#define SHRAM_SIZE_RIGHT_SHIFT 8
+#define BYTES_IN_32_BITS 4
+#define CUSTOM_OPTION_LENGTH_32_BIT_WORD 1
+#define DRIVER_ACTION_LENGTH_32_BIT_WORD 1
+#define OPTIMIZER_CONFIG_LENGTH_32_BIT_WORD 2
+#define ETHOSU_FOURCC ('1' << 24 | 'P' << 16 | 'O' << 8 | 'C') // "Custom Operator Payload 1"
+#define APB_START_ADDR_MASK 0x0FFF
+#define APB_NUM_REG_BIT_SHIFT 12
+#define BYTES_1KB 1024
+#define PRODUCT_MAJOR_ETHOSU55 (4)
+#define MASK_16_BYTE_ALIGN (0xF)
+#define FAST_MEMORY_BASE_ADDR_INDEX 2
+
+/******************************************************************************
+ * Types
+ ******************************************************************************/
+
+// Driver actions
+enum DRIVER_ACTION_e
+{
+    RESERVED         = 0,
+    OPTIMIZER_CONFIG = 1,
+    COMMAND_STREAM   = 2,
+    READ_APB_REG     = 3,
+    DUMP_SHRAM       = 4,
+    NOP              = 5,
+};
+
+// Custom data struct
+struct custom_data_s
+{
+    union
+    {
+        // Driver action data
+        struct
+        {
+            // Driver action command (valid values in DRIVER_ACTION_e)
+            uint8_t driver_action_command;
+
+            // reserved
+            uint8_t reserved;
+
+            // Driver action data
+            union
+            {
+                // DA_CMD_OPT_CFG
+                struct
+                {
+                    uint16_t rel_nbr : 4;
+                    uint16_t patch_nbr : 4;
+                    uint16_t opt_cfg_reserved : 8;
+                };
+
+                // DA_CMD_CMSTRM
+                struct
+                {
+                    uint16_t length;
+                };
+
+                // DA_CMD_READAPB
+                struct
+                {
+                    uint16_t start_address : 12;
+                    uint16_t nbr_reg_minus1 : 4;
+                };
+
+                uint16_t driver_action_data;
+            };
+        };
+
+        uint32_t word;
+    };
+};
+
+// optimizer config struct
+struct opt_cfg_s
+{
+    struct custom_data_s da_data;
+    union
+    {
+        struct
+        {
+            uint32_t macs_per_cc : 4;
+            uint32_t cmd_stream_version : 4;
+            uint32_t shram_size : 8;
+            uint32_t reserved1 : 16;
+        };
+        uint32_t npu_cfg;
+    };
+    union
+    {
+        struct
+        {
+            uint32_t version_status : 4;
+            uint32_t version_minor : 4;
+            uint32_t version_major : 4;
+            uint32_t product_major : 4;
+            uint32_t arch_patch_rev : 4;
+            uint32_t arch_minor_rev : 8;
+            uint32_t arch_major_rev : 4;
+        };
+        uint32_t ethosu_id;
+    };
+};
+
+/******************************************************************************
+ * Functions
+ ******************************************************************************/
 
 struct ethosu_driver ethosu_drv = {
     .dev             = {.base_address = NULL, .pmccntr = 0, .pmu_evcntr = {0, 0, 0, 0}, .pmu_evtypr = {0, 0, 0, 0}},
@@ -94,99 +213,6 @@ static inline void wait_for_irq(struct ethosu_driver *drv)
 }
 #endif
 
-#define MACS_PER_CYCLE_LOG2_MASK 0x000F
-#define SHRAM_SIZE_MASK 0xFF00
-#define SHRAM_SIZE_RIGHT_SHIFT 8
-#define BYTES_IN_32_BITS 4
-#define CUSTOM_OPTION_LENGTH_32_BIT_WORD 1
-#define DRIVER_ACTION_LENGTH_32_BIT_WORD 1
-#define OPTIMIZER_CONFIG_LENGTH_32_BIT_WORD 2
-#define ETHOSU_FOURCC ('1' << 24 | 'P' << 16 | 'O' << 8 | 'C') // "Custom Operator Payload 1"
-#define APB_START_ADDR_MASK 0x0FFF
-#define APB_NUM_REG_BIT_SHIFT 12
-#define BYTES_1KB 1024
-#define PRODUCT_MAJOR_ETHOSU55 (4)
-#define MASK_16_BYTE_ALIGN (0xF)
-
-// Driver actions
-enum DRIVER_ACTION_e
-{
-    RESERVED         = 0,
-    OPTIMIZER_CONFIG = 1,
-    COMMAND_STREAM   = 2,
-    READ_APB_REG     = 3,
-    DUMP_SHRAM       = 4,
-    NOP              = 5,
-};
-
-// Custom data struct
-struct custom_data_s
-{
-    union
-    {
-        // Driver action data
-        struct
-        {
-            // Driver action command (valid values in DRIVER_ACTION_e)
-            uint8_t driver_action_command;
-            // reserved
-            uint8_t reserved;
-            // Driver action data
-            union
-            {
-                struct
-                { // DA_CMD_OPT_CFG
-                    uint16_t rel_nbr : 4;
-                    uint16_t patch_nbr : 4;
-                    uint16_t opt_cfg_reserved : 8;
-                };
-                struct
-                { // DA_CMD_CMSTRM
-                    uint16_t length;
-                };
-                struct
-                { // DA_CMD_READAPB
-                    uint16_t start_address : 12;
-                    uint16_t nbr_reg_minus1 : 4;
-                };
-                uint16_t driver_action_data;
-            };
-        };
-        uint32_t word;
-    };
-};
-
-// optimizer config struct
-struct opt_cfg_s
-{
-    struct custom_data_s da_data;
-    union
-    {
-        struct
-        {
-            uint32_t macs_per_cc : 4;
-            uint32_t cmd_stream_version : 4;
-            uint32_t shram_size : 8;
-            uint32_t reserved1 : 16;
-        };
-        uint32_t npu_cfg;
-    };
-    union
-    {
-        struct
-        {
-            uint32_t version_status : 4;
-            uint32_t version_minor : 4;
-            uint32_t version_major : 4;
-            uint32_t product_major : 4;
-            uint32_t arch_patch_rev : 4;
-            uint32_t arch_minor_rev : 8;
-            uint32_t arch_major_rev : 4;
-        };
-        uint32_t ethosu_id;
-    };
-};
-
 static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s *opt_cfg_p);
 static int handle_command_stream(struct ethosu_driver *drv,
                                  const uint8_t *cmd_stream,
@@ -199,11 +225,18 @@ static void dump_npu_register(struct ethosu_driver *drv, int npu_reg, int npu_re
 static void dump_command_stream(const uint32_t *cmd_stream, const int cms_length, int qread);
 static void npu_axi_init(struct ethosu_driver *drv);
 
-int ethosu_init(const void *base_address)
+int ethosu_init_v2(const void *base_address, const void *fast_memory, const size_t fast_memory_size)
 {
     int return_code = 0;
 
-    LOG_INFO("ethosu_init calling NPU embed driver ethosu_dev_init\n");
+    LOG_INFO("%s. base_address=%p, fast_memory=%p, fast_memory_size=%zu\n",
+             __FUNCTION__,
+             base_address,
+             fast_memory,
+             fast_memory_size);
+
+    ethosu_drv.fast_memory      = (uint64_t)fast_memory;
+    ethosu_drv.fast_memory_size = fast_memory_size;
 
     if (ETHOSU_SUCCESS != ethosu_dev_init(&ethosu_drv.dev, base_address))
     {
@@ -261,37 +294,56 @@ int ethosu_get_version(struct ethosu_version *version)
     return return_code;
 }
 
-int ethosu_invoke(const void *custom_data_ptr,
-                  const int custom_data_size,
-                  const uint64_t *base_addr,
-                  const int num_base_addr)
+int ethosu_invoke_v2(const void *custom_data_ptr,
+                     const int custom_data_size,
+                     const uint64_t *base_addr,
+                     const size_t *base_addr_size,
+                     const int num_base_addr)
 {
-    struct custom_data_s *data_start_ptr = (struct custom_data_s *)custom_data_ptr;
+    const struct custom_data_s *data_ptr = custom_data_ptr;
+    const struct custom_data_s *data_end = custom_data_ptr + custom_data_size;
     int return_code                      = 0;
 
-    LOG_INFO("ethosu_invoke\n");
+    LOG_INFO("%s\n", __FUNCTION__);
 
     // First word in custom_data_ptr should contain "Custom Operator Payload 1"
-    if (data_start_ptr->word != ETHOSU_FOURCC)
+    if (data_ptr->word != ETHOSU_FOURCC)
     {
-        LOG_ERR("Custom Operator Payload: %x is not correct, expected %x\n", data_start_ptr->word, ETHOSU_FOURCC);
+        LOG_ERR("Custom Operator Payload: %x is not correct, expected %x\n", data_ptr->word, ETHOSU_FOURCC);
         return -1;
     }
-    data_start_ptr += CUSTOM_OPTION_LENGTH_32_BIT_WORD;
-    struct custom_data_s *data_ptr = data_start_ptr;
 
+    // Custom data length must be a multiple of 32 bits
     if ((custom_data_size % BYTES_IN_32_BITS) != 0)
     {
         LOG_ERR("ethosu_invoke ERROR custom_data_size=0x%x not a multiple of 4\n", custom_data_size);
         return -1;
     }
-    int custom_data_32bit_size = (custom_data_size / BYTES_IN_32_BITS - CUSTOM_OPTION_LENGTH_32_BIT_WORD);
+
+    ++data_ptr;
+
+    // Adjust base address to fast memory area
+    if (ethosu_drv.fast_memory != NULL && num_base_addr >= FAST_MEMORY_BASE_ADDR_INDEX)
+    {
+        uint64_t *fast_memory = (uint64_t *)&base_addr[FAST_MEMORY_BASE_ADDR_INDEX];
+
+        if (base_addr_size != NULL && base_addr_size[FAST_MEMORY_BASE_ADDR_INDEX] > ethosu_drv.fast_memory_size)
+        {
+            LOG_WARN("Fast memory area too small. fast_memory_size=%u, base_addr_size=%u\n",
+                     ethosu_drv.fast_memory_size,
+                     base_addr_size[FAST_MEMORY_BASE_ADDR_INDEX]);
+        }
+        else
+        {
+            *fast_memory = ethosu_drv.fast_memory;
+        }
+    }
 
     ethosu_soft_reset(&ethosu_drv.dev);
     ethosu_set_clock_and_power(&ethosu_drv.dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_DISABLE);
     ethosu_restore_pmu_config(&ethosu_drv.dev);
 
-    while (data_ptr < (data_start_ptr + custom_data_32bit_size))
+    while (data_ptr < data_end)
     {
         int ret = 0;
         switch (data_ptr->driver_action_command)
@@ -352,8 +404,10 @@ int ethosu_invoke(const void *custom_data_ptr,
             break;
         }
     }
+
     ethosu_save_pmu_config(&ethosu_drv.dev);
     ethosu_set_clock_and_power(&ethosu_drv.dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
+
     return return_code;
 }
 

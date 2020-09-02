@@ -26,6 +26,7 @@
 #include "ethosu_device.h"
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -40,6 +41,8 @@ struct ethosu_driver
 {
     struct ethosu_device dev;
     bool abort_inference;
+    uint64_t fast_memory;
+    size_t fast_memory_size;
 };
 
 struct ethosu_version_id
@@ -79,7 +82,9 @@ struct ethosu_version
 /**
  * Initialize the Ethos-U driver.
  */
-int ethosu_init(const void *base_address);
+int ethosu_init_v2(const void *base_address, const void *fast_memory, const size_t fast_memory_size);
+
+#define ethosu_init(base_address) ethosu_init_v2(base_address, NULL, 0)
 
 /**
  * Get Ethos-U version.
@@ -89,10 +94,15 @@ int ethosu_get_version(struct ethosu_version *version);
 /**
  * Invoke Vela command stream.
  */
-int ethosu_invoke(const void *custom_data_ptr,
-                  const int custom_data_size,
-                  const uint64_t *base_addr,
-                  const int num_base_addr);
+int ethosu_invoke_v2(const void *custom_data_ptr,
+                     const int custom_data_size,
+                     const uint64_t *base_addr,
+                     const size_t *base_addr_size,
+                     const int num_base_addr);
+
+#define ethosu_invoke(custom_data_ptr, custom_data_size, base_addr, num_base_addr)                                     \
+    ethosu_invoke_v2(custom_data_ptr, custom_data_size, base_addr, NULL, num_base_addr)
+
 /**
  * Abort Ethos-U inference.
  */
