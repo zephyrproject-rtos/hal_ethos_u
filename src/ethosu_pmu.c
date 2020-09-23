@@ -153,8 +153,8 @@ void ETHOSU_PMU_CYCCNT_Reset(void)
     pmcr.word          = ethosu_drv.dev.pmcr;
     pmcr.cycle_cnt_rst = 1;
     ethosu_write_reg(&ethosu_drv.dev, NPU_REG_PMCR, pmcr.word);
-    ethosu_drv.dev.pmcr        = ethosu_read_reg(&ethosu_drv.dev, NPU_REG_PMCR);
-    ethosu_drv.dev.pmccntr_cfg = 0;
+    ethosu_drv.dev.pmcr    = ethosu_read_reg(&ethosu_drv.dev, NPU_REG_PMCR);
+    ethosu_drv.dev.pmccntr = 0;
 }
 
 void ETHOSU_PMU_EVCNTR_ALL_Reset(void)
