@@ -27,9 +27,9 @@
 
 #include <assert.h>
 #include <cmsis_compiler.h>
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -309,7 +309,7 @@ int ethosu_invoke_v2(const void *custom_data_ptr,
     // First word in custom_data_ptr should contain "Custom Operator Payload 1"
     if (data_ptr->word != ETHOSU_FOURCC)
     {
-        LOG_ERR("Custom Operator Payload: %x is not correct, expected %x\n", data_ptr->word, ETHOSU_FOURCC);
+        LOG_ERR("Custom Operator Payload: %" PRIu32 " is not correct, expected %x\n", data_ptr->word, ETHOSU_FOURCC);
         return -1;
     }
 
@@ -435,30 +435,33 @@ static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s *
 
     (void)ethosu_get_config(&drv->dev, &cfg);
     (void)ethosu_get_id(&drv->dev, &id);
-    LOG_INFO("Ethos-U config cmd_stream_version: %d macs_per_cc: %d shram_size: %d\n",
+    LOG_INFO("Ethos-U config cmd_stream_version: %" PRIu32 " macs_per_cc: %" PRIu32 " shram_size: %" PRIu32 "\n",
              cfg.cmd_stream_version,
              cfg.macs_per_cc,
              cfg.shram_size);
-    LOG_INFO("Ethos-U version: %d.%d.%d\n", id.arch_major_rev, id.arch_minor_rev, id.arch_patch_rev);
+    LOG_INFO("Ethos-U version: %" PRIu32 ".%" PRIu32 ".%" PRIu32 "\n",
+             id.arch_major_rev,
+             id.arch_minor_rev,
+             id.arch_patch_rev);
 
     if ((cfg.macs_per_cc != opt_cfg_p->macs_per_cc) || (cfg.shram_size != opt_cfg_p->shram_size) ||
         (cfg.cmd_stream_version != opt_cfg_p->cmd_stream_version))
     {
         if (cfg.macs_per_cc != opt_cfg_p->macs_per_cc)
         {
-            LOG_ERR("NPU config mismatch: npu.macs_per_cc=%d optimizer.macs_per_cc=%d\n",
+            LOG_ERR("NPU config mismatch: npu.macs_per_cc=%" PRIu32 " optimizer.macs_per_cc=%d\n",
                     cfg.macs_per_cc,
                     opt_cfg_p->macs_per_cc);
         }
         if (cfg.shram_size != opt_cfg_p->shram_size)
         {
-            LOG_ERR("NPU config mismatch: npu.shram_size=%d optimizer.shram_size=%d\n",
+            LOG_ERR("NPU config mismatch: npu.shram_size=%" PRIu32 " optimizer.shram_size=%d\n",
                     cfg.shram_size,
                     opt_cfg_p->shram_size);
         }
         if (cfg.cmd_stream_version != opt_cfg_p->cmd_stream_version)
         {
-            LOG_ERR("NPU config mismatch: npu.cmd_stream_version=%d optimizer.cmd_stream_version=%d\n",
+            LOG_ERR("NPU config mismatch: npu.cmd_stream_version=%" PRIu32 " optimizer.cmd_stream_version=%d\n",
                     cfg.cmd_stream_version,
                     opt_cfg_p->cmd_stream_version);
         }
@@ -468,7 +471,7 @@ static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s *
     if ((id.product_major == PRODUCT_MAJOR_ETHOSU55) &&
         ((id.arch_major_rev != opt_cfg_p->arch_major_rev) || (id.arch_minor_rev != opt_cfg_p->arch_minor_rev)))
     {
-        LOG_ERR("NPU arch mismatch: npu.arch=%d.%d.%d optimizer.arch=%d.%d.%d\n",
+        LOG_ERR("NPU arch mismatch: npu.arch=%" PRIu32 ".%" PRIu32 ".%" PRIu32 " optimizer.arch=%d.%d.%d\n",
                 id.arch_major_rev,
                 id.arch_minor_rev,
                 id.arch_patch_rev,
@@ -540,7 +543,7 @@ static int handle_command_stream(struct ethosu_driver *drv,
     {
         if (0 != (base_addr[i] & MASK_16_BYTE_ALIGN))
         {
-            LOG_ERR("Error: Base addr %d: %p not aligned to 16 bytes\n", i, (void *)(base_addr[i]));
+            LOG_ERR("Error: Base addr %d: 0x%llx not aligned to 16 bytes\n", i, base_addr[i]);
             base_addr_invalid = true;
         }
     }
@@ -560,7 +563,8 @@ static int handle_command_stream(struct ethosu_driver *drv,
     (void)ethosu_get_qread(&drv->dev, &qread);
     if (qread != cms_bytes)
     {
-        LOG_ERR("Failure: IRQ received but qread (%d) not at end of stream (%d).\n", qread, cms_bytes);
+        LOG_ERR(
+            "Failure: IRQ received but qread (%" PRIu32 ") not at end of stream (%" PRIu32 ").\n", qread, cms_bytes);
         return -1;
     }
 
@@ -585,7 +589,8 @@ static int read_apb_reg(struct ethosu_driver *drv, uint16_t da_data)
     {
         for (int i = 0; i < num_reg; i++)
         {
-            LOG_INFO("NPU_REG ADDR 0x%04x = 0x%08x\n", (start_address + (i * BYTES_IN_32_BITS)), reg_p[i]);
+            LOG_INFO(
+                "NPU_REG ADDR 0x%04" PRIu32 " = 0x%08" PRIu32 "\n", (start_address + (i * BYTES_IN_32_BITS)), reg_p[i]);
         }
     }
     else
@@ -604,7 +609,7 @@ static int dump_shram(struct ethosu_driver *drv)
     uint32_t *shram_p;
     (void)ethosu_get_config(&drv->dev, &cfg);
 
-    LOG_INFO("dump_shram size = %d KB\n", cfg.shram_size);
+    LOG_INFO("dump_shram size = %" PRIu32 " KB\n", cfg.shram_size);
 
     shram_p = (uint32_t *)malloc(BYTES_1KB);
     if (shram_p == NULL)
@@ -617,10 +622,10 @@ static int dump_shram(struct ethosu_driver *drv)
     {
         ethosu_get_shram_data(&drv->dev, i, (uint32_t *)shram_p);
         // Output 1KB of SHRAM
-        LOG_INFO("***SHRAM SECTION %d***\n", i);
+        LOG_INFO("***SHRAM SECTION %" PRIu32 "***\n", i);
         for (int j = 0; j < (BYTES_1KB / BYTES_IN_32_BITS); j++)
         {
-            LOG_INFO("[0x%04x] %x\n", (i * 1024 + j * 4), shram_p[j]);
+            LOG_INFO("[0x%04" PRIx32 "] %" PRIx32 "\n", (i * 1024 + j * 4), shram_p[j]);
         }
     }
     free(shram_p);
@@ -930,7 +935,7 @@ static void dump_command_stream(const uint32_t *cmd_stream, const int cms_length
         }
         if (cmd_name)
         {
-            LOG_INFO("\t%s 0x%.8X", cmd_name, cmd_val);
+            LOG_INFO("\t%s 0x%.8" PRIX32, cmd_name, cmd_val);
         }
         if (offset == qread)
         {
