@@ -26,8 +26,8 @@
 #include "pmu_ethosu.h"
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stddef.h>
-#include <stdint.h>
 
 /*****************************************************************************
  * Defines
@@ -69,6 +69,8 @@ enum ethosu_pmu_event_type pmu_event_type(uint32_t id)
     switch (id)
     {
         EXPAND_PMU_EVENT_TYPE(EVTYPE, SEMICOLON);
+    default:
+        LOG_ERR("Unknown PMU event id: 0x%" PRIx32 "\n", id);
     }
 
     return ETHOSU_PMU_SENTINEL;
