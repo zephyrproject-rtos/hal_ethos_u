@@ -78,12 +78,15 @@ enum ethosu_pmu_event_type pmu_event_type(uint32_t id)
 
 uint32_t pmu_event_value(enum ethosu_pmu_event_type event)
 {
-    if (!(event < ETHOSU_PMU_SENTINEL) || (event < 0))
+    int a = event;
+    if ((a < ETHOSU_PMU_SENTINEL) && (a >= ETHOSU_PMU_NO_EVENT))
+    {
+        return eventbyid[event];
+    }
+    else
     {
         return (uint32_t)(-1);
     }
-
-    return eventbyid[event];
 }
 
 void ethosu_pmu_driver_init(void)
