@@ -235,7 +235,7 @@ int ethosu_init_v2(const void *base_address, const void *fast_memory, const size
              fast_memory,
              fast_memory_size);
 
-    ethosu_drv.fast_memory      = (uint64_t)fast_memory;
+    ethosu_drv.fast_memory      = (uint32_t)fast_memory;
     ethosu_drv.fast_memory_size = fast_memory_size;
 
     if (ETHOSU_SUCCESS != ethosu_dev_init(&ethosu_drv.dev, base_address))

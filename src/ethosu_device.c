@@ -100,7 +100,7 @@ enum ethosu_error_codes ethosu_run_command_stream(struct ethosu_device *dev,
 #if !defined(ARM_NPU_STUB)
     ASSERT(num_base_addr <= ETHOSU_DRIVER_BASEP_INDEXES);
 
-    uint64_t qbase = (uint64_t)cmd_stream_ptr + BASE_POINTER_OFFSET;
+    uint64_t qbase = (uintptr_t)cmd_stream_ptr + BASE_POINTER_OFFSET;
     ASSERT(qbase <= ADDRESS_MASK);
     LOG_DEBUG("QBASE=0x%016llx, QSIZE=%u, base_pointer_offset=0x%08x\n", qbase, cms_length, BASE_POINTER_OFFSET);
     ethosu_write_reg(dev, NPU_REG_QBASE0, qbase & 0xffffffff);
