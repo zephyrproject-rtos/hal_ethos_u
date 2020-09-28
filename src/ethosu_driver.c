@@ -149,7 +149,7 @@ struct opt_cfg_s
  ******************************************************************************/
 
 struct ethosu_driver ethosu_drv = {
-    .dev             = {.base_address = NULL, .pmccntr = 0, .pmu_evcntr = {0, 0, 0, 0}, .pmu_evtypr = {0, 0, 0, 0}},
+    .dev             = {.base_address = 0, .pmccntr = 0, .pmu_evcntr = {0, 0, 0, 0}, .pmu_evtypr = {0, 0, 0, 0}},
     .abort_inference = false};
 
 // IRQ
@@ -323,7 +323,7 @@ int ethosu_invoke_v2(const void *custom_data_ptr,
     ++data_ptr;
 
     // Adjust base address to fast memory area
-    if (ethosu_drv.fast_memory != NULL && num_base_addr >= FAST_MEMORY_BASE_ADDR_INDEX)
+    if (ethosu_drv.fast_memory != 0 && num_base_addr >= FAST_MEMORY_BASE_ADDR_INDEX)
     {
         uint64_t *fast_memory = (uint64_t *)&base_addr[FAST_MEMORY_BASE_ADDR_INDEX];
 

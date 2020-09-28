@@ -531,7 +531,7 @@ enum ethosu_error_codes ethosu_set_clock_and_power(struct ethosu_device *dev,
 uint32_t ethosu_read_reg(struct ethosu_device *dev, uint32_t address)
 {
 #if !defined(ARM_NPU_STUB)
-    ASSERT(dev->base_address != NULL);
+    ASSERT(dev->base_address != 0);
 
     volatile uint32_t *reg = (uint32_t *)(uintptr_t)(dev->base_address + address);
     return *reg;
@@ -546,7 +546,7 @@ uint32_t ethosu_read_reg(struct ethosu_device *dev, uint32_t address)
 void ethosu_write_reg(struct ethosu_device *dev, uint32_t address, uint32_t value)
 {
 #if !defined(ARM_NPU_STUB)
-    ASSERT(dev->base_address != NULL);
+    ASSERT(dev->base_address != 0);
 
     volatile uint32_t *reg = (uint32_t *)(uintptr_t)(dev->base_address + address);
     *reg                   = value;
