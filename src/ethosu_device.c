@@ -193,6 +193,8 @@ enum ethosu_error_codes ethosu_soft_reset(struct ethosu_device *dev)
     ethosu_write_reg(dev, NPU_REG_RESET, reset.word);
 
     return_code = ethosu_wait_for_reset(dev);
+
+    dev->reset = ethosu_read_reg(dev, NPU_REG_PROT);
 #else
     UNUSED(dev);
 #endif
@@ -617,4 +619,18 @@ enum ethosu_error_codes ethosu_restore_pmu_config(struct ethosu_device *dev)
 #endif
 
     return ETHOSU_SUCCESS;
+}
+
+bool ethosu_status_has_error(struct ethosu_device *dev)
+{
+    bool status_error = false;
+#if !defined(ARM_NPU_STUB)
+    struct status_r status;
+    status.word  = ethosu_read_reg(dev, NPU_REG_STATUS);
+    status_error = ((1 == status.bus_status) || (1 == status.cmd_parse_error) || (1 == status.wd_fault) ||
+                    (1 == status.ecc_fault));
+#else
+    UNUSED(dev);
+#endif
+    return status_error;
 }

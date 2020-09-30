@@ -43,6 +43,7 @@ struct ethosu_driver
     bool abort_inference;
     uint64_t fast_memory;
     size_t fast_memory_size;
+    bool status_error;
 };
 
 struct ethosu_version_id

@@ -55,6 +55,7 @@ enum ethosu_error_codes
 struct ethosu_device
 {
     uintptr_t base_address;
+    uint32_t reset;
     uint32_t pmcr;
     uint64_t pmccntr;
     uint32_t pmcnten;
@@ -391,6 +392,14 @@ enum ethosu_error_codes ethosu_save_pmu_config(struct ethosu_device *dev);
  * \return                     \ref ethosu_error_codes
  */
 enum ethosu_error_codes ethosu_restore_pmu_config(struct ethosu_device *dev);
+
+/**
+ * Check if the STATUS register has any error bits set or not.
+ * \param[in] dev              Ethos-U device to check.
+ * \return                     true if any error bits set,
+ *                             false otherwise.
+ */
+bool ethosu_status_has_error(struct ethosu_device *dev);
 
 #ifdef __cplusplus
 }

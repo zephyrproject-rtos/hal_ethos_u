@@ -149,8 +149,9 @@ struct opt_cfg_s
  ******************************************************************************/
 
 struct ethosu_driver ethosu_drv = {
-    .dev             = {.base_address = 0, .pmccntr = 0, .pmu_evcntr = {0, 0, 0, 0}, .pmu_evtypr = {0, 0, 0, 0}},
-    .abort_inference = false};
+    .dev = {.base_address = NULL, .reset = 0, .pmccntr = 0, .pmu_evcntr = {0, 0, 0, 0}, .pmu_evtypr = {0, 0, 0, 0}},
+    .abort_inference = false,
+    .status_error    = false};
 
 // IRQ
 static volatile bool irq_triggered = false;
@@ -172,9 +173,15 @@ void ethosu_irq_handler(void)
     // Clear interrupt
     (void)ethosu_clear_irq_status(&ethosu_drv.dev);
 
-    // Verify that interrupt has been successfully cleard
+    // Verify that interrupt has been successfully cleared
     (void)ethosu_is_irq_raised(&ethosu_drv.dev, &irq_raised);
     ASSERT(irq_raised == 0);
+
+    if (ethosu_status_has_error(&ethosu_drv.dev))
+    {
+        ethosu_soft_reset(&ethosu_drv.dev);
+        ethosu_drv.status_error = true;
+    }
 }
 
 static inline void wait_for_irq(struct ethosu_driver *drv)
@@ -257,6 +264,7 @@ int ethosu_init_v2(const void *base_address, const void *fast_memory, const size
         LOG_ERR("Failed reset of Ethos-U\n");
         return -1;
     }
+    ethosu_drv.status_error = false;
 
     return return_code;
 }
@@ -339,7 +347,11 @@ int ethosu_invoke_v2(const void *custom_data_ptr,
         }
     }
 
-    ethosu_soft_reset(&ethosu_drv.dev);
+    if (ethosu_drv.dev.reset != ethosu_read_reg(&ethosu_drv.dev, NPU_REG_PROT))
+    {
+        ethosu_soft_reset(&ethosu_drv.dev);
+    }
+    ethosu_drv.status_error = false;
     ethosu_set_clock_and_power(&ethosu_drv.dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_DISABLE);
     ethosu_restore_pmu_config(&ethosu_drv.dev);
 
@@ -405,8 +417,11 @@ int ethosu_invoke_v2(const void *custom_data_ptr,
         }
     }
 
-    ethosu_save_pmu_config(&ethosu_drv.dev);
-    ethosu_set_clock_and_power(&ethosu_drv.dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
+    if (!ethosu_drv.status_error)
+    {
+        ethosu_save_pmu_config(&ethosu_drv.dev);
+        ethosu_set_clock_and_power(&ethosu_drv.dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
+    }
 
     return return_code;
 }
@@ -560,6 +575,13 @@ static int handle_command_stream(struct ethosu_driver *drv,
 
     wait_for_irq(drv);
 
+    if (drv->status_error)
+    {
+        return -1;
+    }
+
+    // ETHOSU would have been reset in the IRQ handler if there were
+    // status error(s). So don't read the QREAD register.
     (void)ethosu_get_qread(&drv->dev, &qread);
     if (qread != cms_bytes)
     {
