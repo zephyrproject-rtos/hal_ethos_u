@@ -24,7 +24,6 @@
  ******************************************************************************/
 
 #include "ethosu55_interface.h"
-#include "ethosu_device.h"
 
 #include <stdio.h>
 

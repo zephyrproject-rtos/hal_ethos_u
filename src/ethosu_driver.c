@@ -149,7 +149,7 @@ struct opt_cfg_s
  ******************************************************************************/
 
 struct ethosu_driver ethosu_drv = {
-    .dev = {.base_address = NULL, .reset = 0, .pmccntr = 0, .pmu_evcntr = {0, 0, 0, 0}, .pmu_evtypr = {0, 0, 0, 0}},
+    .dev = {.base_address = NULL, .reset = 0, .pmccntr = {0}, .pmu_evcntr = {0, 0, 0, 0}, .pmu_evtypr = {0, 0, 0, 0}},
     .abort_inference = false,
     .status_error    = false};
 
@@ -419,7 +419,7 @@ int ethosu_invoke_v2(const void *custom_data_ptr,
 
     if (!ethosu_drv.status_error)
     {
-        ethosu_save_pmu_config(&ethosu_drv.dev);
+        ethosu_save_pmu_counters(&ethosu_drv.dev);
         ethosu_set_clock_and_power(&ethosu_drv.dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
     }
 
@@ -580,17 +580,14 @@ static int handle_command_stream(struct ethosu_driver *drv,
         return -1;
     }
 
-    // ETHOSU would have been reset in the IRQ handler if there were
-    // status error(s). So don't read the QREAD register.
     (void)ethosu_get_qread(&drv->dev, &qread);
     if (qread != cms_bytes)
     {
-        LOG_ERR(
+        LOG_WARN(
             "Failure: IRQ received but qread (%" PRIu32 ") not at end of stream (%" PRIu32 ").\n", qread, cms_bytes);
         return -1;
     }
 
-    // TODO Power off
     return 0;
 }
 

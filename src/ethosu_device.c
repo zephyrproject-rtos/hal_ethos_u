@@ -37,7 +37,7 @@ static uint32_t stream_length = 0;
 enum ethosu_error_codes ethosu_dev_init(struct ethosu_device *dev, const void *base_address)
 {
 #if !defined(ARM_NPU_STUB)
-    dev->base_address = (uintptr_t)base_address;
+    dev->base_address = (volatile uint32_t *)base_address;
     ethosu_save_pmu_config(dev);
 #else
     UNUSED(dev);
@@ -189,12 +189,21 @@ enum ethosu_error_codes ethosu_soft_reset(struct ethosu_device *dev)
         // Register access not permitted
         return ETHOSU_GENERIC_FAILURE;
     }
+
     // Reset and set security level
     ethosu_write_reg(dev, NPU_REG_RESET, reset.word);
 
+    // Wait for reset to complete
     return_code = ethosu_wait_for_reset(dev);
 
+    // Save the proto register
     dev->reset = ethosu_read_reg(dev, NPU_REG_PROT);
+
+    // Soft reset will clear the PMU configuration and counters. The shadow PMU counters
+    // are cleared by saving the PMU counters to ram, which will read back zeros.
+    // The PMU configuration will be restored in the invoke function after power save
+    // has been disabled.
+    ethosu_save_pmu_counters(dev);
 #else
     UNUSED(dev);
 #endif
@@ -534,8 +543,9 @@ uint32_t ethosu_read_reg(struct ethosu_device *dev, uint32_t address)
 {
 #if !defined(ARM_NPU_STUB)
     ASSERT(dev->base_address != 0);
+    ASSERT(address % 4 == 0);
 
-    volatile uint32_t *reg = (uint32_t *)(uintptr_t)(dev->base_address + address);
+    volatile uint32_t *reg = dev->base_address + address / sizeof(uint32_t);
     return *reg;
 #else
     UNUSED(dev);
@@ -549,14 +559,21 @@ void ethosu_write_reg(struct ethosu_device *dev, uint32_t address, uint32_t valu
 {
 #if !defined(ARM_NPU_STUB)
     ASSERT(dev->base_address != 0);
+    ASSERT(address % 4 == 0);
 
-    volatile uint32_t *reg = (uint32_t *)(uintptr_t)(dev->base_address + address);
+    volatile uint32_t *reg = dev->base_address + address / sizeof(uint32_t);
     *reg                   = value;
 #else
     UNUSED(dev);
     UNUSED(address);
     UNUSED(value);
 #endif
+}
+
+void ethosu_write_reg_shadow(struct ethosu_device *dev, uint32_t address, uint32_t value, uint32_t *shadow)
+{
+    ethosu_write_reg(dev, address, value);
+    *shadow = ethosu_read_reg(dev, address);
 }
 
 enum ethosu_error_codes ethosu_save_pmu_config(struct ethosu_device *dev)
@@ -574,13 +591,9 @@ enum ethosu_error_codes ethosu_save_pmu_config(struct ethosu_device *dev)
     // Save start and stop event
     dev->pmccntr_cfg = ethosu_read_reg(dev, NPU_REG_PMCCNTR_CFG);
 
-    // Save the cycle counter
-    dev->pmccntr = ETHOSU_PMU_Get_CCNTR();
-
     // Save the event settings and counters
     for (uint32_t i = 0; i < ETHOSU_PMU_NCOUNTERS; i++)
     {
-        dev->pmu_evcntr[i] = ethosu_read_reg(dev, NPU_REG_PMEVCNTR0 + i * sizeof(uint32_t));
         dev->pmu_evtypr[i] = ethosu_read_reg(dev, NPU_REG_PMEVTYPER0 + i * sizeof(uint32_t));
     }
 #else
@@ -605,14 +618,29 @@ enum ethosu_error_codes ethosu_restore_pmu_config(struct ethosu_device *dev)
     // Restore start and stop event
     ethosu_write_reg(dev, NPU_REG_PMCCNTR_CFG, dev->pmccntr_cfg);
 
-    // Restore the cycle counter
-    ETHOSU_PMU_Set_CCNTR(dev->pmccntr);
-
-    // Restore event settings and counters
+    // Save the event settings and counters
     for (uint32_t i = 0; i < ETHOSU_PMU_NCOUNTERS; i++)
     {
-        ethosu_write_reg(dev, NPU_REG_PMEVCNTR0 + i * sizeof(uint32_t), dev->pmu_evcntr[i]);
         ethosu_write_reg(dev, NPU_REG_PMEVTYPER0 + i * sizeof(uint32_t), dev->pmu_evtypr[i]);
+    }
+#else
+    UNUSED(dev);
+#endif
+
+    return ETHOSU_SUCCESS;
+}
+
+enum ethosu_error_codes ethosu_save_pmu_counters(struct ethosu_device *dev)
+{
+#if !defined(ARM_NPU_STUB)
+    // Save the cycle counter
+    dev->pmccntr[0] = ethosu_read_reg(dev, NPU_REG_PMCCNTR_LO);
+    dev->pmccntr[1] = ethosu_read_reg(dev, NPU_REG_PMCCNTR_HI);
+
+    // Save the event settings and counters
+    for (uint32_t i = 0; i < ETHOSU_PMU_NCOUNTERS; i++)
+    {
+        dev->pmu_evcntr[i] = ethosu_read_reg(dev, NPU_REG_PMEVCNTR0 + i * sizeof(uint32_t));
     }
 #else
     UNUSED(dev);

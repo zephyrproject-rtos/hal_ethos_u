@@ -54,15 +54,15 @@ enum ethosu_error_codes
 
 struct ethosu_device
 {
-    uintptr_t base_address;
+    volatile uint32_t *base_address;
     uint32_t reset;
     uint32_t pmcr;
-    uint64_t pmccntr;
+    uint32_t pmccntr[2];
     uint32_t pmcnten;
     uint32_t pmint;
     uint32_t pmccntr_cfg;
     uint32_t pmu_evcntr[ETHOSU_PMU_NCOUNTERS];
-    enum ethosu_pmu_event_type pmu_evtypr[ETHOSU_PMU_NCOUNTERS];
+    uint32_t pmu_evtypr[ETHOSU_PMU_NCOUNTERS];
 };
 
 struct ethosu_id
@@ -378,6 +378,13 @@ uint32_t ethosu_read_reg(struct ethosu_device *dev, uint32_t address);
 void ethosu_write_reg(struct ethosu_device *dev, uint32_t address, uint32_t value);
 
 /**
+ * Write register with shadow variable.
+ * \param[in] address          Address to read.
+ * \param[in] value            Value to be written.
+ */
+void ethosu_write_reg_shadow(struct ethosu_device *dev, uint32_t address, uint32_t value, uint32_t *shadow);
+
+/**
  * Save the PMU configuration to ethosu_device struct.
  * \param[in] dev              Ethos-U device where the PMU configuration is
  *                             saved.
@@ -392,6 +399,14 @@ enum ethosu_error_codes ethosu_save_pmu_config(struct ethosu_device *dev);
  * \return                     \ref ethosu_error_codes
  */
 enum ethosu_error_codes ethosu_restore_pmu_config(struct ethosu_device *dev);
+
+/**
+ * Save PMU counters to shadow variables in memory.
+ * \param[in] dev              Ethos-U device where the PMU configuration is
+ *                             stored.
+ * \return                     \ref ethosu_error_codes
+ */
+enum ethosu_error_codes ethosu_save_pmu_counters(struct ethosu_device *dev);
 
 /**
  * Check if the STATUS register has any error bits set or not.

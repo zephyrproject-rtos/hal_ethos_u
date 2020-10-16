@@ -62,11 +62,6 @@ if (${LOG_SEVERITY} EQUAL -1)
     message(FATAL_ERROR "Unsupported log level ${ETHOSU_LOG_SEVERITY}")
 endif()
 
-# Enable PMU boot auto-initialization
-if(DRIVER_PMU_AUTOINIT)
-    add_compile_definitions(PMU_AUTOINIT)
-endif()
-
 # Make include directories available for current- and sub projects
 include_directories(include src)
 include_directories(${CMSIS_PATH}/CMSIS/Core/Include)
