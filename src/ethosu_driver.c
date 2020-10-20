@@ -225,6 +225,7 @@ static int handle_command_stream(struct ethosu_driver *drv,
                                  const uint8_t *cmd_stream,
                                  const int cms_length,
                                  const uint64_t *base_addr,
+                                 const size_t *base_addr_size,
                                  const int num_base_addr);
 static int read_apb_reg(struct ethosu_driver *drv, uint16_t);
 static int dump_shram(struct ethosu_driver *drv);
@@ -375,7 +376,8 @@ int ethosu_invoke_v2(const void *custom_data_ptr,
             // It is safe to clear this flag without atomic, because npu is not running.
             irq_triggered = false;
 
-            ret = handle_command_stream(&ethosu_drv, command_stream, cms_length, base_addr, num_base_addr);
+            ret = handle_command_stream(
+                &ethosu_drv, command_stream, cms_length, base_addr, base_addr_size, num_base_addr);
 
             if (return_code == -1 && ethosu_drv.abort_inference)
             {
@@ -536,10 +538,29 @@ static void npu_axi_init(struct ethosu_driver *drv)
                                 AXI_LIMIT3_MAX_OUTSTANDING_WRITES);
 }
 
+/* Default implementation to flush the data cache. Override if available on the targeted device.
+ * Passing NULL as p argument expects the whole cache to be flushed.
+ */
+void __attribute__((weak)) ethosu_flush_dcache(uint32_t *p, size_t bytes)
+{
+    (void)p;
+    (void)bytes;
+}
+
+/* Default implementation to invalidate the data cache. Override if available on the targeted device.
+ * Passing NULL as p argument expects the whole cache to be flushed.
+ */
+void __attribute__((weak)) ethosu_invalidate_dcache(uint32_t *p, size_t bytes)
+{
+    (void)p;
+    (void)bytes;
+}
+
 static int handle_command_stream(struct ethosu_driver *drv,
                                  const uint8_t *cmd_stream,
                                  const int cms_length,
                                  const uint64_t *base_addr,
+                                 const size_t *base_addr_size,
                                  const int num_base_addr)
 {
     uint32_t qread     = 0;
@@ -567,6 +588,25 @@ static int handle_command_stream(struct ethosu_driver *drv,
     }
     npu_axi_init(drv);
 
+    /* Flush the cache if available on our CPU.
+     * The upcasting to uin32_t* is ok since the pointer never is dereferenced.
+     * The base_addr_size is null if invoking from prior to invoke_V2, in that case
+     * the whole cache is being flushed.
+     */
+
+    if (base_addr_size != NULL)
+    {
+        ethosu_flush_dcache((uint32_t *)cmd_stream, cms_bytes);
+        for (int i = 0; i < num_base_addr; i++)
+        {
+            ethosu_flush_dcache((uint32_t *)base_addr[i], base_addr_size[i]);
+        }
+    }
+    else
+    {
+        ethosu_flush_dcache(NULL, 0);
+    }
+
     if (ETHOSU_SUCCESS != ethosu_run_command_stream(&drv->dev, cmd_stream, cms_bytes, base_addr, num_base_addr))
     {
         return -1;
@@ -577,6 +617,18 @@ static int handle_command_stream(struct ethosu_driver *drv,
     if (drv->status_error)
     {
         return -1;
+    }
+
+    if (base_addr_size != NULL)
+    {
+        for (int i = 0; i < num_base_addr; i++)
+        {
+            ethosu_invalidate_dcache((uint32_t *)base_addr[i], base_addr_size[i]);
+        }
+    }
+    else
+    {
+        ethosu_invalidate_dcache(NULL, 0);
     }
 
     (void)ethosu_get_qread(&drv->dev, &qread);

@@ -19,6 +19,29 @@ $ cmake .. -DCMAKE_TOOLCHAIN_FILE=<toolchain> -DCMAKE_SYSTEM_PROCESSOR=cortex-m<
 $ make
 ```
 
+For running the driver on Arm CPUs which are configured with datacache, the
+cache maintenance functions in the driver are exported with weakly linked
+symbols that should be overriden. An example implementation using the CMSIS
+primitives found in cachel1_armv7.h could be as below:
+
+```
+extern "C" {
+void ethosu_flush_dcache(uint32_t *p, size_t bytes) {
+    if (p)
+        SCB_CleanDCache_by_Addr(p, bytes);
+    else
+        SCB_CleanDCache();
+}
+
+void ethosu_invalidate_dcache(uint32_t *p, size_t bytes) {
+    if (p)
+        SCB_InvalidateDCache_by_Addr(p, bytes);
+    else
+        SCB_InvalidateDCache();
+}
+}
+```
+
 # License
 
 The Arm Ethos-U Core Driver is provided under an Apache-2.0 license. Please see
