@@ -21,7 +21,7 @@ $ make
 
 # License
 
-The Arm Ethos-U core driver is proved under an Apache-2.0 license. Please see
+The Arm Ethos-U Core Driver is provided under an Apache-2.0 license. Please see
 [LICENSE.txt](LICENSE.txt) for more information.
 
 # Contributions
@@ -53,13 +53,6 @@ Signed-off-by: Foo Bar foo.bar@example.org
 The contributions will be code reviewed by Arm before they can be accepted into
 the repository.
 
-# Security
+## Security
 
-If you believe you have identified a security related issue or vulnerability,
-then we encourage you to responsibly disclose it to us as soon as possible.
-
-## Reporting Security Issues and Vulnerabilities
-
-Please send an email to <MLG-Security@arm.com> with the subject
-`Ethos-U Security`. In the body of the email include as much information as
-possible about the issue or vulnerability and any additional contact details.
+Please see [Security](SECURITY.md).
