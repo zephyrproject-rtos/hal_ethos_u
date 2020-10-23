@@ -164,12 +164,12 @@ uint32_t ETHOSU_PMU_CNTR_Status(void)
 
 uint64_t ETHOSU_PMU_Get_CCNTR(void)
 {
-    uint32_t val_lo = ethosu_read_reg(&ethosu_drv.dev, NPU_REG_PMCCNTR_HI);
-    uint32_t val_hi = ethosu_read_reg(&ethosu_drv.dev, NPU_REG_PMCCNTR_LO);
+    uint32_t val_lo = ethosu_read_reg(&ethosu_drv.dev, NPU_REG_PMCCNTR_LO);
+    uint32_t val_hi = ethosu_read_reg(&ethosu_drv.dev, NPU_REG_PMCCNTR_HI);
     uint64_t val    = ((uint64_t)val_hi << 32) | val_lo;
     uint64_t shadow = ((uint64_t)ethosu_drv.dev.pmccntr[1] << 32) | ethosu_drv.dev.pmccntr[0];
 
-    LOG_DEBUG("%s: val=%llu, shadow=%llu\n", __FUNCTION__, val, shadow);
+    LOG_DEBUG("%s: val=%" PRIu64 ", shadow=%" PRIu64 "\n", __FUNCTION__, val, shadow);
 
     // Return the shadow variable in case the NPU was powered off and lost the cycle count
     if (shadow > val)
