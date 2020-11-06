@@ -337,14 +337,13 @@ int ethosu_invoke_v2(const void *custom_data_ptr,
 
         if (base_addr_size != NULL && base_addr_size[FAST_MEMORY_BASE_ADDR_INDEX] > ethosu_drv.fast_memory_size)
         {
-            LOG_WARN("Fast memory area too small. fast_memory_size=%u, base_addr_size=%u\n",
-                     ethosu_drv.fast_memory_size,
-                     base_addr_size[FAST_MEMORY_BASE_ADDR_INDEX]);
+            LOG_ERR("Fast memory area too small. fast_memory_size=%u, base_addr_size=%u\n",
+                    ethosu_drv.fast_memory_size,
+                    base_addr_size[FAST_MEMORY_BASE_ADDR_INDEX]);
+            return -1;
         }
-        else
-        {
-            *fast_memory = ethosu_drv.fast_memory;
-        }
+
+        *fast_memory = ethosu_drv.fast_memory;
     }
 
     if (ethosu_drv.dev.reset != ethosu_read_reg(&ethosu_drv.dev, NPU_REG_PROT))
