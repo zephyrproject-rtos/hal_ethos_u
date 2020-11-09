@@ -34,10 +34,16 @@
 static uint32_t stream_length = 0;
 #endif
 
-enum ethosu_error_codes ethosu_dev_init(struct ethosu_device *dev, const void *base_address)
+enum ethosu_error_codes ethosu_dev_init(struct ethosu_device *dev,
+                                        const void *base_address,
+                                        uint32_t secure_enable,
+                                        uint32_t privilege_enable)
 {
 #if !defined(ARM_NPU_STUB)
     dev->base_address = (volatile uint32_t *)base_address;
+    dev->secure       = secure_enable;
+    dev->privileged   = privilege_enable;
+
     ethosu_save_pmu_config(dev);
 #else
     UNUSED(dev);
@@ -170,7 +176,6 @@ enum ethosu_error_codes ethosu_clear_irq_status(struct ethosu_device *dev)
     return ETHOSU_SUCCESS;
 }
 
-// TODO Understand settings of privilege/security level and update API.
 enum ethosu_error_codes ethosu_soft_reset(struct ethosu_device *dev)
 {
     enum ethosu_error_codes return_code = ETHOSU_SUCCESS;
@@ -179,13 +184,14 @@ enum ethosu_error_codes ethosu_soft_reset(struct ethosu_device *dev)
     struct prot_r prot;
 
     reset.word        = 0;
-    reset.pending_CPL = PRIVILEGE_LEVEL_USER;      // TODO, how to get the host privilege level
-    reset.pending_CSL = SECURITY_LEVEL_NON_SECURE; // TODO, how to get Security level
+    reset.pending_CPL = dev->privileged ? PRIVILEGE_LEVEL_PRIVILEGED : PRIVILEGE_LEVEL_USER;
+    reset.pending_CSL = dev->secure ? SECURITY_LEVEL_SECURE : SECURITY_LEVEL_NON_SECURE;
 
     prot.word = ethosu_read_reg(dev, NPU_REG_PROT);
 
     if (prot.active_CPL < reset.pending_CPL && prot.active_CSL > reset.pending_CSL)
     {
+        LOG_ERR("Failed to reset NPU\n");
         // Register access not permitted
         return ETHOSU_GENERIC_FAILURE;
     }
@@ -196,7 +202,7 @@ enum ethosu_error_codes ethosu_soft_reset(struct ethosu_device *dev)
     // Wait for reset to complete
     return_code = ethosu_wait_for_reset(dev);
 
-    // Save the proto register
+    // Save the prot register
     dev->reset = ethosu_read_reg(dev, NPU_REG_PROT);
 
     // Soft reset will clear the PMU configuration and counters. The shadow PMU counters

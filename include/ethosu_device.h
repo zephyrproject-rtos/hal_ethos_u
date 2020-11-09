@@ -63,6 +63,8 @@ struct ethosu_device
     uint32_t pmccntr_cfg;
     uint32_t pmu_evcntr[ETHOSU_PMU_NCOUNTERS];
     uint32_t pmu_evtypr[ETHOSU_PMU_NCOUNTERS];
+    uint32_t secure;
+    uint32_t privileged;
 };
 
 struct ethosu_id
@@ -143,7 +145,10 @@ enum ethosu_power_q_request
 /**
  * Initialize the device.
  */
-enum ethosu_error_codes ethosu_dev_init(struct ethosu_device *dev, const void *base_address);
+enum ethosu_error_codes ethosu_dev_init(struct ethosu_device *dev,
+                                        const void *base_address,
+                                        uint32_t secure_enable,
+                                        uint32_t privilege_enable);
 
 /**
  * Get device id.

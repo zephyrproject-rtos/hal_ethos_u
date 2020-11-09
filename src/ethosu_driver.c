@@ -233,20 +233,26 @@ static void dump_npu_register(struct ethosu_driver *drv, int npu_reg, int npu_re
 static void dump_command_stream(const uint32_t *cmd_stream, const int cms_length, int qread);
 static void npu_axi_init(struct ethosu_driver *drv);
 
-int ethosu_init_v2(const void *base_address, const void *fast_memory, const size_t fast_memory_size)
+int ethosu_init_v3(const void *base_address,
+                   const void *fast_memory,
+                   const size_t fast_memory_size,
+                   uint32_t secure_enable,
+                   uint32_t privilege_enable)
 {
     int return_code = 0;
 
-    LOG_INFO("%s. base_address=%p, fast_memory=%p, fast_memory_size=%zu\n",
+    LOG_INFO("%s. base_address=%p, fast_memory=%p, fast_memory_size=%zu, secure=%u, privileged=%u\n",
              __FUNCTION__,
              base_address,
              fast_memory,
-             fast_memory_size);
+             fast_memory_size,
+             secure_enable,
+             privilege_enable);
 
     ethosu_drv.fast_memory      = (uint32_t)fast_memory;
     ethosu_drv.fast_memory_size = fast_memory_size;
 
-    if (ETHOSU_SUCCESS != ethosu_dev_init(&ethosu_drv.dev, base_address))
+    if (ETHOSU_SUCCESS != ethosu_dev_init(&ethosu_drv.dev, base_address, secure_enable, privilege_enable))
     {
         LOG_ERR("Failed in ethosu_dev_init");
         return -1;
