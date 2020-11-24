@@ -149,7 +149,7 @@ struct opt_cfg_s
  ******************************************************************************/
 
 struct ethosu_driver ethosu_drv = {
-    .dev = {.base_address = NULL, .reset = 0, .pmccntr = {0}, .pmu_evcntr = {0, 0, 0, 0}, .pmu_evtypr = {0, 0, 0, 0}},
+    .dev = {.base_address = NULL, .proto = 0, .pmccntr = {0}, .pmu_evcntr = {0, 0, 0, 0}, .pmu_evtypr = {0, 0, 0, 0}},
     .abort_inference = false,
     .status_error    = false};
 
@@ -356,13 +356,15 @@ int ethosu_invoke_v2(const void *custom_data_ptr,
         *fast_memory = ethosu_drv.fast_memory;
     }
 
-    if (ethosu_drv.dev.reset != ethosu_read_reg(&ethosu_drv.dev, NPU_REG_PROT))
+    // Only soft reset if securty state or privilege level needs changing
+    if (ethosu_drv.dev.proto != ethosu_read_reg(&ethosu_drv.dev, NPU_REG_PROT))
     {
         if (ETHOSU_SUCCESS != ethosu_soft_reset(&ethosu_drv.dev))
         {
             return -1;
         }
     }
+
     ethosu_drv.status_error = false;
     ethosu_set_clock_and_power(&ethosu_drv.dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_DISABLE);
     ethosu_restore_pmu_config(&ethosu_drv.dev);
@@ -575,8 +577,10 @@ static int handle_command_stream(struct ethosu_driver *drv,
                                  const size_t *base_addr_size,
                                  const int num_base_addr)
 {
-    uint32_t qread     = 0;
-    uint32_t cms_bytes = cms_length * BYTES_IN_32_BITS;
+    uint32_t qread           = 0;
+    uint32_t cms_bytes       = cms_length * BYTES_IN_32_BITS;
+    ptrdiff_t cmd_stream_ptr = (ptrdiff_t)cmd_stream;
+
     LOG_INFO("handle_command_stream: cmd_stream=%p, cms_length %d\n", cmd_stream, cms_length);
 
     if (0 != ((ptrdiff_t)cmd_stream & MASK_16_BYTE_ALIGN))
@@ -594,10 +598,12 @@ static int handle_command_stream(struct ethosu_driver *drv,
             base_addr_invalid = true;
         }
     }
+
     if (base_addr_invalid)
     {
         return -1;
     }
+
     npu_axi_init(drv);
 
     /* Flush the cache if available on our CPU.
@@ -608,7 +614,7 @@ static int handle_command_stream(struct ethosu_driver *drv,
 
     if (base_addr_size != NULL)
     {
-        ethosu_flush_dcache((uint32_t *)cmd_stream, cms_bytes);
+        ethosu_flush_dcache((uint32_t *)cmd_stream_ptr, cms_bytes);
         for (int i = 0; i < num_base_addr; i++)
         {
             ethosu_flush_dcache((uint32_t *)base_addr[i], base_addr_size[i]);

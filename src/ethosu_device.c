@@ -170,6 +170,7 @@ enum ethosu_error_codes ethosu_clear_irq_status(struct ethosu_device *dev)
     cmd.clock_q_enable = oldcmd.clock_q_enable;
     cmd.power_q_enable = oldcmd.power_q_enable;
     ethosu_write_reg(dev, NPU_REG_CMD, cmd.word);
+    LOG_DEBUG("CMD=0x%08x\n", cmd.word);
 #else
     UNUSED(dev);
 #endif
@@ -187,23 +188,29 @@ enum ethosu_error_codes ethosu_soft_reset(struct ethosu_device *dev)
     reset.pending_CPL = dev->privileged ? PRIVILEGE_LEVEL_PRIVILEGED : PRIVILEGE_LEVEL_USER;
     reset.pending_CSL = dev->secure ? SECURITY_LEVEL_SECURE : SECURITY_LEVEL_NON_SECURE;
 
-    prot.word = ethosu_read_reg(dev, NPU_REG_PROT);
-
-    if (prot.active_CPL < reset.pending_CPL && prot.active_CSL > reset.pending_CSL)
-    {
-        LOG_ERR("Failed to reset NPU\n");
-        // Register access not permitted
-        return ETHOSU_GENERIC_FAILURE;
-    }
-
     // Reset and set security level
+    LOG_INFO("Soft reset NPU\n");
     ethosu_write_reg(dev, NPU_REG_RESET, reset.word);
 
     // Wait for reset to complete
     return_code = ethosu_wait_for_reset(dev);
+    if (return_code != ETHOSU_SUCCESS)
+    {
+        LOG_ERR("Soft reset timed out\n");
+        return return_code;
+    }
+
+    // Verify that NPU has switched security state and privilege level
+    prot.word = ethosu_read_reg(dev, NPU_REG_PROT);
+    if (prot.active_CPL != reset.pending_CPL || prot.active_CSL != reset.pending_CSL)
+    {
+        LOG_ERR("Failed to switch security state and privilege level\n");
+        // Register access not permitted
+        return ETHOSU_GENERIC_FAILURE;
+    }
 
     // Save the prot register
-    dev->reset = ethosu_read_reg(dev, NPU_REG_PROT);
+    dev->proto = ethosu_read_reg(dev, NPU_REG_PROT);
 
     // Soft reset will clear the PMU configuration and counters. The shadow PMU counters
     // are cleared by saving the PMU counters to ram, which will read back zeros.
@@ -277,6 +284,7 @@ enum ethosu_error_codes ethosu_set_qconfig(struct ethosu_device *dev, enum ethos
     }
 #if !defined(ARM_NPU_STUB)
     ethosu_write_reg(dev, NPU_REG_QCONFIG, memory_type);
+    LOG_DEBUG("QCONFIG=0x%08x\n", memory_type);
 #else
     // NPU stubbed
     UNUSED(dev);
@@ -324,6 +332,7 @@ enum ethosu_error_codes ethosu_set_axi_limit0(struct ethosu_device *dev,
     axi_limit0.max_outstanding_write_m1 = max_writes - 1;
 
     ethosu_write_reg(dev, NPU_REG_AXI_LIMIT0, axi_limit0.word);
+    LOG_DEBUG("AXI_LIMIT0=0x%08x\n", axi_limit0.word);
 #else
     // NPU stubbed
     UNUSED(dev);
@@ -351,6 +360,7 @@ enum ethosu_error_codes ethosu_set_axi_limit1(struct ethosu_device *dev,
     axi_limit1.max_outstanding_write_m1 = max_writes - 1;
 
     ethosu_write_reg(dev, NPU_REG_AXI_LIMIT1, axi_limit1.word);
+    LOG_DEBUG("AXI_LIMIT1=0x%08x\n", axi_limit1.word);
 #else
     // NPU stubbed
     UNUSED(dev);
@@ -378,6 +388,7 @@ enum ethosu_error_codes ethosu_set_axi_limit2(struct ethosu_device *dev,
     axi_limit2.max_outstanding_write_m1 = max_writes - 1;
 
     ethosu_write_reg(dev, NPU_REG_AXI_LIMIT2, axi_limit2.word);
+    LOG_DEBUG("AXI_LIMIT2=0x%08x\n", axi_limit2.word);
 #else
     // NPU stubbed
     UNUSED(dev);
@@ -405,6 +416,7 @@ enum ethosu_error_codes ethosu_set_axi_limit3(struct ethosu_device *dev,
     axi_limit3.max_outstanding_write_m1 = max_writes - 1;
 
     ethosu_write_reg(dev, NPU_REG_AXI_LIMIT3, axi_limit3.word);
+    LOG_DEBUG("AXI_LIMIT3=0x%08x\n", axi_limit3.word);
 #else
     // NPU stubbed
     UNUSED(dev);
@@ -479,6 +491,7 @@ enum ethosu_error_codes ethosu_clear_irq_history_mask(struct ethosu_device *dev,
     cmd.power_q_enable    = oldcmd.power_q_enable;
     cmd.clear_irq_history = irq_history_clear_mask;
     ethosu_write_reg(dev, NPU_REG_CMD, cmd.word);
+    LOG_DEBUG("CMD=0x%08x\n", cmd.word);
 #else
     UNUSED(dev);
     UNUSED(irq_history_clear_mask);
@@ -498,6 +511,7 @@ enum ethosu_error_codes ethosu_set_command_run(struct ethosu_device *dev)
     cmd.clock_q_enable              = oldcmd.clock_q_enable;
     cmd.power_q_enable              = oldcmd.power_q_enable;
     ethosu_write_reg(dev, NPU_REG_CMD, cmd.word);
+    LOG_DEBUG("CMD=0x%08x\n", cmd.word);
 #else
     UNUSED(dev);
 #endif
@@ -537,6 +551,7 @@ enum ethosu_error_codes ethosu_set_clock_and_power(struct ethosu_device *dev,
     cmd.clock_q_enable = clock_q;
     cmd.power_q_enable = power_q;
     ethosu_write_reg(dev, NPU_REG_CMD, cmd.word);
+    LOG_DEBUG("CMD=0x%08x\n", cmd.word);
 #else
     UNUSED(dev);
     UNUSED(clock_q);
