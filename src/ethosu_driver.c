@@ -179,7 +179,7 @@ void ethosu_irq_handler(void)
 
     if (ethosu_status_has_error(&ethosu_drv.dev))
     {
-        ethosu_soft_reset(&ethosu_drv.dev);
+        (void)ethosu_soft_reset(&ethosu_drv.dev);
         ethosu_drv.status_error = true;
     }
 }
@@ -264,7 +264,10 @@ int ethosu_init_v3(const void *base_address,
         return -1;
     }
 
-    ethosu_soft_reset(&ethosu_drv.dev);
+    if (ETHOSU_SUCCESS != ethosu_soft_reset(&ethosu_drv.dev))
+    {
+        return -1;
+    }
 
     if (ETHOSU_SUCCESS != ethosu_wait_for_reset(&ethosu_drv.dev))
     {
@@ -355,7 +358,10 @@ int ethosu_invoke_v2(const void *custom_data_ptr,
 
     if (ethosu_drv.dev.reset != ethosu_read_reg(&ethosu_drv.dev, NPU_REG_PROT))
     {
-        ethosu_soft_reset(&ethosu_drv.dev);
+        if (ETHOSU_SUCCESS != ethosu_soft_reset(&ethosu_drv.dev))
+        {
+            return -1;
+        }
     }
     ethosu_drv.status_error = false;
     ethosu_set_clock_and_power(&ethosu_drv.dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_DISABLE);

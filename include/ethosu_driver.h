@@ -95,9 +95,9 @@ int ethosu_init_v3(const void *base_address,
                    uint32_t secure_enable,
                    uint32_t privilege_enable);
 
-#define ethosu_init(base_address) ethosu_init_v3(base_address, NULL, 0, 1, 1)
+#define ethosu_init(base_address) ethosu_init_v3(base_address, NULL, 0, 0, 0)
 #define ethosu_init_v2(base_address, fast_memory, fast_memory_size)                                                    \
-    ethosu_init_v3(base_address, fast_memory, fast_memory_size, 1, 1)
+    ethosu_init_v3(base_address, fast_memory, fast_memory_size, 0, 0)
 
 /**
  * Get Ethos-U version.
