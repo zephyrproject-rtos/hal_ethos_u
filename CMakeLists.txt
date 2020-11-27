@@ -36,26 +36,6 @@ set_property(CACHE ETHOSU_LOG_SEVERITY PROPERTY STRINGS ${LOG_NAMES})
 # Global settings
 #
 
-if(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m0")
-    add_compile_definitions(CPU_CORTEX_M0)
-elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m1")
-    add_compile_definitions(CPU_CORTEX_M1)
-elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m23")
-    add_compile_definitions(CPU_CORTEX_M23)
-elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m3")
-    add_compile_definitions(CPU_CORTEX_M3)
-elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m33")
-    add_compile_definitions(CPU_CORTEX_M33)
-elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m4")
-    add_compile_definitions(CPU_CORTEX_M4)
-elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m55")
-    add_compile_definitions(CPU_CORTEX_M55)
-elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m7")
-    add_compile_definitions(CPU_CORTEX_M7)
-else()
-    message(FATAL_ERROR "Unsupported compiler ${CMAKE_SYSTEM_PROCESSOR}.")
-endif()
-
 # Check that ETHOSU_LOG_SEVERITY has one of the supported levels
 list(FIND LOG_NAMES ${ETHOSU_LOG_SEVERITY} LOG_SEVERITY)
 if (${LOG_SEVERITY} EQUAL -1)

@@ -155,8 +155,6 @@ struct ethosu_driver ethosu_drv = {
 
 // IRQ
 static volatile bool irq_triggered = false;
-#if defined(CPU_CORTEX_M3) || defined(CPU_CORTEX_M4) || defined(CPU_CORTEX_M7) || defined(CPU_CORTEX_M33) ||           \
-    defined(CPU_CORTEX_M55)
 void ethosu_irq_handler(void)
 {
     uint8_t irq_raised = 0;
@@ -200,25 +198,6 @@ static inline void wait_for_irq(struct ethosu_driver *drv)
         __enable_irq();
     }
 }
-#else
-// Just polling the status register
-static inline void wait_for_irq(struct ethosu_driver *drv)
-{
-    uint8_t irq_raised = 0;
-
-    for (int i = 0; i < 5000; ++i)
-    {
-        (void)ethosu_is_irq_raised(&drv->dev, &irq_raised);
-        if (1 == irq_raised)
-        {
-            break;
-        }
-    }
-    ASSERT(1 == irq_raised);
-
-    irq_triggered = true;
-}
-#endif
 
 static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s *opt_cfg_p);
 static int handle_command_stream(struct ethosu_driver *drv,
