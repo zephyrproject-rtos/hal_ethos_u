@@ -220,7 +220,7 @@ int ethosu_init_v3(const void *base_address,
 {
     int return_code = 0;
 
-    LOG_INFO("%s. base_address=%p, fast_memory=%p, fast_memory_size=%zu, secure=%u, privileged=%u\n",
+    LOG_INFO("%s. base_address=%p, fast_memory=%p, fast_memory_size=%zu, secure=%" PRIu32 ", privileged=%" PRIu32 "\n",
              __FUNCTION__,
              base_address,
              fast_memory,
@@ -596,7 +596,7 @@ static int handle_command_stream(struct ethosu_driver *drv,
         ethosu_flush_dcache((uint32_t *)cmd_stream_ptr, cms_bytes);
         for (int i = 0; i < num_base_addr; i++)
         {
-            ethosu_flush_dcache((uint32_t *)base_addr[i], base_addr_size[i]);
+            ethosu_flush_dcache((uint32_t *)(uintptr_t)base_addr[i], base_addr_size[i]);
         }
     }
     else
@@ -620,7 +620,7 @@ static int handle_command_stream(struct ethosu_driver *drv,
     {
         for (int i = 0; i < num_base_addr; i++)
         {
-            ethosu_invalidate_dcache((uint32_t *)base_addr[i], base_addr_size[i]);
+            ethosu_invalidate_dcache((uint32_t *)(uintptr_t)base_addr[i], base_addr_size[i]);
         }
     }
     else
