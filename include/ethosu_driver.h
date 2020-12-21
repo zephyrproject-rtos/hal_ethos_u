@@ -44,6 +44,7 @@ struct ethosu_driver
     uint64_t fast_memory;
     size_t fast_memory_size;
     bool status_error;
+    bool dev_power_always_on;
 };
 
 struct ethosu_version_id
@@ -125,6 +126,11 @@ void ethosu_abort(void);
  * Interrupt handler do be called on IRQ from Ethos-U
  */
 void ethosu_irq_handler(void);
+
+/**
+ * Set Ethos-U power mode.
+ */
+void ethosu_set_power_mode(bool);
 
 #ifdef __cplusplus
 }

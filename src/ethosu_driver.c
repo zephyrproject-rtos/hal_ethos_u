@@ -150,11 +150,13 @@ struct opt_cfg_s
 
 struct ethosu_driver ethosu_drv = {
     .dev = {.base_address = NULL, .proto = 0, .pmccntr = {0}, .pmu_evcntr = {0, 0, 0, 0}, .pmu_evtypr = {0, 0, 0, 0}},
-    .abort_inference = false,
-    .status_error    = false};
+    .abort_inference     = false,
+    .status_error        = false,
+    .dev_power_always_on = false};
 
 // IRQ
 static volatile bool irq_triggered = false;
+static int ethosu_soft_reset_and_restore(struct ethosu_driver *drv);
 void ethosu_irq_handler(void)
 {
     uint8_t irq_raised = 0;
@@ -177,7 +179,7 @@ void ethosu_irq_handler(void)
 
     if (ethosu_status_has_error(&ethosu_drv.dev))
     {
-        (void)ethosu_soft_reset(&ethosu_drv.dev);
+        ethosu_soft_reset_and_restore(&ethosu_drv);
         ethosu_drv.status_error = true;
     }
 }
@@ -253,6 +255,7 @@ int ethosu_init_v3(const void *base_address,
         LOG_ERR("Failed reset of Ethos-U\n");
         return -1;
     }
+
     ethosu_drv.status_error = false;
 
     return return_code;
@@ -335,18 +338,21 @@ int ethosu_invoke_v2(const void *custom_data_ptr,
         *fast_memory = ethosu_drv.fast_memory;
     }
 
-    // Only soft reset if securty state or privilege level needs changing
-    if (ethosu_drv.dev.proto != ethosu_read_reg(&ethosu_drv.dev, NPU_REG_PROT))
+    if (!ethosu_drv.dev_power_always_on)
     {
-        if (ETHOSU_SUCCESS != ethosu_soft_reset(&ethosu_drv.dev))
+        if (ethosu_drv.dev.proto != ethosu_read_reg(&ethosu_drv.dev, NPU_REG_PROT))
         {
-            return -1;
+            if (ETHOSU_SUCCESS != ethosu_soft_reset(&ethosu_drv.dev))
+            {
+                return -1;
+            }
         }
+        ethosu_set_clock_and_power(&ethosu_drv.dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_DISABLE);
+        ethosu_restore_pmu_config(&ethosu_drv.dev);
+        npu_axi_init(&ethosu_drv);
     }
 
     ethosu_drv.status_error = false;
-    ethosu_set_clock_and_power(&ethosu_drv.dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_DISABLE);
-    ethosu_restore_pmu_config(&ethosu_drv.dev);
 
     while (data_ptr < data_end)
     {
@@ -411,7 +417,7 @@ int ethosu_invoke_v2(const void *custom_data_ptr,
         }
     }
 
-    if (!ethosu_drv.status_error)
+    if (!ethosu_drv.status_error && !ethosu_drv.dev_power_always_on)
     {
         ethosu_save_pmu_counters(&ethosu_drv.dev);
         ethosu_set_clock_and_power(&ethosu_drv.dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
@@ -423,6 +429,32 @@ int ethosu_invoke_v2(const void *custom_data_ptr,
 void ethosu_abort(void)
 {
     ethosu_drv.abort_inference = true;
+}
+
+void ethosu_set_power_mode(bool always_on)
+{
+    ethosu_drv.dev_power_always_on = always_on;
+
+    if (always_on)
+    {
+        npu_axi_init(&ethosu_drv);
+    }
+}
+
+static int ethosu_soft_reset_and_restore(struct ethosu_driver *drv)
+{
+
+    if (ETHOSU_SUCCESS != ethosu_soft_reset(&drv->dev))
+    {
+        return -1;
+    }
+
+    ethosu_set_clock_and_power(&drv->dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_DISABLE);
+
+    npu_axi_init(drv);
+    ethosu_restore_pmu_config(&drv->dev);
+
+    return 0;
 }
 
 static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s *opt_cfg_p)
@@ -582,8 +614,6 @@ static int handle_command_stream(struct ethosu_driver *drv,
     {
         return -1;
     }
-
-    npu_axi_init(drv);
 
     /* Flush the cache if available on our CPU.
      * The upcasting to uin32_t* is ok since the pointer never is dereferenced.
