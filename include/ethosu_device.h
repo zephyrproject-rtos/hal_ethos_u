@@ -23,8 +23,6 @@
  * Includes
  ******************************************************************************/
 
-#include "pmu_ethosu.h"
-
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -40,6 +38,10 @@ extern "C" {
 #define ETHOSU_DRIVER_VERSION_MINOR 16 ///< Driver minor version
 #define ETHOSU_DRIVER_VERSION_PATCH 0  ///< Driver patch version
 #define ETHOSU_DRIVER_BASEP_INDEXES 8  ///< Number of base pointer indexes
+
+#ifndef ETHOSU_PMU_NCOUNTERS
+#define ETHOSU_PMU_NCOUNTERS 4
+#endif
 
 /******************************************************************************
  * Types

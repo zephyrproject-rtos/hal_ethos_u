@@ -25,6 +25,8 @@
 
 #include <stdint.h>
 
+#include "ethosu_driver.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -137,36 +139,48 @@ enum ethosu_pmu_event_type
 /**
  * \brief   Enable the PMU
  */
-void ETHOSU_PMU_Enable(void);
+void ETHOSU_PMU_Enable_v2(struct ethosu_driver *drv);
+
+#define ETHOSU_PMU_Enable(void) ETHOSU_PMU_Enable_v2(&ethosu_drv)
 
 /**
  * \brief   Disable the PMU
  */
-void ETHOSU_PMU_Disable(void);
+void ETHOSU_PMU_Disable_v2(struct ethosu_driver *drv);
+
+#define ETHOSU_PMU_Disable(void) ETHOSU_PMU_Disable_v2(&ethosu_drv)
 
 /**
  * \brief   Set event to count for PMU eventer counter
  * \param [in]    num     Event counter (0-ETHOSU_PMU_NCOUNTERS) to configure
  * \param [in]    type    Event to count
  */
-void ETHOSU_PMU_Set_EVTYPER(uint32_t num, enum ethosu_pmu_event_type type);
+void ETHOSU_PMU_Set_EVTYPER_v2(struct ethosu_driver *drv, uint32_t num, enum ethosu_pmu_event_type type);
+
+#define ETHOSU_PMU_Set_EVTYPER(num, type) ETHOSU_PMU_Set_EVTYPER_v2(&ethosu_drv, num, type)
 
 /**
  * \brief   Get event to count for PMU eventer counter
  * \param [in]    num     Event counter (0-ETHOSU_PMU_NCOUNTERS) to configure
  * \return        type    Event to count
  */
-enum ethosu_pmu_event_type ETHOSU_PMU_Get_EVTYPER(uint32_t num);
+enum ethosu_pmu_event_type ETHOSU_PMU_Get_EVTYPER_v2(struct ethosu_driver *drv, uint32_t num);
+
+#define ETHOSU_PMU_Get_EVTYPER(num) ETHOSU_PMU_Get_EVTYPER_v2(&ethosu_drv, num)
 
 /**
  * \brief  Reset cycle counter
  */
-void ETHOSU_PMU_CYCCNT_Reset(void);
+void ETHOSU_PMU_CYCCNT_Reset_v2(struct ethosu_driver *drv);
+
+#define ETHOSU_PMU_CYCCNT_Reset(void) ETHOSU_PMU_CYCCNT_Reset_v2(&ethosu_drv)
 
 /**
  * \brief  Reset all event counters
  */
-void ETHOSU_PMU_EVCNTR_ALL_Reset(void);
+void ETHOSU_PMU_EVCNTR_ALL_Reset_v2(struct ethosu_driver *drv);
+
+#define ETHOSU_PMU_EVCNTR_ALL_Reset(void) ETHOSU_PMU_EVCNTR_ALL_Reset_v2(&ethosu_drv)
 
 /**
  * \brief  Enable counters
@@ -175,7 +189,9 @@ void ETHOSU_PMU_EVCNTR_ALL_Reset(void);
  *         - event counters (bit 0-ETHOSU_PMU_NCOUNTERS)
  *         - cycle counter  (bit 31)
  */
-void ETHOSU_PMU_CNTR_Enable(uint32_t mask);
+void ETHOSU_PMU_CNTR_Enable_v2(struct ethosu_driver *drv, uint32_t mask);
+
+#define ETHOSU_PMU_CNTR_Enable(mask) ETHOSU_PMU_CNTR_Enable_v2(&ethosu_drv, mask)
 
 /**
  * \brief  Disable counters
@@ -184,7 +200,9 @@ void ETHOSU_PMU_CNTR_Enable(uint32_t mask);
  *         - event counters (bit 0-ETHOSU_PMU_NCOUNTERS)
  *         - cycle counter  (bit 31)
  */
-void ETHOSU_PMU_CNTR_Disable(uint32_t mask);
+void ETHOSU_PMU_CNTR_Disable_v2(struct ethosu_driver *drv, uint32_t mask);
+
+#define ETHOSU_PMU_CNTR_Disable(mask) ETHOSU_PMU_CNTR_Disable_v2(&ethosu_drv, mask)
 
 /**
  * \brief  Determine counters activation
@@ -196,7 +214,9 @@ void ETHOSU_PMU_CNTR_Disable(uint32_t mask);
  *         - cycle counter  activate  (bit 31)
  * \note   ETHOSU specific. Usage breaks CMSIS complience
  */
-uint32_t ETHOSU_PMU_CNTR_Status(void);
+uint32_t ETHOSU_PMU_CNTR_Status_v2(struct ethosu_driver *drv);
+
+#define ETHOSU_PMU_CNTR_Status(void) ETHOSU_PMU_CNTR_Status_v2(&ethosu_drv)
 
 /**
  * \brief  Read cycle counter (64 bit)
@@ -207,7 +227,9 @@ uint32_t ETHOSU_PMU_CNTR_Status(void);
  *         is not greater than the former, it means overflow of LSW without
  *         incrementing MSW has occurred, in which case the former value is used.
  */
-uint64_t ETHOSU_PMU_Get_CCNTR(void);
+uint64_t ETHOSU_PMU_Get_CCNTR_v2(struct ethosu_driver *drv);
+
+#define ETHOSU_PMU_Get_CCNTR(void) ETHOSU_PMU_Get_CCNTR_v2(&ethosu_drv)
 
 /**
  * \brief  Set cycle counter (64 bit)
@@ -216,14 +238,18 @@ uint64_t ETHOSU_PMU_Get_CCNTR(void);
  *         To work-around raciness, counter is temporary disabled if enabled.
  * \note   ETHOSU specific. Usage breaks CMSIS complience
  */
-void ETHOSU_PMU_Set_CCNTR(uint64_t val);
+void ETHOSU_PMU_Set_CCNTR_v2(struct ethosu_driver *drv, uint64_t val);
+
+#define ETHOSU_PMU_Set_CCNTR(val) ETHOSU_PMU_Set_CCNTR_v2(&ethosu_drv, val)
 
 /**
  * \brief   Read event counter
  * \param [in]    num     Event counter (0-ETHOSU_PMU_NCOUNTERS)
  * \return                Event count
  */
-uint32_t ETHOSU_PMU_Get_EVCNTR(uint32_t num);
+uint32_t ETHOSU_PMU_Get_EVCNTR_v2(struct ethosu_driver *drv, uint32_t num);
+
+#define ETHOSU_PMU_Get_EVCNTR(num) ETHOSU_PMU_Get_EVCNTR_v2(&ethosu_drv, num)
 
 /**
  * \brief   Set event counter value
@@ -231,7 +257,9 @@ uint32_t ETHOSU_PMU_Get_EVCNTR(uint32_t num);
  * \param [in]    val     Conter value
  * \note   ETHOSU specific. Usage breaks CMSIS complience
  */
-void ETHOSU_PMU_Set_EVCNTR(uint32_t num, uint32_t val);
+void ETHOSU_PMU_Set_EVCNTR_v2(struct ethosu_driver *drv, uint32_t num, uint32_t val);
+
+#define ETHOSU_PMU_Set_EVCNTR(num, val) ETHOSU_PMU_Set_EVCNTR_v2(&ethosu_drv, num, val)
 
 /**
  * \brief   Read counter overflow status
@@ -239,7 +267,9 @@ void ETHOSU_PMU_Set_EVCNTR(uint32_t num, uint32_t val);
  *          - event counters (bit 0-ETHOSU_PMU_NCOUNTERS))
  *          - cycle counter  (bit 31)
  */
-uint32_t ETHOSU_PMU_Get_CNTR_OVS(void);
+uint32_t ETHOSU_PMU_Get_CNTR_OVS_v2(struct ethosu_driver *drv);
+
+#define ETHOSU_PMU_Get_CNTR_OVS(void) ETHOSU_PMU_Get_CNTR_OVS_v2(&ethosu_drv)
 
 /**
  * \brief   Clear counter overflow status
@@ -248,7 +278,9 @@ uint32_t ETHOSU_PMU_Get_CNTR_OVS(void);
  *          - event counters (bit 0-ETHOSU_PMU_NCOUNTERS)
  *          - cycle counter  (bit 31)
  */
-void ETHOSU_PMU_Set_CNTR_OVS(uint32_t mask);
+void ETHOSU_PMU_Set_CNTR_OVS_v2(struct ethosu_driver *drv, uint32_t mask);
+
+#define ETHOSU_PMU_Set_CNTR_OVS(mask) ETHOSU_PMU_Set_CNTR_OVS_v2(&ethosu_drv, mask)
 
 /**
  * \brief   Enable counter overflow interrupt request
@@ -257,7 +289,9 @@ void ETHOSU_PMU_Set_CNTR_OVS(uint32_t mask);
  *          - event counters (bit 0-ETHOSU_PMU_NCOUNTERS)
  *          - cycle counter  (bit 31)
  */
-void ETHOSU_PMU_Set_CNTR_IRQ_Enable(uint32_t mask);
+void ETHOSU_PMU_Set_CNTR_IRQ_Enable_v2(struct ethosu_driver *drv, uint32_t mask);
+
+#define ETHOSU_PMU_Set_CNTR_IRQ_Enable(mask) ETHOSU_PMU_Set_CNTR_IRQ_Enable_v2(&ethosu_drv, mask)
 
 /**
  * \brief   Disable counter overflow interrupt request
@@ -266,7 +300,9 @@ void ETHOSU_PMU_Set_CNTR_IRQ_Enable(uint32_t mask);
  *          - event counters (bit 0-ETHOSU_PMU_NCOUNTERS)
  *          - cycle counter  (bit 31)
  */
-void ETHOSU_PMU_Set_CNTR_IRQ_Disable(uint32_t mask);
+void ETHOSU_PMU_Set_CNTR_IRQ_Disable_v2(struct ethosu_driver *drv, uint32_t mask);
+
+#define ETHOSU_PMU_Set_CNTR_IRQ_Disable(mask) ETHOSU_PMU_Set_CNTR_IRQ_Disable_v2(&ethosu_drv, mask)
 
 /**
  * \brief   Get counters overflow interrupt request stiinings
@@ -276,7 +312,9 @@ void ETHOSU_PMU_Set_CNTR_IRQ_Disable(uint32_t mask);
  *          - cycle counter  (bit 31)
  * \note   ETHOSU specific. Usage breaks CMSIS compliance
  */
-uint32_t ETHOSU_PMU_Get_IRQ_Enable(void);
+uint32_t ETHOSU_PMU_Get_IRQ_Enable_v2(struct ethosu_driver *drv);
+
+#define ETHOSU_PMU_Get_IRQ_Enable(void) ETHOSU_PMU_Get_IRQ_Enable_v2(&ethosu_drv)
 
 /**
  * \brief   Software increment event counter
@@ -285,7 +323,9 @@ uint32_t ETHOSU_PMU_Get_IRQ_Enable(void);
  *          - cycle counter  (bit 31)
  * \note    Software increment bits for one or more event counters.
  */
-void ETHOSU_PMU_CNTR_Increment(uint32_t mask);
+void ETHOSU_PMU_CNTR_Increment_v2(struct ethosu_driver *drv, uint32_t mask);
+
+#define ETHOSU_PMU_CNTR_Increment(mask) ETHOSU_PMU_CNTR_Increment_v2(&ethosu_drv, mask)
 
 /**
  * \brief   Set start event number for the cycle counter
@@ -294,7 +334,10 @@ void ETHOSU_PMU_CNTR_Increment(uint32_t mask);
  * \note   Sets the event number that starts the cycle counter.
  *           - Event number in the range 0..1023
  */
-void ETHOSU_PMU_PMCCNTR_CFG_Set_Start_Event(uint32_t start_event);
+void ETHOSU_PMU_PMCCNTR_CFG_Set_Start_Event_v2(struct ethosu_driver *drv, uint32_t start_event);
+
+#define ETHOSU_PMU_PMCCNTR_CFG_Set_Start_Event(start_event)                                                            \
+    ETHOSU_PMU_PMCCNTR_CFG_Set_Start_Event_v2(&ethosu_drv, start_event)
 
 /**
  * \brief   Set stop event number for the cycle counter
@@ -303,7 +346,10 @@ void ETHOSU_PMU_PMCCNTR_CFG_Set_Start_Event(uint32_t start_event);
  * \note   Sets the event number that stops the cycle counter.
  *           - Event number in the range 0..1023
  */
-void ETHOSU_PMU_PMCCNTR_CFG_Set_Stop_Event(uint32_t stop_event);
+void ETHOSU_PMU_PMCCNTR_CFG_Set_Stop_Event_v2(struct ethosu_driver *drv, uint32_t stop_event);
+
+#define ETHOSU_PMU_PMCCNTR_CFG_Set_Stop_Event(stop_event)                                                              \
+    ETHOSU_PMU_PMCCNTR_CFG_Set_Stop_Event_v2(&ethosu_drv, stop_event)
 
 #ifdef __cplusplus
 }

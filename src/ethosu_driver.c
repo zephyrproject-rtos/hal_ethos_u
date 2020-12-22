@@ -154,33 +154,37 @@ struct ethosu_driver ethosu_drv = {
     .status_error        = false,
     .dev_power_always_on = false};
 
+// Registered drivers linked list HEAD
+static struct ethosu_driver *registered_drivers = NULL;
+
 // IRQ
 static volatile bool irq_triggered = false;
 static int ethosu_soft_reset_and_restore(struct ethosu_driver *drv);
-void ethosu_irq_handler(void)
+
+void ethosu_irq_handler_v2(struct ethosu_driver *drv)
 {
     uint8_t irq_raised = 0;
 
     LOG_DEBUG("Interrupt. status=0x%08x, qread=%d\n",
-              ethosu_read_reg(&ethosu_drv.dev, NPU_REG_STATUS),
-              ethosu_read_reg(&ethosu_drv.dev, NPU_REG_QREAD));
+              ethosu_read_reg(&drv->dev, NPU_REG_STATUS),
+              ethosu_read_reg(&drv->dev, NPU_REG_QREAD));
 
     // Verify that interrupt has been raised
-    (void)ethosu_is_irq_raised(&ethosu_drv.dev, &irq_raised);
+    (void)ethosu_is_irq_raised(&drv->dev, &irq_raised);
     ASSERT(irq_raised == 1);
     irq_triggered = true;
 
     // Clear interrupt
-    (void)ethosu_clear_irq_status(&ethosu_drv.dev);
+    (void)ethosu_clear_irq_status(&drv->dev);
 
     // Verify that interrupt has been successfully cleared
-    (void)ethosu_is_irq_raised(&ethosu_drv.dev, &irq_raised);
+    (void)ethosu_is_irq_raised(&drv->dev, &irq_raised);
     ASSERT(irq_raised == 0);
 
-    if (ethosu_status_has_error(&ethosu_drv.dev))
+    if (ethosu_status_has_error(&drv->dev))
     {
-        ethosu_soft_reset_and_restore(&ethosu_drv);
-        ethosu_drv.status_error = true;
+        ethosu_soft_reset_and_restore(drv);
+        drv->status_error = true;
     }
 }
 
@@ -214,7 +218,8 @@ static void dump_npu_register(struct ethosu_driver *drv, int npu_reg, int npu_re
 static void dump_command_stream(const uint32_t *cmd_stream, const int cms_length, int qread);
 static void npu_axi_init(struct ethosu_driver *drv);
 
-int ethosu_init_v3(const void *base_address,
+int ethosu_init_v4(struct ethosu_driver *drv,
+                   const void *base_address,
                    const void *fast_memory,
                    const size_t fast_memory_size,
                    uint32_t secure_enable,
@@ -230,38 +235,40 @@ int ethosu_init_v3(const void *base_address,
              secure_enable,
              privilege_enable);
 
-    ethosu_drv.fast_memory      = (uint32_t)fast_memory;
-    ethosu_drv.fast_memory_size = fast_memory_size;
+    ethosu_register_driver(drv);
 
-    if (ETHOSU_SUCCESS != ethosu_dev_init(&ethosu_drv.dev, base_address, secure_enable, privilege_enable))
+    drv->fast_memory      = (uint32_t)fast_memory;
+    drv->fast_memory_size = fast_memory_size;
+
+    if (ETHOSU_SUCCESS != ethosu_dev_init(&drv->dev, base_address, secure_enable, privilege_enable))
     {
         LOG_ERR("Failed in ethosu_dev_init");
         return -1;
     }
 
-    if (ETHOSU_SUCCESS != ethosu_set_clock_and_power(&ethosu_drv.dev, ETHOSU_CLOCK_Q_DISABLE, ETHOSU_POWER_Q_DISABLE))
+    if (ETHOSU_SUCCESS != ethosu_set_clock_and_power(&drv->dev, ETHOSU_CLOCK_Q_DISABLE, ETHOSU_POWER_Q_DISABLE))
     {
         LOG_ERR("Failed to disable clock-q & power-q for Ethos-U\n");
         return -1;
     }
 
-    if (ETHOSU_SUCCESS != ethosu_soft_reset(&ethosu_drv.dev))
+    if (ETHOSU_SUCCESS != ethosu_soft_reset(&drv->dev))
     {
         return -1;
     }
 
-    if (ETHOSU_SUCCESS != ethosu_wait_for_reset(&ethosu_drv.dev))
+    if (ETHOSU_SUCCESS != ethosu_wait_for_reset(&drv->dev))
     {
         LOG_ERR("Failed reset of Ethos-U\n");
         return -1;
     }
 
-    ethosu_drv.status_error = false;
+    drv->status_error = false;
 
     return return_code;
 }
 
-int ethosu_get_version(struct ethosu_version *version)
+int ethosu_get_version_v2(struct ethosu_driver *drv, struct ethosu_version *version)
 {
     int return_code = 0;
 
@@ -269,8 +276,8 @@ int ethosu_get_version(struct ethosu_version *version)
     {
         struct ethosu_id id;
         struct ethosu_config cfg;
-        (void)ethosu_get_id(&ethosu_drv.dev, &id);
-        (void)ethosu_get_config(&ethosu_drv.dev, &cfg);
+        (void)ethosu_get_id(&drv->dev, &id);
+        (void)ethosu_get_config(&drv->dev, &cfg);
 
         version->id.version_status      = id.version_status;
         version->id.version_minor       = id.version_minor;
@@ -294,7 +301,8 @@ int ethosu_get_version(struct ethosu_version *version)
     return return_code;
 }
 
-int ethosu_invoke_v2(const void *custom_data_ptr,
+int ethosu_invoke_v3(struct ethosu_driver *drv,
+                     const void *custom_data_ptr,
                      const int custom_data_size,
                      const uint64_t *base_addr,
                      const size_t *base_addr_size,
@@ -323,36 +331,39 @@ int ethosu_invoke_v2(const void *custom_data_ptr,
     ++data_ptr;
 
     // Adjust base address to fast memory area
-    if (ethosu_drv.fast_memory != 0 && num_base_addr >= FAST_MEMORY_BASE_ADDR_INDEX)
+    if (drv->fast_memory != 0 && num_base_addr >= FAST_MEMORY_BASE_ADDR_INDEX)
     {
         uint64_t *fast_memory = (uint64_t *)&base_addr[FAST_MEMORY_BASE_ADDR_INDEX];
 
-        if (base_addr_size != NULL && base_addr_size[FAST_MEMORY_BASE_ADDR_INDEX] > ethosu_drv.fast_memory_size)
+        if (base_addr_size != NULL && base_addr_size[FAST_MEMORY_BASE_ADDR_INDEX] > drv->fast_memory_size)
         {
             LOG_ERR("Fast memory area too small. fast_memory_size=%u, base_addr_size=%u\n",
-                    ethosu_drv.fast_memory_size,
+                    drv->fast_memory_size,
                     base_addr_size[FAST_MEMORY_BASE_ADDR_INDEX]);
             return -1;
         }
 
-        *fast_memory = ethosu_drv.fast_memory;
+        *fast_memory = drv->fast_memory;
     }
 
-    if (!ethosu_drv.dev_power_always_on)
+    if (!drv->dev_power_always_on)
     {
-        if (ethosu_drv.dev.proto != ethosu_read_reg(&ethosu_drv.dev, NPU_REG_PROT))
+        // Only soft reset if securty state or privilege level needs changing
+        if (drv->dev.proto != ethosu_read_reg(&drv->dev, NPU_REG_PROT))
         {
-            if (ETHOSU_SUCCESS != ethosu_soft_reset(&ethosu_drv.dev))
+            if (ETHOSU_SUCCESS != ethosu_soft_reset(&drv->dev))
             {
                 return -1;
             }
         }
-        ethosu_set_clock_and_power(&ethosu_drv.dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_DISABLE);
-        ethosu_restore_pmu_config(&ethosu_drv.dev);
-        npu_axi_init(&ethosu_drv);
+
+        drv->status_error = false;
+        ethosu_set_clock_and_power(&drv->dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_DISABLE);
+        ethosu_restore_pmu_config(&drv->dev);
+        npu_axi_init(drv);
     }
 
-    ethosu_drv.status_error = false;
+    drv->status_error = false;
 
     while (data_ptr < data_end)
     {
@@ -363,7 +374,7 @@ int ethosu_invoke_v2(const void *custom_data_ptr,
             LOG_INFO("ethosu_invoke OPTIMIZER_CONFIG\n");
             struct opt_cfg_s *opt_cfg_p = (struct opt_cfg_s *)data_ptr;
 
-            ret = handle_optimizer_config(&ethosu_drv, opt_cfg_p);
+            ret = handle_optimizer_config(drv, opt_cfg_p);
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD + OPTIMIZER_CONFIG_LENGTH_32_BIT_WORD;
             break;
         case COMMAND_STREAM:
@@ -371,34 +382,33 @@ int ethosu_invoke_v2(const void *custom_data_ptr,
             void *command_stream = (uint8_t *)(data_ptr) + sizeof(struct custom_data_s);
             int cms_length       = (data_ptr->reserved << 16) | data_ptr->length;
 
-            ethosu_drv.abort_inference = false;
+            drv->abort_inference = false;
             // It is safe to clear this flag without atomic, because npu is not running.
             irq_triggered = false;
 
-            ret = handle_command_stream(
-                &ethosu_drv, command_stream, cms_length, base_addr, base_addr_size, num_base_addr);
+            ret = handle_command_stream(drv, command_stream, cms_length, base_addr, base_addr_size, num_base_addr);
 
-            if (return_code == -1 && ethosu_drv.abort_inference)
+            if (return_code == -1 && drv->abort_inference)
             {
                 uint32_t qread = 0;
-                ethosu_get_qread(&ethosu_drv.dev, &qread);
+                ethosu_get_qread(&drv->dev, &qread);
                 LOG_ERR("NPU timeout\n");
                 dump_command_stream(command_stream, cms_length, qread);
-                dump_npu_register(&ethosu_drv, 0x200, 0x2BF);
-                dump_npu_register(&ethosu_drv, 0x800, 0xB3F);
-                dump_shram(&ethosu_drv);
+                dump_npu_register(drv, 0x200, 0x2BF);
+                dump_npu_register(drv, 0x800, 0xB3F);
+                dump_shram(drv);
             }
 
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD + cms_length;
             break;
         case READ_APB_REG:
             LOG_INFO("ethosu_invoke READ_APB_REG\n");
-            ret = read_apb_reg(&ethosu_drv, data_ptr->driver_action_data);
+            ret = read_apb_reg(drv, data_ptr->driver_action_data);
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD;
             break;
         case DUMP_SHRAM:
             LOG_INFO("ethosu_invoke DUMP_SHRAM\n");
-            ret = dump_shram(&ethosu_drv);
+            ret = dump_shram(drv);
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD;
             break;
         case NOP:
@@ -417,27 +427,103 @@ int ethosu_invoke_v2(const void *custom_data_ptr,
         }
     }
 
-    if (!ethosu_drv.status_error && !ethosu_drv.dev_power_always_on)
+    if (!drv->status_error && !drv->dev_power_always_on)
     {
-        ethosu_save_pmu_counters(&ethosu_drv.dev);
-        ethosu_set_clock_and_power(&ethosu_drv.dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
+        ethosu_save_pmu_counters(&drv->dev);
+        ethosu_set_clock_and_power(&drv->dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
     }
 
     return return_code;
 }
 
-void ethosu_abort(void)
+void ethosu_abort_v2(struct ethosu_driver *drv)
 {
-    ethosu_drv.abort_inference = true;
+    drv->abort_inference = true;
 }
 
-void ethosu_set_power_mode(bool always_on)
+void ethosu_set_power_mode_v2(struct ethosu_driver *drv, bool always_on)
 {
-    ethosu_drv.dev_power_always_on = always_on;
+    drv->dev_power_always_on = always_on;
 
     if (always_on)
     {
-        npu_axi_init(&ethosu_drv);
+        npu_axi_init(drv);
+    }
+}
+
+int ethosu_register_driver(struct ethosu_driver *drv)
+{
+    // Safeguard check for if driver is already registered
+    struct ethosu_driver *cur = registered_drivers;
+    while (cur != NULL)
+    {
+        if (cur == drv)
+        {
+            LOG_ERR("%s: NPU driver at address %p is already registered.\n", __FUNCTION__, drv);
+            return -1;
+        }
+        cur = cur->next;
+    }
+
+    drv->next = registered_drivers;
+    // Designate new registered driver HEAD
+    registered_drivers = drv;
+
+    LOG_INFO("%s: New NPU driver at address %p is registered.\n", __FUNCTION__, drv);
+
+    return 0;
+}
+
+int ethosu_deregister_driver(struct ethosu_driver *drv)
+{
+    struct ethosu_driver *cur   = registered_drivers;
+    struct ethosu_driver **prev = &registered_drivers;
+
+    while (cur != NULL)
+    {
+        if (cur == drv)
+        {
+            *prev = cur->next;
+            LOG_INFO("%s: NPU driver at address %p is deregistered.\n", __FUNCTION__, drv);
+            return 0;
+        }
+
+        prev = &cur->next;
+        cur  = cur->next;
+    }
+
+    LOG_ERR("%s: NPU driver at address %p does not match a registered driver and therefore may not be deregistered.\n",
+            __FUNCTION__,
+            drv);
+    return -1;
+}
+
+struct ethosu_driver *ethosu_reserve_driver(void)
+{
+    struct ethosu_driver *drv = registered_drivers;
+
+    while (drv != NULL)
+    {
+        if (!drv->reserved)
+        {
+            drv->reserved = true;
+            LOG_INFO("%s - Driver %p reserved.\n", __FUNCTION__, drv);
+            return drv;
+        }
+        drv = drv->next;
+    }
+
+    LOG_INFO("%s: No available drivers.\n", __FUNCTION__, drv);
+
+    return NULL;
+}
+
+void ethosu_release_driver(struct ethosu_driver *drv)
+{
+    if (drv != NULL && drv->reserved)
+    {
+        drv->reserved = false;
+        LOG_INFO("%s - Driver %p released\n", __FUNCTION__, drv);
     }
 }
 
