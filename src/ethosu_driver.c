@@ -509,8 +509,7 @@ static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s *
         return_code = -1;
     }
 
-    if ((id.product_major == PRODUCT_MAJOR_ETHOSU55) &&
-        ((id.arch_major_rev != opt_cfg_p->arch_major_rev) || (id.arch_minor_rev != opt_cfg_p->arch_minor_rev)))
+    if ((id.arch_major_rev != opt_cfg_p->arch_major_rev) || (id.arch_minor_rev < opt_cfg_p->arch_minor_rev))
     {
         LOG_ERR("NPU arch mismatch: npu.arch=%" PRIu32 ".%" PRIu32 ".%" PRIu32 " optimizer.arch=%d.%d.%d\n",
                 id.arch_major_rev,
