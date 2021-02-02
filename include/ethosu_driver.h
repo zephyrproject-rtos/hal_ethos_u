@@ -124,8 +124,6 @@ int ethosu_invoke_v3(struct ethosu_driver *drv,
 
 #define ethosu_invoke(custom_data_ptr, custom_data_size, base_addr, num_base_addr)                                     \
     ethosu_invoke_v2(custom_data_ptr, custom_data_size, base_addr, NULL, num_base_addr)
-#define ethosu_invoke_v2(custom_data_ptr, custom_data_size, base_addr, base_addr_size, num_base_addr)                  \
-    ethosu_invoke_v3(&ethosu_drv, custom_data_ptr, custom_data_size, base_addr, base_addr_size, num_base_addr)
 
 /**
  * Abort Ethos-U inference.
@@ -159,7 +157,7 @@ int ethosu_register_driver(struct ethosu_driver *drv);
 int ethosu_deregister_driver(struct ethosu_driver *drv);
 
 /**
- * Find, reserve, and return the first available driver
+ * Reserves a driver to execute inference with
  */
 struct ethosu_driver *ethosu_reserve_driver(void);
 
@@ -167,6 +165,21 @@ struct ethosu_driver *ethosu_reserve_driver(void);
  * Change driver status to available
  */
 void ethosu_release_driver(struct ethosu_driver *drv);
+
+/**
+ * Static inline for backwards-compatibility
+ */
+static inline int ethosu_invoke_v2(const void *custom_data_ptr,
+                                   const int custom_data_size,
+                                   const uint64_t *base_addr,
+                                   const size_t *base_addr_size,
+                                   const int num_base_addr)
+{
+    struct ethosu_driver *drv = ethosu_reserve_driver();
+    int result = ethosu_invoke_v3(drv, custom_data_ptr, custom_data_size, base_addr, base_addr_size, num_base_addr);
+    ethosu_release_driver(drv);
+    return result;
+}
 
 #ifdef __cplusplus
 }

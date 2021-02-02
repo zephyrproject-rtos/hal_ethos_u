@@ -161,6 +161,46 @@ static struct ethosu_driver *registered_drivers = NULL;
 static volatile bool irq_triggered = false;
 static int ethosu_soft_reset_and_restore(struct ethosu_driver *drv);
 
+/* Default implementation to initialise ethosu driver mutex. Override if available on the targeted RTOS.
+ * If not overridden, will do nothing (assumes baremetal).
+ */
+void __attribute__((weak)) ethosu_mutex_init() {}
+
+/* Default implementation to initialise ethosu driver binary semaphore. Override if available on the targeted RTOS.
+ * If not overridden, will do nothing (assumes baremetal).
+ */
+void __attribute__((weak)) ethosu_semaphore_init() {}
+
+/* Default implementation to lock ethosu driver mutex. Override if available on the targeted RTOS.
+ * If not overridden, will do nothing (assumes baremetal).
+ */
+void __attribute__((weak)) ethosu_mutex_lock() {}
+
+/* Default implementation to unlock ethosu driver mutex. Override if available on the targeted RTOS.
+ * If not overridden, will do nothing (assumes baremetal).
+ */
+void __attribute__((weak)) ethosu_mutex_unlock() {}
+
+/* Default implementation to wait for and take free ethosu driver semaphore. Override if available on the targeted RTOS.
+ * If not overridden, will do nothing (assumes baremetal).
+ */
+void __attribute__((weak)) ethosu_semaphore_take() {}
+
+/* Default implementation to give ethosu driver semaphore. Override if available on the targeted RTOS.
+ * If not overridden, will do nothing (assumes baremetal).
+ */
+void __attribute__((weak)) ethosu_semaphore_give() {}
+
+/* Default implementation to force context-switch while waiting for Ethos-U IRQ. Override if available on the targeted
+ * RTOS. If not overridden, will do nothing (assumes baremetal).
+ */
+void __attribute__((weak)) ethosu_yield() {}
+
+/* Default implementation to indicate thread/task is resuming. Override if available on the targeted RTOS.
+ * If not overridden, will do nothing (assumes baremetal).
+ */
+void __attribute__((weak)) ethosu_resume() {}
+
 void ethosu_irq_handler_v2(struct ethosu_driver *drv)
 {
     uint8_t irq_raised = 0;
@@ -201,7 +241,9 @@ static inline void wait_for_irq(struct ethosu_driver *drv)
 
         __WFI();
 
+        ethosu_yield();
         __enable_irq();
+        ethosu_resume();
     }
 }
 
@@ -217,6 +259,7 @@ static int dump_shram(struct ethosu_driver *drv);
 static void dump_npu_register(struct ethosu_driver *drv, int npu_reg, int npu_reg_end);
 static void dump_command_stream(const uint32_t *cmd_stream, const int cms_length, int qread);
 static void npu_axi_init(struct ethosu_driver *drv);
+static struct ethosu_driver *ethosu_find_and_reserve_driver(void);
 
 int ethosu_init_v4(struct ethosu_driver *drv,
                    const void *base_address,
@@ -235,6 +278,8 @@ int ethosu_init_v4(struct ethosu_driver *drv,
              secure_enable,
              privilege_enable);
 
+    ethosu_mutex_init();
+    ethosu_semaphore_init();
     ethosu_register_driver(drv);
 
     drv->fast_memory      = (uint32_t)fast_memory;
@@ -470,7 +515,6 @@ int ethosu_register_driver(struct ethosu_driver *drv)
     registered_drivers = drv;
 
     LOG_INFO("%s: New NPU driver at address %p is registered.\n", __FUNCTION__, drv);
-
     return 0;
 }
 
@@ -495,10 +539,33 @@ int ethosu_deregister_driver(struct ethosu_driver *drv)
     LOG_ERR("%s: NPU driver at address %p does not match a registered driver and therefore may not be deregistered.\n",
             __FUNCTION__,
             drv);
+
     return -1;
 }
 
 struct ethosu_driver *ethosu_reserve_driver(void)
+{
+    struct ethosu_driver *drv = NULL;
+
+    do
+    {
+        ethosu_mutex_lock();
+        drv = ethosu_find_and_reserve_driver();
+        ethosu_mutex_unlock();
+
+        if (drv != NULL)
+        {
+            break;
+        }
+
+        ethosu_semaphore_take();
+
+    } while (1);
+
+    return drv;
+}
+
+static struct ethosu_driver *ethosu_find_and_reserve_driver(void)
 {
     struct ethosu_driver *drv = registered_drivers;
 
@@ -520,11 +587,14 @@ struct ethosu_driver *ethosu_reserve_driver(void)
 
 void ethosu_release_driver(struct ethosu_driver *drv)
 {
+    ethosu_mutex_lock();
     if (drv != NULL && drv->reserved)
     {
         drv->reserved = false;
         LOG_INFO("%s - Driver %p released\n", __FUNCTION__, drv);
+        ethosu_semaphore_give();
     }
+    ethosu_mutex_unlock();
 }
 
 static int ethosu_soft_reset_and_restore(struct ethosu_driver *drv)
