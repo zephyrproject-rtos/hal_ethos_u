@@ -1,11 +1,11 @@
-# Arm Ethos-U Core Driver
+# Arm(R) Ethos(TM)-U core driver
 
-This repository contains a device driver for the Arm Ethos-U NPU.
+This repository contains a device driver for the Arm(R) Ethos(TM)-U NPU.
 
 ## Building
 
-The source code comes with a CMake based build system. The driver is expeced
-to be cross compiled for any of the supported Arm Cortex-m CPUs, which will
+The source code comes with a CMake based build system. The driver is expeced to
+be cross compiled for any of the supported Arm Cortex(R)-M CPUs, which will
 require the user to setup a custom toolchain file.
 
 The user is also required to define `CMAKE_SYSTEM_PROCESSOR` for the target CPU,
@@ -44,7 +44,7 @@ void ethosu_invalidate_dcache(uint32_t *p, size_t bytes) {
 
 # License
 
-The Arm Ethos-U Core Driver is provided under an Apache-2.0 license. Please see
+The Arm Ethos-U core driver is provided under an Apache-2.0 license. Please see
 [LICENSE.txt](LICENSE.txt) for more information.
 
 # Contributions
@@ -76,6 +76,11 @@ Signed-off-by: Foo Bar foo.bar@example.org
 The contributions will be code reviewed by Arm before they can be accepted into
 the repository.
 
-## Security
+# Security
 
 Please see [Security](SECURITY.md).
+
+# Trademark notice
+
+Arm, Cortex and Ethos are registered trademarks of Arm Limited (or its
+subsidiaries) in the US and/or elsewhere.
