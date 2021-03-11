@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Arm Limited. All rights reserved.
+ * Copyright (c) 2019-2021 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -288,20 +288,22 @@ void ETHOSU_PMU_CNTR_Increment_v2(struct ethosu_driver *drv, uint32_t mask)
     ETHOSU_PMU_CNTR_Enable_v2(drv, cntrs_active);
 }
 
-void ETHOSU_PMU_PMCCNTR_CFG_Set_Start_Event_v2(struct ethosu_driver *drv, uint32_t start_event)
+void ETHOSU_PMU_PMCCNTR_CFG_Set_Start_Event_v2(struct ethosu_driver *drv, enum ethosu_pmu_event_type start_event)
 {
     LOG_DEBUG("%s: start_event=%u\n", __FUNCTION__, start_event);
+    uint32_t val = pmu_event_value(start_event);
     struct pmccntr_cfg_r cfg;
     cfg.word                = drv->dev.pmccntr_cfg;
-    cfg.CYCLE_CNT_CFG_START = start_event;
+    cfg.CYCLE_CNT_CFG_START = val;
     ethosu_write_reg_shadow(&drv->dev, NPU_REG_PMCCNTR_CFG, cfg.word, &drv->dev.pmccntr_cfg);
 }
 
-void ETHOSU_PMU_PMCCNTR_CFG_Set_Stop_Event_v2(struct ethosu_driver *drv, uint32_t stop_event)
+void ETHOSU_PMU_PMCCNTR_CFG_Set_Stop_Event_v2(struct ethosu_driver *drv, enum ethosu_pmu_event_type stop_event)
 {
     LOG_DEBUG("%s: stop_event=%u\n", __FUNCTION__, stop_event);
+    uint32_t val = pmu_event_value(stop_event);
     struct pmccntr_cfg_r cfg;
     cfg.word               = drv->dev.pmccntr_cfg;
-    cfg.CYCLE_CNT_CFG_STOP = stop_event;
+    cfg.CYCLE_CNT_CFG_STOP = val;
     ethosu_write_reg_shadow(&drv->dev, NPU_REG_PMCCNTR_CFG, cfg.word, &drv->dev.pmccntr_cfg);
 }

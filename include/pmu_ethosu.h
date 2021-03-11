@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Arm Limited. All rights reserved.
+ * Copyright (c) 2019-2021 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -329,12 +329,10 @@ void ETHOSU_PMU_CNTR_Increment_v2(struct ethosu_driver *drv, uint32_t mask);
 
 /**
  * \brief   Set start event number for the cycle counter
- * \param [in]   start_event   Event number
- *           - Start event (bits [9:0])
+ * \param [in]   start_event   Event to trigger start of the cycle counter
  * \note   Sets the event number that starts the cycle counter.
- *           - Event number in the range 0..1023
  */
-void ETHOSU_PMU_PMCCNTR_CFG_Set_Start_Event_v2(struct ethosu_driver *drv, uint32_t start_event);
+void ETHOSU_PMU_PMCCNTR_CFG_Set_Start_Event_v2(struct ethosu_driver *drv, enum ethosu_pmu_event_type start_event);
 
 #define ETHOSU_PMU_PMCCNTR_CFG_Set_Start_Event(start_event)                                                            \
     ETHOSU_PMU_PMCCNTR_CFG_Set_Start_Event_v2(&ethosu_drv, start_event)
@@ -342,11 +340,9 @@ void ETHOSU_PMU_PMCCNTR_CFG_Set_Start_Event_v2(struct ethosu_driver *drv, uint32
 /**
  * \brief   Set stop event number for the cycle counter
  * \param [in]   stop_event   Event number
- *           - Stop event (bits [25:16])
  * \note   Sets the event number that stops the cycle counter.
- *           - Event number in the range 0..1023
  */
-void ETHOSU_PMU_PMCCNTR_CFG_Set_Stop_Event_v2(struct ethosu_driver *drv, uint32_t stop_event);
+void ETHOSU_PMU_PMCCNTR_CFG_Set_Stop_Event_v2(struct ethosu_driver *drv, enum ethosu_pmu_event_type stop_event);
 
 #define ETHOSU_PMU_PMCCNTR_CFG_Set_Stop_Event(stop_event)                                                              \
     ETHOSU_PMU_PMCCNTR_CFG_Set_Stop_Event_v2(&ethosu_drv, stop_event)
