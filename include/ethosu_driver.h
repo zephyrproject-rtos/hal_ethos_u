@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Arm Limited. All rights reserved.
+ * Copyright (c) 2019-2021 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -47,6 +47,8 @@ struct ethosu_driver
     bool dev_power_always_on;
     struct ethosu_driver *next;
     bool reserved;
+    volatile bool irq_triggered;
+    void *semaphore;
 };
 
 struct ethosu_version_id

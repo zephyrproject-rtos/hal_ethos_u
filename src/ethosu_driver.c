@@ -157,49 +157,56 @@ struct ethosu_driver ethosu_drv = {
 // Registered drivers linked list HEAD
 static struct ethosu_driver *registered_drivers = NULL;
 
-// IRQ
-static volatile bool irq_triggered = false;
+/*
+ * Following section handles the minimal sempahore and mutex implementation in case of baremetal applications.
+ * Weak symbols will be overwritten by RTOS definitions and implement true thread-safety. (Done in application layer)
+ */
+
+// Baremetal sempahore implementation
+struct ethosu_semaphore_t
+{
+    int count;
+};
+
+// Minimal needed declaration to allow baremetal functionality.
+static void *ethosu_mutex;
+static void *ethosu_semaphore;
+
+void *__attribute__((weak)) ethosu_mutex_create(void) {}
+
+void __attribute__((weak)) ethosu_mutex_lock(void *mutex) {}
+
+void __attribute__((weak)) ethosu_mutex_unlock(void *mutex) {}
+
+// Baremetal implementation of creating a semaphore
+void *__attribute__((weak)) ethosu_semaphore_create(void)
+{
+    struct ethosu_semaphore_t *sem = malloc(sizeof(*sem));
+    sem->count                     = 1;
+    return sem;
+}
+
+// Baremetal simulation of waiting/sleeping for and then taking a semaphore using intrisics
+void __attribute__((weak)) ethosu_semaphore_take(void *sem)
+{
+    struct ethosu_semaphore_t *s = sem;
+    while (s->count <= 0)
+    {
+        __WFE();
+    }
+    s->count--;
+}
+
+// Baremetal simulation of giving a semaphore and waking up processes using intrinsics
+void __attribute__((weak)) ethosu_semaphore_give(void *sem)
+{
+    struct ethosu_semaphore_t *s = sem;
+    s->count++;
+    __SEV();
+}
+// <--- End of semaphore and mutex implementations
+
 static int ethosu_soft_reset_and_restore(struct ethosu_driver *drv);
-
-/* Default implementation to initialise ethosu driver mutex. Override if available on the targeted RTOS.
- * If not overridden, will do nothing (assumes baremetal).
- */
-void __attribute__((weak)) ethosu_mutex_init() {}
-
-/* Default implementation to initialise ethosu driver binary semaphore. Override if available on the targeted RTOS.
- * If not overridden, will do nothing (assumes baremetal).
- */
-void __attribute__((weak)) ethosu_semaphore_init() {}
-
-/* Default implementation to lock ethosu driver mutex. Override if available on the targeted RTOS.
- * If not overridden, will do nothing (assumes baremetal).
- */
-void __attribute__((weak)) ethosu_mutex_lock() {}
-
-/* Default implementation to unlock ethosu driver mutex. Override if available on the targeted RTOS.
- * If not overridden, will do nothing (assumes baremetal).
- */
-void __attribute__((weak)) ethosu_mutex_unlock() {}
-
-/* Default implementation to wait for and take free ethosu driver semaphore. Override if available on the targeted RTOS.
- * If not overridden, will do nothing (assumes baremetal).
- */
-void __attribute__((weak)) ethosu_semaphore_take() {}
-
-/* Default implementation to give ethosu driver semaphore. Override if available on the targeted RTOS.
- * If not overridden, will do nothing (assumes baremetal).
- */
-void __attribute__((weak)) ethosu_semaphore_give() {}
-
-/* Default implementation to force context-switch while waiting for Ethos-U IRQ. Override if available on the targeted
- * RTOS. If not overridden, will do nothing (assumes baremetal).
- */
-void __attribute__((weak)) ethosu_yield() {}
-
-/* Default implementation to indicate thread/task is resuming. Override if available on the targeted RTOS.
- * If not overridden, will do nothing (assumes baremetal).
- */
-void __attribute__((weak)) ethosu_resume() {}
 
 void __attribute__((weak)) ethosu_irq_handler_v2(struct ethosu_driver *drv)
 {
@@ -212,7 +219,7 @@ void __attribute__((weak)) ethosu_irq_handler_v2(struct ethosu_driver *drv)
     // Verify that interrupt has been raised
     (void)ethosu_is_irq_raised(&drv->dev, &irq_raised);
     ASSERT(irq_raised == 1);
-    irq_triggered = true;
+    drv->irq_triggered = true;
 
     // Clear interrupt
     (void)ethosu_clear_irq_status(&drv->dev);
@@ -226,24 +233,21 @@ void __attribute__((weak)) ethosu_irq_handler_v2(struct ethosu_driver *drv)
         ethosu_soft_reset_and_restore(drv);
         drv->status_error = true;
     }
+
+    ethosu_semaphore_give(drv->semaphore);
 }
 
 static inline void wait_for_irq(struct ethosu_driver *drv)
 {
     while (1)
     {
-        __disable_irq();
-        if (irq_triggered || drv->abort_inference)
+        if (drv->irq_triggered || drv->abort_inference)
         {
-            __enable_irq();
+            drv->irq_triggered = false;
             break;
         }
 
-        __WFI();
-
-        ethosu_yield();
-        __enable_irq();
-        ethosu_resume();
+        ethosu_semaphore_take(drv->semaphore);
     }
 }
 
@@ -278,12 +282,22 @@ int ethosu_init_v4(struct ethosu_driver *drv,
              secure_enable,
              privilege_enable);
 
-    ethosu_mutex_init();
-    ethosu_semaphore_init();
+    if (!ethosu_mutex)
+    {
+        ethosu_mutex = ethosu_mutex_create();
+    }
+
+    if (!ethosu_semaphore)
+    {
+        ethosu_semaphore = ethosu_semaphore_create();
+    }
+
     ethosu_register_driver(drv);
 
     drv->fast_memory      = (uint32_t)fast_memory;
     drv->fast_memory_size = fast_memory_size;
+    drv->irq_triggered    = false;
+    drv->semaphore        = ethosu_semaphore_create();
 
     if (ETHOSU_SUCCESS != ethosu_dev_init(&drv->dev, base_address, secure_enable, privilege_enable))
     {
@@ -429,7 +443,7 @@ int ethosu_invoke_v3(struct ethosu_driver *drv,
 
             drv->abort_inference = false;
             // It is safe to clear this flag without atomic, because npu is not running.
-            irq_triggered = false;
+            drv->irq_triggered = false;
 
             ret = handle_command_stream(drv, command_stream, cms_length, base_addr, base_addr_size, num_base_addr);
 
@@ -549,16 +563,17 @@ struct ethosu_driver *ethosu_reserve_driver(void)
 
     do
     {
-        ethosu_mutex_lock();
+        ethosu_mutex_lock(ethosu_mutex);
         drv = ethosu_find_and_reserve_driver();
-        ethosu_mutex_unlock();
+        ethosu_mutex_unlock(ethosu_mutex);
 
         if (drv != NULL)
         {
             break;
         }
 
-        ethosu_semaphore_take();
+        LOG_INFO("%s - Waiting for driver \n", __FUNCTION__);
+        ethosu_semaphore_take(ethosu_semaphore);
 
     } while (1);
 
@@ -587,14 +602,14 @@ static struct ethosu_driver *ethosu_find_and_reserve_driver(void)
 
 void ethosu_release_driver(struct ethosu_driver *drv)
 {
-    ethosu_mutex_lock();
+    ethosu_mutex_lock(ethosu_mutex);
     if (drv != NULL && drv->reserved)
     {
         drv->reserved = false;
         LOG_INFO("%s - Driver %p released\n", __FUNCTION__, drv);
-        ethosu_semaphore_give();
+        ethosu_semaphore_give(ethosu_semaphore);
     }
-    ethosu_mutex_unlock();
+    ethosu_mutex_unlock(ethosu_mutex);
 }
 
 static int ethosu_soft_reset_and_restore(struct ethosu_driver *drv)
