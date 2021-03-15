@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Arm Limited. All rights reserved.
+ * Copyright (c) 2019-2021 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -201,7 +201,7 @@ void __attribute__((weak)) ethosu_yield() {}
  */
 void __attribute__((weak)) ethosu_resume() {}
 
-void ethosu_irq_handler_v2(struct ethosu_driver *drv)
+void __attribute__((weak)) ethosu_irq_handler_v2(struct ethosu_driver *drv)
 {
     uint8_t irq_raised = 0;
 
