@@ -305,7 +305,8 @@ int ethosu_init_v4(struct ethosu_driver *drv,
         return -1;
     }
 
-    if (ETHOSU_SUCCESS != ethosu_set_clock_and_power(&drv->dev, ETHOSU_CLOCK_Q_DISABLE, ETHOSU_POWER_Q_DISABLE))
+    if (ETHOSU_SUCCESS !=
+        set_clock_and_power_request(drv, ETHOSU_INFERENCE_REQUEST, ETHOSU_CLOCK_Q_DISABLE, ETHOSU_POWER_Q_DISABLE))
     {
         LOG_ERR("Failed to disable clock-q & power-q for Ethos-U\n");
         return -1;
@@ -417,7 +418,7 @@ int ethosu_invoke_v3(struct ethosu_driver *drv,
         }
 
         drv->status_error = false;
-        ethosu_set_clock_and_power(&drv->dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_DISABLE);
+        set_clock_and_power_request(drv, ETHOSU_INFERENCE_REQUEST, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_DISABLE);
         ethosu_restore_pmu_config(&drv->dev);
         npu_axi_init(drv);
     }
@@ -489,7 +490,7 @@ int ethosu_invoke_v3(struct ethosu_driver *drv,
     if (!drv->status_error && !drv->dev_power_always_on)
     {
         ethosu_save_pmu_counters(&drv->dev);
-        ethosu_set_clock_and_power(&drv->dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
+        set_clock_and_power_request(drv, ETHOSU_INFERENCE_REQUEST, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
     }
 
     return return_code;
@@ -620,12 +621,46 @@ static int ethosu_soft_reset_and_restore(struct ethosu_driver *drv)
         return -1;
     }
 
-    ethosu_set_clock_and_power(&drv->dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_DISABLE);
+    set_clock_and_power_request(drv, ETHOSU_INFERENCE_REQUEST, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_DISABLE);
 
     npu_axi_init(drv);
     ethosu_restore_pmu_config(&drv->dev);
 
     return 0;
+}
+
+enum ethosu_error_codes set_clock_and_power_request(struct ethosu_driver *drv,
+                                                    enum ethosu_request_clients client,
+                                                    enum ethosu_clock_q_request clock_request,
+                                                    enum ethosu_power_q_request power_request)
+{
+    // Set clock request bit for client
+    if (clock_request == ETHOSU_CLOCK_Q_DISABLE)
+    {
+        drv->clock_request |= (1 << client);
+    }
+    else
+    {
+        drv->clock_request &= ~(1 << client);
+    }
+    // Get current clock request (ENABLE if both PMU and INFERENCE asks for clock request, else DISABLE)
+    clock_request = drv->clock_request == 0 ? ETHOSU_CLOCK_Q_ENABLE : ETHOSU_CLOCK_Q_DISABLE;
+
+    // Set power request bit for client
+    if (power_request == ETHOSU_CLOCK_Q_DISABLE)
+    {
+        drv->power_request |= (1 << client);
+    }
+    else
+    {
+        drv->power_request &= ~(1 << client);
+    }
+    // Get current power request (ENABLE if both PMU and INFERENCE asks for power request, else DISABLE)
+    power_request = drv->power_request == 0 ? ETHOSU_POWER_Q_ENABLE : ETHOSU_POWER_Q_DISABLE;
+    // Set clock and power
+    enum ethosu_error_codes ret = ethosu_set_clock_and_power(&drv->dev, clock_request, power_request);
+
+    return ret;
 }
 
 static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s *opt_cfg_p)

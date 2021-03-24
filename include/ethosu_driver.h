@@ -49,6 +49,8 @@ struct ethosu_driver
     bool reserved;
     volatile bool irq_triggered;
     void *semaphore;
+    uint8_t clock_request;
+    uint8_t power_request;
 };
 
 struct ethosu_version_id
@@ -79,6 +81,12 @@ struct ethosu_version
 {
     struct ethosu_version_id id;
     struct ethosu_version_config cfg;
+};
+
+enum ethosu_request_clients
+{
+    ETHOSU_PMU_REQUEST       = 0,
+    ETHOSU_INFERENCE_REQUEST = 1,
 };
 
 /******************************************************************************
@@ -167,6 +175,14 @@ struct ethosu_driver *ethosu_reserve_driver(void);
  * Change driver status to available
  */
 void ethosu_release_driver(struct ethosu_driver *drv);
+
+/**
+ * Set clock and power request bits
+ */
+enum ethosu_error_codes set_clock_and_power_request(struct ethosu_driver *drv,
+                                                    enum ethosu_request_clients client,
+                                                    enum ethosu_clock_q_request clock_request,
+                                                    enum ethosu_power_q_request power_request);
 
 /**
  * Static inline for backwards-compatibility

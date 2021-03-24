@@ -90,6 +90,7 @@ void ETHOSU_PMU_Enable_v2(struct ethosu_driver *drv)
     struct pmcr_r pmcr;
     pmcr.word   = drv->dev.pmcr;
     pmcr.cnt_en = 1;
+    set_clock_and_power_request(drv, ETHOSU_PMU_REQUEST, ETHOSU_CLOCK_Q_DISABLE, ETHOSU_POWER_Q_DISABLE);
     ethosu_write_reg_shadow(&drv->dev, NPU_REG_PMCR, pmcr.word, &drv->dev.pmcr);
 }
 
@@ -99,6 +100,7 @@ void ETHOSU_PMU_Disable_v2(struct ethosu_driver *drv)
     struct pmcr_r pmcr;
     pmcr.word   = drv->dev.pmcr;
     pmcr.cnt_en = 0;
+    set_clock_and_power_request(drv, ETHOSU_PMU_REQUEST, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
     ethosu_write_reg_shadow(&drv->dev, NPU_REG_PMCR, pmcr.word, &drv->dev.pmcr);
 }
 
