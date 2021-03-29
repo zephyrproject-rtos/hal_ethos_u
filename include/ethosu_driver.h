@@ -75,6 +75,7 @@ struct ethosu_version_config
     uint8_t macs_per_cc;
     uint8_t cmd_stream_version;
     uint8_t shram_size;
+    uint8_t custom_dma;
 };
 
 struct ethosu_version

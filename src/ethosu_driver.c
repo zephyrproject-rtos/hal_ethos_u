@@ -124,7 +124,9 @@ struct opt_cfg_s
             uint32_t macs_per_cc : 4;
             uint32_t cmd_stream_version : 4;
             uint32_t shram_size : 8;
-            uint32_t reserved1 : 16;
+            uint32_t reserved0 : 11;
+            uint32_t custom_dma : 1;
+            uint32_t product : 4;
         };
         uint32_t npu_cfg;
     };
@@ -352,6 +354,7 @@ int ethosu_get_version_v2(struct ethosu_driver *drv, struct ethosu_version *vers
         version->cfg.macs_per_cc        = cfg.macs_per_cc;
         version->cfg.cmd_stream_version = cfg.cmd_stream_version;
         version->cfg.shram_size         = cfg.shram_size;
+        version->cfg.custom_dma         = cfg.custom_dma;
     }
     else
     {
@@ -671,10 +674,11 @@ static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s *
 
     LOG_INFO("handle_optimizer_config:\n");
     LOG_INFO("Optimizer release nbr: %d patch: %d\n", opt_cfg_p->da_data.rel_nbr, opt_cfg_p->da_data.patch_nbr);
-    LOG_INFO("Optimizer config cmd_stream_version: %d macs_per_cc: %d shram_size: %d\n",
+    LOG_INFO("Optimizer config cmd_stream_version: %d macs_per_cc: %d shram_size: %d custom_dma: %d\n",
              opt_cfg_p->cmd_stream_version,
              opt_cfg_p->macs_per_cc,
-             opt_cfg_p->shram_size);
+             opt_cfg_p->shram_size,
+             opt_cfg_p->custom_dma);
     LOG_INFO("Optimizer config Ethos-U version: %d.%d.%d\n",
              opt_cfg_p->arch_major_rev,
              opt_cfg_p->arch_minor_rev,
@@ -682,17 +686,19 @@ static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s *
 
     (void)ethosu_get_config(&drv->dev, &cfg);
     (void)ethosu_get_id(&drv->dev, &id);
-    LOG_INFO("Ethos-U config cmd_stream_version: %" PRIu32 " macs_per_cc: %" PRIu32 " shram_size: %" PRIu32 "\n",
+    LOG_INFO("Ethos-U config cmd_stream_version: %" PRIu32 " macs_per_cc: %" PRIu32 " shram_size: %" PRIu32
+             " custom_dma: %" PRIu32 "\n",
              cfg.cmd_stream_version,
              cfg.macs_per_cc,
-             cfg.shram_size);
+             cfg.shram_size,
+             cfg.custom_dma);
     LOG_INFO("Ethos-U version: %" PRIu32 ".%" PRIu32 ".%" PRIu32 "\n",
              id.arch_major_rev,
              id.arch_minor_rev,
              id.arch_patch_rev);
 
     if ((cfg.macs_per_cc != opt_cfg_p->macs_per_cc) || (cfg.shram_size != opt_cfg_p->shram_size) ||
-        (cfg.cmd_stream_version != opt_cfg_p->cmd_stream_version))
+        (cfg.cmd_stream_version != opt_cfg_p->cmd_stream_version) || (!cfg.custom_dma && opt_cfg_p->custom_dma))
     {
         if (cfg.macs_per_cc != opt_cfg_p->macs_per_cc)
         {
@@ -711,6 +717,12 @@ static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s *
             LOG_ERR("NPU config mismatch: npu.cmd_stream_version=%" PRIu32 " optimizer.cmd_stream_version=%d\n",
                     cfg.cmd_stream_version,
                     opt_cfg_p->cmd_stream_version);
+        }
+        if (!cfg.custom_dma && opt_cfg_p->custom_dma)
+        {
+            LOG_ERR("NPU config mismatch: npu.custom_dma=%" PRIu32 " optimize.custom_dma=%d\n",
+                    cfg.custom_dma,
+                    opt_cfg_p->custom_dma);
         }
         return_code = -1;
     }

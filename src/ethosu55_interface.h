@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Arm Limited. All rights reserved.
+ * Copyright (c) 2019-2021 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -2254,8 +2254,9 @@ struct config_r
                                              // MACs/clock cycle.
             uint32_t cmd_stream_version : 4; // command stream version accepted by this NPU.
             uint32_t shram_size : 8;         // Size in KB of SHRAM in the range 8 to 48.
-            uint32_t reserved0 : 12;
-            uint32_t product : 4; // Product configuration
+            uint32_t reserved0 : 11;
+            uint32_t custom_dma : 1; // Custom DMA enable bit.
+            uint32_t product : 4;    // Product configuration
         };
         uint32_t word;
     };

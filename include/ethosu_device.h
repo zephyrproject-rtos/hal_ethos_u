@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Arm Limited. All rights reserved.
+ * Copyright (c) 2019-2021 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -87,6 +87,7 @@ struct ethosu_config
         uint32_t macs_per_cc;        ///< MACs per clock cycle
         uint32_t cmd_stream_version; ///< NPU command stream version
         uint32_t shram_size;         ///< SHRAM size
+        uint32_t custom_dma;         ///< Custom DMA enabled
     };
 };
 

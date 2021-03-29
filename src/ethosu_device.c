@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Arm Limited. All rights reserved.
+ * Copyright (c) 2019-2021 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -91,6 +91,7 @@ enum ethosu_error_codes ethosu_get_config(struct ethosu_device *dev, struct etho
     config->macs_per_cc        = cfg.macs_per_cc;
     config->cmd_stream_version = cfg.cmd_stream_version;
     config->shram_size         = cfg.shram_size;
+    config->custom_dma         = cfg.custom_dma;
 
     return ETHOSU_SUCCESS;
 }
