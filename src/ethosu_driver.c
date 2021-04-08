@@ -259,6 +259,18 @@ static inline void wait_for_irq(struct ethosu_driver *drv)
     }
 }
 
+void __attribute__((weak)) ethosu_inference_begin(struct ethosu_driver *drv, const void *inference_data)
+{
+    (void)inference_data;
+    (void)drv;
+}
+
+void __attribute__((weak)) ethosu_inference_end(struct ethosu_driver *drv, const void *inference_data)
+{
+    (void)inference_data;
+    (void)drv;
+}
+
 static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s *opt_cfg_p);
 static int handle_command_stream(struct ethosu_driver *drv,
                                  const uint8_t *cmd_stream,
@@ -434,6 +446,7 @@ int ethosu_invoke(struct ethosu_driver *drv,
 
     drv->status_error = false;
 
+    ethosu_inference_begin(drv, custom_data_ptr);
     while (data_ptr < data_end)
     {
         int ret = 0;
@@ -495,6 +508,7 @@ int ethosu_invoke(struct ethosu_driver *drv,
             break;
         }
     }
+    ethosu_inference_end(drv, custom_data_ptr);
 
     if (!drv->status_error && !drv->dev_power_always_on)
     {
