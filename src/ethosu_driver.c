@@ -650,7 +650,7 @@ enum ethosu_error_codes set_clock_and_power_request(struct ethosu_driver *drv,
     clock_request = drv->clock_request == 0 ? ETHOSU_CLOCK_Q_ENABLE : ETHOSU_CLOCK_Q_DISABLE;
 
     // Set power request bit for client
-    if (power_request == ETHOSU_CLOCK_Q_DISABLE)
+    if (power_request == ETHOSU_POWER_Q_DISABLE)
     {
         drv->power_request |= (1 << client);
     }
@@ -660,6 +660,7 @@ enum ethosu_error_codes set_clock_and_power_request(struct ethosu_driver *drv,
     }
     // Get current power request (ENABLE if both PMU and INFERENCE asks for power request, else DISABLE)
     power_request = drv->power_request == 0 ? ETHOSU_POWER_Q_ENABLE : ETHOSU_POWER_Q_DISABLE;
+
     // Set clock and power
     enum ethosu_error_codes ret = ethosu_set_clock_and_power(&drv->dev, clock_request, power_request);
 
