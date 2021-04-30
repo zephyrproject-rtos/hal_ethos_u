@@ -176,9 +176,15 @@ static void *ethosu_semaphore;
 
 void *__attribute__((weak)) ethosu_mutex_create(void) {}
 
-void __attribute__((weak)) ethosu_mutex_lock(void *mutex) {}
+void __attribute__((weak)) ethosu_mutex_lock(void *mutex)
+{
+    UNUSED(mutex);
+}
 
-void __attribute__((weak)) ethosu_mutex_unlock(void *mutex) {}
+void __attribute__((weak)) ethosu_mutex_unlock(void *mutex)
+{
+    UNUSED(mutex);
+}
 
 // Baremetal implementation of creating a semaphore
 void *__attribute__((weak)) ethosu_semaphore_create(void)
