@@ -216,7 +216,7 @@ void __attribute__((weak)) ethosu_semaphore_give(void *sem)
 
 static int ethosu_soft_reset_and_restore(struct ethosu_driver *drv);
 
-void __attribute__((weak)) ethosu_irq_handler_v2(struct ethosu_driver *drv)
+void __attribute__((weak)) ethosu_irq_handler(struct ethosu_driver *drv)
 {
     uint8_t irq_raised = 0;
 
@@ -273,12 +273,12 @@ static void dump_command_stream(const uint32_t *cmd_stream, const int cms_length
 static void npu_axi_init(struct ethosu_driver *drv);
 static struct ethosu_driver *ethosu_find_and_reserve_driver(void);
 
-int ethosu_init_v4(struct ethosu_driver *drv,
-                   const void *base_address,
-                   const void *fast_memory,
-                   const size_t fast_memory_size,
-                   uint32_t secure_enable,
-                   uint32_t privilege_enable)
+int ethosu_init(struct ethosu_driver *drv,
+                const void *base_address,
+                const void *fast_memory,
+                const size_t fast_memory_size,
+                uint32_t secure_enable,
+                uint32_t privilege_enable)
 {
     int return_code = 0;
 
@@ -336,7 +336,7 @@ int ethosu_init_v4(struct ethosu_driver *drv,
     return return_code;
 }
 
-int ethosu_get_version_v2(struct ethosu_driver *drv, struct ethosu_version *version)
+int ethosu_get_version(struct ethosu_driver *drv, struct ethosu_version *version)
 {
     int return_code = 0;
 
@@ -370,12 +370,12 @@ int ethosu_get_version_v2(struct ethosu_driver *drv, struct ethosu_version *vers
     return return_code;
 }
 
-int ethosu_invoke_v3(struct ethosu_driver *drv,
-                     const void *custom_data_ptr,
-                     const int custom_data_size,
-                     const uint64_t *base_addr,
-                     const size_t *base_addr_size,
-                     const int num_base_addr)
+int ethosu_invoke(struct ethosu_driver *drv,
+                  const void *custom_data_ptr,
+                  const int custom_data_size,
+                  const uint64_t *base_addr,
+                  const size_t *base_addr_size,
+                  const int num_base_addr)
 {
     const struct custom_data_s *data_ptr = custom_data_ptr;
     const struct custom_data_s *data_end = custom_data_ptr + custom_data_size;
@@ -505,12 +505,12 @@ int ethosu_invoke_v3(struct ethosu_driver *drv,
     return return_code;
 }
 
-void ethosu_abort_v2(struct ethosu_driver *drv)
+void ethosu_abort(struct ethosu_driver *drv)
 {
     drv->abort_inference = true;
 }
 
-void ethosu_set_power_mode_v2(struct ethosu_driver *drv, bool always_on)
+void ethosu_set_power_mode(struct ethosu_driver *drv, bool always_on)
 {
     drv->dev_power_always_on = always_on;
 
