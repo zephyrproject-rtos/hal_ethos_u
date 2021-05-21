@@ -174,7 +174,10 @@ struct ethosu_semaphore_t
 static void *ethosu_mutex;
 static void *ethosu_semaphore;
 
-void *__attribute__((weak)) ethosu_mutex_create(void) {}
+void *__attribute__((weak)) ethosu_mutex_create(void)
+{
+    return NULL;
+}
 
 void __attribute__((weak)) ethosu_mutex_lock(void *mutex)
 {
