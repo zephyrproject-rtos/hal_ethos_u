@@ -229,7 +229,7 @@ void __attribute__((weak)) ethosu_irq_handler(struct ethosu_driver *drv)
 
     // Verify that interrupt has been raised
     (void)ethosu_is_irq_raised(&drv->dev, &irq_raised);
-    ASSERT(irq_raised == 1);
+    assert(irq_raised == 1);
     drv->irq_triggered = true;
 
     // Clear interrupt
@@ -237,7 +237,7 @@ void __attribute__((weak)) ethosu_irq_handler(struct ethosu_driver *drv)
 
     // Verify that interrupt has been successfully cleared
     (void)ethosu_is_irq_raised(&drv->dev, &irq_raised);
-    ASSERT(irq_raised == 0);
+    assert(irq_raised == 0);
 
     if (ethosu_status_has_error(&drv->dev))
     {

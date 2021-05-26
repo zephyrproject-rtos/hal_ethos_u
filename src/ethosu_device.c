@@ -40,7 +40,7 @@ enum ethosu_error_codes ethosu_dev_init(struct ethosu_device *dev,
                                         uint32_t privilege_enable)
 {
 #if !defined(ARM_NPU_STUB)
-    dev->base_address = (volatile uint32_t *)base_address;
+    dev->base_address = (volatile uintptr_t)base_address;
     dev->secure       = secure_enable;
     dev->privileged   = privilege_enable;
 
@@ -105,10 +105,10 @@ enum ethosu_error_codes ethosu_run_command_stream(struct ethosu_device *dev,
     enum ethosu_error_codes ret_code = ETHOSU_SUCCESS;
 
 #if !defined(ARM_NPU_STUB)
-    ASSERT(num_base_addr <= ETHOSU_DRIVER_BASEP_INDEXES);
+    assert(num_base_addr <= ETHOSU_DRIVER_BASEP_INDEXES);
 
     uint64_t qbase = (uintptr_t)cmd_stream_ptr + BASE_POINTER_OFFSET;
-    ASSERT(qbase <= ADDRESS_MASK);
+    assert(qbase <= ADDRESS_MASK);
     LOG_DEBUG("QBASE=0x%016llx, QSIZE=%u, base_pointer_offset=0x%08x\n", qbase, cms_length, BASE_POINTER_OFFSET);
     ethosu_write_reg(dev, NPU_REG_QBASE0, qbase & 0xffffffff);
     ethosu_write_reg(dev, NPU_REG_QBASE1, qbase >> 32);
@@ -117,7 +117,7 @@ enum ethosu_error_codes ethosu_run_command_stream(struct ethosu_device *dev,
     for (int i = 0; i < num_base_addr; i++)
     {
         uint64_t addr = base_addr[i] + BASE_POINTER_OFFSET;
-        ASSERT(addr <= ADDRESS_MASK);
+        assert(addr <= ADDRESS_MASK);
         LOG_DEBUG("BASEP%d=0x%016llx\n", i, addr);
         ethosu_write_reg(dev, NPU_REG_BASEP0 + (2 * i) * BASEP_OFFSET, addr & 0xffffffff);
         ethosu_write_reg(dev, NPU_REG_BASEP0 + (2 * i + 1) * BASEP_OFFSET, addr >> 32);
@@ -130,7 +130,7 @@ enum ethosu_error_codes ethosu_run_command_stream(struct ethosu_device *dev,
     stream_length = cms_length;
     UNUSED(cmd_stream_ptr);
     UNUSED(base_addr);
-    ASSERT(num_base_addr < ETHOSU_DRIVER_BASEP_INDEXES);
+    assert(num_base_addr < ETHOSU_DRIVER_BASEP_INDEXES);
 #if defined(NDEBUG)
     UNUSED(num_base_addr);
 #endif
@@ -259,7 +259,7 @@ enum ethosu_error_codes ethosu_read_apb_reg(struct ethosu_device *dev,
 #if !defined(ARM_NPU_STUB)
     uint32_t address = start_address;
 
-    ASSERT((start_address + num_reg) < ID_REGISTERS_SIZE);
+    assert((start_address + num_reg) < ID_REGISTERS_SIZE);
 
     for (int i = 0; i < num_reg; i++)
     {
@@ -564,10 +564,10 @@ enum ethosu_error_codes ethosu_set_clock_and_power(struct ethosu_device *dev,
 uint32_t ethosu_read_reg(struct ethosu_device *dev, uint32_t address)
 {
 #if !defined(ARM_NPU_STUB)
-    ASSERT(dev->base_address != 0);
-    ASSERT(address % 4 == 0);
+    assert(dev->base_address != 0);
+    assert(address % 4 == 0);
 
-    volatile uint32_t *reg = dev->base_address + address / sizeof(uint32_t);
+    volatile uint32_t *reg = dev->base_address + address;
     return *reg;
 #else
     UNUSED(dev);
@@ -580,10 +580,10 @@ uint32_t ethosu_read_reg(struct ethosu_device *dev, uint32_t address)
 void ethosu_write_reg(struct ethosu_device *dev, uint32_t address, uint32_t value)
 {
 #if !defined(ARM_NPU_STUB)
-    ASSERT(dev->base_address != 0);
-    ASSERT(address % 4 == 0);
+    assert(dev->base_address != 0);
+    assert(address % 4 == 0);
 
-    volatile uint32_t *reg = dev->base_address + address / sizeof(uint32_t);
+    volatile uint32_t *reg = dev->base_address + address;
     *reg                   = value;
 #else
     UNUSED(dev);

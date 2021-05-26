@@ -106,7 +106,7 @@ void ETHOSU_PMU_Disable(struct ethosu_driver *drv)
 
 void ETHOSU_PMU_Set_EVTYPER(struct ethosu_driver *drv, uint32_t num, enum ethosu_pmu_event_type type)
 {
-    ASSERT(num < ETHOSU_PMU_NCOUNTERS);
+    assert(num < ETHOSU_PMU_NCOUNTERS);
     uint32_t val = pmu_event_value(type);
     LOG_DEBUG("%s: num=%u, type=%d, val=%u\n", __FUNCTION__, num, type, val);
     ethosu_write_reg_shadow(&drv->dev, NPU_REG_PMEVTYPER(num), val, &drv->dev.pmu_evtypr[num]);
@@ -114,7 +114,7 @@ void ETHOSU_PMU_Set_EVTYPER(struct ethosu_driver *drv, uint32_t num, enum ethosu
 
 enum ethosu_pmu_event_type ETHOSU_PMU_Get_EVTYPER(struct ethosu_driver *drv, uint32_t num)
 {
-    ASSERT(num < ETHOSU_PMU_NCOUNTERS);
+    assert(num < ETHOSU_PMU_NCOUNTERS);
     uint32_t val                    = drv->dev.pmu_evtypr[num];
     enum ethosu_pmu_event_type type = pmu_event_type(val);
     LOG_DEBUG("%s: num=%u, type=%d, val=%u\n", __FUNCTION__, num, type, val);
@@ -208,7 +208,7 @@ void ETHOSU_PMU_Set_CCNTR(struct ethosu_driver *drv, uint64_t val)
 
 uint32_t ETHOSU_PMU_Get_EVCNTR(struct ethosu_driver *drv, uint32_t num)
 {
-    ASSERT(num < ETHOSU_PMU_NCOUNTERS);
+    assert(num < ETHOSU_PMU_NCOUNTERS);
     uint32_t val = ethosu_read_reg(&drv->dev, NPU_REG_PMEVCNTR(num));
     LOG_DEBUG("%s: num=%u, val=%u, shadow=%u\n", __FUNCTION__, num, val, drv->dev.pmu_evcntr[num]);
 
@@ -226,7 +226,7 @@ uint32_t ETHOSU_PMU_Get_EVCNTR(struct ethosu_driver *drv, uint32_t num)
 
 void ETHOSU_PMU_Set_EVCNTR(struct ethosu_driver *drv, uint32_t num, uint32_t val)
 {
-    ASSERT(num < ETHOSU_PMU_NCOUNTERS);
+    assert(num < ETHOSU_PMU_NCOUNTERS);
     LOG_DEBUG("%s: num=%u, val=%u\n", __FUNCTION__, num, val);
     ethosu_write_reg(&drv->dev, NPU_REG_PMEVCNTR(num), val);
 }

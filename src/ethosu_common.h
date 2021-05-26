@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Arm Limited. All rights reserved.
+ * Copyright (c) 2019-2021 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -103,12 +103,6 @@
 #define LOG_DEBUG(format, ...) fprintf(stdout, format, ##__VA_ARGS__)
 #else
 #define LOG_DEBUG(format, ...)
-#endif
-
-#if defined(ASSERT_DISABLE)
-#define ASSERT(args)
-#else
-#define ASSERT(args) assert(args)
 #endif
 
 #define UNUSED(x) ((void)x)

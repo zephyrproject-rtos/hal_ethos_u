@@ -56,7 +56,7 @@ enum ethosu_error_codes
 
 struct ethosu_device
 {
-    volatile uint32_t *base_address;
+    volatile uintptr_t base_address;
     uint32_t proto;
     uint32_t pmcr;
     uint32_t pmccntr[2];
