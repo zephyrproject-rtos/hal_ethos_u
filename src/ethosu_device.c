@@ -567,7 +567,7 @@ uint32_t ethosu_read_reg(struct ethosu_device *dev, uint32_t address)
     assert(dev->base_address != 0);
     assert(address % 4 == 0);
 
-    volatile uint32_t *reg = dev->base_address + address;
+    volatile uint32_t *reg = (volatile uint32_t *)(dev->base_address + address);
     return *reg;
 #else
     UNUSED(dev);
@@ -583,7 +583,7 @@ void ethosu_write_reg(struct ethosu_device *dev, uint32_t address, uint32_t valu
     assert(dev->base_address != 0);
     assert(address % 4 == 0);
 
-    volatile uint32_t *reg = dev->base_address + address;
+    volatile uint32_t *reg = (volatile uint32_t *)(dev->base_address + address);
     *reg                   = value;
 #else
     UNUSED(dev);
