@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2019-2020 Arm Limited. All rights reserved.
+# Copyright (c) 2019-2021 Arm Limited. All rights reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -28,8 +28,8 @@ option(DRIVER_PMU_AUTOINIT "Enable PMU boot auto-initialization" OFF)
 
 set(CMSIS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmsis" CACHE PATH "Path to CMSIS.")
 
-set(LOG_NAMES emerg alert crit err warning notice info debug)
-set(ETHOSU_LOG_SEVERITY "info" CACHE STRING "Driver log severity level ${LOG_NAMES}")
+set(LOG_NAMES err warning info debug)
+set(ETHOSU_LOG_SEVERITY "warning" CACHE STRING "Driver log severity level ${LOG_NAMES}")
 set_property(CACHE ETHOSU_LOG_SEVERITY PROPERTY STRINGS ${LOG_NAMES})
 
 #
@@ -53,7 +53,7 @@ include_directories(${CMSIS_PATH}/CMSIS/Core/Include)
 # Build driver library
 add_library(ethosu_core_driver STATIC)
 target_include_directories(ethosu_core_driver PUBLIC include)
-target_sources(ethosu_core_driver PRIVATE src/ethosu_driver.c src/ethosu_device.c src/ethosu_pmu.c)
+target_sources(ethosu_core_driver PRIVATE src/ethosu_driver.c src/ethosu_device_u55.c src/ethosu_pmu.c)
 
 # Set the log level for the target
 target_compile_definitions(ethosu_core_driver PRIVATE ETHOSU_LOG_SEVERITY=${LOG_SEVERITY})

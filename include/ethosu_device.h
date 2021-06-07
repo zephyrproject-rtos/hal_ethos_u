@@ -34,10 +34,7 @@ extern "C" {
  * Defines
  ******************************************************************************/
 
-#define ETHOSU_DRIVER_VERSION_MAJOR 0  ///< Driver major version
-#define ETHOSU_DRIVER_VERSION_MINOR 16 ///< Driver minor version
-#define ETHOSU_DRIVER_VERSION_PATCH 0  ///< Driver patch version
-#define ETHOSU_DRIVER_BASEP_INDEXES 8  ///< Number of base pointer indexes
+#define ETHOSU_BASEP_INDEXES 8 ///< Number of base pointer indexes
 
 #ifndef ETHOSU_PMU_NCOUNTERS
 #define ETHOSU_PMU_NCOUNTERS 4
@@ -82,13 +79,10 @@ struct ethosu_id
 
 struct ethosu_config
 {
-    struct
-    {
-        uint32_t macs_per_cc;        ///< MACs per clock cycle
-        uint32_t cmd_stream_version; ///< NPU command stream version
-        uint32_t shram_size;         ///< SHRAM size
-        uint32_t custom_dma;         ///< Custom DMA enabled
-    };
+    uint32_t macs_per_cc;        ///< MACs per clock cycle
+    uint32_t cmd_stream_version; ///< NPU command stream version
+    uint32_t shram_size;         ///< SHRAM size
+    uint32_t custom_dma;         ///< Custom DMA enabled
 };
 
 /**
@@ -156,12 +150,12 @@ enum ethosu_error_codes ethosu_dev_init(struct ethosu_device *dev,
 /**
  * Get device id.
  */
-enum ethosu_error_codes ethosu_get_id(struct ethosu_device *dev, struct ethosu_id *id);
+enum ethosu_error_codes ethosu_dev_get_id(struct ethosu_device *dev, struct ethosu_id *id);
 
 /**
  * Get device configuration.
  */
-enum ethosu_error_codes ethosu_get_config(struct ethosu_device *dev, struct ethosu_config *config);
+enum ethosu_error_codes ethosu_dev_get_config(struct ethosu_device *dev, struct ethosu_config *config);
 
 /**
  * Execute a given command stream on NPU.
@@ -175,11 +169,11 @@ enum ethosu_error_codes ethosu_get_config(struct ethosu_device *dev, struct etho
  * \param[in] num_base_addr    Number of base addresses.
  * \return                     \ref ethosu_error_codes
  */
-enum ethosu_error_codes ethosu_run_command_stream(struct ethosu_device *dev,
-                                                  const uint8_t *cmd_stream_ptr,
-                                                  uint32_t cms_length,
-                                                  const uint64_t *base_addr,
-                                                  int num_base_addr);
+enum ethosu_error_codes ethosu_dev_run_command_stream(struct ethosu_device *dev,
+                                                      const uint8_t *cmd_stream_ptr,
+                                                      uint32_t cms_length,
+                                                      const uint64_t *base_addr,
+                                                      int num_base_addr);
 
 /**
  * Check if IRQ is raised.
@@ -188,13 +182,13 @@ enum ethosu_error_codes ethosu_run_command_stream(struct ethosu_device *dev,
  *                             - 1 IRQ raised
  * \return                     \ref ethosu_error_codes
  */
-enum ethosu_error_codes ethosu_is_irq_raised(struct ethosu_device *dev, uint8_t *irq_status);
+enum ethosu_error_codes ethosu_dev_is_irq_raised(struct ethosu_device *dev, uint8_t *irq_status);
 
 /**
  * Clear IRQ status.
  * \return                     \ref ethosu_error_codes
  */
-enum ethosu_error_codes ethosu_clear_irq_status(struct ethosu_device *dev);
+enum ethosu_error_codes ethosu_dev_clear_irq_status(struct ethosu_device *dev);
 
 /**
  * Get the 16 bit status mask.
@@ -210,14 +204,21 @@ enum ethosu_error_codes ethosu_clear_irq_status(struct ethosu_device *dev);
  *                                 bit7-15: reserved
  * \return                         \ref ethosu_error_codes
  */
-enum ethosu_error_codes ethosu_get_status_mask(struct ethosu_device *dev, uint16_t *status_mask);
+
+enum ethosu_error_codes ethosu_dev_get_status_mask(struct ethosu_device *dev, uint16_t *status_mask);
+
+/**
+ * Get current NPU status
+ * \return                     32 bit status value
+ */
+uint32_t ethosu_dev_get_status(struct ethosu_device *dev);
 
 /**
  * Get the 16 bit IRQ history mask.
  * \param[out] irq_history_mask    Pointer to the IRQ history mask.
  * \return                         \ref ethosu_error_codes
  */
-enum ethosu_error_codes ethosu_get_irq_history_mask(struct ethosu_device *dev, uint16_t *irq_history_mask);
+enum ethosu_error_codes ethosu_dev_get_irq_history_mask(struct ethosu_device *dev, uint16_t *irq_history_mask);
 
 /**
  * Clear the given bits in the
@@ -226,19 +227,19 @@ enum ethosu_error_codes ethosu_get_irq_history_mask(struct ethosu_device *dev, u
  *                                     clear in the IRQ history mask.
  * \return                             \ref ethosu_error_codes
  */
-enum ethosu_error_codes ethosu_clear_irq_history_mask(struct ethosu_device *dev, uint16_t irq_history_clear_mask);
+enum ethosu_error_codes ethosu_dev_clear_irq_history_mask(struct ethosu_device *dev, uint16_t irq_history_clear_mask);
 
 /**
  * Perform a NPU soft reset.
  * \return                     \ref ethosu_error_codes
  */
-enum ethosu_error_codes ethosu_soft_reset(struct ethosu_device *dev);
+enum ethosu_error_codes ethosu_dev_soft_reset(struct ethosu_device *dev);
 
 /**
  * Wait for reset ready.
  * \return                     \ref ethosu_error_codes
  */
-enum ethosu_error_codes ethosu_wait_for_reset(struct ethosu_device *dev);
+enum ethosu_error_codes ethosu_dev_wait_for_reset(struct ethosu_device *dev);
 
 /**
  * Read and return the content of a given NPU APB
@@ -250,10 +251,10 @@ enum ethosu_error_codes ethosu_wait_for_reset(struct ethosu_device *dev);
  *                             written.
  * \return                     \ref ethosu_error_codes
  */
-enum ethosu_error_codes ethosu_read_apb_reg(struct ethosu_device *dev,
-                                            uint32_t start_address,
-                                            uint16_t num_reg,
-                                            uint32_t *reg_p);
+enum ethosu_error_codes ethosu_dev_read_apb_reg(struct ethosu_device *dev,
+                                                uint32_t start_address,
+                                                uint16_t num_reg,
+                                                uint32_t *reg_p);
 
 /**
  * Set qconfig register. I.e.
@@ -262,7 +263,7 @@ enum ethosu_error_codes ethosu_read_apb_reg(struct ethosu_device *dev,
  *                             enum ethosu_memory_type.
  * \return                     \ref ethosu_error_codes
  */
-enum ethosu_error_codes ethosu_set_qconfig(struct ethosu_device *dev, enum ethosu_memory_type memory_type);
+enum ethosu_error_codes ethosu_dev_set_qconfig(struct ethosu_device *dev, enum ethosu_memory_type memory_type);
 
 /**
  * Set register REGIONCFG.
@@ -272,9 +273,9 @@ enum ethosu_error_codes ethosu_set_qconfig(struct ethosu_device *dev, enum ethos
  * \param[in] memory_type      Memory_type to use for region: enum ethosu_memory_type.
  * \return                     \ref ethosu_error_codes
  */
-enum ethosu_error_codes ethosu_set_regioncfg(struct ethosu_device *dev,
-                                             uint8_t region,
-                                             enum ethosu_memory_type memory_type);
+enum ethosu_error_codes ethosu_dev_set_regioncfg(struct ethosu_device *dev,
+                                                 uint8_t region,
+                                                 enum ethosu_memory_type memory_type);
 
 /**
  * Set AXI limit parameters for port 0 counter 0.
@@ -284,11 +285,11 @@ enum ethosu_error_codes ethosu_set_regioncfg(struct ethosu_device *dev,
  * \param[in] max_writes       Maximum number of outstanding writes.
  * \return                     \ref ethosu_error_codes
  */
-enum ethosu_error_codes ethosu_set_axi_limit0(struct ethosu_device *dev,
-                                              enum ethosu_axi_limit_beats max_beats,
-                                              enum ethosu_axi_limit_mem_type memtype,
-                                              uint8_t max_reads,
-                                              uint8_t max_writes);
+enum ethosu_error_codes ethosu_dev_set_axi_limit0(struct ethosu_device *dev,
+                                                  enum ethosu_axi_limit_beats max_beats,
+                                                  enum ethosu_axi_limit_mem_type memtype,
+                                                  uint8_t max_reads,
+                                                  uint8_t max_writes);
 /**
  * Set AXI limit parameters for port 0 counter 1.
  * \param[in] max_beats        Burst split alignment, \ref ethosu_axi_limit_beats.
@@ -297,11 +298,11 @@ enum ethosu_error_codes ethosu_set_axi_limit0(struct ethosu_device *dev,
  * \param[in] max_writes       Maximum number of outstanding writes.
  * \return                     \ref ethosu_error_codes
  */
-enum ethosu_error_codes ethosu_set_axi_limit1(struct ethosu_device *dev,
-                                              enum ethosu_axi_limit_beats max_beats,
-                                              enum ethosu_axi_limit_mem_type memtype,
-                                              uint8_t max_reads,
-                                              uint8_t max_writes);
+enum ethosu_error_codes ethosu_dev_set_axi_limit1(struct ethosu_device *dev,
+                                                  enum ethosu_axi_limit_beats max_beats,
+                                                  enum ethosu_axi_limit_mem_type memtype,
+                                                  uint8_t max_reads,
+                                                  uint8_t max_writes);
 /**
  * Set AXI limit parameters for port 1 counter 2.
  * \param[in] max_beats        Burst split alignment, \ref ethosu_axi_limit_beats.
@@ -310,11 +311,11 @@ enum ethosu_error_codes ethosu_set_axi_limit1(struct ethosu_device *dev,
  * \param[in] max_writes       Maximum number of outstanding writes.
  * \return                     \ref ethosu_error_codes
  */
-enum ethosu_error_codes ethosu_set_axi_limit2(struct ethosu_device *dev,
-                                              enum ethosu_axi_limit_beats max_beats,
-                                              enum ethosu_axi_limit_mem_type memtype,
-                                              uint8_t max_reads,
-                                              uint8_t max_writes);
+enum ethosu_error_codes ethosu_dev_set_axi_limit2(struct ethosu_device *dev,
+                                                  enum ethosu_axi_limit_beats max_beats,
+                                                  enum ethosu_axi_limit_mem_type memtype,
+                                                  uint8_t max_reads,
+                                                  uint8_t max_writes);
 /**
  * Set AXI limit parameters for port 1 counter 3.
  * \param[in] max_beats        Burst split alignment, \ref ethosu_axi_limit_beats.
@@ -323,25 +324,24 @@ enum ethosu_error_codes ethosu_set_axi_limit2(struct ethosu_device *dev,
  * \param[in] max_writes       Maximum number of outstanding writes.
  * \return                     \ref ethosu_error_codes
  */
-enum ethosu_error_codes ethosu_set_axi_limit3(struct ethosu_device *dev,
-                                              enum ethosu_axi_limit_beats max_beats,
-                                              enum ethosu_axi_limit_mem_type memtype,
-                                              uint8_t max_reads,
-                                              uint8_t max_writes);
+enum ethosu_error_codes ethosu_dev_set_axi_limit3(struct ethosu_device *dev,
+                                                  enum ethosu_axi_limit_beats max_beats,
+                                                  enum ethosu_axi_limit_mem_type memtype,
+                                                  uint8_t max_reads,
+                                                  uint8_t max_writes);
 
 /**
  * Get current command stream queue read position.
- * \param[out] qread           Pointer to queue read.
- * \return                     \ref ethosu_error_codes
+ * \return                     qread position
  */
-enum ethosu_error_codes ethosu_get_qread(struct ethosu_device *dev, uint32_t *qread);
+uint32_t ethosu_dev_get_qread(struct ethosu_device *dev);
 
 /**
  * Get revision of NPU
  * \param[out] revision        Pointer to revision read.
  * \return                     \ref ethosu_error_codes
  */
-enum ethosu_error_codes ethosu_get_revision(struct ethosu_device *dev, uint32_t *revision);
+enum ethosu_error_codes ethosu_dev_get_revision(struct ethosu_device *dev, uint32_t *revision);
 
 /**
  * Issue run command for the currently programmed
@@ -349,7 +349,7 @@ enum ethosu_error_codes ethosu_get_revision(struct ethosu_device *dev, uint32_t 
  *                             position.
  * \return                     \ref ethosu_error_codes
  */
-enum ethosu_error_codes ethosu_set_command_run(struct ethosu_device *dev);
+enum ethosu_error_codes ethosu_dev_set_command_run(struct ethosu_device *dev);
 
 /**
  * Dump a 1KB section of SHRAM.
@@ -359,7 +359,7 @@ enum ethosu_error_codes ethosu_set_command_run(struct ethosu_device *dev);
  *                             written.
  * \return                     \ref ethosu_error_codes
  */
-enum ethosu_error_codes ethosu_get_shram_data(struct ethosu_device *dev, int section, uint32_t *shram_p);
+enum ethosu_error_codes ethosu_dev_get_shram_data(struct ethosu_device *dev, int section, uint32_t *shram_p);
 
 /**
  * Set clock and power q request enable bits.
@@ -367,30 +367,30 @@ enum ethosu_error_codes ethosu_get_shram_data(struct ethosu_device *dev, int sec
  * \param[in] power_q          Power q ENABLE/DISABLE \ref power_q_request.
  * \return                     \ref ethosu_error_codes
  */
-enum ethosu_error_codes ethosu_set_clock_and_power(struct ethosu_device *dev,
-                                                   enum ethosu_clock_q_request clock_q,
-                                                   enum ethosu_power_q_request power_q);
+enum ethosu_error_codes ethosu_dev_set_clock_and_power(struct ethosu_device *dev,
+                                                       enum ethosu_clock_q_request clock_q,
+                                                       enum ethosu_power_q_request power_q);
 
 /**
  * Read register.
  * \param[in] address          Address to read.
  * \return                     Register value.
  */
-uint32_t ethosu_read_reg(struct ethosu_device *dev, uint32_t address);
+uint32_t ethosu_dev_read_reg(struct ethosu_device *dev, uint32_t address);
 
 /**
  * Write register.
  * \param[in] address          Address to read.
  * \param[in] value            Value to be written.
  */
-void ethosu_write_reg(struct ethosu_device *dev, uint32_t address, uint32_t value);
+void ethosu_dev_write_reg(struct ethosu_device *dev, uint32_t address, uint32_t value);
 
 /**
  * Write register with shadow variable.
  * \param[in] address          Address to read.
  * \param[in] value            Value to be written.
  */
-void ethosu_write_reg_shadow(struct ethosu_device *dev, uint32_t address, uint32_t value, uint32_t *shadow);
+void ethosu_dev_write_reg_shadow(struct ethosu_device *dev, uint32_t address, uint32_t value, uint32_t *shadow);
 
 /**
  * Save the PMU configuration to ethosu_device struct.
@@ -398,7 +398,7 @@ void ethosu_write_reg_shadow(struct ethosu_device *dev, uint32_t address, uint32
  *                             saved.
  * \return                     \ref ethosu_error_codes
  */
-enum ethosu_error_codes ethosu_save_pmu_config(struct ethosu_device *dev);
+enum ethosu_error_codes ethosu_dev_save_pmu_config(struct ethosu_device *dev);
 
 /**
  * Restore the PMU configuration from a ethosu_device struct.
@@ -406,7 +406,7 @@ enum ethosu_error_codes ethosu_save_pmu_config(struct ethosu_device *dev);
  *                             stored.
  * \return                     \ref ethosu_error_codes
  */
-enum ethosu_error_codes ethosu_restore_pmu_config(struct ethosu_device *dev);
+enum ethosu_error_codes ethosu_dev_restore_pmu_config(struct ethosu_device *dev);
 
 /**
  * Save PMU counters to shadow variables in memory.
@@ -414,7 +414,15 @@ enum ethosu_error_codes ethosu_restore_pmu_config(struct ethosu_device *dev);
  *                             stored.
  * \return                     \ref ethosu_error_codes
  */
-enum ethosu_error_codes ethosu_save_pmu_counters(struct ethosu_device *dev);
+enum ethosu_error_codes ethosu_dev_save_pmu_counters(struct ethosu_device *dev);
+
+/**
+ * Check if the PROT register value has changed compared to cached value.
+ * \param[in] dev              Ethos-U device to check.
+ * \return                     true if register value differs from cached value,
+ *                             false otherwise.
+ */
+bool ethosu_dev_prot_has_changed(struct ethosu_device *dev);
 
 /**
  * Check if the STATUS register has any error bits set or not.
@@ -422,7 +430,7 @@ enum ethosu_error_codes ethosu_save_pmu_counters(struct ethosu_device *dev);
  * \return                     true if any error bits set,
  *                             false otherwise.
  */
-bool ethosu_status_has_error(struct ethosu_device *dev);
+bool ethosu_dev_status_has_error(struct ethosu_device *dev);
 
 #ifdef __cplusplus
 }

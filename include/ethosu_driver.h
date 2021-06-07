@@ -34,54 +34,44 @@ extern "C" {
 #endif
 
 /******************************************************************************
+ * Defines
+ ******************************************************************************/
+
+#define ETHOSU_DRIVER_VERSION_MAJOR 0  ///< Driver major version
+#define ETHOSU_DRIVER_VERSION_MINOR 16 ///< Driver minor version
+#define ETHOSU_DRIVER_VERSION_PATCH 0  ///< Driver patch version
+
+/******************************************************************************
  * Types
  ******************************************************************************/
 
 struct ethosu_driver
 {
     struct ethosu_device dev;
-    bool abort_inference;
+    struct ethosu_driver *next;
+    void *semaphore;
     uint64_t fast_memory;
     size_t fast_memory_size;
     bool status_error;
+    bool abort_inference;
     bool dev_power_always_on;
-    struct ethosu_driver *next;
     bool reserved;
     volatile bool irq_triggered;
-    void *semaphore;
     uint8_t clock_request;
     uint8_t power_request;
 };
 
-struct ethosu_version_id
+struct ethosu_driver_version
 {
-    // Ethos-U id
-    uint8_t version_status;
-    uint8_t version_minor;
-    uint8_t version_major;
-    uint8_t product_major;
-    uint8_t arch_patch_rev;
-    uint8_t arch_minor_rev;
-    uint8_t arch_major_rev;
-
-    // Driver Version
-    uint8_t driver_patch_rev;
-    uint8_t driver_minor_rev;
-    uint8_t driver_major_rev;
+    uint8_t major;
+    uint8_t minor;
+    uint8_t patch;
 };
 
-struct ethosu_version_config
+struct ethosu_hw_info
 {
-    uint8_t macs_per_cc;
-    uint8_t cmd_stream_version;
-    uint8_t shram_size;
-    uint8_t custom_dma;
-};
-
-struct ethosu_version
-{
-    struct ethosu_version_id id;
-    struct ethosu_version_config cfg;
+    struct ethosu_id version;
+    struct ethosu_config cfg;
 };
 
 enum ethosu_request_clients
@@ -91,10 +81,43 @@ enum ethosu_request_clients
 };
 
 /******************************************************************************
- * Variables
+ * Prototypes (weak functions in driver)
  ******************************************************************************/
 
-extern struct ethosu_driver ethosu_drv;
+/**
+ * Interrupt handler to be called on IRQ from Ethos-U
+ */
+void ethosu_irq_handler(struct ethosu_driver *drv);
+
+/*
+ * Flush/clean the data cache by address and size. Passing NULL as p argument
+ * expects the whole cache to be flushed.
+ */
+
+void ethosu_flush_dcache(uint32_t *p, size_t bytes);
+/*
+ * Invalidate the data cache by address and size. Passing NULL as p argument
+ * expects the whole cache to be invalidated.
+ */
+void ethosu_invalidate_dcache(uint32_t *p, size_t bytes);
+
+/*
+ * Minimal sempahore and mutex implementation for baremetal applications. See
+ * ethosu_driver.c.
+ */
+void *ethosu_mutex_create(void);
+void ethosu_mutex_lock(void *mutex);
+void ethosu_mutex_unlock(void *mutex);
+void *ethosu_semaphore_create(void);
+void ethosu_semaphore_take(void *sem);
+void ethosu_semaphore_give(void *sem);
+
+/*
+ * Callbacks for begin/end of inference. inference_data pointer is set in the
+ * ethosu_invoke() call, referenced as custom_data_ptr.
+ */
+void ethosu_inference_begin(struct ethosu_driver *drv, const void *inference_data);
+void ethosu_inference_end(struct ethosu_driver *drv, const void *inference_data);
 
 /******************************************************************************
  * Prototypes
@@ -111,9 +134,14 @@ int ethosu_init(struct ethosu_driver *drv,
                 uint32_t privilege_enable);
 
 /**
- * Get Ethos-U version.
+ * Get Ethos-U driver version.
  */
-int ethosu_get_version(struct ethosu_driver *drv, struct ethosu_version *version);
+void ethosu_get_driver_version(struct ethosu_driver_version *ver);
+
+/**
+ * Get Ethos-U hardware information.
+ */
+void ethosu_get_hw_info(struct ethosu_driver *drv, struct ethosu_hw_info *hw);
 
 /**
  * Invoke Vela command stream.
@@ -131,24 +159,9 @@ int ethosu_invoke(struct ethosu_driver *drv,
 void ethosu_abort(struct ethosu_driver *drv);
 
 /**
- * Interrupt handler do be called on IRQ from Ethos-U
- */
-void ethosu_irq_handler(struct ethosu_driver *drv);
-
-/**
  * Set Ethos-U power mode.
  */
 void ethosu_set_power_mode(struct ethosu_driver *drv, bool always_on);
-
-/**
- *  Register a driver for multiNPU usage
- */
-int ethosu_register_driver(struct ethosu_driver *drv);
-
-/**
- * Deregister a driver from multiNPU usage
- */
-int ethosu_deregister_driver(struct ethosu_driver *drv);
 
 /**
  * Reserves a driver to execute inference with

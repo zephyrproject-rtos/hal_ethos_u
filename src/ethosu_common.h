@@ -23,104 +23,52 @@
  * Includes
  ******************************************************************************/
 
-#include "ethosu55_interface.h"
-
 #include <stdio.h>
+#include <string.h>
 
 /******************************************************************************
  * Defines
  ******************************************************************************/
 
+#define UNUSED(x) ((void)x)
+
+#define MASK_0_31_BITS (0xFFFFFFFF)
+#define MASK_32_47_BITS (0xFFFF00000000)
+
 // Log severity levels
-#define ETHOSU_LOG_EMERG 0
-#define ETHOSU_LOG_ALERT 1
-#define ETHOSU_LOG_CRIT 2
-#define ETHOSU_LOG_ERR 3
-#define ETHOSU_LOG_WARN 4
-#define ETHOSU_LOG_NOTICE 5
-#define ETHOSU_LOG_INFO 6
-#define ETHOSU_LOG_DEBUG 7
+#define ETHOSU_LOG_ERR 0
+#define ETHOSU_LOG_WARN 1
+#define ETHOSU_LOG_INFO 2
+#define ETHOSU_LOG_DEBUG 3
 
 // Define default log severity
 #ifndef ETHOSU_LOG_SEVERITY
 #define ETHOSU_LOG_SEVERITY ETHOSU_LOG_WARN
 #endif
 
-#if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_EMERG
-#define LOG_EMERG(format, ...)                                                                                         \
-    fprintf(stderr, format, ##__VA_ARGS__);                                                                            \
-    fflush(stderr);                                                                                                    \
-    exit(-1)
-#else
-#define LOG_EMERG(format, ...)
-#endif
-
-#if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_ALERT
-#define LOG_ALERT(format, ...)                                                                                         \
-    fprintf(stderr, format, ##__VA_ARGS__);                                                                            \
-    fflush(stderr);                                                                                                    \
-    exit(-1)
-#else
-#define LOG_ALERT(format, ...)
-#endif
-
-#if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_CRIT
-#define LOG_CRIT(format, ...)                                                                                          \
-    fprintf(stderr, format, ##__VA_ARGS__);                                                                            \
-    fflush(stderr);                                                                                                    \
-    exit(-1)
-#else
-#define LOG_CRIT(format, ...)
-#endif
-
+// Log formatting
 #if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_ERR
-#define LOG_ERR(format, ...)                                                                                           \
-    fprintf(stderr, format, ##__VA_ARGS__);                                                                            \
-    fflush(stderr)
+#define LOG_ERR(f, ...) fprintf(stderr, "E: " f " (%s:%d)\n", ##__VA_ARGS__, strrchr("/" __FILE__, '/') + 1, __LINE__)
 #else
-#define LOG_ERR(format, ...)
+#define LOG_ERR(f, ...)
 #endif
 
 #if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_WARN
-#define LOG_WARN(format, ...) fprintf(stdout, format, ##__VA_ARGS__)
+#define LOG_WARN(f, ...) fprintf(stdout, "W: " f "\n", ##__VA_ARGS__)
 #else
-#define LOG_WARN(format, ...)
-#endif
-
-#if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_NOTICE
-#define LOG_NOTICE(format, ...) fprintf(stdout, format, ##__VA_ARGS__)
-#else
-#define LOG_NOTICE(format, ...)
+#define LOG_WARN(f, ...)
 #endif
 
 #if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_INFO
-#define LOG_INFO(format, ...) fprintf(stdout, format, ##__VA_ARGS__)
+#define LOG_INFO(f, ...) fprintf(stdout, "I: " f "\n", ##__VA_ARGS__)
 #else
-#define LOG_INFO(format, ...)
+#define LOG_INFO(f, ...)
 #endif
 
 #if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_DEBUG
-#define LOG_DEBUG(format, ...) fprintf(stdout, format, ##__VA_ARGS__)
+#define LOG_DEBUG(f, ...) fprintf(stdout, "D: %s(): " f "\n", __FUNCTION__, ##__VA_ARGS__)
 #else
-#define LOG_DEBUG(format, ...)
+#define LOG_DEBUG(f, ...)
 #endif
-
-#define UNUSED(x) ((void)x)
-
-#define VER_STR(X) VNUM_STR(X)
-#define VNUM_STR(X) #X
-
-#define MASK_0_31_BITS (0xFFFFFFFF)
-#define MASK_32_47_BITS (0xFFFF00000000)
-
-/******************************************************************************
- * Inline functions
- ******************************************************************************/
-
-static const __attribute__((section("npu_driver_version"))) char driver_version_str[] = VER_STR(
-    ETHOSU_DRIVER_VERSION_MAJOR) "." VER_STR(ETHOSU_DRIVER_VERSION_MINOR) "." VER_STR(ETHOSU_DRIVER_VERSION_PATCH);
-
-static const __attribute__((section("npu_driver_arch_version"))) char driver_arch_version_str[] =
-    VER_STR(NNX_ARCH_VERSION_MAJOR) "." VER_STR(NNX_ARCH_VERSION_MINOR) "." VER_STR(NNX_ARCH_VERSION_PATCH);
 
 #endif // ETHOSU_COMMON_H
