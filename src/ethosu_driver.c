@@ -696,6 +696,11 @@ int ethosu_init(struct ethosu_driver *drv,
     return return_code;
 }
 
+void ethosu_deinit(struct ethosu_driver *drv)
+{
+    ethosu_deregister_driver(drv);
+}
+
 void ethosu_get_driver_version(struct ethosu_driver_version *ver)
 {
     assert(ver != NULL);

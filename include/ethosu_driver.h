@@ -134,6 +134,11 @@ int ethosu_init(struct ethosu_driver *drv,
                 uint32_t privilege_enable);
 
 /**
+ * Deinitialize the Ethos-U driver.
+ */
+void ethosu_deinit(struct ethosu_driver *drv);
+
+/**
  * Get Ethos-U driver version.
  */
 void ethosu_get_driver_version(struct ethosu_driver_version *ver);
