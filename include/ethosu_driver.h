@@ -186,6 +186,21 @@ enum ethosu_error_codes set_clock_and_power_request(struct ethosu_driver *drv,
                                                     enum ethosu_clock_q_request clock_request,
                                                     enum ethosu_power_q_request power_request);
 
+/**
+ * Static inline for backwards-compatibility
+ */
+static inline int ethosu_invoke_v2(const void *custom_data_ptr,
+                                   const int custom_data_size,
+                                   const uint64_t *base_addr,
+                                   const size_t *base_addr_size,
+                                   const int num_base_addr)
+{
+    struct ethosu_driver *drv = ethosu_reserve_driver();
+    int result = ethosu_invoke(drv, custom_data_ptr, custom_data_size, base_addr, base_addr_size, num_base_addr);
+    ethosu_release_driver(drv);
+    return result;
+}
+
 #ifdef __cplusplus
 }
 #endif
