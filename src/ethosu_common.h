@@ -23,9 +23,6 @@
  * Includes
  ******************************************************************************/
 
-#include <stdio.h>
-#include <string.h>
-
 /******************************************************************************
  * Defines
  ******************************************************************************/
@@ -34,41 +31,5 @@
 
 #define MASK_0_31_BITS (0xFFFFFFFF)
 #define MASK_32_47_BITS (0xFFFF00000000)
-
-// Log severity levels
-#define ETHOSU_LOG_ERR 0
-#define ETHOSU_LOG_WARN 1
-#define ETHOSU_LOG_INFO 2
-#define ETHOSU_LOG_DEBUG 3
-
-// Define default log severity
-#ifndef ETHOSU_LOG_SEVERITY
-#define ETHOSU_LOG_SEVERITY ETHOSU_LOG_WARN
-#endif
-
-// Log formatting
-#if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_ERR
-#define LOG_ERR(f, ...) fprintf(stderr, "E: " f " (%s:%d)\n", ##__VA_ARGS__, strrchr("/" __FILE__, '/') + 1, __LINE__)
-#else
-#define LOG_ERR(f, ...)
-#endif
-
-#if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_WARN
-#define LOG_WARN(f, ...) fprintf(stdout, "W: " f "\n", ##__VA_ARGS__)
-#else
-#define LOG_WARN(f, ...)
-#endif
-
-#if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_INFO
-#define LOG_INFO(f, ...) fprintf(stdout, "I: " f "\n", ##__VA_ARGS__)
-#else
-#define LOG_INFO(f, ...)
-#endif
-
-#if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_DEBUG
-#define LOG_DEBUG(f, ...) fprintf(stdout, "D: %s(): " f "\n", __FUNCTION__, ##__VA_ARGS__)
-#else
-#define LOG_DEBUG(f, ...)
-#endif
 
 #endif // ETHOSU_COMMON_H

@@ -20,6 +20,7 @@
 #include "ethosu_common.h"
 #include "ethosu_config.h"
 #include "ethosu_device.h"
+#include "ethosu_log.h"
 
 #include <assert.h>
 #include <stddef.h>

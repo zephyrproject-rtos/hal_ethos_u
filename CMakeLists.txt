@@ -29,7 +29,7 @@ option(DRIVER_PMU_AUTOINIT "Enable PMU boot auto-initialization" OFF)
 set(CMSIS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmsis" CACHE PATH "Path to CMSIS.")
 
 set(LOG_NAMES err warning info debug)
-set(ETHOSU_LOG_SEVERITY "warning" CACHE STRING "Driver log severity level ${LOG_NAMES}")
+set(ETHOSU_LOG_SEVERITY "warning" CACHE STRING "Driver log severity level ${LOG_NAMES} (Defaults to 'warning')")
 set_property(CACHE ETHOSU_LOG_SEVERITY PROPERTY STRINGS ${LOG_NAMES})
 
 #
@@ -54,8 +54,6 @@ include_directories(${CMSIS_PATH}/CMSIS/Core/Include)
 add_library(ethosu_core_driver STATIC)
 target_include_directories(ethosu_core_driver PUBLIC include)
 target_sources(ethosu_core_driver PRIVATE src/ethosu_driver.c src/ethosu_device_u55.c src/ethosu_pmu.c)
-
-# Set the log level for the target
 target_compile_definitions(ethosu_core_driver PRIVATE ETHOSU_LOG_SEVERITY=${LOG_SEVERITY})
 
 # Install library and include files

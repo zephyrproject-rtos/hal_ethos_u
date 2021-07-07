@@ -24,6 +24,7 @@
 #include "ethosu_common.h"
 #include "ethosu_config.h"
 #include "ethosu_device.h"
+#include "ethosu_log.h"
 
 #include <assert.h>
 #include <cmsis_compiler.h>
@@ -311,7 +312,7 @@ static void ethosu_register_driver(struct ethosu_driver *drv)
     drv->next          = registered_drivers;
     registered_drivers = drv;
 
-    LOG_INFO("New NPU driver registered (handle: 0x%p, NPU: 0x%x)", drv, drv->dev.base_address);
+    LOG_INFO("New NPU driver registered (handle: 0x%p, NPU: 0x%x)\n", drv, drv->dev.base_address);
 }
 
 static int ethosu_deregister_driver(struct ethosu_driver *drv)
@@ -324,7 +325,7 @@ static int ethosu_deregister_driver(struct ethosu_driver *drv)
         if (cur == drv)
         {
             *prev = cur->next;
-            LOG_INFO("NPU driver handle %p deregistered.", drv);
+            LOG_INFO("NPU driver handle %p deregistered.\n", drv);
             return 0;
         }
 
@@ -332,7 +333,7 @@ static int ethosu_deregister_driver(struct ethosu_driver *drv)
         cur  = cur->next;
     }
 
-    LOG_ERR("No NPU driver handle registered at address %p.", drv);
+    LOG_ERR("No NPU driver handle registered at address %p.\n", drv);
 
     return -1;
 }
@@ -346,13 +347,13 @@ static struct ethosu_driver *ethosu_find_and_reserve_driver(void)
         if (!drv->reserved)
         {
             drv->reserved = true;
-            LOG_DEBUG("NPU driver handle %p reserved.", drv);
+            LOG_DEBUG("NPU driver handle %p reserved.\n", drv);
             return drv;
         }
         drv = drv->next;
     }
 
-    LOG_DEBUG("No NPU driver handle available.", drv);
+    LOG_DEBUG("No NPU driver handle available.\n", drv);
 
     return NULL;
 }
@@ -379,13 +380,13 @@ static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s *
     struct ethosu_id id;
     int return_code = 0;
 
-    LOG_INFO("Optimizer release nbr: %d patch: %d", opt_cfg_p->da_data.rel_nbr, opt_cfg_p->da_data.patch_nbr);
-    LOG_INFO("Optimizer config cmd_stream_version: %d macs_per_cc: %d shram_size: %d custom_dma: %d",
+    LOG_INFO("Optimizer release nbr: %d patch: %d\n", opt_cfg_p->da_data.rel_nbr, opt_cfg_p->da_data.patch_nbr);
+    LOG_INFO("Optimizer config cmd_stream_version: %d macs_per_cc: %d shram_size: %d custom_dma: %d\n",
              opt_cfg_p->cmd_stream_version,
              opt_cfg_p->macs_per_cc,
              opt_cfg_p->shram_size,
              opt_cfg_p->custom_dma);
-    LOG_INFO("Optimizer config Ethos-U version: %d.%d.%d",
+    LOG_INFO("Optimizer config Ethos-U version: %d.%d.%d\n",
              opt_cfg_p->arch_major_rev,
              opt_cfg_p->arch_minor_rev,
              opt_cfg_p->arch_patch_rev);
@@ -393,12 +394,12 @@ static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s *
     (void)ethosu_dev_get_config(&drv->dev, &cfg);
     (void)ethosu_dev_get_id(&drv->dev, &id);
     LOG_INFO("Ethos-U config cmd_stream_version: %" PRIu32 " macs_per_cc: %" PRIu32 " shram_size: %" PRIu32
-             " custom_dma: %" PRIu32 "",
+             " custom_dma: %" PRIu32 "\n",
              cfg.cmd_stream_version,
              cfg.macs_per_cc,
              cfg.shram_size,
              cfg.custom_dma);
-    LOG_INFO("Ethos-U version: %" PRIu32 ".%" PRIu32 ".%" PRIu32 "",
+    LOG_INFO("Ethos-U version: %" PRIu32 ".%" PRIu32 ".%" PRIu32 "\n",
              id.arch_major_rev,
              id.arch_minor_rev,
              id.arch_patch_rev);
@@ -408,25 +409,25 @@ static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s *
     {
         if (cfg.macs_per_cc != opt_cfg_p->macs_per_cc)
         {
-            LOG_ERR("NPU config mismatch: npu.macs_per_cc=%" PRIu32 " optimizer.macs_per_cc=%d",
+            LOG_ERR("NPU config mismatch: npu.macs_per_cc=%" PRIu32 " optimizer.macs_per_cc=%d\n",
                     cfg.macs_per_cc,
                     opt_cfg_p->macs_per_cc);
         }
         if (cfg.shram_size != opt_cfg_p->shram_size)
         {
-            LOG_ERR("NPU config mismatch: npu.shram_size=%" PRIu32 " optimizer.shram_size=%d",
+            LOG_ERR("NPU config mismatch: npu.shram_size=%" PRIu32 " optimizer.shram_size=%d\n",
                     cfg.shram_size,
                     opt_cfg_p->shram_size);
         }
         if (cfg.cmd_stream_version != opt_cfg_p->cmd_stream_version)
         {
-            LOG_ERR("NPU config mismatch: npu.cmd_stream_version=%" PRIu32 " optimizer.cmd_stream_version=%d",
+            LOG_ERR("NPU config mismatch: npu.cmd_stream_version=%" PRIu32 " optimizer.cmd_stream_version=%d\n",
                     cfg.cmd_stream_version,
                     opt_cfg_p->cmd_stream_version);
         }
         if (!cfg.custom_dma && opt_cfg_p->custom_dma)
         {
-            LOG_ERR("NPU config mismatch: npu.custom_dma=%" PRIu32 " optimize.custom_dma=%d",
+            LOG_ERR("NPU config mismatch: npu.custom_dma=%" PRIu32 " optimize.custom_dma=%d\n",
                     cfg.custom_dma,
                     opt_cfg_p->custom_dma);
         }
@@ -435,7 +436,7 @@ static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s *
 
     if ((id.arch_major_rev != opt_cfg_p->arch_major_rev) || (id.arch_minor_rev < opt_cfg_p->arch_minor_rev))
     {
-        LOG_ERR("NPU arch mismatch: npu.arch=%" PRIu32 ".%" PRIu32 ".%" PRIu32 " optimizer.arch=%d.%d.%d",
+        LOG_ERR("NPU arch mismatch: npu.arch=%" PRIu32 ".%" PRIu32 ".%" PRIu32 " optimizer.arch=%d.%d.%d\n",
                 id.arch_major_rev,
                 id.arch_minor_rev,
                 id.arch_patch_rev,
@@ -462,11 +463,11 @@ static int handle_command_stream(struct ethosu_driver *drv,
     uint32_t cms_bytes       = cms_length * BYTES_IN_32_BITS;
     ptrdiff_t cmd_stream_ptr = (ptrdiff_t)cmd_stream;
 
-    LOG_INFO("handle_command_stream: cmd_stream=%p, cms_length %d", cmd_stream, cms_length);
+    LOG_INFO("handle_command_stream: cmd_stream=%p, cms_length %d\n", cmd_stream, cms_length);
 
     if (0 != ((ptrdiff_t)cmd_stream & MASK_16_BYTE_ALIGN))
     {
-        LOG_ERR("Command stream addr %p not aligned to 16 bytes", cmd_stream);
+        LOG_ERR("Command stream addr %p not aligned to 16 bytes\n", cmd_stream);
         return -1;
     }
 
@@ -475,7 +476,7 @@ static int handle_command_stream(struct ethosu_driver *drv,
     {
         if (0 != (base_addr[i] & MASK_16_BYTE_ALIGN))
         {
-            LOG_ERR("Base addr %d: 0x%llx not aligned to 16 bytes", i, base_addr[i]);
+            LOG_ERR("Base addr %d: 0x%llx not aligned to 16 bytes\n", i, base_addr[i]);
             base_addr_invalid = true;
         }
     }
@@ -531,7 +532,7 @@ static int handle_command_stream(struct ethosu_driver *drv,
     qread = ethosu_dev_get_qread(&drv->dev);
     if (qread != cms_bytes)
     {
-        LOG_WARN("IRQ received but qread (%" PRIu32 ") not at end of stream (%" PRIu32 ").", qread, cms_bytes);
+        LOG_WARN("IRQ received but qread (%" PRIu32 ") not at end of stream (%" PRIu32 ").\n", qread, cms_bytes);
         return -1;
     }
 
@@ -547,7 +548,7 @@ static int read_apb_reg(struct ethosu_driver *drv, uint16_t da_data)
     reg_p = (uint32_t *)malloc(num_reg * sizeof(uint32_t));
     if (reg_p == NULL)
     {
-        LOG_ERR("Memory allocation failed");
+        LOG_ERR("Memory allocation failed\n");
         return -1;
     }
 
@@ -556,7 +557,7 @@ static int read_apb_reg(struct ethosu_driver *drv, uint16_t da_data)
         for (int i = 0; i < num_reg; i++)
         {
             LOG_INFO(
-                "NPU_REG ADDR 0x%04" PRIu32 " = 0x%08" PRIu32 "", (start_address + (i * BYTES_IN_32_BITS)), reg_p[i]);
+                "NPU_REG ADDR 0x%04" PRIu32 " = 0x%08" PRIu32 "\n", (start_address + (i * BYTES_IN_32_BITS)), reg_p[i]);
         }
     }
     else
@@ -575,12 +576,12 @@ static int dump_shram(struct ethosu_driver *drv)
     uint32_t *shram_p;
     (void)ethosu_dev_get_config(&drv->dev, &cfg);
 
-    LOG_INFO("dump_shram size = %" PRIu32 " KB", cfg.shram_size);
+    LOG_INFO("dump_shram size = %" PRIu32 " KB\n", cfg.shram_size);
 
     shram_p = (uint32_t *)malloc(BYTES_1KB);
     if (shram_p == NULL)
     {
-        LOG_ERR("Memory allocation failed for shram data");
+        LOG_ERR("Memory allocation failed for shram data\n");
         return -1;
     }
 
@@ -588,10 +589,10 @@ static int dump_shram(struct ethosu_driver *drv)
     {
         ethosu_dev_get_shram_data(&drv->dev, i, (uint32_t *)shram_p);
         // Output 1KB of SHRAM
-        LOG_INFO("***SHRAM SECTION %" PRIu32 "***", i);
+        LOG_INFO("***SHRAM SECTION %" PRIu32 "***\n", i);
         for (int j = 0; j < (BYTES_1KB / BYTES_IN_32_BITS); j++)
         {
-            LOG_INFO("[0x%04" PRIx32 "] %" PRIx32 "", (i * 1024 + j * 4), shram_p[j]);
+            LOG_INFO("[0x%04" PRIx32 "] %" PRIx32 "\n", (i * 1024 + j * 4), shram_p[j]);
         }
     }
     free(shram_p);
@@ -606,7 +607,8 @@ void __attribute__((weak)) ethosu_irq_handler(struct ethosu_driver *drv)
 {
     uint8_t irq_raised = 0;
 
-    LOG_DEBUG("Interrupt. status=0x%08x, qread=%d", ethosu_dev_get_status(&drv->dev), ethosu_dev_get_qread(&drv->dev));
+    LOG_DEBUG(
+        "Interrupt. status=0x%08x, qread=%d\n", ethosu_dev_get_status(&drv->dev), ethosu_dev_get_qread(&drv->dev));
 
     // Verify that interrupt has been raised
     (void)ethosu_dev_is_irq_raised(&drv->dev, &irq_raised);
@@ -643,7 +645,7 @@ int ethosu_init(struct ethosu_driver *drv,
     int return_code = 0;
 
     LOG_INFO("Initializing NPU: base_address=%p, fast_memory=%p, fast_memory_size=%zu, secure=%" PRIu32
-             ", privileged=%" PRIu32,
+             ", privileged=%" PRIu32 "\n",
              base_address,
              fast_memory,
              fast_memory_size,
@@ -667,14 +669,14 @@ int ethosu_init(struct ethosu_driver *drv,
 
     if (ETHOSU_SUCCESS != ethosu_dev_init(&drv->dev, base_address, secure_enable, privilege_enable))
     {
-        LOG_ERR("Failed to initialize Ethos-U device");
+        LOG_ERR("Failed to initialize Ethos-U device\n");
         return -1;
     }
 
     if (ETHOSU_SUCCESS !=
         set_clock_and_power_request(drv, ETHOSU_INFERENCE_REQUEST, ETHOSU_CLOCK_Q_DISABLE, ETHOSU_POWER_Q_DISABLE))
     {
-        LOG_ERR("Failed to disable clock-q & power-q for Ethos-U");
+        LOG_ERR("Failed to disable clock-q & power-q for Ethos-U\n");
         return -1;
     }
 
@@ -685,7 +687,7 @@ int ethosu_init(struct ethosu_driver *drv,
 
     if (ETHOSU_SUCCESS != ethosu_dev_wait_for_reset(&drv->dev))
     {
-        LOG_ERR("Failed reset of Ethos-U");
+        LOG_ERR("Failed reset of Ethos-U\n");
         return -1;
     }
 
@@ -731,14 +733,14 @@ int ethosu_invoke(struct ethosu_driver *drv,
     // First word in custom_data_ptr should contain "Custom Operator Payload 1"
     if (data_ptr->word != ETHOSU_FOURCC)
     {
-        LOG_ERR("Custom Operator Payload: %" PRIu32 " is not correct, expected %x", data_ptr->word, ETHOSU_FOURCC);
+        LOG_ERR("Custom Operator Payload: %" PRIu32 " is not correct, expected %x\n", data_ptr->word, ETHOSU_FOURCC);
         return -1;
     }
 
     // Custom data length must be a multiple of 32 bits
     if ((custom_data_size % BYTES_IN_32_BITS) != 0)
     {
-        LOG_ERR("custom_data_size=0x%x not a multiple of 4", custom_data_size);
+        LOG_ERR("custom_data_size=0x%x not a multiple of 4\n", custom_data_size);
         return -1;
     }
 
@@ -751,7 +753,7 @@ int ethosu_invoke(struct ethosu_driver *drv,
 
         if (base_addr_size != NULL && base_addr_size[FAST_MEMORY_BASE_ADDR_INDEX] > drv->fast_memory_size)
         {
-            LOG_ERR("Fast memory area too small. fast_memory_size=%u, base_addr_size=%u",
+            LOG_ERR("Fast memory area too small. fast_memory_size=%u, base_addr_size=%u\n",
                     drv->fast_memory_size,
                     base_addr_size[FAST_MEMORY_BASE_ADDR_INDEX]);
             return -1;
@@ -786,14 +788,14 @@ int ethosu_invoke(struct ethosu_driver *drv,
         switch (data_ptr->driver_action_command)
         {
         case OPTIMIZER_CONFIG:
-            LOG_DEBUG("OPTIMIZER_CONFIG");
+            LOG_DEBUG("OPTIMIZER_CONFIG\n");
             struct opt_cfg_s *opt_cfg_p = (struct opt_cfg_s *)data_ptr;
 
             ret = handle_optimizer_config(drv, opt_cfg_p);
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD + OPTIMIZER_CONFIG_LENGTH_32_BIT_WORD;
             break;
         case COMMAND_STREAM:
-            LOG_DEBUG("COMMAND_STREAM");
+            LOG_DEBUG("COMMAND_STREAM\n");
             void *command_stream = (uint8_t *)(data_ptr) + sizeof(struct custom_data_s);
             int cms_length       = (data_ptr->reserved << 16) | data_ptr->length;
 
@@ -805,28 +807,28 @@ int ethosu_invoke(struct ethosu_driver *drv,
 
             if (return_code == -1 && drv->abort_inference)
             {
-                LOG_ERR("NPU timeout. qread=%" PRIu32, ethosu_dev_get_qread(&drv->dev));
+                LOG_ERR("NPU timeout. qread=%" PRIu32 "\n", ethosu_dev_get_qread(&drv->dev));
                 dump_shram(drv);
             }
 
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD + cms_length;
             break;
         case READ_APB_REG:
-            LOG_DEBUG("READ_APB_REG");
+            LOG_DEBUG("READ_APB_REG\n");
             ret = read_apb_reg(drv, data_ptr->driver_action_data);
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD;
             break;
         case DUMP_SHRAM:
-            LOG_DEBUG("DUMP_SHRAM");
+            LOG_DEBUG("DUMP_SHRAM\n");
             ret = dump_shram(drv);
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD;
             break;
         case NOP:
-            LOG_DEBUG("NOP");
+            LOG_DEBUG("NOP\n");
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD;
             break;
         default:
-            LOG_ERR("UNSUPPORTED driver_action_command: %d ", data_ptr->driver_action_command);
+            LOG_ERR("UNSUPPORTED driver_action_command: %d \n", data_ptr->driver_action_command);
             ret = -1;
             break;
         }
@@ -877,7 +879,7 @@ struct ethosu_driver *ethosu_reserve_driver(void)
             break;
         }
 
-        LOG_INFO("Waiting for NPU driver handle to become available...");
+        LOG_INFO("Waiting for NPU driver handle to become available...\n");
         ethosu_semaphore_take(ethosu_semaphore);
 
     } while (1);
@@ -891,7 +893,7 @@ void ethosu_release_driver(struct ethosu_driver *drv)
     if (drv != NULL && drv->reserved)
     {
         drv->reserved = false;
-        LOG_DEBUG("NPU driver handle %p released", drv);
+        LOG_DEBUG("NPU driver handle %p released\n", drv);
         ethosu_semaphore_give(ethosu_semaphore);
     }
     ethosu_mutex_unlock(ethosu_mutex);
