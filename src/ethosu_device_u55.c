@@ -66,7 +66,7 @@ enum ethosu_error_codes ethosu_dev_get_id(struct ethosu_device *dev, struct etho
 
 enum ethosu_error_codes ethosu_dev_get_config(struct ethosu_device *dev, struct ethosu_config *config)
 {
-    struct config_r cfg = {.word = 0};
+    struct config_r cfg = {0};
 
     cfg.word = ethosu_dev_read_reg(dev, NPU_REG_CONFIG);
 
