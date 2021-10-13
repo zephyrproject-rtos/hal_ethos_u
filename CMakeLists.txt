@@ -30,6 +30,7 @@ set(CMSIS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmsis" CACHE PATH "Path to CMSIS.
 
 set(LOG_NAMES err warning info debug)
 set(ETHOSU_LOG_SEVERITY "warning" CACHE STRING "Driver log severity level ${LOG_NAMES} (Defaults to 'warning')")
+set(ETHOSU_TARGET_NPU_CONFIG "ethos-u55-128" CACHE STRING "Default NPU configuration")
 set_property(CACHE ETHOSU_LOG_SEVERITY PROPERTY STRINGS ${LOG_NAMES})
 
 #
@@ -53,7 +54,28 @@ include_directories(${CMSIS_PATH}/CMSIS/Core/Include)
 # Build driver library
 add_library(ethosu_core_driver STATIC)
 target_include_directories(ethosu_core_driver PUBLIC include)
-target_sources(ethosu_core_driver PRIVATE src/ethosu_driver.c src/ethosu_device_u55.c src/ethosu_pmu.c)
+target_sources(ethosu_core_driver PRIVATE src/ethosu_driver.c src/ethosu_pmu.c)
+
+string(TOLOWER ${ETHOSU_TARGET_NPU_CONFIG} ETHOSU_TARGET_NPU_CONFIG)
+if(ETHOSU_TARGET_NPU_CONFIG MATCHES "^ethos-(u[0-9]+|uz)-([0-9]+$)")
+    set(ETHOSU_ARCH ${CMAKE_MATCH_1})
+    set(ETHOSU_MACS ${CMAKE_MATCH_2})
+else()
+    message(FATAL_ERROR "Invalid Ethos-U target configuration '${ETHOSU_TARGET_NPU_CONFIG}")
+endif()
+
+target_compile_definitions(ethosu_core_driver PRIVATE
+    ETHOSU_ARCH=${ETHOSU_ARCH}
+    ETHOS$<UPPER_CASE:${ETHOSU_ARCH}>)
+
+if (ETHOSU_ARCH STREQUAL "u55" OR ETHOSU_ARCH STREQUAL "u65")
+    target_sources(ethosu_core_driver PRIVATE src/ethosu_device_u55_u65.c)
+else()
+    message(FATAL_ERROR "Invalid NPU configuration")
+endif()
+
+
+# Set the log level for the target
 target_compile_definitions(ethosu_core_driver PRIVATE ETHOSU_LOG_SEVERITY=${LOG_SEVERITY})
 
 # Install library and include files
@@ -67,6 +89,7 @@ install(FILES include/ethosu_device.h include/ethosu_driver.h include/pmu_ethosu
 
 message(STATUS "*******************************************************")
 message(STATUS "PROJECT_NAME                           : ${PROJECT_NAME}")
+message(STATUS "ETHOSU_TARGET_NPU_CONFIG               : ${ETHOSU_TARGET_NPU_CONFIG}")
 message(STATUS "CMAKE_SYSTEM_PROCESSOR                 : ${CMAKE_SYSTEM_PROCESSOR}")
 message(STATUS "CMSIS_PATH                             : ${CMSIS_PATH}")
 message(STATUS "ETHOSU_LOG_SEVERITY                    : ${ETHOSU_LOG_SEVERITY}")

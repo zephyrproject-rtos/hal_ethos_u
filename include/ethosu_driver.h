@@ -23,7 +23,7 @@
  * Includes
  ******************************************************************************/
 
-#include "ethosu_device.h"
+#include "ethosu_types.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -45,15 +45,17 @@ extern "C" {
  * Types
  ******************************************************************************/
 
+// Forward declare
+struct ethosu_device;
+
 struct ethosu_driver
 {
-    struct ethosu_device dev;
+    struct ethosu_device *dev;
     struct ethosu_driver *next;
     void *semaphore;
     uint64_t fast_memory;
     size_t fast_memory_size;
     bool status_error;
-    bool abort_inference;
     bool dev_power_always_on;
     bool reserved;
     volatile bool irq_triggered;
@@ -66,12 +68,6 @@ struct ethosu_driver_version
     uint8_t major;
     uint8_t minor;
     uint8_t patch;
-};
-
-struct ethosu_hw_info
-{
-    struct ethosu_id version;
-    struct ethosu_config cfg;
 };
 
 enum ethosu_request_clients
@@ -157,11 +153,6 @@ int ethosu_invoke(struct ethosu_driver *drv,
                   const uint64_t *base_addr,
                   const size_t *base_addr_size,
                   const int num_base_addr);
-
-/**
- * Abort Ethos-U inference.
- */
-void ethosu_abort(struct ethosu_driver *drv);
 
 /**
  * Set Ethos-U power mode.

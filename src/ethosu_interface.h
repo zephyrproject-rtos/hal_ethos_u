@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Arm Limited. All rights reserved.
+ * Copyright (c) 2020-2021 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -15,21 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// clang-format off
+#ifndef ETHOSU_INTERFACE_WRAPPER_
+#define ETHOSU_INTERFACE_WRAPPER_
 
-#ifndef ETHOSU_COMMON_H
-#define ETHOSU_COMMON_H
+#define xstr(a) str(a)
+#define str(a)  #a
 
-/******************************************************************************
- * Includes
- ******************************************************************************/
+#define catm(a, b)  catm_(a, b)
+#define catm_(a, b) a##b
 
-/******************************************************************************
- * Defines
- ******************************************************************************/
+#define ETHOSU_INTERFACE_FILE xstr(catm(ethos, ETHOSU_ARCH)_interface.h)
 
-#define UNUSED(x) ((void)x)
+#include ETHOSU_INTERFACE_FILE
 
-#define MASK_0_31_BITS (0xFFFFFFFF)
-#define MASK_32_47_BITS (0xFFFF00000000)
-
-#endif // ETHOSU_COMMON_H
+#endif // ETHOSU_INTERFACE_WRAPPER_
