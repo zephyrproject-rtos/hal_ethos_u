@@ -676,7 +676,7 @@ enum ethosu_error_codes set_clock_and_power_request(struct ethosu_driver *drv,
     {
         drv->power_request |= (1 << client);
     }
-    else if (power_request == ETHOSU_CLOCK_Q_ENABLE)
+    else if (power_request == ETHOSU_POWER_Q_ENABLE)
     {
         drv->power_request &= ~(1 << client);
     }
