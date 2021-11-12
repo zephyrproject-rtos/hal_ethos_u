@@ -46,35 +46,27 @@
 #define LOG(f, ...) fprintf(stdout, f, ##__VA_ARGS__)
 
 #if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_ERR
-#define LOG_ERR_N(f, ...) fprintf(stderr, f, ##__VA_ARGS__)
-#define LOG_ERR(f, ...) LOG_ERR_N("E: " f " (%s:%d)", ##__VA_ARGS__, strrchr("/" __FILE__, '/') + 1, __LINE__)
+#define LOG_ERR(f, ...) fprintf(stderr, "E: " f " (%s:%d)\n", ##__VA_ARGS__, strrchr("/" __FILE__, '/') + 1, __LINE__)
 #else
 #define LOG_ERR(f, ...)
-#define LOG_ERR_N(f, ...)
 #endif
 
 #if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_WARN
-#define LOG_WARN_N(f, ...) fprintf(stdout, f, ##__VA_ARGS__)
-#define LOG_WARN(f, ...) LOG_WARN_N("W: " f, ##__VA_ARGS__)
+#define LOG_WARN(f, ...) fprintf(stdout, "W: " f "\n", ##__VA_ARGS__)
 #else
 #define LOG_WARN(f, ...)
-#define LOG_WARN_N(f, ...)
 #endif
 
 #if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_INFO
-#define LOG_INFO_N(f, ...) fprintf(stdout, f, ##__VA_ARGS__)
-#define LOG_INFO(f, ...) LOG_INFO_N("I: " f, ##__VA_ARGS__)
+#define LOG_INFO(f, ...) fprintf(stdout, "I: " f "\n", ##__VA_ARGS__)
 #else
 #define LOG_INFO(f, ...)
-#define LOG_INFO_N(f, ...)
 #endif
 
 #if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_DEBUG
-#define LOG_DEBUG_N(f, ...) fprintf(stdout, f, ##__VA_ARGS__)
-#define LOG_DEBUG(f, ...) LOG_DEBUG_N("D: %s(): " f, __FUNCTION__, ##__VA_ARGS__)
+#define LOG_DEBUG(f, ...) fprintf(stdout, "D: %s(): " f "\n", __FUNCTION__, ##__VA_ARGS__)
 #else
 #define LOG_DEBUG(f, ...)
-#define LOG_DEBUG_N(f, ...)
 #endif
 
 #endif

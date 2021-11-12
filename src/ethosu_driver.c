@@ -244,7 +244,7 @@ static void ethosu_register_driver(struct ethosu_driver *drv)
     drv->next          = registered_drivers;
     registered_drivers = drv;
 
-    LOG_INFO("New NPU driver registered (handle: 0x%p, NPU: 0x%p)\n", drv, drv->dev->reg);
+    LOG_INFO("New NPU driver registered (handle: 0x%p, NPU: 0x%p)", drv, drv->dev->reg);
 }
 
 static int ethosu_deregister_driver(struct ethosu_driver *drv)
@@ -257,7 +257,7 @@ static int ethosu_deregister_driver(struct ethosu_driver *drv)
         if (cur == drv)
         {
             *prev = cur->next;
-            LOG_INFO("NPU driver handle %p deregistered.\n", drv);
+            LOG_INFO("NPU driver handle %p deregistered.", drv);
             return 0;
         }
 
@@ -265,7 +265,7 @@ static int ethosu_deregister_driver(struct ethosu_driver *drv)
         cur  = cur->next;
     }
 
-    LOG_ERR("No NPU driver handle registered at address %p.\n", drv);
+    LOG_ERR("No NPU driver handle registered at address %p.", drv);
 
     return -1;
 }
@@ -279,20 +279,20 @@ static struct ethosu_driver *ethosu_find_and_reserve_driver(void)
         if (!drv->reserved)
         {
             drv->reserved = true;
-            LOG_DEBUG("NPU driver handle %p reserved.\n", drv);
+            LOG_DEBUG("NPU driver handle %p reserved.", drv);
             return drv;
         }
         drv = drv->next;
     }
 
-    LOG_DEBUG("No NPU driver handle available.\n", drv);
+    LOG_DEBUG("No NPU driver handle available.", drv);
 
     return NULL;
 }
 
 static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s *opt_cfg_p)
 {
-    LOG_INFO("Optimizer release nbr: %d patch: %d\n", opt_cfg_p->da_data.rel_nbr, opt_cfg_p->da_data.patch_nbr);
+    LOG_INFO("Optimizer release nbr: %d patch: %d", opt_cfg_p->da_data.rel_nbr, opt_cfg_p->da_data.patch_nbr);
 
     if (ethosu_dev_verify_optimizer_config(drv->dev, opt_cfg_p->cfg, opt_cfg_p->id) != true)
     {
@@ -312,11 +312,11 @@ static int handle_command_stream(struct ethosu_driver *drv,
     uint32_t cms_bytes       = cms_length * BYTES_IN_32_BITS;
     ptrdiff_t cmd_stream_ptr = (ptrdiff_t)cmd_stream;
 
-    LOG_INFO("handle_command_stream: cmd_stream=%p, cms_length %d\n", cmd_stream, cms_length);
+    LOG_INFO("handle_command_stream: cmd_stream=%p, cms_length %d", cmd_stream, cms_length);
 
     if (0 != ((ptrdiff_t)cmd_stream & MASK_16_BYTE_ALIGN))
     {
-        LOG_ERR("Command stream addr %p not aligned to 16 bytes\n", cmd_stream);
+        LOG_ERR("Command stream addr %p not aligned to 16 bytes", cmd_stream);
         return -1;
     }
 
@@ -325,7 +325,7 @@ static int handle_command_stream(struct ethosu_driver *drv,
     {
         if (0 != (base_addr[i] & MASK_16_BYTE_ALIGN))
         {
-            LOG_ERR("Base addr %d: 0x%llx not aligned to 16 bytes\n", i, base_addr[i]);
+            LOG_ERR("Base addr %d: 0x%llx not aligned to 16 bytes", i, base_addr[i]);
             return -1;
         }
     }
@@ -383,7 +383,7 @@ static int handle_command_stream(struct ethosu_driver *drv,
  ******************************************************************************/
 void __attribute__((weak)) ethosu_irq_handler(struct ethosu_driver *drv)
 {
-    LOG_DEBUG("Got interrupt from Ethos-U\n");
+    LOG_DEBUG("Got interrupt from Ethos-U");
 
     drv->irq_triggered = true;
     if (!ethosu_dev_handle_interrupt(drv->dev))
@@ -405,7 +405,7 @@ int ethosu_init(struct ethosu_driver *drv,
                 uint32_t privilege_enable)
 {
     LOG_INFO("Initializing NPU: base_address=%p, fast_memory=%p, fast_memory_size=%zu, secure=%" PRIu32
-             ", privileged=%" PRIu32 "\n",
+             ", privileged=%" PRIu32,
              base_address,
              fast_memory,
              fast_memory_size,
@@ -431,7 +431,7 @@ int ethosu_init(struct ethosu_driver *drv,
 
     if (drv->dev == NULL)
     {
-        LOG_ERR("Failed to initialize Ethos-U device\n");
+        LOG_ERR("Failed to initialize Ethos-U device");
         return -1;
     }
 
@@ -441,7 +441,7 @@ int ethosu_init(struct ethosu_driver *drv,
         if (set_clock_and_power_request(drv, ETHOSU_INFERENCE_REQUEST, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_DISABLE) !=
             ETHOSU_SUCCESS)
         {
-            LOG_ERR("Failed to disable power-q for Ethos-U\n");
+            LOG_ERR("Failed to disable power-q for Ethos-U");
             return -1;
         }
     }
@@ -490,14 +490,14 @@ int ethosu_invoke(struct ethosu_driver *drv,
     // First word in custom_data_ptr should contain "Custom Operator Payload 1"
     if (data_ptr->word != ETHOSU_FOURCC)
     {
-        LOG_ERR("Custom Operator Payload: %" PRIu32 " is not correct, expected %x\n", data_ptr->word, ETHOSU_FOURCC);
+        LOG_ERR("Custom Operator Payload: %" PRIu32 " is not correct, expected %x", data_ptr->word, ETHOSU_FOURCC);
         return -1;
     }
 
     // Custom data length must be a multiple of 32 bits
     if ((custom_data_size % BYTES_IN_32_BITS) != 0)
     {
-        LOG_ERR("custom_data_size=0x%x not a multiple of 4\n", custom_data_size);
+        LOG_ERR("custom_data_size=0x%x not a multiple of 4", custom_data_size);
         return -1;
     }
 
@@ -510,7 +510,7 @@ int ethosu_invoke(struct ethosu_driver *drv,
 
         if (base_addr_size != NULL && base_addr_size[FAST_MEMORY_BASE_ADDR_INDEX] > drv->fast_memory_size)
         {
-            LOG_ERR("Fast memory area too small. fast_memory_size=%u, base_addr_size=%u\n",
+            LOG_ERR("Fast memory area too small. fast_memory_size=%u, base_addr_size=%u",
                     drv->fast_memory_size,
                     base_addr_size[FAST_MEMORY_BASE_ADDR_INDEX]);
             return -1;
@@ -552,14 +552,14 @@ int ethosu_invoke(struct ethosu_driver *drv,
         switch (data_ptr->driver_action_command)
         {
         case OPTIMIZER_CONFIG:
-            LOG_DEBUG("OPTIMIZER_CONFIG\n");
+            LOG_DEBUG("OPTIMIZER_CONFIG");
             struct opt_cfg_s *opt_cfg_p = (struct opt_cfg_s *)data_ptr;
 
             ret = handle_optimizer_config(drv, opt_cfg_p);
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD + OPTIMIZER_CONFIG_LENGTH_32_BIT_WORD;
             break;
         case COMMAND_STREAM:
-            LOG_DEBUG("COMMAND_STREAM\n");
+            LOG_DEBUG("COMMAND_STREAM");
             void *command_stream = (uint8_t *)(data_ptr) + sizeof(struct cop_data_s);
             int cms_length       = (data_ptr->reserved << 16) | data_ptr->length;
 
@@ -569,17 +569,17 @@ int ethosu_invoke(struct ethosu_driver *drv,
             ret = handle_command_stream(drv, command_stream, cms_length, base_addr, base_addr_size, num_base_addr);
             if (ret < 0)
             {
-                LOG_ERR("Inference failed.\n");
+                LOG_ERR("Inference failed.");
             }
 
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD + cms_length;
             break;
         case NOP:
-            LOG_DEBUG("NOP\n");
+            LOG_DEBUG("NOP");
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD;
             break;
         default:
-            LOG_ERR("UNSUPPORTED driver_action_command: %d\n", data_ptr->driver_action_command);
+            LOG_ERR("UNSUPPORTED driver_action_command: %d", data_ptr->driver_action_command);
             ret = -1;
             break;
         }
@@ -609,7 +609,7 @@ void ethosu_set_power_mode(struct ethosu_driver *drv, bool always_on)
         // Reset to enter correct security state/privilege mode
         if (ethosu_dev_soft_reset(drv->dev) == false)
         {
-            LOG_ERR("Failed to set power mode for Ethos-U\n");
+            LOG_ERR("Failed to set power mode for Ethos-U");
             return;
         }
     }
@@ -633,7 +633,7 @@ struct ethosu_driver *ethosu_reserve_driver(void)
             break;
         }
 
-        LOG_INFO("Waiting for NPU driver handle to become available...\n");
+        LOG_INFO("Waiting for NPU driver handle to become available...");
         ethosu_semaphore_take(ethosu_semaphore);
 
     } while (1);
@@ -647,7 +647,7 @@ void ethosu_release_driver(struct ethosu_driver *drv)
     if (drv != NULL && drv->reserved)
     {
         drv->reserved = false;
-        LOG_DEBUG("NPU driver handle %p released\n", drv);
+        LOG_DEBUG("NPU driver handle %p released", drv);
         ethosu_semaphore_give(ethosu_semaphore);
     }
     ethosu_mutex_unlock(ethosu_mutex);
@@ -699,7 +699,7 @@ enum ethosu_error_codes set_clock_and_power_request(struct ethosu_driver *drv,
         {
             if (ethosu_dev_soft_reset(drv->dev) != ETHOSU_SUCCESS)
             {
-                LOG_ERR("Failed to set clock and power q channels for Ethos-U\n");
+                LOG_ERR("Failed to set clock and power q channels for Ethos-U");
                 return ETHOSU_GENERIC_FAILURE;
             }
         }

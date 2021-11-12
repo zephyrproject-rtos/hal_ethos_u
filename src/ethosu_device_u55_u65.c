@@ -45,7 +45,7 @@ struct ethosu_device *ethosu_dev_init(const void *base_address, uint32_t secure_
     struct ethosu_device *dev = malloc(sizeof(struct ethosu_device));
     if (!dev)
     {
-        LOG_ERR("Failed to allocate memory for Ethos-U device\n");
+        LOG_ERR("Failed to allocate memory for Ethos-U device");
         return NULL;
     }
 
@@ -127,7 +127,7 @@ enum ethosu_error_codes ethosu_dev_run_command_stream(struct ethosu_device *dev,
     struct cmd_r cmd;
     uint64_t qbase = (uintptr_t)cmd_stream_ptr + BASE_POINTER_OFFSET;
     assert(qbase <= ADDRESS_MASK);
-    LOG_DEBUG("QBASE=0x%016llx, QSIZE=%u, base_pointer_offset=0x%08x\n", qbase, cms_length, BASE_POINTER_OFFSET);
+    LOG_DEBUG("QBASE=0x%016llx, QSIZE=%u, base_pointer_offset=0x%08x", qbase, cms_length, BASE_POINTER_OFFSET);
 
     dev->reg->QBASE.word[0] = qbase & 0xffffffff;
 #ifdef ETHOSU65
@@ -139,7 +139,7 @@ enum ethosu_error_codes ethosu_dev_run_command_stream(struct ethosu_device *dev,
     {
         uint64_t addr = base_addr[i] + BASE_POINTER_OFFSET;
         assert(addr <= ADDRESS_MASK);
-        LOG_DEBUG("BASEP%d=0x%016llx\n", i, addr);
+        LOG_DEBUG("BASEP%d=0x%016llx", i, addr);
         dev->reg->BASEP[i].word[0] = addr & 0xffffffff;
 #ifdef ETHOSU65
         dev->reg->BASEP[i].word[1] = addr >> 32;
@@ -150,7 +150,7 @@ enum ethosu_error_codes ethosu_dev_run_command_stream(struct ethosu_device *dev,
     cmd.transition_to_running_state = 1;
 
     dev->reg->CMD.word = cmd.word;
-    LOG_DEBUG("CMD=0x%08x\n", cmd.word);
+    LOG_DEBUG("CMD=0x%08x", cmd.word);
 
     return ETHOSU_SUCCESS;
 }
@@ -168,7 +168,7 @@ bool ethosu_dev_handle_interrupt(struct ethosu_device *dev)
     if (dev->reg->STATUS.bus_status || dev->reg->STATUS.cmd_parse_error || dev->reg->STATUS.wd_fault ||
         dev->reg->STATUS.ecc_fault)
     {
-        LOG_DEBUG("NPU fault. status=0x%08x, qread=%" PRIu32 "\n", dev->reg->STATUS.word, dev->reg->QREAD.word);
+        LOG_DEBUG("NPU fault. status=0x%08x, qread=%" PRIu32, dev->reg->STATUS.word, dev->reg->QREAD.word);
         ethosu_dev_soft_reset(dev);
         ethosu_dev_set_clock_and_power(dev, ETHOSU_CLOCK_Q_UNCHANGED, ETHOSU_POWER_Q_DISABLE);
         return false;
@@ -197,7 +197,7 @@ enum ethosu_error_codes ethosu_dev_soft_reset(struct ethosu_device *dev)
     reset.pending_CSL = dev->secure ? SECURITY_LEVEL_SECURE : SECURITY_LEVEL_NON_SECURE;
 
     // Reset and set security level
-    LOG_INFO("Soft reset NPU\n");
+    LOG_INFO("Soft reset NPU");
     dev->reg->RESET.word = reset.word;
 
     // Wait until reset status indicates that reset has been completed
@@ -207,14 +207,14 @@ enum ethosu_error_codes ethosu_dev_soft_reset(struct ethosu_device *dev)
 
     if (dev->reg->STATUS.reset_status != 0)
     {
-        LOG_ERR("Soft reset timed out\n");
+        LOG_ERR("Soft reset timed out");
         return ETHOSU_GENERIC_FAILURE;
     }
 
     // Verify that NPU has switched security state and privilege level
     if (ethosu_dev_verify_access_state(dev) != true)
     {
-        LOG_ERR("Failed to switch security state and privilege level\n");
+        LOG_ERR("Failed to switch security state and privilege level");
         return ETHOSU_GENERIC_FAILURE;
     }
 
@@ -262,7 +262,7 @@ enum ethosu_error_codes ethosu_dev_set_clock_and_power(struct ethosu_device *dev
     }
 
     dev->reg->CMD.word = cmd.word;
-    LOG_DEBUG("CMD=0x%08x\n", cmd.word);
+    LOG_DEBUG("CMD=0x%08x", cmd.word);
 
     return ETHOSU_SUCCESS;
 }
@@ -279,23 +279,23 @@ bool ethosu_dev_verify_optimizer_config(struct ethosu_device *dev, uint32_t cfg_
     hw_id.word  = dev->reg->ID.word;
 
     LOG_INFO("Optimizer config cmd_stream_version: %" PRIu32 " macs_per_cc: %" PRIu32 " shram_size: %" PRIu32
-             " custom_dma: %" PRIu32 "\n",
+             " custom_dma: %" PRIu32,
              opt_cfg->cmd_stream_version,
              opt_cfg->macs_per_cc,
              opt_cfg->shram_size,
              opt_cfg->custom_dma);
-    LOG_INFO("Optimizer config Ethos-U version: %" PRIu32 ".%" PRIu32 ".%" PRIu32 "\n",
+    LOG_INFO("Optimizer config Ethos-U version: %" PRIu32 ".%" PRIu32 ".%" PRIu32,
              opt_id->arch_major_rev,
              opt_id->arch_minor_rev,
              opt_id->arch_patch_rev);
 
     LOG_INFO("Ethos-U config cmd_stream_version: %" PRIu32 " macs_per_cc: %" PRIu32 " shram_size: %" PRIu32
-             " custom_dma: %" PRIu32 "\n",
+             " custom_dma: %" PRIu32,
              hw_cfg.cmd_stream_version,
              hw_cfg.macs_per_cc,
              hw_cfg.shram_size,
              hw_cfg.custom_dma);
-    LOG_INFO("Ethos-U version: %" PRIu32 ".%" PRIu32 ".%" PRIu32 "\n",
+    LOG_INFO("Ethos-U version: %" PRIu32 ".%" PRIu32 ".%" PRIu32,
              hw_id.arch_major_rev,
              hw_id.arch_minor_rev,
              hw_id.arch_patch_rev);
@@ -304,7 +304,7 @@ bool ethosu_dev_verify_optimizer_config(struct ethosu_device *dev, uint32_t cfg_
     {
         if (hw_cfg.macs_per_cc != opt_cfg->macs_per_cc)
         {
-            LOG_ERR("NPU config mismatch: npu.macs_per_cc=%" PRIu32 " optimizer.macs_per_cc=%" PRIu32 "\n",
+            LOG_ERR("NPU config mismatch: npu.macs_per_cc=%" PRIu32 " optimizer.macs_per_cc=%" PRIu32,
                     hw_cfg.macs_per_cc,
                     opt_cfg->macs_per_cc);
             ret = false;
@@ -312,7 +312,7 @@ bool ethosu_dev_verify_optimizer_config(struct ethosu_device *dev, uint32_t cfg_
 
         if (hw_cfg.shram_size != opt_cfg->shram_size)
         {
-            LOG_ERR("NPU config mismatch: npu.shram_size=%" PRIu32 " optimizer.shram_size=%" PRIu32 "\n",
+            LOG_ERR("NPU config mismatch: npu.shram_size=%" PRIu32 " optimizer.shram_size=%" PRIu32,
                     hw_cfg.shram_size,
                     opt_cfg->shram_size);
             ret = false;
@@ -320,8 +320,7 @@ bool ethosu_dev_verify_optimizer_config(struct ethosu_device *dev, uint32_t cfg_
 
         if (hw_cfg.cmd_stream_version != opt_cfg->cmd_stream_version)
         {
-            LOG_ERR("NPU config mismatch: npu.cmd_stream_version=%" PRIu32 " optimizer.cmd_stream_version=%" PRIu32
-                    "\n",
+            LOG_ERR("NPU config mismatch: npu.cmd_stream_version=%" PRIu32 " optimizer.cmd_stream_version=%" PRIu32,
                     hw_cfg.cmd_stream_version,
                     opt_cfg->cmd_stream_version);
             ret = false;
@@ -329,7 +328,7 @@ bool ethosu_dev_verify_optimizer_config(struct ethosu_device *dev, uint32_t cfg_
 
         if (!hw_cfg.custom_dma && opt_cfg->custom_dma)
         {
-            LOG_ERR("NPU config mismatch: npu.custom_dma=%" PRIu32 " optimizer.custom_dma=%" PRIu32 "\n",
+            LOG_ERR("NPU config mismatch: npu.custom_dma=%" PRIu32 " optimizer.custom_dma=%" PRIu32,
                     hw_cfg.custom_dma,
                     opt_cfg->custom_dma);
             ret = false;
@@ -339,7 +338,7 @@ bool ethosu_dev_verify_optimizer_config(struct ethosu_device *dev, uint32_t cfg_
     if ((hw_id.arch_major_rev != opt_id->arch_major_rev) || (hw_id.arch_minor_rev < opt_id->arch_minor_rev))
     {
         LOG_ERR("NPU arch mismatch: npu.arch=%" PRIu32 ".%" PRIu32 ".%" PRIu32 " optimizer.arch=%" PRIu32 ".%" PRIu32
-                ".%" PRIu32 "\n",
+                ".%" PRIu32,
                 hw_id.arch_major_rev,
                 hw_id.arch_minor_rev,
                 hw_id.arch_patch_rev,
