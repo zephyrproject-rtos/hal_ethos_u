@@ -298,9 +298,11 @@ namespace NPU_NAMESPACE
 #define NPU_REG_WEIGHT_BASE 0x0A80
 #define NPU_REG_WEIGHT_BASE_HI 0x0A84
 #define NPU_REG_WEIGHT_LENGTH 0x0A88
+#define NPU_REG_WEIGHT_LENGTH_HI 0x0A8C
 #define NPU_REG_SCALE_BASE 0x0A90
 #define NPU_REG_SCALE_BASE_HI 0x0A94
 #define NPU_REG_SCALE_LENGTH 0x0A98
+#define NPU_REG_SCALE_LENGTH_HI 0x0A9C
 #define NPU_REG_OFM_SCALE 0x0AA0
 #define NPU_REG_OFM_SCALE_SHIFT 0x0AA4
 #define NPU_REG_OPA_SCALE 0x0AA8
@@ -348,9 +350,11 @@ namespace NPU_NAMESPACE
 #define NPU_REG_WEIGHT1_BASE 0x0B40
 #define NPU_REG_WEIGHT1_BASE_HI 0x0B44
 #define NPU_REG_WEIGHT1_LENGTH 0x0B48
+#define NPU_REG_WEIGHT1_LENGTH_HI 0x0B4C
 #define NPU_REG_SCALE1_BASE 0x0B50
 #define NPU_REG_SCALE1_BASE_HI 0x0B54
 #define NPU_REG_SCALE1_LENGTH 0x0B58
+#define NPU_REG_SCALE1_LENGTH_HI 0x0B5C
 #define TSU_WS1_BASE_REGISTERS_SIZE 0x0B80
 
 //
@@ -1255,8 +1259,10 @@ static const char *acc_format_str[] = {
 
 static const char *activation_clip_range_str[] = {
     "ACTIVATION_CLIP_RANGE_OFM_PRECISION",
+    "****",
     "ACTIVATION_CLIP_RANGE_FORCE_UINT8",
     "ACTIVATION_CLIP_RANGE_FORCE_INT8",
+    "****",
     "ACTIVATION_CLIP_RANGE_FORCE_INT16",
 };
 
@@ -1267,8 +1273,21 @@ static const char *activation_format_str[] = {
 
 static const char *activation_function_str[] = {
     "ACTIVATION_FUNCTION_RELU",
+    "****",
+    "****",
     "ACTIVATION_FUNCTION_TANH",
     "ACTIVATION_FUNCTION_SIGMOID",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
     "ACTIVATION_FUNCTION_TABLE_0",
     "ACTIVATION_FUNCTION_TABLE_1",
     "ACTIVATION_FUNCTION_TABLE_2",
@@ -1316,25 +1335,275 @@ static const char *cmd0_opcode_str[] = {
     "CMD0_OPCODE_NPU_OP_IRQ",
     "CMD0_OPCODE_NPU_OP_CONV",
     "CMD0_OPCODE_NPU_OP_DEPTHWISE",
+    "****",
     "CMD0_OPCODE_NPU_OP_POOL",
     "CMD0_OPCODE_NPU_OP_ELEMENTWISE",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
     "CMD0_OPCODE_NPU_OP_DMA_START",
     "CMD0_OPCODE_NPU_OP_DMA_WAIT",
     "CMD0_OPCODE_NPU_OP_KERNEL_WAIT",
     "CMD0_OPCODE_NPU_OP_PMU_MASK",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
     "CMD0_OPCODE_NPU_SET_IFM_PAD_TOP",
     "CMD0_OPCODE_NPU_SET_IFM_PAD_LEFT",
     "CMD0_OPCODE_NPU_SET_IFM_PAD_RIGHT",
     "CMD0_OPCODE_NPU_SET_IFM_PAD_BOTTOM",
     "CMD0_OPCODE_NPU_SET_IFM_DEPTH_M1",
     "CMD0_OPCODE_NPU_SET_IFM_PRECISION",
+    "****",
     "CMD0_OPCODE_NPU_SET_IFM_UPSCALE",
+    "****",
     "CMD0_OPCODE_NPU_SET_IFM_ZERO_POINT",
     "CMD0_OPCODE_NPU_SET_IFM_WIDTH0_M1",
     "CMD0_OPCODE_NPU_SET_IFM_HEIGHT0_M1",
     "CMD0_OPCODE_NPU_SET_IFM_HEIGHT1_M1",
     "CMD0_OPCODE_NPU_SET_IFM_IB_END",
+    "****",
     "CMD0_OPCODE_NPU_SET_IFM_REGION",
+    "****",
     "CMD0_OPCODE_NPU_SET_OFM_WIDTH_M1",
     "CMD0_OPCODE_NPU_SET_OFM_HEIGHT_M1",
     "CMD0_OPCODE_NPU_SET_OFM_DEPTH_M1",
@@ -1343,9 +1612,12 @@ static const char *cmd0_opcode_str[] = {
     "CMD0_OPCODE_NPU_SET_OFM_BLK_HEIGHT_M1",
     "CMD0_OPCODE_NPU_SET_OFM_BLK_DEPTH_M1",
     "CMD0_OPCODE_NPU_SET_OFM_ZERO_POINT",
+    "****",
     "CMD0_OPCODE_NPU_SET_OFM_WIDTH0_M1",
     "CMD0_OPCODE_NPU_SET_OFM_HEIGHT0_M1",
     "CMD0_OPCODE_NPU_SET_OFM_HEIGHT1_M1",
+    "****",
+    "****",
     "CMD0_OPCODE_NPU_SET_OFM_REGION",
     "CMD0_OPCODE_NPU_SET_KERNEL_WIDTH_M1",
     "CMD0_OPCODE_NPU_SET_KERNEL_HEIGHT_M1",
@@ -1357,36 +1629,258 @@ static const char *cmd0_opcode_str[] = {
     "CMD0_OPCODE_NPU_SET_ACTIVATION_MAX",
     "CMD0_OPCODE_NPU_SET_WEIGHT_REGION",
     "CMD0_OPCODE_NPU_SET_SCALE_REGION",
+    "****",
+    "****",
+    "****",
     "CMD0_OPCODE_NPU_SET_AB_START",
+    "****",
     "CMD0_OPCODE_NPU_SET_BLOCKDEP",
     "CMD0_OPCODE_NPU_SET_DMA0_SRC_REGION",
     "CMD0_OPCODE_NPU_SET_DMA0_DST_REGION",
     "CMD0_OPCODE_NPU_SET_DMA0_SIZE0",
     "CMD0_OPCODE_NPU_SET_DMA0_SIZE1",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
     "CMD0_OPCODE_NPU_SET_IFM2_BROADCAST",
     "CMD0_OPCODE_NPU_SET_IFM2_SCALAR",
+    "****",
+    "****",
+    "****",
     "CMD0_OPCODE_NPU_SET_IFM2_PRECISION",
+    "****",
+    "****",
+    "****",
     "CMD0_OPCODE_NPU_SET_IFM2_ZERO_POINT",
     "CMD0_OPCODE_NPU_SET_IFM2_WIDTH0_M1",
     "CMD0_OPCODE_NPU_SET_IFM2_HEIGHT0_M1",
     "CMD0_OPCODE_NPU_SET_IFM2_HEIGHT1_M1",
     "CMD0_OPCODE_NPU_SET_IFM2_IB_START",
+    "****",
     "CMD0_OPCODE_NPU_SET_IFM2_REGION",
 };
 
 static const char *cmd1_opcode_str[] = {
-    "CMD1_OPCODE_NPU_SET_IFM_BASE0",     "CMD1_OPCODE_NPU_SET_IFM_BASE1",      "CMD1_OPCODE_NPU_SET_IFM_BASE2",
-    "CMD1_OPCODE_NPU_SET_IFM_BASE3",     "CMD1_OPCODE_NPU_SET_IFM_STRIDE_X",   "CMD1_OPCODE_NPU_SET_IFM_STRIDE_Y",
-    "CMD1_OPCODE_NPU_SET_IFM_STRIDE_C",  "CMD1_OPCODE_NPU_SET_OFM_BASE0",      "CMD1_OPCODE_NPU_SET_OFM_BASE1",
-    "CMD1_OPCODE_NPU_SET_OFM_BASE2",     "CMD1_OPCODE_NPU_SET_OFM_BASE3",      "CMD1_OPCODE_NPU_SET_OFM_STRIDE_X",
-    "CMD1_OPCODE_NPU_SET_OFM_STRIDE_Y",  "CMD1_OPCODE_NPU_SET_OFM_STRIDE_C",   "CMD1_OPCODE_NPU_SET_WEIGHT_BASE",
-    "CMD1_OPCODE_NPU_SET_WEIGHT_LENGTH", "CMD1_OPCODE_NPU_SET_SCALE_BASE",     "CMD1_OPCODE_NPU_SET_SCALE_LENGTH",
-    "CMD1_OPCODE_NPU_SET_OFM_SCALE",     "CMD1_OPCODE_NPU_SET_OPA_SCALE",      "CMD1_OPCODE_NPU_SET_OPB_SCALE",
-    "CMD1_OPCODE_NPU_SET_DMA0_SRC",      "CMD1_OPCODE_NPU_SET_DMA0_DST",       "CMD1_OPCODE_NPU_SET_DMA0_LEN",
-    "CMD1_OPCODE_NPU_SET_DMA0_SKIP0",    "CMD1_OPCODE_NPU_SET_DMA0_SKIP1",     "CMD1_OPCODE_NPU_SET_IFM2_BASE0",
-    "CMD1_OPCODE_NPU_SET_IFM2_BASE1",    "CMD1_OPCODE_NPU_SET_IFM2_BASE2",     "CMD1_OPCODE_NPU_SET_IFM2_BASE3",
-    "CMD1_OPCODE_NPU_SET_IFM2_STRIDE_X", "CMD1_OPCODE_NPU_SET_IFM2_STRIDE_Y",  "CMD1_OPCODE_NPU_SET_IFM2_STRIDE_C",
-    "CMD1_OPCODE_NPU_SET_WEIGHT1_BASE",  "CMD1_OPCODE_NPU_SET_WEIGHT1_LENGTH", "CMD1_OPCODE_NPU_SET_SCALE1_BASE",
+    "CMD1_OPCODE_NPU_SET_IFM_BASE0",
+    "CMD1_OPCODE_NPU_SET_IFM_BASE1",
+    "CMD1_OPCODE_NPU_SET_IFM_BASE2",
+    "CMD1_OPCODE_NPU_SET_IFM_BASE3",
+    "CMD1_OPCODE_NPU_SET_IFM_STRIDE_X",
+    "CMD1_OPCODE_NPU_SET_IFM_STRIDE_Y",
+    "CMD1_OPCODE_NPU_SET_IFM_STRIDE_C",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "CMD1_OPCODE_NPU_SET_OFM_BASE0",
+    "CMD1_OPCODE_NPU_SET_OFM_BASE1",
+    "CMD1_OPCODE_NPU_SET_OFM_BASE2",
+    "CMD1_OPCODE_NPU_SET_OFM_BASE3",
+    "CMD1_OPCODE_NPU_SET_OFM_STRIDE_X",
+    "CMD1_OPCODE_NPU_SET_OFM_STRIDE_Y",
+    "CMD1_OPCODE_NPU_SET_OFM_STRIDE_C",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "CMD1_OPCODE_NPU_SET_WEIGHT_BASE",
+    "CMD1_OPCODE_NPU_SET_WEIGHT_LENGTH",
+    "CMD1_OPCODE_NPU_SET_SCALE_BASE",
+    "CMD1_OPCODE_NPU_SET_SCALE_LENGTH",
+    "CMD1_OPCODE_NPU_SET_OFM_SCALE",
+    "CMD1_OPCODE_NPU_SET_OPA_SCALE",
+    "CMD1_OPCODE_NPU_SET_OPB_SCALE",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "CMD1_OPCODE_NPU_SET_DMA0_SRC",
+    "CMD1_OPCODE_NPU_SET_DMA0_DST",
+    "CMD1_OPCODE_NPU_SET_DMA0_LEN",
+    "CMD1_OPCODE_NPU_SET_DMA0_SKIP0",
+    "CMD1_OPCODE_NPU_SET_DMA0_SKIP1",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "CMD1_OPCODE_NPU_SET_IFM2_BASE0",
+    "CMD1_OPCODE_NPU_SET_IFM2_BASE1",
+    "CMD1_OPCODE_NPU_SET_IFM2_BASE2",
+    "CMD1_OPCODE_NPU_SET_IFM2_BASE3",
+    "CMD1_OPCODE_NPU_SET_IFM2_STRIDE_X",
+    "CMD1_OPCODE_NPU_SET_IFM2_STRIDE_Y",
+    "CMD1_OPCODE_NPU_SET_IFM2_STRIDE_C",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "CMD1_OPCODE_NPU_SET_WEIGHT1_BASE",
+    "CMD1_OPCODE_NPU_SET_WEIGHT1_LENGTH",
+    "CMD1_OPCODE_NPU_SET_SCALE1_BASE",
     "CMD1_OPCODE_NPU_SET_SCALE1_LENGTH",
 };
 
@@ -1490,17 +1984,62 @@ static const char *pmu_axi_channel_str[] = {
     "PMU_AXI_CHANNEL_RD_WEIGHTS",
     "PMU_AXI_CHANNEL_RD_SCALE_BIAS",
     "PMU_AXI_CHANNEL_RD_MEM2MEM",
+    "****",
+    "****",
+    "****",
     "PMU_AXI_CHANNEL_WR_OFM",
     "PMU_AXI_CHANNEL_WR_MEM2MEM",
 };
 
 static const char *pmu_event_str[] = {
     "PMU_EVENT_NO_EVENT",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
     "PMU_EVENT_CYCLE",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
     "PMU_EVENT_NPU_IDLE",
     "PMU_EVENT_CC_STALLED_ON_BLOCKDEP",
     "PMU_EVENT_CC_STALLED_ON_SHRAM_RECONFIG",
     "PMU_EVENT_NPU_ACTIVE",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
     "PMU_EVENT_MAC_ACTIVE",
     "PMU_EVENT_MAC_ACTIVE_8BIT",
     "PMU_EVENT_MAC_ACTIVE_16BIT",
@@ -1512,6 +2051,11 @@ static const char *pmu_event_str[] = {
     "PMU_EVENT_MAC_ACTIVE_32BIT",
     "PMU_EVENT_MAC_STALLED_BY_INT_W",
     "PMU_EVENT_MAC_STALLED_BY_INT_ACC",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
     "PMU_EVENT_AO_ACTIVE",
     "PMU_EVENT_AO_ACTIVE_8BIT",
     "PMU_EVENT_AO_ACTIVE_16BIT",
@@ -1521,6 +2065,13 @@ static const char *pmu_event_str[] = {
     "PMU_EVENT_AO_STALLED_BY_ACC_IB",
     "PMU_EVENT_AO_STALLED_BY_ACC",
     "PMU_EVENT_AO_STALLED_BY_IB",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
     "PMU_EVENT_WD_ACTIVE",
     "PMU_EVENT_WD_STALLED",
     "PMU_EVENT_WD_STALLED_BY_WS",
@@ -1533,6 +2084,42 @@ static const char *pmu_event_str[] = {
     "PMU_EVENT_WD_TRANS_WB",
     "PMU_EVENT_WD_TRANS_DW0",
     "PMU_EVENT_WD_TRANS_DW1",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
     "PMU_EVENT_AXI0_RD_TRANS_ACCEPTED",
     "PMU_EVENT_AXI0_RD_TRANS_COMPLETED",
     "PMU_EVENT_AXI0_RD_DATA_BEAT_RECEIVED",
@@ -1543,9 +2130,28 @@ static const char *pmu_event_str[] = {
     "PMU_EVENT_AXI0_WR_DATA_BEAT_WRITTEN",
     "PMU_EVENT_AXI0_WR_TRAN_REQ_STALLED",
     "PMU_EVENT_AXI0_WR_DATA_BEAT_STALLED",
+    "****",
+    "****",
     "PMU_EVENT_AXI0_ENABLED_CYCLES",
+    "****",
     "PMU_EVENT_AXI0_RD_STALL_LIMIT",
     "PMU_EVENT_AXI0_WR_STALL_LIMIT",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
     "PMU_EVENT_AXI_LATENCY_ANY",
     "PMU_EVENT_AXI_LATENCY_32",
     "PMU_EVENT_AXI_LATENCY_64",
@@ -1553,8 +2159,223 @@ static const char *pmu_event_str[] = {
     "PMU_EVENT_AXI_LATENCY_256",
     "PMU_EVENT_AXI_LATENCY_512",
     "PMU_EVENT_AXI_LATENCY_1024",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
     "PMU_EVENT_ECC_DMA",
     "PMU_EVENT_ECC_SB0",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
     "PMU_EVENT_AXI1_RD_TRANS_ACCEPTED",
     "PMU_EVENT_AXI1_RD_TRANS_COMPLETED",
     "PMU_EVENT_AXI1_RD_DATA_BEAT_RECEIVED",
@@ -1565,9 +2386,45 @@ static const char *pmu_event_str[] = {
     "PMU_EVENT_AXI1_WR_DATA_BEAT_WRITTEN",
     "PMU_EVENT_AXI1_WR_TRAN_REQ_STALLED",
     "PMU_EVENT_AXI1_WR_DATA_BEAT_STALLED",
+    "****",
+    "****",
     "PMU_EVENT_AXI1_ENABLED_CYCLES",
+    "****",
     "PMU_EVENT_AXI1_RD_STALL_LIMIT",
     "PMU_EVENT_AXI1_WR_STALL_LIMIT",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
     "PMU_EVENT_ECC_SB1",
 };
 
@@ -1668,107 +2525,142 @@ struct id_r
     }
     CONSTEXPR uint32_t get_version_status() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 4) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 0);
         return value;
     }
     uint32_t get_version_status() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 4) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 0);
         return value;
     }
     CONSTEXPR id_r &set_version_status(uint32_t value)
     {
-        word0 = (((~((1U << 4) - 1)) << 0) & word0) | ((((1U << 4) - 1) & static_cast<uint32_t>(value)) << 0);
+        word0 = (((~((1U << 4) - 1)) << 0) & word0) | ((((1U << 4) - 1) & value) << 0);
+        return *this;
+    }
+    volatile id_r &set_version_status(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 4) - 1)) << 0) & word0) | ((((1U << 4) - 1) & value) << 0);
         return *this;
     }
     CONSTEXPR uint32_t get_version_minor() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 4) - 1) & (word0 >> 4));
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 4);
         return value;
     }
     uint32_t get_version_minor() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 4) - 1) & (word0 >> 4));
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 4);
         return value;
     }
     CONSTEXPR id_r &set_version_minor(uint32_t value)
     {
-        word0 = (((~((1U << 4) - 1)) << 4) & word0) | ((((1U << 4) - 1) & static_cast<uint32_t>(value)) << 4);
+        word0 = (((~((1U << 4) - 1)) << 4) & word0) | ((((1U << 4) - 1) & value) << 4);
+        return *this;
+    }
+    volatile id_r &set_version_minor(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 4) - 1)) << 4) & word0) | ((((1U << 4) - 1) & value) << 4);
         return *this;
     }
     CONSTEXPR uint32_t get_version_major() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 4) - 1) & (word0 >> 8));
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 8);
         return value;
     }
     uint32_t get_version_major() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 4) - 1) & (word0 >> 8));
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 8);
         return value;
     }
     CONSTEXPR id_r &set_version_major(uint32_t value)
     {
-        word0 = (((~((1U << 4) - 1)) << 8) & word0) | ((((1U << 4) - 1) & static_cast<uint32_t>(value)) << 8);
+        word0 = (((~((1U << 4) - 1)) << 8) & word0) | ((((1U << 4) - 1) & value) << 8);
+        return *this;
+    }
+    volatile id_r &set_version_major(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 4) - 1)) << 8) & word0) | ((((1U << 4) - 1) & value) << 8);
         return *this;
     }
     CONSTEXPR uint32_t get_product_major() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 4) - 1) & (word0 >> 12));
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 12);
         return value;
     }
     uint32_t get_product_major() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 4) - 1) & (word0 >> 12));
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 12);
         return value;
     }
     CONSTEXPR id_r &set_product_major(uint32_t value)
     {
-        word0 = (((~((1U << 4) - 1)) << 12) & word0) | ((((1U << 4) - 1) & static_cast<uint32_t>(value)) << 12);
+        word0 = (((~((1U << 4) - 1)) << 12) & word0) | ((((1U << 4) - 1) & value) << 12);
+        return *this;
+    }
+    volatile id_r &set_product_major(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 4) - 1)) << 12) & word0) | ((((1U << 4) - 1) & value) << 12);
         return *this;
     }
     CONSTEXPR uint32_t get_arch_patch_rev() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 4) - 1) & (word0 >> 16));
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 16);
         return value;
     }
     uint32_t get_arch_patch_rev() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 4) - 1) & (word0 >> 16));
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 16);
         return value;
     }
     CONSTEXPR id_r &set_arch_patch_rev(uint32_t value)
     {
-        word0 = (((~((1U << 4) - 1)) << 16) & word0) | ((((1U << 4) - 1) & static_cast<uint32_t>(value)) << 16);
+        word0 = (((~((1U << 4) - 1)) << 16) & word0) | ((((1U << 4) - 1) & value) << 16);
+        return *this;
+    }
+    volatile id_r &set_arch_patch_rev(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 4) - 1)) << 16) & word0) | ((((1U << 4) - 1) & value) << 16);
         return *this;
     }
     CONSTEXPR uint32_t get_arch_minor_rev() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 8) - 1) & (word0 >> 20));
+        uint32_t value = ((1U << 8) - 1) & (word0 >> 20);
         return value;
     }
     uint32_t get_arch_minor_rev() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 8) - 1) & (word0 >> 20));
+        uint32_t value = ((1U << 8) - 1) & (word0 >> 20);
         return value;
     }
     CONSTEXPR id_r &set_arch_minor_rev(uint32_t value)
     {
-        word0 = (((~((1U << 8) - 1)) << 20) & word0) | ((((1U << 8) - 1) & static_cast<uint32_t>(value)) << 20);
+        word0 = (((~((1U << 8) - 1)) << 20) & word0) | ((((1U << 8) - 1) & value) << 20);
+        return *this;
+    }
+    volatile id_r &set_arch_minor_rev(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 8) - 1)) << 20) & word0) | ((((1U << 8) - 1) & value) << 20);
         return *this;
     }
     CONSTEXPR uint32_t get_arch_major_rev() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 4) - 1) & (word0 >> 28));
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 28);
         return value;
     }
     uint32_t get_arch_major_rev() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 4) - 1) & (word0 >> 28));
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 28);
         return value;
     }
     CONSTEXPR id_r &set_arch_major_rev(uint32_t value)
     {
-        word0 = (((~((1U << 4) - 1)) << 28) & word0) | ((((1U << 4) - 1) & static_cast<uint32_t>(value)) << 28);
+        word0 = (((~((1U << 4) - 1)) << 28) & word0) | ((((1U << 4) - 1) & value) << 28);
+        return *this;
+    }
+    volatile id_r &set_arch_major_rev(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 4) - 1)) << 28) & word0) | ((((1U << 4) - 1) & value) << 28);
         return *this;
     }
 #endif
@@ -1850,124 +2742,169 @@ struct status_r
         word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 0);
         return *this;
     }
+    volatile status_r &set_state(NPU_NAMESPACE::state value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 0);
+        return *this;
+    }
     CONSTEXPR uint32_t get_irq_raised() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     uint32_t get_irq_raised() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     CONSTEXPR status_r &set_irq_raised(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 1);
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
+        return *this;
+    }
+    volatile status_r &set_irq_raised(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
         return *this;
     }
     CONSTEXPR uint32_t get_bus_status() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     uint32_t get_bus_status() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     CONSTEXPR status_r &set_bus_status(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 2);
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
+        return *this;
+    }
+    volatile status_r &set_bus_status(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
         return *this;
     }
     CONSTEXPR uint32_t get_reset_status() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     uint32_t get_reset_status() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     CONSTEXPR status_r &set_reset_status(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 3);
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
+        return *this;
+    }
+    volatile status_r &set_reset_status(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
         return *this;
     }
     CONSTEXPR uint32_t get_cmd_parse_error() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 4));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 4);
         return value;
     }
     uint32_t get_cmd_parse_error() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 4));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 4);
         return value;
     }
     CONSTEXPR status_r &set_cmd_parse_error(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 4) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 4);
+        word0 = (((~((1U << 1) - 1)) << 4) & word0) | ((((1U << 1) - 1) & value) << 4);
+        return *this;
+    }
+    volatile status_r &set_cmd_parse_error(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 4) & word0) | ((((1U << 1) - 1) & value) << 4);
         return *this;
     }
     CONSTEXPR uint32_t get_cmd_end_reached() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 5));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 5);
         return value;
     }
     uint32_t get_cmd_end_reached() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 5));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 5);
         return value;
     }
     CONSTEXPR status_r &set_cmd_end_reached(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 5) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 5);
+        word0 = (((~((1U << 1) - 1)) << 5) & word0) | ((((1U << 1) - 1) & value) << 5);
+        return *this;
+    }
+    volatile status_r &set_cmd_end_reached(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 5) & word0) | ((((1U << 1) - 1) & value) << 5);
         return *this;
     }
     CONSTEXPR uint32_t get_pmu_irq_raised() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 6));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 6);
         return value;
     }
     uint32_t get_pmu_irq_raised() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 6));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 6);
         return value;
     }
     CONSTEXPR status_r &set_pmu_irq_raised(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 6) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 6);
+        word0 = (((~((1U << 1) - 1)) << 6) & word0) | ((((1U << 1) - 1) & value) << 6);
+        return *this;
+    }
+    volatile status_r &set_pmu_irq_raised(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 6) & word0) | ((((1U << 1) - 1) & value) << 6);
         return *this;
     }
     CONSTEXPR uint32_t get_wd_fault() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 7));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 7);
         return value;
     }
     uint32_t get_wd_fault() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 7));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 7);
         return value;
     }
     CONSTEXPR status_r &set_wd_fault(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 7) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 7);
+        word0 = (((~((1U << 1) - 1)) << 7) & word0) | ((((1U << 1) - 1) & value) << 7);
+        return *this;
+    }
+    volatile status_r &set_wd_fault(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 7) & word0) | ((((1U << 1) - 1) & value) << 7);
         return *this;
     }
     CONSTEXPR uint32_t get_ecc_fault() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 8));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 8);
         return value;
     }
     uint32_t get_ecc_fault() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 8));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 8);
         return value;
     }
     CONSTEXPR status_r &set_ecc_fault(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 8) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 8);
+        word0 = (((~((1U << 1) - 1)) << 8) & word0) | ((((1U << 1) - 1) & value) << 8);
+        return *this;
+    }
+    volatile status_r &set_ecc_fault(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 8) & word0) | ((((1U << 1) - 1) & value) << 8);
         return *this;
     }
     CONSTEXPR NPU_NAMESPACE::dma_fault_src get_faulting_interface() const
@@ -1985,34 +2922,49 @@ struct status_r
         word0 = (((~((1U << 1) - 1)) << 11) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 11);
         return *this;
     }
+    volatile status_r &set_faulting_interface(NPU_NAMESPACE::dma_fault_src value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 11) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 11);
+        return *this;
+    }
     CONSTEXPR uint32_t get_faulting_channel() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 4) - 1) & (word0 >> 12));
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 12);
         return value;
     }
     uint32_t get_faulting_channel() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 4) - 1) & (word0 >> 12));
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 12);
         return value;
     }
     CONSTEXPR status_r &set_faulting_channel(uint32_t value)
     {
-        word0 = (((~((1U << 4) - 1)) << 12) & word0) | ((((1U << 4) - 1) & static_cast<uint32_t>(value)) << 12);
+        word0 = (((~((1U << 4) - 1)) << 12) & word0) | ((((1U << 4) - 1) & value) << 12);
+        return *this;
+    }
+    volatile status_r &set_faulting_channel(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 4) - 1)) << 12) & word0) | ((((1U << 4) - 1) & value) << 12);
         return *this;
     }
     CONSTEXPR uint32_t get_irq_history_mask() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 16) - 1) & (word0 >> 16));
+        uint32_t value = ((1U << 16) - 1) & (word0 >> 16);
         return value;
     }
     uint32_t get_irq_history_mask() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 16) - 1) & (word0 >> 16));
+        uint32_t value = ((1U << 16) - 1) & (word0 >> 16);
         return value;
     }
     CONSTEXPR status_r &set_irq_history_mask(uint32_t value)
     {
-        word0 = (((~((1U << 16) - 1)) << 16) & word0) | ((((1U << 16) - 1) & static_cast<uint32_t>(value)) << 16);
+        word0 = (((~((1U << 16) - 1)) << 16) & word0) | ((((1U << 16) - 1) & value) << 16);
+        return *this;
+    }
+    volatile status_r &set_irq_history_mask(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 16) - 1)) << 16) & word0) | ((((1U << 16) - 1) & value) << 16);
         return *this;
     }
 #endif
@@ -2068,92 +3020,122 @@ struct cmd_r
     }
     CONSTEXPR uint32_t get_transition_to_running_state() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     uint32_t get_transition_to_running_state() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     CONSTEXPR cmd_r &set_transition_to_running_state(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 0);
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
+        return *this;
+    }
+    volatile cmd_r &set_transition_to_running_state(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
         return *this;
     }
     CONSTEXPR uint32_t get_clear_irq() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     uint32_t get_clear_irq() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     CONSTEXPR cmd_r &set_clear_irq(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 1);
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
+        return *this;
+    }
+    volatile cmd_r &set_clear_irq(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
         return *this;
     }
     CONSTEXPR uint32_t get_clock_q_enable() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     uint32_t get_clock_q_enable() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     CONSTEXPR cmd_r &set_clock_q_enable(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 2);
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
+        return *this;
+    }
+    volatile cmd_r &set_clock_q_enable(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
         return *this;
     }
     CONSTEXPR uint32_t get_power_q_enable() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     uint32_t get_power_q_enable() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     CONSTEXPR cmd_r &set_power_q_enable(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 3);
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
+        return *this;
+    }
+    volatile cmd_r &set_power_q_enable(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
         return *this;
     }
     CONSTEXPR uint32_t get_stop_request() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 4));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 4);
         return value;
     }
     uint32_t get_stop_request() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 4));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 4);
         return value;
     }
     CONSTEXPR cmd_r &set_stop_request(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 4) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 4);
+        word0 = (((~((1U << 1) - 1)) << 4) & word0) | ((((1U << 1) - 1) & value) << 4);
+        return *this;
+    }
+    volatile cmd_r &set_stop_request(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 4) & word0) | ((((1U << 1) - 1) & value) << 4);
         return *this;
     }
     CONSTEXPR uint32_t get_clear_irq_history() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 16) - 1) & (word0 >> 16));
+        uint32_t value = ((1U << 16) - 1) & (word0 >> 16);
         return value;
     }
     uint32_t get_clear_irq_history() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 16) - 1) & (word0 >> 16));
+        uint32_t value = ((1U << 16) - 1) & (word0 >> 16);
         return value;
     }
     CONSTEXPR cmd_r &set_clear_irq_history(uint32_t value)
     {
-        word0 = (((~((1U << 16) - 1)) << 16) & word0) | ((((1U << 16) - 1) & static_cast<uint32_t>(value)) << 16);
+        word0 = (((~((1U << 16) - 1)) << 16) & word0) | ((((1U << 16) - 1) & value) << 16);
+        return *this;
+    }
+    volatile cmd_r &set_clear_irq_history(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 16) - 1)) << 16) & word0) | ((((1U << 16) - 1) & value) << 16);
         return *this;
     }
 #endif
@@ -2217,6 +3199,11 @@ struct reset_r
         word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 0);
         return *this;
     }
+    volatile reset_r &set_pending_CPL(NPU_NAMESPACE::privilege_level value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 0);
+        return *this;
+    }
     CONSTEXPR NPU_NAMESPACE::security_level get_pending_CSL() const
     {
         NPU_NAMESPACE::security_level value =
@@ -2234,10 +3221,15 @@ struct reset_r
         word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 1);
         return *this;
     }
+    volatile reset_r &set_pending_CSL(NPU_NAMESPACE::security_level value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 1);
+        return *this;
+    }
 #endif
 };
 
-// qbase_r - Base address of command queue. The address is 4 byte aligned
+// qbase_r - Base address of the command stream in bytes
 struct qbase_r
 {
 #ifndef __cplusplus
@@ -2259,19 +3251,19 @@ struct qbase_r
   public:
     CONSTEXPR qbase_r() : word0(0), word1(0) {}
     CONSTEXPR qbase_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -2329,17 +3321,22 @@ struct qread_r
     }
     CONSTEXPR uint32_t get_QREAD() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_QREAD() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR qread_r &set_QREAD(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile qread_r &set_QREAD(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -2400,6 +3397,11 @@ struct qconfig_r
         word0 = (((~((1U << 2) - 1)) << 0) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 0);
         return *this;
     }
+    volatile qconfig_r &set_cmd_region0(NPU_NAMESPACE::mem_attr value) volatile
+    {
+        word0 = (((~((1U << 2) - 1)) << 0) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 0);
+        return *this;
+    }
 #endif
 };
 
@@ -2444,17 +3446,22 @@ struct qsize_r
     }
     CONSTEXPR uint32_t get_QSIZE() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_QSIZE() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR qsize_r &set_QSIZE(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile qsize_r &set_QSIZE(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -2518,6 +3525,11 @@ struct prot_r
         word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 0);
         return *this;
     }
+    volatile prot_r &set_active_CPL(NPU_NAMESPACE::privilege_level value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 0);
+        return *this;
+    }
     CONSTEXPR NPU_NAMESPACE::security_level get_active_CSL() const
     {
         NPU_NAMESPACE::security_level value =
@@ -2531,6 +3543,11 @@ struct prot_r
         return value;
     }
     CONSTEXPR prot_r &set_active_CSL(NPU_NAMESPACE::security_level value)
+    {
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 1);
+        return *this;
+    }
+    volatile prot_r &set_active_CSL(NPU_NAMESPACE::security_level value) volatile
     {
         word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 1);
         return *this;
@@ -2585,47 +3602,62 @@ struct config_r
     }
     CONSTEXPR uint32_t get_macs_per_cc() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 4) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 0);
         return value;
     }
     uint32_t get_macs_per_cc() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 4) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 0);
         return value;
     }
     CONSTEXPR config_r &set_macs_per_cc(uint32_t value)
     {
-        word0 = (((~((1U << 4) - 1)) << 0) & word0) | ((((1U << 4) - 1) & static_cast<uint32_t>(value)) << 0);
+        word0 = (((~((1U << 4) - 1)) << 0) & word0) | ((((1U << 4) - 1) & value) << 0);
+        return *this;
+    }
+    volatile config_r &set_macs_per_cc(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 4) - 1)) << 0) & word0) | ((((1U << 4) - 1) & value) << 0);
         return *this;
     }
     CONSTEXPR uint32_t get_cmd_stream_version() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 4) - 1) & (word0 >> 4));
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 4);
         return value;
     }
     uint32_t get_cmd_stream_version() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 4) - 1) & (word0 >> 4));
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 4);
         return value;
     }
     CONSTEXPR config_r &set_cmd_stream_version(uint32_t value)
     {
-        word0 = (((~((1U << 4) - 1)) << 4) & word0) | ((((1U << 4) - 1) & static_cast<uint32_t>(value)) << 4);
+        word0 = (((~((1U << 4) - 1)) << 4) & word0) | ((((1U << 4) - 1) & value) << 4);
+        return *this;
+    }
+    volatile config_r &set_cmd_stream_version(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 4) - 1)) << 4) & word0) | ((((1U << 4) - 1) & value) << 4);
         return *this;
     }
     CONSTEXPR uint32_t get_shram_size() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 8) - 1) & (word0 >> 8));
+        uint32_t value = ((1U << 8) - 1) & (word0 >> 8);
         return value;
     }
     uint32_t get_shram_size() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 8) - 1) & (word0 >> 8));
+        uint32_t value = ((1U << 8) - 1) & (word0 >> 8);
         return value;
     }
     CONSTEXPR config_r &set_shram_size(uint32_t value)
     {
-        word0 = (((~((1U << 8) - 1)) << 8) & word0) | ((((1U << 8) - 1) & static_cast<uint32_t>(value)) << 8);
+        word0 = (((~((1U << 8) - 1)) << 8) & word0) | ((((1U << 8) - 1) & value) << 8);
+        return *this;
+    }
+    volatile config_r &set_shram_size(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 8) - 1)) << 8) & word0) | ((((1U << 8) - 1) & value) << 8);
         return *this;
     }
     CONSTEXPR NPU_NAMESPACE::functional_safety get_functional_safety() const
@@ -2645,6 +3677,11 @@ struct config_r
         word0 = (((~((1U << 1) - 1)) << 26) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 26);
         return *this;
     }
+    volatile config_r &set_functional_safety(NPU_NAMESPACE::functional_safety value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 26) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 26);
+        return *this;
+    }
     CONSTEXPR NPU_NAMESPACE::custom_dma get_custom_dma() const
     {
         NPU_NAMESPACE::custom_dma value = static_cast<NPU_NAMESPACE::custom_dma>(((1U << 1) - 1) & (word0 >> 27));
@@ -2660,19 +3697,29 @@ struct config_r
         word0 = (((~((1U << 1) - 1)) << 27) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 27);
         return *this;
     }
+    volatile config_r &set_custom_dma(NPU_NAMESPACE::custom_dma value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 27) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 27);
+        return *this;
+    }
     CONSTEXPR uint32_t get_product() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 4) - 1) & (word0 >> 28));
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 28);
         return value;
     }
     uint32_t get_product() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 4) - 1) & (word0 >> 28));
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 28);
         return value;
     }
     CONSTEXPR config_r &set_product(uint32_t value)
     {
-        word0 = (((~((1U << 4) - 1)) << 28) & word0) | ((((1U << 4) - 1) & static_cast<uint32_t>(value)) << 28);
+        word0 = (((~((1U << 4) - 1)) << 28) & word0) | ((((1U << 4) - 1) & value) << 28);
+        return *this;
+    }
+    volatile config_r &set_product(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 4) - 1)) << 28) & word0) | ((((1U << 4) - 1) & value) << 28);
         return *this;
     }
 #endif
@@ -2719,17 +3766,22 @@ struct lock_r
     }
     CONSTEXPR uint32_t get_LOCK() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_LOCK() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR lock_r &set_LOCK(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile lock_r &set_LOCK(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -2797,6 +3849,11 @@ struct regioncfg_r
         word0 = (((~((1U << 2) - 1)) << 0) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 0);
         return *this;
     }
+    volatile regioncfg_r &set_region0(NPU_NAMESPACE::mem_attr value) volatile
+    {
+        word0 = (((~((1U << 2) - 1)) << 0) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 0);
+        return *this;
+    }
     CONSTEXPR NPU_NAMESPACE::mem_attr get_region1() const
     {
         NPU_NAMESPACE::mem_attr value = static_cast<NPU_NAMESPACE::mem_attr>(((1U << 2) - 1) & (word0 >> 2));
@@ -2808,6 +3865,11 @@ struct regioncfg_r
         return value;
     }
     CONSTEXPR regioncfg_r &set_region1(NPU_NAMESPACE::mem_attr value)
+    {
+        word0 = (((~((1U << 2) - 1)) << 2) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 2);
+        return *this;
+    }
+    volatile regioncfg_r &set_region1(NPU_NAMESPACE::mem_attr value) volatile
     {
         word0 = (((~((1U << 2) - 1)) << 2) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 2);
         return *this;
@@ -2827,6 +3889,11 @@ struct regioncfg_r
         word0 = (((~((1U << 2) - 1)) << 4) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 4);
         return *this;
     }
+    volatile regioncfg_r &set_region2(NPU_NAMESPACE::mem_attr value) volatile
+    {
+        word0 = (((~((1U << 2) - 1)) << 4) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 4);
+        return *this;
+    }
     CONSTEXPR NPU_NAMESPACE::mem_attr get_region3() const
     {
         NPU_NAMESPACE::mem_attr value = static_cast<NPU_NAMESPACE::mem_attr>(((1U << 2) - 1) & (word0 >> 6));
@@ -2838,6 +3905,11 @@ struct regioncfg_r
         return value;
     }
     CONSTEXPR regioncfg_r &set_region3(NPU_NAMESPACE::mem_attr value)
+    {
+        word0 = (((~((1U << 2) - 1)) << 6) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 6);
+        return *this;
+    }
+    volatile regioncfg_r &set_region3(NPU_NAMESPACE::mem_attr value) volatile
     {
         word0 = (((~((1U << 2) - 1)) << 6) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 6);
         return *this;
@@ -2857,6 +3929,11 @@ struct regioncfg_r
         word0 = (((~((1U << 2) - 1)) << 8) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 8);
         return *this;
     }
+    volatile regioncfg_r &set_region4(NPU_NAMESPACE::mem_attr value) volatile
+    {
+        word0 = (((~((1U << 2) - 1)) << 8) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 8);
+        return *this;
+    }
     CONSTEXPR NPU_NAMESPACE::mem_attr get_region5() const
     {
         NPU_NAMESPACE::mem_attr value = static_cast<NPU_NAMESPACE::mem_attr>(((1U << 2) - 1) & (word0 >> 10));
@@ -2868,6 +3945,11 @@ struct regioncfg_r
         return value;
     }
     CONSTEXPR regioncfg_r &set_region5(NPU_NAMESPACE::mem_attr value)
+    {
+        word0 = (((~((1U << 2) - 1)) << 10) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 10);
+        return *this;
+    }
+    volatile regioncfg_r &set_region5(NPU_NAMESPACE::mem_attr value) volatile
     {
         word0 = (((~((1U << 2) - 1)) << 10) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 10);
         return *this;
@@ -2887,6 +3969,11 @@ struct regioncfg_r
         word0 = (((~((1U << 2) - 1)) << 12) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 12);
         return *this;
     }
+    volatile regioncfg_r &set_region6(NPU_NAMESPACE::mem_attr value) volatile
+    {
+        word0 = (((~((1U << 2) - 1)) << 12) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 12);
+        return *this;
+    }
     CONSTEXPR NPU_NAMESPACE::mem_attr get_region7() const
     {
         NPU_NAMESPACE::mem_attr value = static_cast<NPU_NAMESPACE::mem_attr>(((1U << 2) - 1) & (word0 >> 14));
@@ -2898,6 +3985,11 @@ struct regioncfg_r
         return value;
     }
     CONSTEXPR regioncfg_r &set_region7(NPU_NAMESPACE::mem_attr value)
+    {
+        word0 = (((~((1U << 2) - 1)) << 14) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 14);
+        return *this;
+    }
+    volatile regioncfg_r &set_region7(NPU_NAMESPACE::mem_attr value) volatile
     {
         word0 = (((~((1U << 2) - 1)) << 14) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 14);
         return *this;
@@ -2968,6 +4060,11 @@ struct axi_limit0_r
         word0 = (((~((1U << 2) - 1)) << 0) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 0);
         return *this;
     }
+    volatile axi_limit0_r &set_max_beats(NPU_NAMESPACE::max_beats value) volatile
+    {
+        word0 = (((~((1U << 2) - 1)) << 0) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 0);
+        return *this;
+    }
     CONSTEXPR NPU_NAMESPACE::axi_mem_encoding get_memtype() const
     {
         NPU_NAMESPACE::axi_mem_encoding value =
@@ -2985,34 +4082,49 @@ struct axi_limit0_r
         word0 = (((~((1U << 4) - 1)) << 4) & word0) | ((((1U << 4) - 1) & static_cast<uint32_t>(value)) << 4);
         return *this;
     }
+    volatile axi_limit0_r &set_memtype(NPU_NAMESPACE::axi_mem_encoding value) volatile
+    {
+        word0 = (((~((1U << 4) - 1)) << 4) & word0) | ((((1U << 4) - 1) & static_cast<uint32_t>(value)) << 4);
+        return *this;
+    }
     CONSTEXPR uint32_t get_max_outstanding_read_m1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 6) - 1) & (word0 >> 16));
+        uint32_t value = ((1U << 6) - 1) & (word0 >> 16);
         return value;
     }
     uint32_t get_max_outstanding_read_m1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 6) - 1) & (word0 >> 16));
+        uint32_t value = ((1U << 6) - 1) & (word0 >> 16);
         return value;
     }
     CONSTEXPR axi_limit0_r &set_max_outstanding_read_m1(uint32_t value)
     {
-        word0 = (((~((1U << 6) - 1)) << 16) & word0) | ((((1U << 6) - 1) & static_cast<uint32_t>(value)) << 16);
+        word0 = (((~((1U << 6) - 1)) << 16) & word0) | ((((1U << 6) - 1) & value) << 16);
+        return *this;
+    }
+    volatile axi_limit0_r &set_max_outstanding_read_m1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 6) - 1)) << 16) & word0) | ((((1U << 6) - 1) & value) << 16);
         return *this;
     }
     CONSTEXPR uint32_t get_max_outstanding_write_m1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 5) - 1) & (word0 >> 24));
+        uint32_t value = ((1U << 5) - 1) & (word0 >> 24);
         return value;
     }
     uint32_t get_max_outstanding_write_m1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 5) - 1) & (word0 >> 24));
+        uint32_t value = ((1U << 5) - 1) & (word0 >> 24);
         return value;
     }
     CONSTEXPR axi_limit0_r &set_max_outstanding_write_m1(uint32_t value)
     {
-        word0 = (((~((1U << 5) - 1)) << 24) & word0) | ((((1U << 5) - 1) & static_cast<uint32_t>(value)) << 24);
+        word0 = (((~((1U << 5) - 1)) << 24) & word0) | ((((1U << 5) - 1) & value) << 24);
+        return *this;
+    }
+    volatile axi_limit0_r &set_max_outstanding_write_m1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 5) - 1)) << 24) & word0) | ((((1U << 5) - 1) & value) << 24);
         return *this;
     }
 #endif
@@ -3081,6 +4193,11 @@ struct axi_limit1_r
         word0 = (((~((1U << 2) - 1)) << 0) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 0);
         return *this;
     }
+    volatile axi_limit1_r &set_max_beats(NPU_NAMESPACE::max_beats value) volatile
+    {
+        word0 = (((~((1U << 2) - 1)) << 0) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 0);
+        return *this;
+    }
     CONSTEXPR NPU_NAMESPACE::axi_mem_encoding get_memtype() const
     {
         NPU_NAMESPACE::axi_mem_encoding value =
@@ -3098,34 +4215,49 @@ struct axi_limit1_r
         word0 = (((~((1U << 4) - 1)) << 4) & word0) | ((((1U << 4) - 1) & static_cast<uint32_t>(value)) << 4);
         return *this;
     }
+    volatile axi_limit1_r &set_memtype(NPU_NAMESPACE::axi_mem_encoding value) volatile
+    {
+        word0 = (((~((1U << 4) - 1)) << 4) & word0) | ((((1U << 4) - 1) & static_cast<uint32_t>(value)) << 4);
+        return *this;
+    }
     CONSTEXPR uint32_t get_max_outstanding_read_m1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 6) - 1) & (word0 >> 16));
+        uint32_t value = ((1U << 6) - 1) & (word0 >> 16);
         return value;
     }
     uint32_t get_max_outstanding_read_m1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 6) - 1) & (word0 >> 16));
+        uint32_t value = ((1U << 6) - 1) & (word0 >> 16);
         return value;
     }
     CONSTEXPR axi_limit1_r &set_max_outstanding_read_m1(uint32_t value)
     {
-        word0 = (((~((1U << 6) - 1)) << 16) & word0) | ((((1U << 6) - 1) & static_cast<uint32_t>(value)) << 16);
+        word0 = (((~((1U << 6) - 1)) << 16) & word0) | ((((1U << 6) - 1) & value) << 16);
+        return *this;
+    }
+    volatile axi_limit1_r &set_max_outstanding_read_m1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 6) - 1)) << 16) & word0) | ((((1U << 6) - 1) & value) << 16);
         return *this;
     }
     CONSTEXPR uint32_t get_max_outstanding_write_m1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 5) - 1) & (word0 >> 24));
+        uint32_t value = ((1U << 5) - 1) & (word0 >> 24);
         return value;
     }
     uint32_t get_max_outstanding_write_m1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 5) - 1) & (word0 >> 24));
+        uint32_t value = ((1U << 5) - 1) & (word0 >> 24);
         return value;
     }
     CONSTEXPR axi_limit1_r &set_max_outstanding_write_m1(uint32_t value)
     {
-        word0 = (((~((1U << 5) - 1)) << 24) & word0) | ((((1U << 5) - 1) & static_cast<uint32_t>(value)) << 24);
+        word0 = (((~((1U << 5) - 1)) << 24) & word0) | ((((1U << 5) - 1) & value) << 24);
+        return *this;
+    }
+    volatile axi_limit1_r &set_max_outstanding_write_m1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 5) - 1)) << 24) & word0) | ((((1U << 5) - 1) & value) << 24);
         return *this;
     }
 #endif
@@ -3194,6 +4326,11 @@ struct axi_limit2_r
         word0 = (((~((1U << 2) - 1)) << 0) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 0);
         return *this;
     }
+    volatile axi_limit2_r &set_max_beats(NPU_NAMESPACE::max_beats value) volatile
+    {
+        word0 = (((~((1U << 2) - 1)) << 0) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 0);
+        return *this;
+    }
     CONSTEXPR NPU_NAMESPACE::axi_mem_encoding get_memtype() const
     {
         NPU_NAMESPACE::axi_mem_encoding value =
@@ -3211,34 +4348,49 @@ struct axi_limit2_r
         word0 = (((~((1U << 4) - 1)) << 4) & word0) | ((((1U << 4) - 1) & static_cast<uint32_t>(value)) << 4);
         return *this;
     }
+    volatile axi_limit2_r &set_memtype(NPU_NAMESPACE::axi_mem_encoding value) volatile
+    {
+        word0 = (((~((1U << 4) - 1)) << 4) & word0) | ((((1U << 4) - 1) & static_cast<uint32_t>(value)) << 4);
+        return *this;
+    }
     CONSTEXPR uint32_t get_max_outstanding_read_m1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 6) - 1) & (word0 >> 16));
+        uint32_t value = ((1U << 6) - 1) & (word0 >> 16);
         return value;
     }
     uint32_t get_max_outstanding_read_m1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 6) - 1) & (word0 >> 16));
+        uint32_t value = ((1U << 6) - 1) & (word0 >> 16);
         return value;
     }
     CONSTEXPR axi_limit2_r &set_max_outstanding_read_m1(uint32_t value)
     {
-        word0 = (((~((1U << 6) - 1)) << 16) & word0) | ((((1U << 6) - 1) & static_cast<uint32_t>(value)) << 16);
+        word0 = (((~((1U << 6) - 1)) << 16) & word0) | ((((1U << 6) - 1) & value) << 16);
+        return *this;
+    }
+    volatile axi_limit2_r &set_max_outstanding_read_m1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 6) - 1)) << 16) & word0) | ((((1U << 6) - 1) & value) << 16);
         return *this;
     }
     CONSTEXPR uint32_t get_max_outstanding_write_m1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 5) - 1) & (word0 >> 24));
+        uint32_t value = ((1U << 5) - 1) & (word0 >> 24);
         return value;
     }
     uint32_t get_max_outstanding_write_m1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 5) - 1) & (word0 >> 24));
+        uint32_t value = ((1U << 5) - 1) & (word0 >> 24);
         return value;
     }
     CONSTEXPR axi_limit2_r &set_max_outstanding_write_m1(uint32_t value)
     {
-        word0 = (((~((1U << 5) - 1)) << 24) & word0) | ((((1U << 5) - 1) & static_cast<uint32_t>(value)) << 24);
+        word0 = (((~((1U << 5) - 1)) << 24) & word0) | ((((1U << 5) - 1) & value) << 24);
+        return *this;
+    }
+    volatile axi_limit2_r &set_max_outstanding_write_m1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 5) - 1)) << 24) & word0) | ((((1U << 5) - 1) & value) << 24);
         return *this;
     }
 #endif
@@ -3307,6 +4459,11 @@ struct axi_limit3_r
         word0 = (((~((1U << 2) - 1)) << 0) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 0);
         return *this;
     }
+    volatile axi_limit3_r &set_max_beats(NPU_NAMESPACE::max_beats value) volatile
+    {
+        word0 = (((~((1U << 2) - 1)) << 0) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 0);
+        return *this;
+    }
     CONSTEXPR NPU_NAMESPACE::axi_mem_encoding get_memtype() const
     {
         NPU_NAMESPACE::axi_mem_encoding value =
@@ -3324,40 +4481,56 @@ struct axi_limit3_r
         word0 = (((~((1U << 4) - 1)) << 4) & word0) | ((((1U << 4) - 1) & static_cast<uint32_t>(value)) << 4);
         return *this;
     }
+    volatile axi_limit3_r &set_memtype(NPU_NAMESPACE::axi_mem_encoding value) volatile
+    {
+        word0 = (((~((1U << 4) - 1)) << 4) & word0) | ((((1U << 4) - 1) & static_cast<uint32_t>(value)) << 4);
+        return *this;
+    }
     CONSTEXPR uint32_t get_max_outstanding_read_m1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 6) - 1) & (word0 >> 16));
+        uint32_t value = ((1U << 6) - 1) & (word0 >> 16);
         return value;
     }
     uint32_t get_max_outstanding_read_m1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 6) - 1) & (word0 >> 16));
+        uint32_t value = ((1U << 6) - 1) & (word0 >> 16);
         return value;
     }
     CONSTEXPR axi_limit3_r &set_max_outstanding_read_m1(uint32_t value)
     {
-        word0 = (((~((1U << 6) - 1)) << 16) & word0) | ((((1U << 6) - 1) & static_cast<uint32_t>(value)) << 16);
+        word0 = (((~((1U << 6) - 1)) << 16) & word0) | ((((1U << 6) - 1) & value) << 16);
+        return *this;
+    }
+    volatile axi_limit3_r &set_max_outstanding_read_m1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 6) - 1)) << 16) & word0) | ((((1U << 6) - 1) & value) << 16);
         return *this;
     }
     CONSTEXPR uint32_t get_max_outstanding_write_m1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 5) - 1) & (word0 >> 24));
+        uint32_t value = ((1U << 5) - 1) & (word0 >> 24);
         return value;
     }
     uint32_t get_max_outstanding_write_m1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 5) - 1) & (word0 >> 24));
+        uint32_t value = ((1U << 5) - 1) & (word0 >> 24);
         return value;
     }
     CONSTEXPR axi_limit3_r &set_max_outstanding_write_m1(uint32_t value)
     {
-        word0 = (((~((1U << 5) - 1)) << 24) & word0) | ((((1U << 5) - 1) & static_cast<uint32_t>(value)) << 24);
+        word0 = (((~((1U << 5) - 1)) << 24) & word0) | ((((1U << 5) - 1) & value) << 24);
+        return *this;
+    }
+    volatile axi_limit3_r &set_max_outstanding_write_m1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 5) - 1)) << 24) & word0) | ((((1U << 5) - 1) & value) << 24);
         return *this;
     }
 #endif
 };
 
-// basep_r - The driver can use this address to relocate the command stream on region 0
+// basep_r - The driver can use this address to relocate the command stream on region 0. If the region contains data
+// requiring A-byte alignment then the base must be a multiple of A
 struct basep_r
 {
 #ifndef __cplusplus
@@ -3379,19 +4552,19 @@ struct basep_r
   public:
     CONSTEXPR basep_r() : word0(0), word1(0) {}
     CONSTEXPR basep_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -3475,19 +4648,29 @@ struct wd_status_r
         word0 = (((~((1U << 2) - 1)) << 0) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 0);
         return *this;
     }
+    volatile wd_status_r &set_core_slice_state(NPU_NAMESPACE::wd_core_slice_state value) volatile
+    {
+        word0 = (((~((1U << 2) - 1)) << 0) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 0);
+        return *this;
+    }
     CONSTEXPR uint32_t get_core_idle() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     uint32_t get_core_idle() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     CONSTEXPR wd_status_r &set_core_idle(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 2);
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
+        return *this;
+    }
+    volatile wd_status_r &set_core_idle(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
         return *this;
     }
     CONSTEXPR NPU_NAMESPACE::wd_ctrl_state get_ctrl_state() const
@@ -3505,124 +4688,169 @@ struct wd_status_r
         word0 = (((~((1U << 2) - 1)) << 3) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 3);
         return *this;
     }
+    volatile wd_status_r &set_ctrl_state(NPU_NAMESPACE::wd_ctrl_state value) volatile
+    {
+        word0 = (((~((1U << 2) - 1)) << 3) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 3);
+        return *this;
+    }
     CONSTEXPR uint32_t get_ctrl_idle() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 5));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 5);
         return value;
     }
     uint32_t get_ctrl_idle() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 5));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 5);
         return value;
     }
     CONSTEXPR wd_status_r &set_ctrl_idle(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 5) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 5);
+        word0 = (((~((1U << 1) - 1)) << 5) & word0) | ((((1U << 1) - 1) & value) << 5);
+        return *this;
+    }
+    volatile wd_status_r &set_ctrl_idle(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 5) & word0) | ((((1U << 1) - 1) & value) << 5);
         return *this;
     }
     CONSTEXPR uint32_t get_write_buf_index0() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 3) - 1) & (word0 >> 6));
+        uint32_t value = ((1U << 3) - 1) & (word0 >> 6);
         return value;
     }
     uint32_t get_write_buf_index0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 3) - 1) & (word0 >> 6));
+        uint32_t value = ((1U << 3) - 1) & (word0 >> 6);
         return value;
     }
     CONSTEXPR wd_status_r &set_write_buf_index0(uint32_t value)
     {
-        word0 = (((~((1U << 3) - 1)) << 6) & word0) | ((((1U << 3) - 1) & static_cast<uint32_t>(value)) << 6);
+        word0 = (((~((1U << 3) - 1)) << 6) & word0) | ((((1U << 3) - 1) & value) << 6);
+        return *this;
+    }
+    volatile wd_status_r &set_write_buf_index0(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 3) - 1)) << 6) & word0) | ((((1U << 3) - 1) & value) << 6);
         return *this;
     }
     CONSTEXPR uint32_t get_write_buf_valid0() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 9));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 9);
         return value;
     }
     uint32_t get_write_buf_valid0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 9));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 9);
         return value;
     }
     CONSTEXPR wd_status_r &set_write_buf_valid0(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 9) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 9);
+        word0 = (((~((1U << 1) - 1)) << 9) & word0) | ((((1U << 1) - 1) & value) << 9);
+        return *this;
+    }
+    volatile wd_status_r &set_write_buf_valid0(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 9) & word0) | ((((1U << 1) - 1) & value) << 9);
         return *this;
     }
     CONSTEXPR uint32_t get_write_buf_idle0() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 10));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 10);
         return value;
     }
     uint32_t get_write_buf_idle0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 10));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 10);
         return value;
     }
     CONSTEXPR wd_status_r &set_write_buf_idle0(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 10) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 10);
+        word0 = (((~((1U << 1) - 1)) << 10) & word0) | ((((1U << 1) - 1) & value) << 10);
+        return *this;
+    }
+    volatile wd_status_r &set_write_buf_idle0(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 10) & word0) | ((((1U << 1) - 1) & value) << 10);
         return *this;
     }
     CONSTEXPR uint32_t get_write_buf_index1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 3) - 1) & (word0 >> 11));
+        uint32_t value = ((1U << 3) - 1) & (word0 >> 11);
         return value;
     }
     uint32_t get_write_buf_index1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 3) - 1) & (word0 >> 11));
+        uint32_t value = ((1U << 3) - 1) & (word0 >> 11);
         return value;
     }
     CONSTEXPR wd_status_r &set_write_buf_index1(uint32_t value)
     {
-        word0 = (((~((1U << 3) - 1)) << 11) & word0) | ((((1U << 3) - 1) & static_cast<uint32_t>(value)) << 11);
+        word0 = (((~((1U << 3) - 1)) << 11) & word0) | ((((1U << 3) - 1) & value) << 11);
+        return *this;
+    }
+    volatile wd_status_r &set_write_buf_index1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 3) - 1)) << 11) & word0) | ((((1U << 3) - 1) & value) << 11);
         return *this;
     }
     CONSTEXPR uint32_t get_write_buf_valid1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 14));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 14);
         return value;
     }
     uint32_t get_write_buf_valid1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 14));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 14);
         return value;
     }
     CONSTEXPR wd_status_r &set_write_buf_valid1(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 14) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 14);
+        word0 = (((~((1U << 1) - 1)) << 14) & word0) | ((((1U << 1) - 1) & value) << 14);
+        return *this;
+    }
+    volatile wd_status_r &set_write_buf_valid1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 14) & word0) | ((((1U << 1) - 1) & value) << 14);
         return *this;
     }
     CONSTEXPR uint32_t get_write_buf_idle1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 15));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 15);
         return value;
     }
     uint32_t get_write_buf_idle1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 15));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 15);
         return value;
     }
     CONSTEXPR wd_status_r &set_write_buf_idle1(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 15) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 15);
+        word0 = (((~((1U << 1) - 1)) << 15) & word0) | ((((1U << 1) - 1) & value) << 15);
+        return *this;
+    }
+    volatile wd_status_r &set_write_buf_idle1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 15) & word0) | ((((1U << 1) - 1) & value) << 15);
         return *this;
     }
     CONSTEXPR uint32_t get_events() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 12) - 1) & (word0 >> 16));
+        uint32_t value = ((1U << 12) - 1) & (word0 >> 16);
         return value;
     }
     uint32_t get_events() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 12) - 1) & (word0 >> 16));
+        uint32_t value = ((1U << 12) - 1) & (word0 >> 16);
         return value;
     }
     CONSTEXPR wd_status_r &set_events(uint32_t value)
     {
-        word0 = (((~((1U << 12) - 1)) << 16) & word0) | ((((1U << 12) - 1) & static_cast<uint32_t>(value)) << 16);
+        word0 = (((~((1U << 12) - 1)) << 16) & word0) | ((((1U << 12) - 1) & value) << 16);
+        return *this;
+    }
+    volatile wd_status_r &set_events(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 12) - 1)) << 16) & word0) | ((((1U << 12) - 1) & value) << 16);
         return *this;
     }
 #endif
@@ -3686,242 +4914,322 @@ struct mac_status_r
     }
     CONSTEXPR uint32_t get_block_cfg_valid() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     uint32_t get_block_cfg_valid() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     CONSTEXPR mac_status_r &set_block_cfg_valid(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 0);
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
+        return *this;
+    }
+    volatile mac_status_r &set_block_cfg_valid(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
         return *this;
     }
     CONSTEXPR uint32_t get_trav_en() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     uint32_t get_trav_en() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     CONSTEXPR mac_status_r &set_trav_en(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 1);
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
+        return *this;
+    }
+    volatile mac_status_r &set_trav_en(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
         return *this;
     }
     CONSTEXPR uint32_t get_wait_for_ib() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     uint32_t get_wait_for_ib() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     CONSTEXPR mac_status_r &set_wait_for_ib(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 2);
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
+        return *this;
+    }
+    volatile mac_status_r &set_wait_for_ib(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
         return *this;
     }
     CONSTEXPR uint32_t get_wait_for_acc_buf() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     uint32_t get_wait_for_acc_buf() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     CONSTEXPR mac_status_r &set_wait_for_acc_buf(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 3);
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
+        return *this;
+    }
+    volatile mac_status_r &set_wait_for_acc_buf(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
         return *this;
     }
     CONSTEXPR uint32_t get_wait_for_weights() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 4));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 4);
         return value;
     }
     uint32_t get_wait_for_weights() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 4));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 4);
         return value;
     }
     CONSTEXPR mac_status_r &set_wait_for_weights(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 4) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 4);
+        word0 = (((~((1U << 1) - 1)) << 4) & word0) | ((((1U << 1) - 1) & value) << 4);
+        return *this;
+    }
+    volatile mac_status_r &set_wait_for_weights(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 4) & word0) | ((((1U << 1) - 1) & value) << 4);
         return *this;
     }
     CONSTEXPR uint32_t get_stall_stripe() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 5));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 5);
         return value;
     }
     uint32_t get_stall_stripe() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 5));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 5);
         return value;
     }
     CONSTEXPR mac_status_r &set_stall_stripe(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 5) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 5);
+        word0 = (((~((1U << 1) - 1)) << 5) & word0) | ((((1U << 1) - 1) & value) << 5);
+        return *this;
+    }
+    volatile mac_status_r &set_stall_stripe(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 5) & word0) | ((((1U << 1) - 1) & value) << 5);
         return *this;
     }
     CONSTEXPR uint32_t get_dw_sel() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 6));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 6);
         return value;
     }
     uint32_t get_dw_sel() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 6));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 6);
         return value;
     }
     CONSTEXPR mac_status_r &set_dw_sel(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 6) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 6);
+        word0 = (((~((1U << 1) - 1)) << 6) & word0) | ((((1U << 1) - 1) & value) << 6);
+        return *this;
+    }
+    volatile mac_status_r &set_dw_sel(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 6) & word0) | ((((1U << 1) - 1) & value) << 6);
         return *this;
     }
     CONSTEXPR uint32_t get_wait_for_dw0_ready() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 7));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 7);
         return value;
     }
     uint32_t get_wait_for_dw0_ready() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 7));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 7);
         return value;
     }
     CONSTEXPR mac_status_r &set_wait_for_dw0_ready(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 7) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 7);
+        word0 = (((~((1U << 1) - 1)) << 7) & word0) | ((((1U << 1) - 1) & value) << 7);
+        return *this;
+    }
+    volatile mac_status_r &set_wait_for_dw0_ready(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 7) & word0) | ((((1U << 1) - 1) & value) << 7);
         return *this;
     }
     CONSTEXPR uint32_t get_wait_for_dw1_ready() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 8));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 8);
         return value;
     }
     uint32_t get_wait_for_dw1_ready() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 8));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 8);
         return value;
     }
     CONSTEXPR mac_status_r &set_wait_for_dw1_ready(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 8) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 8);
+        word0 = (((~((1U << 1) - 1)) << 8) & word0) | ((((1U << 1) - 1) & value) << 8);
+        return *this;
+    }
+    volatile mac_status_r &set_wait_for_dw1_ready(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 8) & word0) | ((((1U << 1) - 1) & value) << 8);
         return *this;
     }
     CONSTEXPR uint32_t get_acc_buf_sel_ai() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 9));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 9);
         return value;
     }
     uint32_t get_acc_buf_sel_ai() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 9));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 9);
         return value;
     }
     CONSTEXPR mac_status_r &set_acc_buf_sel_ai(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 9) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 9);
+        word0 = (((~((1U << 1) - 1)) << 9) & word0) | ((((1U << 1) - 1) & value) << 9);
+        return *this;
+    }
+    volatile mac_status_r &set_acc_buf_sel_ai(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 9) & word0) | ((((1U << 1) - 1) & value) << 9);
         return *this;
     }
     CONSTEXPR uint32_t get_wait_for_acc0_ready() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 10));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 10);
         return value;
     }
     uint32_t get_wait_for_acc0_ready() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 10));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 10);
         return value;
     }
     CONSTEXPR mac_status_r &set_wait_for_acc0_ready(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 10) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 10);
+        word0 = (((~((1U << 1) - 1)) << 10) & word0) | ((((1U << 1) - 1) & value) << 10);
+        return *this;
+    }
+    volatile mac_status_r &set_wait_for_acc0_ready(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 10) & word0) | ((((1U << 1) - 1) & value) << 10);
         return *this;
     }
     CONSTEXPR uint32_t get_wait_for_acc1_ready() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 11));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 11);
         return value;
     }
     uint32_t get_wait_for_acc1_ready() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 11));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 11);
         return value;
     }
     CONSTEXPR mac_status_r &set_wait_for_acc1_ready(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 11) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 11);
+        word0 = (((~((1U << 1) - 1)) << 11) & word0) | ((((1U << 1) - 1) & value) << 11);
+        return *this;
+    }
+    volatile mac_status_r &set_wait_for_acc1_ready(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 11) & word0) | ((((1U << 1) - 1) & value) << 11);
         return *this;
     }
     CONSTEXPR uint32_t get_acc_buf_sel_aa() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 12));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 12);
         return value;
     }
     uint32_t get_acc_buf_sel_aa() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 12));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 12);
         return value;
     }
     CONSTEXPR mac_status_r &set_acc_buf_sel_aa(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 12) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 12);
+        word0 = (((~((1U << 1) - 1)) << 12) & word0) | ((((1U << 1) - 1) & value) << 12);
+        return *this;
+    }
+    volatile mac_status_r &set_acc_buf_sel_aa(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 12) & word0) | ((((1U << 1) - 1) & value) << 12);
         return *this;
     }
     CONSTEXPR uint32_t get_acc0_valid() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 13));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 13);
         return value;
     }
     uint32_t get_acc0_valid() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 13));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 13);
         return value;
     }
     CONSTEXPR mac_status_r &set_acc0_valid(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 13) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 13);
+        word0 = (((~((1U << 1) - 1)) << 13) & word0) | ((((1U << 1) - 1) & value) << 13);
+        return *this;
+    }
+    volatile mac_status_r &set_acc0_valid(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 13) & word0) | ((((1U << 1) - 1) & value) << 13);
         return *this;
     }
     CONSTEXPR uint32_t get_acc1_valid() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 14));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 14);
         return value;
     }
     uint32_t get_acc1_valid() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 14));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 14);
         return value;
     }
     CONSTEXPR mac_status_r &set_acc1_valid(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 14) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 14);
+        word0 = (((~((1U << 1) - 1)) << 14) & word0) | ((((1U << 1) - 1) & value) << 14);
+        return *this;
+    }
+    volatile mac_status_r &set_acc1_valid(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 14) & word0) | ((((1U << 1) - 1) & value) << 14);
         return *this;
     }
     CONSTEXPR uint32_t get_events() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 11) - 1) & (word0 >> 16));
+        uint32_t value = ((1U << 11) - 1) & (word0 >> 16);
         return value;
     }
     uint32_t get_events() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 11) - 1) & (word0 >> 16));
+        uint32_t value = ((1U << 11) - 1) & (word0 >> 16);
         return value;
     }
     CONSTEXPR mac_status_r &set_events(uint32_t value)
     {
-        word0 = (((~((1U << 11) - 1)) << 16) & word0) | ((((1U << 11) - 1) & static_cast<uint32_t>(value)) << 16);
+        word0 = (((~((1U << 11) - 1)) << 16) & word0) | ((((1U << 11) - 1) & value) << 16);
+        return *this;
+    }
+    volatile mac_status_r &set_events(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 11) - 1)) << 16) & word0) | ((((1U << 11) - 1) & value) << 16);
         return *this;
     }
 #endif
@@ -3978,137 +5286,182 @@ struct ao_status_r
     }
     CONSTEXPR uint32_t get_cmd_sbw_valid() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     uint32_t get_cmd_sbw_valid() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     CONSTEXPR ao_status_r &set_cmd_sbw_valid(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 0);
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
+        return *this;
+    }
+    volatile ao_status_r &set_cmd_sbw_valid(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
         return *this;
     }
     CONSTEXPR uint32_t get_cmd_act_valid() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     uint32_t get_cmd_act_valid() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     CONSTEXPR ao_status_r &set_cmd_act_valid(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 1);
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
+        return *this;
+    }
+    volatile ao_status_r &set_cmd_act_valid(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
         return *this;
     }
     CONSTEXPR uint32_t get_cmd_ctl_valid() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     uint32_t get_cmd_ctl_valid() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     CONSTEXPR ao_status_r &set_cmd_ctl_valid(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 2);
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
+        return *this;
+    }
+    volatile ao_status_r &set_cmd_ctl_valid(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
         return *this;
     }
     CONSTEXPR uint32_t get_cmd_scl_valid() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     uint32_t get_cmd_scl_valid() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     CONSTEXPR ao_status_r &set_cmd_scl_valid(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 3);
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
+        return *this;
+    }
+    volatile ao_status_r &set_cmd_scl_valid(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
         return *this;
     }
     CONSTEXPR uint32_t get_cmd_sbr_valid() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 4));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 4);
         return value;
     }
     uint32_t get_cmd_sbr_valid() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 4));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 4);
         return value;
     }
     CONSTEXPR ao_status_r &set_cmd_sbr_valid(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 4) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 4);
+        word0 = (((~((1U << 1) - 1)) << 4) & word0) | ((((1U << 1) - 1) & value) << 4);
+        return *this;
+    }
+    volatile ao_status_r &set_cmd_sbr_valid(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 4) & word0) | ((((1U << 1) - 1) & value) << 4);
         return *this;
     }
     CONSTEXPR uint32_t get_cmd_ofm_valid() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 5));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 5);
         return value;
     }
     uint32_t get_cmd_ofm_valid() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 5));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 5);
         return value;
     }
     CONSTEXPR ao_status_r &set_cmd_ofm_valid(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 5) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 5);
+        word0 = (((~((1U << 1) - 1)) << 5) & word0) | ((((1U << 1) - 1) & value) << 5);
+        return *this;
+    }
+    volatile ao_status_r &set_cmd_ofm_valid(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 5) & word0) | ((((1U << 1) - 1) & value) << 5);
         return *this;
     }
     CONSTEXPR uint32_t get_blk_cmd_ready() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 6));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 6);
         return value;
     }
     uint32_t get_blk_cmd_ready() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 6));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 6);
         return value;
     }
     CONSTEXPR ao_status_r &set_blk_cmd_ready(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 6) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 6);
+        word0 = (((~((1U << 1) - 1)) << 6) & word0) | ((((1U << 1) - 1) & value) << 6);
+        return *this;
+    }
+    volatile ao_status_r &set_blk_cmd_ready(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 6) & word0) | ((((1U << 1) - 1) & value) << 6);
         return *this;
     }
     CONSTEXPR uint32_t get_blk_cmd_valid() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 7));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 7);
         return value;
     }
     uint32_t get_blk_cmd_valid() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 7));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 7);
         return value;
     }
     CONSTEXPR ao_status_r &set_blk_cmd_valid(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 7) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 7);
+        word0 = (((~((1U << 1) - 1)) << 7) & word0) | ((((1U << 1) - 1) & value) << 7);
+        return *this;
+    }
+    volatile ao_status_r &set_blk_cmd_valid(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 7) & word0) | ((((1U << 1) - 1) & value) << 7);
         return *this;
     }
     CONSTEXPR uint32_t get_events() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 8) - 1) & (word0 >> 16));
+        uint32_t value = ((1U << 8) - 1) & (word0 >> 16);
         return value;
     }
     uint32_t get_events() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 8) - 1) & (word0 >> 16));
+        uint32_t value = ((1U << 8) - 1) & (word0 >> 16);
         return value;
     }
     CONSTEXPR ao_status_r &set_events(uint32_t value)
     {
-        word0 = (((~((1U << 8) - 1)) << 16) & word0) | ((((1U << 8) - 1) & static_cast<uint32_t>(value)) << 16);
+        word0 = (((~((1U << 8) - 1)) << 16) & word0) | ((((1U << 8) - 1) & value) << 16);
+        return *this;
+    }
+    volatile ao_status_r &set_events(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 8) - 1)) << 16) & word0) | ((((1U << 8) - 1) & value) << 16);
         return *this;
     }
 #endif
@@ -4189,482 +5542,642 @@ struct dma_status0_r
     }
     CONSTEXPR uint32_t get_cmd_idle() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     uint32_t get_cmd_idle() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     CONSTEXPR dma_status0_r &set_cmd_idle(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 0);
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
+        return *this;
+    }
+    volatile dma_status0_r &set_cmd_idle(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
         return *this;
     }
     CONSTEXPR uint32_t get_ifm_idle() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     uint32_t get_ifm_idle() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     CONSTEXPR dma_status0_r &set_ifm_idle(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 1);
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
+        return *this;
+    }
+    volatile dma_status0_r &set_ifm_idle(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
         return *this;
     }
     CONSTEXPR uint32_t get_wgt_idle_c0() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     uint32_t get_wgt_idle_c0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     CONSTEXPR dma_status0_r &set_wgt_idle_c0(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 2);
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
+        return *this;
+    }
+    volatile dma_status0_r &set_wgt_idle_c0(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
         return *this;
     }
     CONSTEXPR uint32_t get_bas_idle_c0() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     uint32_t get_bas_idle_c0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     CONSTEXPR dma_status0_r &set_bas_idle_c0(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 3);
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
+        return *this;
+    }
+    volatile dma_status0_r &set_bas_idle_c0(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
         return *this;
     }
     CONSTEXPR uint32_t get_m2m_idle() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 4));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 4);
         return value;
     }
     uint32_t get_m2m_idle() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 4));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 4);
         return value;
     }
     CONSTEXPR dma_status0_r &set_m2m_idle(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 4) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 4);
+        word0 = (((~((1U << 1) - 1)) << 4) & word0) | ((((1U << 1) - 1) & value) << 4);
+        return *this;
+    }
+    volatile dma_status0_r &set_m2m_idle(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 4) & word0) | ((((1U << 1) - 1) & value) << 4);
         return *this;
     }
     CONSTEXPR uint32_t get_ofm_idle() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 5));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 5);
         return value;
     }
     uint32_t get_ofm_idle() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 5));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 5);
         return value;
     }
     CONSTEXPR dma_status0_r &set_ofm_idle(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 5) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 5);
+        word0 = (((~((1U << 1) - 1)) << 5) & word0) | ((((1U << 1) - 1) & value) << 5);
+        return *this;
+    }
+    volatile dma_status0_r &set_ofm_idle(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 5) & word0) | ((((1U << 1) - 1) & value) << 5);
         return *this;
     }
     CONSTEXPR uint32_t get_halt_req() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 6));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 6);
         return value;
     }
     uint32_t get_halt_req() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 6));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 6);
         return value;
     }
     CONSTEXPR dma_status0_r &set_halt_req(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 6) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 6);
+        word0 = (((~((1U << 1) - 1)) << 6) & word0) | ((((1U << 1) - 1) & value) << 6);
+        return *this;
+    }
+    volatile dma_status0_r &set_halt_req(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 6) & word0) | ((((1U << 1) - 1) & value) << 6);
         return *this;
     }
     CONSTEXPR uint32_t get_halt_ack() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 7));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 7);
         return value;
     }
     uint32_t get_halt_ack() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 7));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 7);
         return value;
     }
     CONSTEXPR dma_status0_r &set_halt_ack(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 7) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 7);
+        word0 = (((~((1U << 1) - 1)) << 7) & word0) | ((((1U << 1) - 1) & value) << 7);
+        return *this;
+    }
+    volatile dma_status0_r &set_halt_ack(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 7) & word0) | ((((1U << 1) - 1) & value) << 7);
         return *this;
     }
     CONSTEXPR uint32_t get_pause_req() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 8));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 8);
         return value;
     }
     uint32_t get_pause_req() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 8));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 8);
         return value;
     }
     CONSTEXPR dma_status0_r &set_pause_req(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 8) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 8);
+        word0 = (((~((1U << 1) - 1)) << 8) & word0) | ((((1U << 1) - 1) & value) << 8);
+        return *this;
+    }
+    volatile dma_status0_r &set_pause_req(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 8) & word0) | ((((1U << 1) - 1) & value) << 8);
         return *this;
     }
     CONSTEXPR uint32_t get_pause_ack() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 9));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 9);
         return value;
     }
     uint32_t get_pause_ack() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 9));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 9);
         return value;
     }
     CONSTEXPR dma_status0_r &set_pause_ack(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 9) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 9);
+        word0 = (((~((1U << 1) - 1)) << 9) & word0) | ((((1U << 1) - 1) & value) << 9);
+        return *this;
+    }
+    volatile dma_status0_r &set_pause_ack(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 9) & word0) | ((((1U << 1) - 1) & value) << 9);
         return *this;
     }
     CONSTEXPR uint32_t get_ib0_ai_valid_c0() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 10));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 10);
         return value;
     }
     uint32_t get_ib0_ai_valid_c0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 10));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 10);
         return value;
     }
     CONSTEXPR dma_status0_r &set_ib0_ai_valid_c0(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 10) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 10);
+        word0 = (((~((1U << 1) - 1)) << 10) & word0) | ((((1U << 1) - 1) & value) << 10);
+        return *this;
+    }
+    volatile dma_status0_r &set_ib0_ai_valid_c0(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 10) & word0) | ((((1U << 1) - 1) & value) << 10);
         return *this;
     }
     CONSTEXPR uint32_t get_ib0_ai_ready_c0() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 11));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 11);
         return value;
     }
     uint32_t get_ib0_ai_ready_c0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 11));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 11);
         return value;
     }
     CONSTEXPR dma_status0_r &set_ib0_ai_ready_c0(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 11) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 11);
+        word0 = (((~((1U << 1) - 1)) << 11) & word0) | ((((1U << 1) - 1) & value) << 11);
+        return *this;
+    }
+    volatile dma_status0_r &set_ib0_ai_ready_c0(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 11) & word0) | ((((1U << 1) - 1) & value) << 11);
         return *this;
     }
     CONSTEXPR uint32_t get_ib1_ai_valid_c0() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 12));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 12);
         return value;
     }
     uint32_t get_ib1_ai_valid_c0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 12));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 12);
         return value;
     }
     CONSTEXPR dma_status0_r &set_ib1_ai_valid_c0(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 12) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 12);
+        word0 = (((~((1U << 1) - 1)) << 12) & word0) | ((((1U << 1) - 1) & value) << 12);
+        return *this;
+    }
+    volatile dma_status0_r &set_ib1_ai_valid_c0(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 12) & word0) | ((((1U << 1) - 1) & value) << 12);
         return *this;
     }
     CONSTEXPR uint32_t get_ib1_ai_ready_c0() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 13));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 13);
         return value;
     }
     uint32_t get_ib1_ai_ready_c0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 13));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 13);
         return value;
     }
     CONSTEXPR dma_status0_r &set_ib1_ai_ready_c0(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 13) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 13);
+        word0 = (((~((1U << 1) - 1)) << 13) & word0) | ((((1U << 1) - 1) & value) << 13);
+        return *this;
+    }
+    volatile dma_status0_r &set_ib1_ai_ready_c0(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 13) & word0) | ((((1U << 1) - 1) & value) << 13);
         return *this;
     }
     CONSTEXPR uint32_t get_ib0_ao_valid_c0() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 14));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 14);
         return value;
     }
     uint32_t get_ib0_ao_valid_c0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 14));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 14);
         return value;
     }
     CONSTEXPR dma_status0_r &set_ib0_ao_valid_c0(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 14) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 14);
+        word0 = (((~((1U << 1) - 1)) << 14) & word0) | ((((1U << 1) - 1) & value) << 14);
+        return *this;
+    }
+    volatile dma_status0_r &set_ib0_ao_valid_c0(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 14) & word0) | ((((1U << 1) - 1) & value) << 14);
         return *this;
     }
     CONSTEXPR uint32_t get_ib0_ao_ready_c0() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 15));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 15);
         return value;
     }
     uint32_t get_ib0_ao_ready_c0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 15));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 15);
         return value;
     }
     CONSTEXPR dma_status0_r &set_ib0_ao_ready_c0(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 15) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 15);
+        word0 = (((~((1U << 1) - 1)) << 15) & word0) | ((((1U << 1) - 1) & value) << 15);
+        return *this;
+    }
+    volatile dma_status0_r &set_ib0_ao_ready_c0(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 15) & word0) | ((((1U << 1) - 1) & value) << 15);
         return *this;
     }
     CONSTEXPR uint32_t get_ib1_ao_valid_c0() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 16));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 16);
         return value;
     }
     uint32_t get_ib1_ao_valid_c0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 16));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 16);
         return value;
     }
     CONSTEXPR dma_status0_r &set_ib1_ao_valid_c0(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 16) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 16);
+        word0 = (((~((1U << 1) - 1)) << 16) & word0) | ((((1U << 1) - 1) & value) << 16);
+        return *this;
+    }
+    volatile dma_status0_r &set_ib1_ao_valid_c0(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 16) & word0) | ((((1U << 1) - 1) & value) << 16);
         return *this;
     }
     CONSTEXPR uint32_t get_ib1_ao_ready_c0() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 17));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 17);
         return value;
     }
     uint32_t get_ib1_ao_ready_c0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 17));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 17);
         return value;
     }
     CONSTEXPR dma_status0_r &set_ib1_ao_ready_c0(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 17) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 17);
+        word0 = (((~((1U << 1) - 1)) << 17) & word0) | ((((1U << 1) - 1) & value) << 17);
+        return *this;
+    }
+    volatile dma_status0_r &set_ib1_ao_ready_c0(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 17) & word0) | ((((1U << 1) - 1) & value) << 17);
         return *this;
     }
     CONSTEXPR uint32_t get_ob0_valid_c0() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 18));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 18);
         return value;
     }
     uint32_t get_ob0_valid_c0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 18));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 18);
         return value;
     }
     CONSTEXPR dma_status0_r &set_ob0_valid_c0(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 18) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 18);
+        word0 = (((~((1U << 1) - 1)) << 18) & word0) | ((((1U << 1) - 1) & value) << 18);
+        return *this;
+    }
+    volatile dma_status0_r &set_ob0_valid_c0(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 18) & word0) | ((((1U << 1) - 1) & value) << 18);
         return *this;
     }
     CONSTEXPR uint32_t get_ob0_ready_c0() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 19));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 19);
         return value;
     }
     uint32_t get_ob0_ready_c0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 19));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 19);
         return value;
     }
     CONSTEXPR dma_status0_r &set_ob0_ready_c0(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 19) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 19);
+        word0 = (((~((1U << 1) - 1)) << 19) & word0) | ((((1U << 1) - 1) & value) << 19);
+        return *this;
+    }
+    volatile dma_status0_r &set_ob0_ready_c0(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 19) & word0) | ((((1U << 1) - 1) & value) << 19);
         return *this;
     }
     CONSTEXPR uint32_t get_ob1_valid_c0() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 20));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 20);
         return value;
     }
     uint32_t get_ob1_valid_c0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 20));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 20);
         return value;
     }
     CONSTEXPR dma_status0_r &set_ob1_valid_c0(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 20) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 20);
+        word0 = (((~((1U << 1) - 1)) << 20) & word0) | ((((1U << 1) - 1) & value) << 20);
+        return *this;
+    }
+    volatile dma_status0_r &set_ob1_valid_c0(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 20) & word0) | ((((1U << 1) - 1) & value) << 20);
         return *this;
     }
     CONSTEXPR uint32_t get_ob1_ready_c0() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 21));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 21);
         return value;
     }
     uint32_t get_ob1_ready_c0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 21));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 21);
         return value;
     }
     CONSTEXPR dma_status0_r &set_ob1_ready_c0(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 21) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 21);
+        word0 = (((~((1U << 1) - 1)) << 21) & word0) | ((((1U << 1) - 1) & value) << 21);
+        return *this;
+    }
+    volatile dma_status0_r &set_ob1_ready_c0(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 21) & word0) | ((((1U << 1) - 1) & value) << 21);
         return *this;
     }
     CONSTEXPR uint32_t get_cmd_valid() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 22));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 22);
         return value;
     }
     uint32_t get_cmd_valid() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 22));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 22);
         return value;
     }
     CONSTEXPR dma_status0_r &set_cmd_valid(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 22) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 22);
+        word0 = (((~((1U << 1) - 1)) << 22) & word0) | ((((1U << 1) - 1) & value) << 22);
+        return *this;
+    }
+    volatile dma_status0_r &set_cmd_valid(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 22) & word0) | ((((1U << 1) - 1) & value) << 22);
         return *this;
     }
     CONSTEXPR uint32_t get_cmd_ready() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 23));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 23);
         return value;
     }
     uint32_t get_cmd_ready() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 23));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 23);
         return value;
     }
     CONSTEXPR dma_status0_r &set_cmd_ready(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 23) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 23);
+        word0 = (((~((1U << 1) - 1)) << 23) & word0) | ((((1U << 1) - 1) & value) << 23);
+        return *this;
+    }
+    volatile dma_status0_r &set_cmd_ready(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 23) & word0) | ((((1U << 1) - 1) & value) << 23);
         return *this;
     }
     CONSTEXPR uint32_t get_wd_bitstream_valid_c0() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 24));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 24);
         return value;
     }
     uint32_t get_wd_bitstream_valid_c0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 24));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 24);
         return value;
     }
     CONSTEXPR dma_status0_r &set_wd_bitstream_valid_c0(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 24) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 24);
+        word0 = (((~((1U << 1) - 1)) << 24) & word0) | ((((1U << 1) - 1) & value) << 24);
+        return *this;
+    }
+    volatile dma_status0_r &set_wd_bitstream_valid_c0(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 24) & word0) | ((((1U << 1) - 1) & value) << 24);
         return *this;
     }
     CONSTEXPR uint32_t get_wd_bitstream_ready_c0() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 25));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 25);
         return value;
     }
     uint32_t get_wd_bitstream_ready_c0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 25));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 25);
         return value;
     }
     CONSTEXPR dma_status0_r &set_wd_bitstream_ready_c0(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 25) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 25);
+        word0 = (((~((1U << 1) - 1)) << 25) & word0) | ((((1U << 1) - 1) & value) << 25);
+        return *this;
+    }
+    volatile dma_status0_r &set_wd_bitstream_ready_c0(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 25) & word0) | ((((1U << 1) - 1) & value) << 25);
         return *this;
     }
     CONSTEXPR uint32_t get_bs_bitstream_valid_c0() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 26));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 26);
         return value;
     }
     uint32_t get_bs_bitstream_valid_c0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 26));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 26);
         return value;
     }
     CONSTEXPR dma_status0_r &set_bs_bitstream_valid_c0(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 26) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 26);
+        word0 = (((~((1U << 1) - 1)) << 26) & word0) | ((((1U << 1) - 1) & value) << 26);
+        return *this;
+    }
+    volatile dma_status0_r &set_bs_bitstream_valid_c0(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 26) & word0) | ((((1U << 1) - 1) & value) << 26);
         return *this;
     }
     CONSTEXPR uint32_t get_bs_bitstream_ready_c0() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 27));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 27);
         return value;
     }
     uint32_t get_bs_bitstream_ready_c0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 27));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 27);
         return value;
     }
     CONSTEXPR dma_status0_r &set_bs_bitstream_ready_c0(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 27) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 27);
+        word0 = (((~((1U << 1) - 1)) << 27) & word0) | ((((1U << 1) - 1) & value) << 27);
+        return *this;
+    }
+    volatile dma_status0_r &set_bs_bitstream_ready_c0(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 27) & word0) | ((((1U << 1) - 1) & value) << 27);
         return *this;
     }
     CONSTEXPR uint32_t get_axi0_ar_stalled() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 28));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 28);
         return value;
     }
     uint32_t get_axi0_ar_stalled() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 28));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 28);
         return value;
     }
     CONSTEXPR dma_status0_r &set_axi0_ar_stalled(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 28) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 28);
+        word0 = (((~((1U << 1) - 1)) << 28) & word0) | ((((1U << 1) - 1) & value) << 28);
+        return *this;
+    }
+    volatile dma_status0_r &set_axi0_ar_stalled(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 28) & word0) | ((((1U << 1) - 1) & value) << 28);
         return *this;
     }
     CONSTEXPR uint32_t get_axi0_rd_limit_stall() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 29));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 29);
         return value;
     }
     uint32_t get_axi0_rd_limit_stall() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 29));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 29);
         return value;
     }
     CONSTEXPR dma_status0_r &set_axi0_rd_limit_stall(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 29) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 29);
+        word0 = (((~((1U << 1) - 1)) << 29) & word0) | ((((1U << 1) - 1) & value) << 29);
+        return *this;
+    }
+    volatile dma_status0_r &set_axi0_rd_limit_stall(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 29) & word0) | ((((1U << 1) - 1) & value) << 29);
         return *this;
     }
     CONSTEXPR uint32_t get_axi0_aw_stalled() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 30));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 30);
         return value;
     }
     uint32_t get_axi0_aw_stalled() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 30));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 30);
         return value;
     }
     CONSTEXPR dma_status0_r &set_axi0_aw_stalled(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 30) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 30);
+        word0 = (((~((1U << 1) - 1)) << 30) & word0) | ((((1U << 1) - 1) & value) << 30);
+        return *this;
+    }
+    volatile dma_status0_r &set_axi0_aw_stalled(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 30) & word0) | ((((1U << 1) - 1) & value) << 30);
         return *this;
     }
     CONSTEXPR uint32_t get_axi0_w_stalled() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 31));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 31);
         return value;
     }
     uint32_t get_axi0_w_stalled() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 31));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 31);
         return value;
     }
     CONSTEXPR dma_status0_r &set_axi0_w_stalled(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 31) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 31);
+        word0 = (((~((1U << 1) - 1)) << 31) & word0) | ((((1U << 1) - 1) & value) << 31);
+        return *this;
+    }
+    volatile dma_status0_r &set_axi0_w_stalled(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 31) & word0) | ((((1U << 1) - 1) & value) << 31);
         return *this;
     }
 #endif
@@ -4737,362 +6250,482 @@ struct dma_status1_r
     }
     CONSTEXPR uint32_t get_axi0_wr_limit_stall() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     uint32_t get_axi0_wr_limit_stall() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     CONSTEXPR dma_status1_r &set_axi0_wr_limit_stall(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 0);
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
+        return *this;
+    }
+    volatile dma_status1_r &set_axi0_wr_limit_stall(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
         return *this;
     }
     CONSTEXPR uint32_t get_axi1_ar_stalled() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     uint32_t get_axi1_ar_stalled() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     CONSTEXPR dma_status1_r &set_axi1_ar_stalled(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 1);
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
+        return *this;
+    }
+    volatile dma_status1_r &set_axi1_ar_stalled(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
         return *this;
     }
     CONSTEXPR uint32_t get_axi1_rd_limit_stall() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     uint32_t get_axi1_rd_limit_stall() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     CONSTEXPR dma_status1_r &set_axi1_rd_limit_stall(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 2);
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
+        return *this;
+    }
+    volatile dma_status1_r &set_axi1_rd_limit_stall(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
         return *this;
     }
     CONSTEXPR uint32_t get_axi1_wr_stalled() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     uint32_t get_axi1_wr_stalled() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     CONSTEXPR dma_status1_r &set_axi1_wr_stalled(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 3);
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
+        return *this;
+    }
+    volatile dma_status1_r &set_axi1_wr_stalled(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
         return *this;
     }
     CONSTEXPR uint32_t get_axi1_w_stalled() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 4));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 4);
         return value;
     }
     uint32_t get_axi1_w_stalled() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 4));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 4);
         return value;
     }
     CONSTEXPR dma_status1_r &set_axi1_w_stalled(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 4) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 4);
+        word0 = (((~((1U << 1) - 1)) << 4) & word0) | ((((1U << 1) - 1) & value) << 4);
+        return *this;
+    }
+    volatile dma_status1_r &set_axi1_w_stalled(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 4) & word0) | ((((1U << 1) - 1) & value) << 4);
         return *this;
     }
     CONSTEXPR uint32_t get_axi1_wr_limit_stall() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 5));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 5);
         return value;
     }
     uint32_t get_axi1_wr_limit_stall() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 5));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 5);
         return value;
     }
     CONSTEXPR dma_status1_r &set_axi1_wr_limit_stall(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 5) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 5);
+        word0 = (((~((1U << 1) - 1)) << 5) & word0) | ((((1U << 1) - 1) & value) << 5);
+        return *this;
+    }
+    volatile dma_status1_r &set_axi1_wr_limit_stall(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 5) & word0) | ((((1U << 1) - 1) & value) << 5);
         return *this;
     }
     CONSTEXPR uint32_t get_wgt_idle_c1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 6));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 6);
         return value;
     }
     uint32_t get_wgt_idle_c1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 6));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 6);
         return value;
     }
     CONSTEXPR dma_status1_r &set_wgt_idle_c1(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 6) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 6);
+        word0 = (((~((1U << 1) - 1)) << 6) & word0) | ((((1U << 1) - 1) & value) << 6);
+        return *this;
+    }
+    volatile dma_status1_r &set_wgt_idle_c1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 6) & word0) | ((((1U << 1) - 1) & value) << 6);
         return *this;
     }
     CONSTEXPR uint32_t get_bas_idle_c1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 7));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 7);
         return value;
     }
     uint32_t get_bas_idle_c1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 7));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 7);
         return value;
     }
     CONSTEXPR dma_status1_r &set_bas_idle_c1(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 7) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 7);
+        word0 = (((~((1U << 1) - 1)) << 7) & word0) | ((((1U << 1) - 1) & value) << 7);
+        return *this;
+    }
+    volatile dma_status1_r &set_bas_idle_c1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 7) & word0) | ((((1U << 1) - 1) & value) << 7);
         return *this;
     }
     CONSTEXPR uint32_t get_ib0_ai_valid_c1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 8));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 8);
         return value;
     }
     uint32_t get_ib0_ai_valid_c1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 8));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 8);
         return value;
     }
     CONSTEXPR dma_status1_r &set_ib0_ai_valid_c1(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 8) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 8);
+        word0 = (((~((1U << 1) - 1)) << 8) & word0) | ((((1U << 1) - 1) & value) << 8);
+        return *this;
+    }
+    volatile dma_status1_r &set_ib0_ai_valid_c1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 8) & word0) | ((((1U << 1) - 1) & value) << 8);
         return *this;
     }
     CONSTEXPR uint32_t get_ib0_ai_ready_c1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 9));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 9);
         return value;
     }
     uint32_t get_ib0_ai_ready_c1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 9));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 9);
         return value;
     }
     CONSTEXPR dma_status1_r &set_ib0_ai_ready_c1(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 9) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 9);
+        word0 = (((~((1U << 1) - 1)) << 9) & word0) | ((((1U << 1) - 1) & value) << 9);
+        return *this;
+    }
+    volatile dma_status1_r &set_ib0_ai_ready_c1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 9) & word0) | ((((1U << 1) - 1) & value) << 9);
         return *this;
     }
     CONSTEXPR uint32_t get_ib1_ai_valid_c1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 10));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 10);
         return value;
     }
     uint32_t get_ib1_ai_valid_c1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 10));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 10);
         return value;
     }
     CONSTEXPR dma_status1_r &set_ib1_ai_valid_c1(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 10) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 10);
+        word0 = (((~((1U << 1) - 1)) << 10) & word0) | ((((1U << 1) - 1) & value) << 10);
+        return *this;
+    }
+    volatile dma_status1_r &set_ib1_ai_valid_c1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 10) & word0) | ((((1U << 1) - 1) & value) << 10);
         return *this;
     }
     CONSTEXPR uint32_t get_ib1_ai_ready_c1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 11));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 11);
         return value;
     }
     uint32_t get_ib1_ai_ready_c1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 11));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 11);
         return value;
     }
     CONSTEXPR dma_status1_r &set_ib1_ai_ready_c1(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 11) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 11);
+        word0 = (((~((1U << 1) - 1)) << 11) & word0) | ((((1U << 1) - 1) & value) << 11);
+        return *this;
+    }
+    volatile dma_status1_r &set_ib1_ai_ready_c1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 11) & word0) | ((((1U << 1) - 1) & value) << 11);
         return *this;
     }
     CONSTEXPR uint32_t get_ib0_ao_valid_c1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 12));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 12);
         return value;
     }
     uint32_t get_ib0_ao_valid_c1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 12));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 12);
         return value;
     }
     CONSTEXPR dma_status1_r &set_ib0_ao_valid_c1(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 12) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 12);
+        word0 = (((~((1U << 1) - 1)) << 12) & word0) | ((((1U << 1) - 1) & value) << 12);
+        return *this;
+    }
+    volatile dma_status1_r &set_ib0_ao_valid_c1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 12) & word0) | ((((1U << 1) - 1) & value) << 12);
         return *this;
     }
     CONSTEXPR uint32_t get_ib0_ao_ready_c1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 13));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 13);
         return value;
     }
     uint32_t get_ib0_ao_ready_c1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 13));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 13);
         return value;
     }
     CONSTEXPR dma_status1_r &set_ib0_ao_ready_c1(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 13) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 13);
+        word0 = (((~((1U << 1) - 1)) << 13) & word0) | ((((1U << 1) - 1) & value) << 13);
+        return *this;
+    }
+    volatile dma_status1_r &set_ib0_ao_ready_c1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 13) & word0) | ((((1U << 1) - 1) & value) << 13);
         return *this;
     }
     CONSTEXPR uint32_t get_ib1_ao_valid_c1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 14));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 14);
         return value;
     }
     uint32_t get_ib1_ao_valid_c1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 14));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 14);
         return value;
     }
     CONSTEXPR dma_status1_r &set_ib1_ao_valid_c1(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 14) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 14);
+        word0 = (((~((1U << 1) - 1)) << 14) & word0) | ((((1U << 1) - 1) & value) << 14);
+        return *this;
+    }
+    volatile dma_status1_r &set_ib1_ao_valid_c1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 14) & word0) | ((((1U << 1) - 1) & value) << 14);
         return *this;
     }
     CONSTEXPR uint32_t get_ib1_ao_ready_c1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 15));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 15);
         return value;
     }
     uint32_t get_ib1_ao_ready_c1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 15));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 15);
         return value;
     }
     CONSTEXPR dma_status1_r &set_ib1_ao_ready_c1(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 15) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 15);
+        word0 = (((~((1U << 1) - 1)) << 15) & word0) | ((((1U << 1) - 1) & value) << 15);
+        return *this;
+    }
+    volatile dma_status1_r &set_ib1_ao_ready_c1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 15) & word0) | ((((1U << 1) - 1) & value) << 15);
         return *this;
     }
     CONSTEXPR uint32_t get_ob0_valid_c1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 16));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 16);
         return value;
     }
     uint32_t get_ob0_valid_c1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 16));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 16);
         return value;
     }
     CONSTEXPR dma_status1_r &set_ob0_valid_c1(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 16) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 16);
+        word0 = (((~((1U << 1) - 1)) << 16) & word0) | ((((1U << 1) - 1) & value) << 16);
+        return *this;
+    }
+    volatile dma_status1_r &set_ob0_valid_c1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 16) & word0) | ((((1U << 1) - 1) & value) << 16);
         return *this;
     }
     CONSTEXPR uint32_t get_ob0_ready_c1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 17));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 17);
         return value;
     }
     uint32_t get_ob0_ready_c1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 17));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 17);
         return value;
     }
     CONSTEXPR dma_status1_r &set_ob0_ready_c1(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 17) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 17);
+        word0 = (((~((1U << 1) - 1)) << 17) & word0) | ((((1U << 1) - 1) & value) << 17);
+        return *this;
+    }
+    volatile dma_status1_r &set_ob0_ready_c1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 17) & word0) | ((((1U << 1) - 1) & value) << 17);
         return *this;
     }
     CONSTEXPR uint32_t get_ob1_valid_c1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 18));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 18);
         return value;
     }
     uint32_t get_ob1_valid_c1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 18));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 18);
         return value;
     }
     CONSTEXPR dma_status1_r &set_ob1_valid_c1(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 18) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 18);
+        word0 = (((~((1U << 1) - 1)) << 18) & word0) | ((((1U << 1) - 1) & value) << 18);
+        return *this;
+    }
+    volatile dma_status1_r &set_ob1_valid_c1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 18) & word0) | ((((1U << 1) - 1) & value) << 18);
         return *this;
     }
     CONSTEXPR uint32_t get_ob1_ready_c1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 19));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 19);
         return value;
     }
     uint32_t get_ob1_ready_c1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 19));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 19);
         return value;
     }
     CONSTEXPR dma_status1_r &set_ob1_ready_c1(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 19) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 19);
+        word0 = (((~((1U << 1) - 1)) << 19) & word0) | ((((1U << 1) - 1) & value) << 19);
+        return *this;
+    }
+    volatile dma_status1_r &set_ob1_ready_c1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 19) & word0) | ((((1U << 1) - 1) & value) << 19);
         return *this;
     }
     CONSTEXPR uint32_t get_wd_bitstream_valid_c1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 20));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 20);
         return value;
     }
     uint32_t get_wd_bitstream_valid_c1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 20));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 20);
         return value;
     }
     CONSTEXPR dma_status1_r &set_wd_bitstream_valid_c1(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 20) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 20);
+        word0 = (((~((1U << 1) - 1)) << 20) & word0) | ((((1U << 1) - 1) & value) << 20);
+        return *this;
+    }
+    volatile dma_status1_r &set_wd_bitstream_valid_c1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 20) & word0) | ((((1U << 1) - 1) & value) << 20);
         return *this;
     }
     CONSTEXPR uint32_t get_wd_bitstream_ready_c1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 21));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 21);
         return value;
     }
     uint32_t get_wd_bitstream_ready_c1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 21));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 21);
         return value;
     }
     CONSTEXPR dma_status1_r &set_wd_bitstream_ready_c1(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 21) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 21);
+        word0 = (((~((1U << 1) - 1)) << 21) & word0) | ((((1U << 1) - 1) & value) << 21);
+        return *this;
+    }
+    volatile dma_status1_r &set_wd_bitstream_ready_c1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 21) & word0) | ((((1U << 1) - 1) & value) << 21);
         return *this;
     }
     CONSTEXPR uint32_t get_bs_bitstream_valid_c1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 22));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 22);
         return value;
     }
     uint32_t get_bs_bitstream_valid_c1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 22));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 22);
         return value;
     }
     CONSTEXPR dma_status1_r &set_bs_bitstream_valid_c1(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 22) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 22);
+        word0 = (((~((1U << 1) - 1)) << 22) & word0) | ((((1U << 1) - 1) & value) << 22);
+        return *this;
+    }
+    volatile dma_status1_r &set_bs_bitstream_valid_c1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 22) & word0) | ((((1U << 1) - 1) & value) << 22);
         return *this;
     }
     CONSTEXPR uint32_t get_bs_bitstream_ready_c1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 23));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 23);
         return value;
     }
     uint32_t get_bs_bitstream_ready_c1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 23));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 23);
         return value;
     }
     CONSTEXPR dma_status1_r &set_bs_bitstream_ready_c1(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 23) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 23);
+        word0 = (((~((1U << 1) - 1)) << 23) & word0) | ((((1U << 1) - 1) & value) << 23);
+        return *this;
+    }
+    volatile dma_status1_r &set_bs_bitstream_ready_c1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 23) & word0) | ((((1U << 1) - 1) & value) << 23);
         return *this;
     }
 #endif
@@ -5145,92 +6778,122 @@ struct clkforce_r
     }
     CONSTEXPR uint32_t get_top_level_clk() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     uint32_t get_top_level_clk() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     CONSTEXPR clkforce_r &set_top_level_clk(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 0);
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
+        return *this;
+    }
+    volatile clkforce_r &set_top_level_clk(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
         return *this;
     }
     CONSTEXPR uint32_t get_cc_clk() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     uint32_t get_cc_clk() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     CONSTEXPR clkforce_r &set_cc_clk(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 1);
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
+        return *this;
+    }
+    volatile clkforce_r &set_cc_clk(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
         return *this;
     }
     CONSTEXPR uint32_t get_dma_clk() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     uint32_t get_dma_clk() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     CONSTEXPR clkforce_r &set_dma_clk(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 2);
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
+        return *this;
+    }
+    volatile clkforce_r &set_dma_clk(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
         return *this;
     }
     CONSTEXPR uint32_t get_mac_clk() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     uint32_t get_mac_clk() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     CONSTEXPR clkforce_r &set_mac_clk(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 3);
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
+        return *this;
+    }
+    volatile clkforce_r &set_mac_clk(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
         return *this;
     }
     CONSTEXPR uint32_t get_ao_clk() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 4));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 4);
         return value;
     }
     uint32_t get_ao_clk() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 4));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 4);
         return value;
     }
     CONSTEXPR clkforce_r &set_ao_clk(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 4) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 4);
+        word0 = (((~((1U << 1) - 1)) << 4) & word0) | ((((1U << 1) - 1) & value) << 4);
+        return *this;
+    }
+    volatile clkforce_r &set_ao_clk(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 4) & word0) | ((((1U << 1) - 1) & value) << 4);
         return *this;
     }
     CONSTEXPR uint32_t get_wd_clk() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 5));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 5);
         return value;
     }
     uint32_t get_wd_clk() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 5));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 5);
         return value;
     }
     CONSTEXPR clkforce_r &set_wd_clk(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 5) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 5);
+        word0 = (((~((1U << 1) - 1)) << 5) & word0) | ((((1U << 1) - 1) & value) << 5);
+        return *this;
+    }
+    volatile clkforce_r &set_wd_clk(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 5) & word0) | ((((1U << 1) - 1) & value) << 5);
         return *this;
     }
 #endif
@@ -5277,17 +6940,22 @@ struct debug_address_r
     }
     CONSTEXPR uint32_t get_addr() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_addr() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR debug_address_r &set_addr(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile debug_address_r &set_addr(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -5334,17 +7002,22 @@ struct debug_misc_r
     }
     CONSTEXPR uint32_t get_misc() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_misc() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR debug_misc_r &set_misc(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile debug_misc_r &set_misc(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -5391,17 +7064,22 @@ struct debugcore_r
     }
     CONSTEXPR uint32_t get_core() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_core() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR debugcore_r &set_core(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile debugcore_r &set_core(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -5449,17 +7127,22 @@ struct debug_block_r
     }
     CONSTEXPR uint32_t get_block() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_block() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR debug_block_r &set_block(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile debug_block_r &set_block(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -5512,77 +7195,102 @@ struct pmcr_r
     }
     CONSTEXPR uint32_t get_cnt_en() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     uint32_t get_cnt_en() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     CONSTEXPR pmcr_r &set_cnt_en(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 0);
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
+        return *this;
+    }
+    volatile pmcr_r &set_cnt_en(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
         return *this;
     }
     CONSTEXPR uint32_t get_event_cnt_rst() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     uint32_t get_event_cnt_rst() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     CONSTEXPR pmcr_r &set_event_cnt_rst(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 1);
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
+        return *this;
+    }
+    volatile pmcr_r &set_event_cnt_rst(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
         return *this;
     }
     CONSTEXPR uint32_t get_cycle_cnt_rst() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     uint32_t get_cycle_cnt_rst() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     CONSTEXPR pmcr_r &set_cycle_cnt_rst(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 2);
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
+        return *this;
+    }
+    volatile pmcr_r &set_cycle_cnt_rst(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
         return *this;
     }
     CONSTEXPR uint32_t get_mask_en() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     uint32_t get_mask_en() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     CONSTEXPR pmcr_r &set_mask_en(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 3);
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
+        return *this;
+    }
+    volatile pmcr_r &set_mask_en(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
         return *this;
     }
     CONSTEXPR uint32_t get_num_event_cnt() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 5) - 1) & (word0 >> 11));
+        uint32_t value = ((1U << 5) - 1) & (word0 >> 11);
         return value;
     }
     uint32_t get_num_event_cnt() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 5) - 1) & (word0 >> 11));
+        uint32_t value = ((1U << 5) - 1) & (word0 >> 11);
         return value;
     }
     CONSTEXPR pmcr_r &set_num_event_cnt(uint32_t value)
     {
-        word0 = (((~((1U << 5) - 1)) << 11) & word0) | ((((1U << 5) - 1) & static_cast<uint32_t>(value)) << 11);
+        word0 = (((~((1U << 5) - 1)) << 11) & word0) | ((((1U << 5) - 1) & value) << 11);
+        return *this;
+    }
+    volatile pmcr_r &set_num_event_cnt(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 5) - 1)) << 11) & word0) | ((((1U << 5) - 1) & value) << 11);
         return *this;
     }
 #endif
@@ -5634,77 +7342,102 @@ struct pmcntenset_r
     }
     CONSTEXPR uint32_t get_EVENT_CNT_0() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     uint32_t get_EVENT_CNT_0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     CONSTEXPR pmcntenset_r &set_EVENT_CNT_0(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 0);
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
+        return *this;
+    }
+    volatile pmcntenset_r &set_EVENT_CNT_0(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
         return *this;
     }
     CONSTEXPR uint32_t get_EVENT_CNT_1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     uint32_t get_EVENT_CNT_1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     CONSTEXPR pmcntenset_r &set_EVENT_CNT_1(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 1);
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
+        return *this;
+    }
+    volatile pmcntenset_r &set_EVENT_CNT_1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
         return *this;
     }
     CONSTEXPR uint32_t get_EVENT_CNT_2() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     uint32_t get_EVENT_CNT_2() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     CONSTEXPR pmcntenset_r &set_EVENT_CNT_2(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 2);
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
+        return *this;
+    }
+    volatile pmcntenset_r &set_EVENT_CNT_2(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
         return *this;
     }
     CONSTEXPR uint32_t get_EVENT_CNT_3() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     uint32_t get_EVENT_CNT_3() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     CONSTEXPR pmcntenset_r &set_EVENT_CNT_3(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 3);
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
+        return *this;
+    }
+    volatile pmcntenset_r &set_EVENT_CNT_3(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
         return *this;
     }
     CONSTEXPR uint32_t get_CYCLE_CNT() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 31));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 31);
         return value;
     }
     uint32_t get_CYCLE_CNT() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 31));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 31);
         return value;
     }
     CONSTEXPR pmcntenset_r &set_CYCLE_CNT(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 31) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 31);
+        word0 = (((~((1U << 1) - 1)) << 31) & word0) | ((((1U << 1) - 1) & value) << 31);
+        return *this;
+    }
+    volatile pmcntenset_r &set_CYCLE_CNT(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 31) & word0) | ((((1U << 1) - 1) & value) << 31);
         return *this;
     }
 #endif
@@ -5756,77 +7489,102 @@ struct pmcntenclr_r
     }
     CONSTEXPR uint32_t get_EVENT_CNT_0() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     uint32_t get_EVENT_CNT_0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     CONSTEXPR pmcntenclr_r &set_EVENT_CNT_0(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 0);
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
+        return *this;
+    }
+    volatile pmcntenclr_r &set_EVENT_CNT_0(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
         return *this;
     }
     CONSTEXPR uint32_t get_EVENT_CNT_1() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     uint32_t get_EVENT_CNT_1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     CONSTEXPR pmcntenclr_r &set_EVENT_CNT_1(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 1);
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
+        return *this;
+    }
+    volatile pmcntenclr_r &set_EVENT_CNT_1(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
         return *this;
     }
     CONSTEXPR uint32_t get_EVENT_CNT_2() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     uint32_t get_EVENT_CNT_2() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     CONSTEXPR pmcntenclr_r &set_EVENT_CNT_2(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 2);
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
+        return *this;
+    }
+    volatile pmcntenclr_r &set_EVENT_CNT_2(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
         return *this;
     }
     CONSTEXPR uint32_t get_EVENT_CNT_3() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     uint32_t get_EVENT_CNT_3() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     CONSTEXPR pmcntenclr_r &set_EVENT_CNT_3(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 3);
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
+        return *this;
+    }
+    volatile pmcntenclr_r &set_EVENT_CNT_3(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
         return *this;
     }
     CONSTEXPR uint32_t get_CYCLE_CNT() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 31));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 31);
         return value;
     }
     uint32_t get_CYCLE_CNT() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 31));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 31);
         return value;
     }
     CONSTEXPR pmcntenclr_r &set_CYCLE_CNT(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 31) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 31);
+        word0 = (((~((1U << 1) - 1)) << 31) & word0) | ((((1U << 1) - 1) & value) << 31);
+        return *this;
+    }
+    volatile pmcntenclr_r &set_CYCLE_CNT(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 31) & word0) | ((((1U << 1) - 1) & value) << 31);
         return *this;
     }
 #endif
@@ -5878,77 +7636,102 @@ struct pmovsset_r
     }
     CONSTEXPR uint32_t get_EVENT_CNT_0_OVF() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     uint32_t get_EVENT_CNT_0_OVF() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     CONSTEXPR pmovsset_r &set_EVENT_CNT_0_OVF(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 0);
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
+        return *this;
+    }
+    volatile pmovsset_r &set_EVENT_CNT_0_OVF(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
         return *this;
     }
     CONSTEXPR uint32_t get_EVENT_CNT_1_OVF() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     uint32_t get_EVENT_CNT_1_OVF() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     CONSTEXPR pmovsset_r &set_EVENT_CNT_1_OVF(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 1);
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
+        return *this;
+    }
+    volatile pmovsset_r &set_EVENT_CNT_1_OVF(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
         return *this;
     }
     CONSTEXPR uint32_t get_EVENT_CNT_2_OVF() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     uint32_t get_EVENT_CNT_2_OVF() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     CONSTEXPR pmovsset_r &set_EVENT_CNT_2_OVF(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 2);
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
+        return *this;
+    }
+    volatile pmovsset_r &set_EVENT_CNT_2_OVF(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
         return *this;
     }
     CONSTEXPR uint32_t get_EVENT_CNT_3_OVF() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     uint32_t get_EVENT_CNT_3_OVF() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     CONSTEXPR pmovsset_r &set_EVENT_CNT_3_OVF(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 3);
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
+        return *this;
+    }
+    volatile pmovsset_r &set_EVENT_CNT_3_OVF(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
         return *this;
     }
     CONSTEXPR uint32_t get_CYCLE_CNT_OVF() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 31));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 31);
         return value;
     }
     uint32_t get_CYCLE_CNT_OVF() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 31));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 31);
         return value;
     }
     CONSTEXPR pmovsset_r &set_CYCLE_CNT_OVF(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 31) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 31);
+        word0 = (((~((1U << 1) - 1)) << 31) & word0) | ((((1U << 1) - 1) & value) << 31);
+        return *this;
+    }
+    volatile pmovsset_r &set_CYCLE_CNT_OVF(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 31) & word0) | ((((1U << 1) - 1) & value) << 31);
         return *this;
     }
 #endif
@@ -6000,77 +7783,102 @@ struct pmovsclr_r
     }
     CONSTEXPR uint32_t get_EVENT_CNT_0_OVF() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     uint32_t get_EVENT_CNT_0_OVF() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     CONSTEXPR pmovsclr_r &set_EVENT_CNT_0_OVF(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 0);
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
+        return *this;
+    }
+    volatile pmovsclr_r &set_EVENT_CNT_0_OVF(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
         return *this;
     }
     CONSTEXPR uint32_t get_EVENT_CNT_1_OVF() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     uint32_t get_EVENT_CNT_1_OVF() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     CONSTEXPR pmovsclr_r &set_EVENT_CNT_1_OVF(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 1);
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
+        return *this;
+    }
+    volatile pmovsclr_r &set_EVENT_CNT_1_OVF(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
         return *this;
     }
     CONSTEXPR uint32_t get_EVENT_CNT_2_OVF() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     uint32_t get_EVENT_CNT_2_OVF() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     CONSTEXPR pmovsclr_r &set_EVENT_CNT_2_OVF(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 2);
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
+        return *this;
+    }
+    volatile pmovsclr_r &set_EVENT_CNT_2_OVF(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
         return *this;
     }
     CONSTEXPR uint32_t get_EVENT_CNT_3_OVF() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     uint32_t get_EVENT_CNT_3_OVF() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     CONSTEXPR pmovsclr_r &set_EVENT_CNT_3_OVF(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 3);
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
+        return *this;
+    }
+    volatile pmovsclr_r &set_EVENT_CNT_3_OVF(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
         return *this;
     }
     CONSTEXPR uint32_t get_CYCLE_CNT_OVF() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 31));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 31);
         return value;
     }
     uint32_t get_CYCLE_CNT_OVF() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 31));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 31);
         return value;
     }
     CONSTEXPR pmovsclr_r &set_CYCLE_CNT_OVF(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 31) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 31);
+        word0 = (((~((1U << 1) - 1)) << 31) & word0) | ((((1U << 1) - 1) & value) << 31);
+        return *this;
+    }
+    volatile pmovsclr_r &set_CYCLE_CNT_OVF(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 31) & word0) | ((((1U << 1) - 1) & value) << 31);
         return *this;
     }
 #endif
@@ -6122,77 +7930,102 @@ struct pmintset_r
     }
     CONSTEXPR uint32_t get_EVENT_CNT_0_INT() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     uint32_t get_EVENT_CNT_0_INT() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     CONSTEXPR pmintset_r &set_EVENT_CNT_0_INT(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 0);
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
+        return *this;
+    }
+    volatile pmintset_r &set_EVENT_CNT_0_INT(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
         return *this;
     }
     CONSTEXPR uint32_t get_EVENT_CNT_1_INT() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     uint32_t get_EVENT_CNT_1_INT() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     CONSTEXPR pmintset_r &set_EVENT_CNT_1_INT(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 1);
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
+        return *this;
+    }
+    volatile pmintset_r &set_EVENT_CNT_1_INT(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
         return *this;
     }
     CONSTEXPR uint32_t get_EVENT_CNT_2_INT() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     uint32_t get_EVENT_CNT_2_INT() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     CONSTEXPR pmintset_r &set_EVENT_CNT_2_INT(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 2);
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
+        return *this;
+    }
+    volatile pmintset_r &set_EVENT_CNT_2_INT(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
         return *this;
     }
     CONSTEXPR uint32_t get_EVENT_CNT_3_INT() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     uint32_t get_EVENT_CNT_3_INT() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     CONSTEXPR pmintset_r &set_EVENT_CNT_3_INT(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 3);
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
+        return *this;
+    }
+    volatile pmintset_r &set_EVENT_CNT_3_INT(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
         return *this;
     }
     CONSTEXPR uint32_t get_CYCLE_CNT_INT() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 31));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 31);
         return value;
     }
     uint32_t get_CYCLE_CNT_INT() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 31));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 31);
         return value;
     }
     CONSTEXPR pmintset_r &set_CYCLE_CNT_INT(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 31) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 31);
+        word0 = (((~((1U << 1) - 1)) << 31) & word0) | ((((1U << 1) - 1) & value) << 31);
+        return *this;
+    }
+    volatile pmintset_r &set_CYCLE_CNT_INT(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 31) & word0) | ((((1U << 1) - 1) & value) << 31);
         return *this;
     }
 #endif
@@ -6244,77 +8077,102 @@ struct pmintclr_r
     }
     CONSTEXPR uint32_t get_EVENT_CNT_0_INT() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     uint32_t get_EVENT_CNT_0_INT() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 0));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 0);
         return value;
     }
     CONSTEXPR pmintclr_r &set_EVENT_CNT_0_INT(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 0);
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
+        return *this;
+    }
+    volatile pmintclr_r &set_EVENT_CNT_0_INT(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 0) & word0) | ((((1U << 1) - 1) & value) << 0);
         return *this;
     }
     CONSTEXPR uint32_t get_EVENT_CNT_1_INT() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     uint32_t get_EVENT_CNT_1_INT() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 1));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 1);
         return value;
     }
     CONSTEXPR pmintclr_r &set_EVENT_CNT_1_INT(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 1);
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
+        return *this;
+    }
+    volatile pmintclr_r &set_EVENT_CNT_1_INT(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 1) & word0) | ((((1U << 1) - 1) & value) << 1);
         return *this;
     }
     CONSTEXPR uint32_t get_EVENT_CNT_2_INT() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     uint32_t get_EVENT_CNT_2_INT() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 2));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 2);
         return value;
     }
     CONSTEXPR pmintclr_r &set_EVENT_CNT_2_INT(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 2);
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
+        return *this;
+    }
+    volatile pmintclr_r &set_EVENT_CNT_2_INT(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 2) & word0) | ((((1U << 1) - 1) & value) << 2);
         return *this;
     }
     CONSTEXPR uint32_t get_EVENT_CNT_3_INT() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     uint32_t get_EVENT_CNT_3_INT() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 3));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 3);
         return value;
     }
     CONSTEXPR pmintclr_r &set_EVENT_CNT_3_INT(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 3);
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
+        return *this;
+    }
+    volatile pmintclr_r &set_EVENT_CNT_3_INT(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 3) & word0) | ((((1U << 1) - 1) & value) << 3);
         return *this;
     }
     CONSTEXPR uint32_t get_CYCLE_CNT_INT() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 31));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 31);
         return value;
     }
     uint32_t get_CYCLE_CNT_INT() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 31));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 31);
         return value;
     }
     CONSTEXPR pmintclr_r &set_CYCLE_CNT_INT(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 31) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 31);
+        word0 = (((~((1U << 1) - 1)) << 31) & word0) | ((((1U << 1) - 1) & value) << 31);
+        return *this;
+    }
+    volatile pmintclr_r &set_CYCLE_CNT_INT(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 31) & word0) | ((((1U << 1) - 1) & value) << 31);
         return *this;
     }
 #endif
@@ -6342,19 +8200,19 @@ struct pmccntr_r
   public:
     CONSTEXPR pmccntr_r() : word0(0), word1(0) {}
     CONSTEXPR pmccntr_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -6428,6 +8286,11 @@ struct pmccntr_cfg_r
         word0 = (((~((1U << 10) - 1)) << 0) & word0) | ((((1U << 10) - 1) & static_cast<uint32_t>(value)) << 0);
         return *this;
     }
+    volatile pmccntr_cfg_r &set_CYCLE_CNT_CFG_START(NPU_NAMESPACE::pmu_event value) volatile
+    {
+        word0 = (((~((1U << 10) - 1)) << 0) & word0) | ((((1U << 10) - 1) & static_cast<uint32_t>(value)) << 0);
+        return *this;
+    }
     CONSTEXPR NPU_NAMESPACE::pmu_event get_CYCLE_CNT_CFG_STOP() const
     {
         NPU_NAMESPACE::pmu_event value = static_cast<NPU_NAMESPACE::pmu_event>(((1U << 10) - 1) & (word0 >> 16));
@@ -6439,6 +8302,11 @@ struct pmccntr_cfg_r
         return value;
     }
     CONSTEXPR pmccntr_cfg_r &set_CYCLE_CNT_CFG_STOP(NPU_NAMESPACE::pmu_event value)
+    {
+        word0 = (((~((1U << 10) - 1)) << 16) & word0) | ((((1U << 10) - 1) & static_cast<uint32_t>(value)) << 16);
+        return *this;
+    }
+    volatile pmccntr_cfg_r &set_CYCLE_CNT_CFG_STOP(NPU_NAMESPACE::pmu_event value) volatile
     {
         word0 = (((~((1U << 10) - 1)) << 16) & word0) | ((((1U << 10) - 1) & static_cast<uint32_t>(value)) << 16);
         return *this;
@@ -6506,34 +8374,49 @@ struct pmcaxi_chan_r
         word0 = (((~((1U << 4) - 1)) << 0) & word0) | ((((1U << 4) - 1) & static_cast<uint32_t>(value)) << 0);
         return *this;
     }
+    volatile pmcaxi_chan_r &set_CH_SEL(NPU_NAMESPACE::pmu_axi_channel value) volatile
+    {
+        word0 = (((~((1U << 4) - 1)) << 0) & word0) | ((((1U << 4) - 1) & static_cast<uint32_t>(value)) << 0);
+        return *this;
+    }
     CONSTEXPR uint32_t get_AXI_CNT_SEL() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 2) - 1) & (word0 >> 8));
+        uint32_t value = ((1U << 2) - 1) & (word0 >> 8);
         return value;
     }
     uint32_t get_AXI_CNT_SEL() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 2) - 1) & (word0 >> 8));
+        uint32_t value = ((1U << 2) - 1) & (word0 >> 8);
         return value;
     }
     CONSTEXPR pmcaxi_chan_r &set_AXI_CNT_SEL(uint32_t value)
     {
-        word0 = (((~((1U << 2) - 1)) << 8) & word0) | ((((1U << 2) - 1) & static_cast<uint32_t>(value)) << 8);
+        word0 = (((~((1U << 2) - 1)) << 8) & word0) | ((((1U << 2) - 1) & value) << 8);
+        return *this;
+    }
+    volatile pmcaxi_chan_r &set_AXI_CNT_SEL(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 2) - 1)) << 8) & word0) | ((((1U << 2) - 1) & value) << 8);
         return *this;
     }
     CONSTEXPR uint32_t get_BW_CH_SEL_EN() const
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 10));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 10);
         return value;
     }
     uint32_t get_BW_CH_SEL_EN() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(((1U << 1) - 1) & (word0 >> 10));
+        uint32_t value = ((1U << 1) - 1) & (word0 >> 10);
         return value;
     }
     CONSTEXPR pmcaxi_chan_r &set_BW_CH_SEL_EN(uint32_t value)
     {
-        word0 = (((~((1U << 1) - 1)) << 10) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 10);
+        word0 = (((~((1U << 1) - 1)) << 10) & word0) | ((((1U << 1) - 1) & value) << 10);
+        return *this;
+    }
+    volatile pmcaxi_chan_r &set_BW_CH_SEL_EN(uint32_t value) volatile
+    {
+        word0 = (((~((1U << 1) - 1)) << 10) & word0) | ((((1U << 1) - 1) & value) << 10);
         return *this;
     }
 #endif
@@ -6580,17 +8463,22 @@ struct kernel_x_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR kernel_x_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile kernel_x_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -6637,17 +8525,22 @@ struct kernel_y_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR kernel_y_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile kernel_y_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -6694,17 +8587,22 @@ struct kernel_w_m1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR kernel_w_m1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile kernel_w_m1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -6751,17 +8649,22 @@ struct kernel_h_m1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR kernel_h_m1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile kernel_h_m1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -6808,17 +8711,22 @@ struct ofm_cblk_width_m1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ofm_cblk_width_m1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ofm_cblk_width_m1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -6865,17 +8773,22 @@ struct ofm_cblk_height_m1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ofm_cblk_height_m1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ofm_cblk_height_m1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -6922,17 +8835,22 @@ struct ofm_cblk_depth_m1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ofm_cblk_depth_m1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ofm_cblk_depth_m1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -6979,17 +8897,22 @@ struct ifm_cblk_depth_m1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm_cblk_depth_m1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm_cblk_depth_m1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -7036,17 +8959,22 @@ struct ofm_x_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ofm_x_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ofm_x_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -7093,17 +9021,22 @@ struct ofm_y_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ofm_y_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ofm_y_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -7150,17 +9083,22 @@ struct ofm_z_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ofm_z_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ofm_z_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -7207,17 +9145,22 @@ struct ifm_z_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm_z_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm_z_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -7264,17 +9207,22 @@ struct pad_top_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR pad_top_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile pad_top_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -7321,17 +9269,22 @@ struct pad_left_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR pad_left_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile pad_left_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -7378,17 +9331,22 @@ struct ifm_cblk_width_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm_cblk_width_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm_cblk_width_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -7435,17 +9393,22 @@ struct ifm_cblk_height_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm_cblk_height_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm_cblk_height_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -7473,19 +9436,19 @@ struct dma_ifm_src_r
   public:
     CONSTEXPR dma_ifm_src_r() : word0(0), word1(0) {}
     CONSTEXPR dma_ifm_src_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -7543,17 +9506,22 @@ struct dma_ifm_dst_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR dma_ifm_dst_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile dma_ifm_dst_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -7600,17 +9568,22 @@ struct dma_ofm_src_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR dma_ofm_src_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile dma_ofm_src_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -7638,19 +9611,19 @@ struct dma_ofm_dst_r
   public:
     CONSTEXPR dma_ofm_dst_r() : word0(0), word1(0) {}
     CONSTEXPR dma_ofm_dst_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -7689,19 +9662,19 @@ struct dma_weight_src_r
   public:
     CONSTEXPR dma_weight_src_r() : word0(0), word1(0) {}
     CONSTEXPR dma_weight_src_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -7740,19 +9713,19 @@ struct dma_cmd_src_r
   public:
     CONSTEXPR dma_cmd_src_r() : word0(0), word1(0) {}
     CONSTEXPR dma_cmd_src_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -7810,17 +9783,22 @@ struct dma_cmd_size_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR dma_cmd_size_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile dma_cmd_size_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -7848,19 +9826,19 @@ struct dma_m2m_src_r
   public:
     CONSTEXPR dma_m2m_src_r() : word0(0), word1(0) {}
     CONSTEXPR dma_m2m_src_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -7899,19 +9877,19 @@ struct dma_m2m_dst_r
   public:
     CONSTEXPR dma_m2m_dst_r() : word0(0), word1(0) {}
     CONSTEXPR dma_m2m_dst_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -7969,17 +9947,22 @@ struct current_qread_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR current_qread_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile current_qread_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -8007,19 +9990,19 @@ struct dma_scale_src_r
   public:
     CONSTEXPR dma_scale_src_r() : word0(0), word1(0) {}
     CONSTEXPR dma_scale_src_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -8077,17 +10060,22 @@ struct current_block_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR current_block_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile current_block_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -8134,17 +10122,22 @@ struct current_op_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR current_op_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile current_op_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -8191,17 +10184,22 @@ struct current_cmd_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR current_cmd_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile current_cmd_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -8248,17 +10246,22 @@ struct pmevcntr_r
     }
     CONSTEXPR uint32_t get_count() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_count() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR pmevcntr_r &set_count(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile pmevcntr_r &set_count(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -8319,6 +10322,11 @@ struct pmevtyper_r
         word0 = (((~((1U << 10) - 1)) << 0) & word0) | ((((1U << 10) - 1) & static_cast<uint32_t>(value)) << 0);
         return *this;
     }
+    volatile pmevtyper_r &set_EV_TYPE(NPU_NAMESPACE::pmu_event value) volatile
+    {
+        word0 = (((~((1U << 10) - 1)) << 0) & word0) | ((((1U << 10) - 1) & static_cast<uint32_t>(value)) << 0);
+        return *this;
+    }
 #endif
 };
 
@@ -8363,17 +10371,22 @@ struct shared_buffer_r
     }
     CONSTEXPR uint32_t get_mem_word() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_mem_word() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR shared_buffer_r &set_mem_word(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile shared_buffer_r &set_mem_word(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -8420,17 +10433,22 @@ struct ifm_pad_top_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm_pad_top_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm_pad_top_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -8477,17 +10495,22 @@ struct ifm_pad_left_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm_pad_left_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm_pad_left_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -8534,17 +10557,22 @@ struct ifm_pad_right_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm_pad_right_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm_pad_right_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -8591,17 +10619,22 @@ struct ifm_pad_bottom_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm_pad_bottom_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm_pad_bottom_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -8648,17 +10681,22 @@ struct ifm_depth_m1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm_depth_m1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm_depth_m1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -8705,17 +10743,22 @@ struct ifm_precision_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm_precision_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm_precision_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -8762,17 +10805,22 @@ struct ifm_upscale_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm_upscale_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm_upscale_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -8819,17 +10867,22 @@ struct ifm_zero_point_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm_zero_point_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm_zero_point_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -8876,17 +10929,22 @@ struct ifm_width0_m1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm_width0_m1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm_width0_m1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -8933,17 +10991,22 @@ struct ifm_height0_m1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm_height0_m1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm_height0_m1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -8990,17 +11053,22 @@ struct ifm_height1_m1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm_height1_m1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm_height1_m1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -9047,17 +11115,22 @@ struct ifm_ib_end_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm_ib_end_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm_ib_end_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -9104,17 +11177,22 @@ struct ifm_region_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm_region_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm_region_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -9161,17 +11239,22 @@ struct ofm_width_m1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ofm_width_m1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ofm_width_m1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -9218,17 +11301,22 @@ struct ofm_height_m1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ofm_height_m1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ofm_height_m1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -9275,17 +11363,22 @@ struct ofm_depth_m1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ofm_depth_m1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ofm_depth_m1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -9332,17 +11425,22 @@ struct ofm_precision_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ofm_precision_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ofm_precision_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -9389,17 +11487,22 @@ struct ofm_blk_width_m1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ofm_blk_width_m1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ofm_blk_width_m1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -9446,17 +11549,22 @@ struct ofm_blk_height_m1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ofm_blk_height_m1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ofm_blk_height_m1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -9503,17 +11611,22 @@ struct ofm_blk_depth_m1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ofm_blk_depth_m1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ofm_blk_depth_m1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -9560,17 +11673,22 @@ struct ofm_zero_point_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ofm_zero_point_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ofm_zero_point_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -9617,17 +11735,22 @@ struct ofm_width0_m1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ofm_width0_m1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ofm_width0_m1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -9674,17 +11797,22 @@ struct ofm_height0_m1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ofm_height0_m1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ofm_height0_m1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -9731,17 +11859,22 @@ struct ofm_height1_m1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ofm_height1_m1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ofm_height1_m1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -9788,17 +11921,22 @@ struct ofm_region_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ofm_region_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ofm_region_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -9845,17 +11983,22 @@ struct kernel_width_m1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR kernel_width_m1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile kernel_width_m1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -9902,17 +12045,22 @@ struct kernel_height_m1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR kernel_height_m1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile kernel_height_m1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -9959,17 +12107,22 @@ struct kernel_stride_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR kernel_stride_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile kernel_stride_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -10016,17 +12169,22 @@ struct parallel_mode_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR parallel_mode_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile parallel_mode_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -10073,17 +12231,22 @@ struct acc_format_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR acc_format_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile acc_format_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -10130,17 +12293,22 @@ struct activation_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR activation_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile activation_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -10187,17 +12355,22 @@ struct activation_min_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR activation_min_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile activation_min_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -10244,17 +12417,22 @@ struct activation_max_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR activation_max_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile activation_max_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -10301,17 +12479,22 @@ struct weight_region_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR weight_region_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile weight_region_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -10358,17 +12541,22 @@ struct scale_region_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR scale_region_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile scale_region_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -10415,17 +12603,22 @@ struct ab_start_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ab_start_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ab_start_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -10472,17 +12665,22 @@ struct blockdep_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR blockdep_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile blockdep_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -10529,17 +12727,22 @@ struct dma0_src_region_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR dma0_src_region_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile dma0_src_region_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -10586,17 +12789,22 @@ struct dma0_dst_region_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR dma0_dst_region_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile dma0_dst_region_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -10643,17 +12851,22 @@ struct dma0_size0_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR dma0_size0_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile dma0_size0_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -10700,17 +12913,22 @@ struct dma0_size1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR dma0_size1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile dma0_size1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -10757,17 +12975,22 @@ struct ifm2_broadcast_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm2_broadcast_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm2_broadcast_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -10814,17 +13037,22 @@ struct ifm2_scalar_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm2_scalar_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm2_scalar_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -10871,17 +13099,22 @@ struct ifm2_precision_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm2_precision_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm2_precision_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -10928,17 +13161,22 @@ struct ifm2_zero_point_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm2_zero_point_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm2_zero_point_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -10985,17 +13223,22 @@ struct ifm2_width0_m1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm2_width0_m1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm2_width0_m1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -11042,17 +13285,22 @@ struct ifm2_height0_m1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm2_height0_m1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm2_height0_m1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -11099,17 +13347,22 @@ struct ifm2_height1_m1_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm2_height1_m1_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm2_height1_m1_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -11156,17 +13409,22 @@ struct ifm2_ib_start_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm2_ib_start_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm2_ib_start_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -11213,17 +13471,22 @@ struct ifm2_region_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ifm2_region_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ifm2_region_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -11250,19 +13513,19 @@ struct ifm_base0_r
   public:
     CONSTEXPR ifm_base0_r() : word0(0), word1(0) {}
     CONSTEXPR ifm_base0_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -11300,19 +13563,19 @@ struct ifm_base1_r
   public:
     CONSTEXPR ifm_base1_r() : word0(0), word1(0) {}
     CONSTEXPR ifm_base1_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -11350,19 +13613,19 @@ struct ifm_base2_r
   public:
     CONSTEXPR ifm_base2_r() : word0(0), word1(0) {}
     CONSTEXPR ifm_base2_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -11400,19 +13663,19 @@ struct ifm_base3_r
   public:
     CONSTEXPR ifm_base3_r() : word0(0), word1(0) {}
     CONSTEXPR ifm_base3_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -11450,19 +13713,19 @@ struct ifm_stride_x_r
   public:
     CONSTEXPR ifm_stride_x_r() : word0(0), word1(0) {}
     CONSTEXPR ifm_stride_x_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -11500,19 +13763,19 @@ struct ifm_stride_y_r
   public:
     CONSTEXPR ifm_stride_y_r() : word0(0), word1(0) {}
     CONSTEXPR ifm_stride_y_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -11550,19 +13813,19 @@ struct ifm_stride_c_r
   public:
     CONSTEXPR ifm_stride_c_r() : word0(0), word1(0) {}
     CONSTEXPR ifm_stride_c_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -11600,19 +13863,19 @@ struct ofm_base0_r
   public:
     CONSTEXPR ofm_base0_r() : word0(0), word1(0) {}
     CONSTEXPR ofm_base0_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -11650,19 +13913,19 @@ struct ofm_base1_r
   public:
     CONSTEXPR ofm_base1_r() : word0(0), word1(0) {}
     CONSTEXPR ofm_base1_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -11700,19 +13963,19 @@ struct ofm_base2_r
   public:
     CONSTEXPR ofm_base2_r() : word0(0), word1(0) {}
     CONSTEXPR ofm_base2_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -11750,19 +14013,19 @@ struct ofm_base3_r
   public:
     CONSTEXPR ofm_base3_r() : word0(0), word1(0) {}
     CONSTEXPR ofm_base3_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -11800,19 +14063,19 @@ struct ofm_stride_x_r
   public:
     CONSTEXPR ofm_stride_x_r() : word0(0), word1(0) {}
     CONSTEXPR ofm_stride_x_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -11850,19 +14113,19 @@ struct ofm_stride_y_r
   public:
     CONSTEXPR ofm_stride_y_r() : word0(0), word1(0) {}
     CONSTEXPR ofm_stride_y_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -11900,19 +14163,19 @@ struct ofm_stride_c_r
   public:
     CONSTEXPR ofm_stride_c_r() : word0(0), word1(0) {}
     CONSTEXPR ofm_stride_c_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -11950,19 +14213,19 @@ struct weight_base_r
   public:
     CONSTEXPR weight_base_r() : word0(0), word1(0) {}
     CONSTEXPR weight_base_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -11987,50 +14250,43 @@ struct weight_length_r
     {
         struct
         {
-            uint32_t value : 32; // 32-bit register value
+            uint32_t value_LO : 32; // 64-bit register value - LSB
+            uint32_t value_HI : 32; // 64-bit register value - MSB
         };
-        uint32_t word;
+        uint32_t word[2];
     };
 #else
   private:
     uint32_t word0;
+    uint32_t word1;
 
   public:
-    CONSTEXPR weight_length_r() : word0(0) {}
-    CONSTEXPR weight_length_r(uint32_t init) : word0(init) {}
-    CONSTEXPR void operator=(uint32_t value)
+    CONSTEXPR weight_length_r() : word0(0), word1(0) {}
+    CONSTEXPR weight_length_r(uint64_t init) :
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
-        word0 = value;
     }
-    void operator=(uint32_t value) volatile
+    CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = value;
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
-    CONSTEXPR operator uint32_t()
+    void operator=(uint64_t value) volatile
     {
-        return word0;
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
-    operator uint32_t() volatile
+    CONSTEXPR operator uint64_t()
     {
-        return word0;
+        return (static_cast<uint64_t>(word1) << 32) | word0;
+    }
+    operator uint64_t() volatile
+    {
+        return (static_cast<uint64_t>(word1) << 32) | word0;
     }
     weight_length_r copy() volatile
     {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_value() const
-    {
-        uint32_t value = static_cast<uint32_t>(word0);
-        return value;
-    }
-    uint32_t get_value() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(word0);
-        return value;
-    }
-    CONSTEXPR weight_length_r &set_value(uint32_t value)
-    {
-        word0 = static_cast<uint32_t>(value);
         return *this;
     }
 #endif
@@ -12057,19 +14313,19 @@ struct scale_base_r
   public:
     CONSTEXPR scale_base_r() : word0(0), word1(0) {}
     CONSTEXPR scale_base_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -12094,50 +14350,43 @@ struct scale_length_r
     {
         struct
         {
-            uint32_t value : 32; // 32-bit register value
+            uint32_t value_LO : 32; // 64-bit register value - LSB
+            uint32_t value_HI : 32; // 64-bit register value - MSB
         };
-        uint32_t word;
+        uint32_t word[2];
     };
 #else
   private:
     uint32_t word0;
+    uint32_t word1;
 
   public:
-    CONSTEXPR scale_length_r() : word0(0) {}
-    CONSTEXPR scale_length_r(uint32_t init) : word0(init) {}
-    CONSTEXPR void operator=(uint32_t value)
+    CONSTEXPR scale_length_r() : word0(0), word1(0) {}
+    CONSTEXPR scale_length_r(uint64_t init) :
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
-        word0 = value;
     }
-    void operator=(uint32_t value) volatile
+    CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = value;
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
-    CONSTEXPR operator uint32_t()
+    void operator=(uint64_t value) volatile
     {
-        return word0;
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
-    operator uint32_t() volatile
+    CONSTEXPR operator uint64_t()
     {
-        return word0;
+        return (static_cast<uint64_t>(word1) << 32) | word0;
+    }
+    operator uint64_t() volatile
+    {
+        return (static_cast<uint64_t>(word1) << 32) | word0;
     }
     scale_length_r copy() volatile
     {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_value() const
-    {
-        uint32_t value = static_cast<uint32_t>(word0);
-        return value;
-    }
-    uint32_t get_value() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(word0);
-        return value;
-    }
-    CONSTEXPR scale_length_r &set_value(uint32_t value)
-    {
-        word0 = static_cast<uint32_t>(value);
         return *this;
     }
 #endif
@@ -12184,17 +14433,22 @@ struct ofm_scale_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ofm_scale_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ofm_scale_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -12241,17 +14495,22 @@ struct ofm_scale_shift_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR ofm_scale_shift_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile ofm_scale_shift_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -12298,17 +14557,22 @@ struct opa_scale_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR opa_scale_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile opa_scale_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -12355,17 +14619,22 @@ struct opa_scale_shift_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR opa_scale_shift_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile opa_scale_shift_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -12412,17 +14681,22 @@ struct opb_scale_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR opb_scale_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile opb_scale_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -12449,19 +14723,19 @@ struct dma0_src_r
   public:
     CONSTEXPR dma0_src_r() : word0(0), word1(0) {}
     CONSTEXPR dma0_src_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -12499,19 +14773,19 @@ struct dma0_dst_r
   public:
     CONSTEXPR dma0_dst_r() : word0(0), word1(0) {}
     CONSTEXPR dma0_dst_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -12549,19 +14823,19 @@ struct dma0_len_r
   public:
     CONSTEXPR dma0_len_r() : word0(0), word1(0) {}
     CONSTEXPR dma0_len_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -12599,19 +14873,19 @@ struct dma0_skip0_r
   public:
     CONSTEXPR dma0_skip0_r() : word0(0), word1(0) {}
     CONSTEXPR dma0_skip0_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -12649,19 +14923,19 @@ struct dma0_skip1_r
   public:
     CONSTEXPR dma0_skip1_r() : word0(0), word1(0) {}
     CONSTEXPR dma0_skip1_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -12699,19 +14973,19 @@ struct ifm2_base0_r
   public:
     CONSTEXPR ifm2_base0_r() : word0(0), word1(0) {}
     CONSTEXPR ifm2_base0_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -12749,19 +15023,19 @@ struct ifm2_base1_r
   public:
     CONSTEXPR ifm2_base1_r() : word0(0), word1(0) {}
     CONSTEXPR ifm2_base1_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -12799,19 +15073,19 @@ struct ifm2_base2_r
   public:
     CONSTEXPR ifm2_base2_r() : word0(0), word1(0) {}
     CONSTEXPR ifm2_base2_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -12849,19 +15123,19 @@ struct ifm2_base3_r
   public:
     CONSTEXPR ifm2_base3_r() : word0(0), word1(0) {}
     CONSTEXPR ifm2_base3_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -12899,19 +15173,19 @@ struct ifm2_stride_x_r
   public:
     CONSTEXPR ifm2_stride_x_r() : word0(0), word1(0) {}
     CONSTEXPR ifm2_stride_x_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -12949,19 +15223,19 @@ struct ifm2_stride_y_r
   public:
     CONSTEXPR ifm2_stride_y_r() : word0(0), word1(0) {}
     CONSTEXPR ifm2_stride_y_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -12999,19 +15273,19 @@ struct ifm2_stride_c_r
   public:
     CONSTEXPR ifm2_stride_c_r() : word0(0), word1(0) {}
     CONSTEXPR ifm2_stride_c_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -13049,19 +15323,19 @@ struct weight1_base_r
   public:
     CONSTEXPR weight1_base_r() : word0(0), word1(0) {}
     CONSTEXPR weight1_base_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -13086,50 +15360,43 @@ struct weight1_length_r
     {
         struct
         {
-            uint32_t value : 32; // 32-bit register value
+            uint32_t value_LO : 32; // 64-bit register value - LSB
+            uint32_t value_HI : 32; // 64-bit register value - MSB
         };
-        uint32_t word;
+        uint32_t word[2];
     };
 #else
   private:
     uint32_t word0;
+    uint32_t word1;
 
   public:
-    CONSTEXPR weight1_length_r() : word0(0) {}
-    CONSTEXPR weight1_length_r(uint32_t init) : word0(init) {}
-    CONSTEXPR void operator=(uint32_t value)
+    CONSTEXPR weight1_length_r() : word0(0), word1(0) {}
+    CONSTEXPR weight1_length_r(uint64_t init) :
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
-        word0 = value;
     }
-    void operator=(uint32_t value) volatile
+    CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = value;
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
-    CONSTEXPR operator uint32_t()
+    void operator=(uint64_t value) volatile
     {
-        return word0;
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
-    operator uint32_t() volatile
+    CONSTEXPR operator uint64_t()
     {
-        return word0;
+        return (static_cast<uint64_t>(word1) << 32) | word0;
+    }
+    operator uint64_t() volatile
+    {
+        return (static_cast<uint64_t>(word1) << 32) | word0;
     }
     weight1_length_r copy() volatile
     {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_value() const
-    {
-        uint32_t value = static_cast<uint32_t>(word0);
-        return value;
-    }
-    uint32_t get_value() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(word0);
-        return value;
-    }
-    CONSTEXPR weight1_length_r &set_value(uint32_t value)
-    {
-        word0 = static_cast<uint32_t>(value);
         return *this;
     }
 #endif
@@ -13156,19 +15423,19 @@ struct scale1_base_r
   public:
     CONSTEXPR scale1_base_r() : word0(0), word1(0) {}
     CONSTEXPR scale1_base_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-        word1(static_cast<uint32_t>((init >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
     }
     CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     void operator=(uint64_t value) volatile
     {
-        word0 = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-        word1 = static_cast<uint32_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
     CONSTEXPR operator uint64_t()
     {
@@ -13193,50 +15460,43 @@ struct scale1_length_r
     {
         struct
         {
-            uint32_t value : 32; // 32-bit register value
+            uint32_t value_LO : 32; // 64-bit register value - LSB
+            uint32_t value_HI : 32; // 64-bit register value - MSB
         };
-        uint32_t word;
+        uint32_t word[2];
     };
 #else
   private:
     uint32_t word0;
+    uint32_t word1;
 
   public:
-    CONSTEXPR scale1_length_r() : word0(0) {}
-    CONSTEXPR scale1_length_r(uint32_t init) : word0(init) {}
-    CONSTEXPR void operator=(uint32_t value)
+    CONSTEXPR scale1_length_r() : word0(0), word1(0) {}
+    CONSTEXPR scale1_length_r(uint64_t init) :
+        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
+        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
     {
-        word0 = value;
     }
-    void operator=(uint32_t value) volatile
+    CONSTEXPR void operator=(uint64_t value)
     {
-        word0 = value;
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
-    CONSTEXPR operator uint32_t()
+    void operator=(uint64_t value) volatile
     {
-        return word0;
+        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
     }
-    operator uint32_t() volatile
+    CONSTEXPR operator uint64_t()
     {
-        return word0;
+        return (static_cast<uint64_t>(word1) << 32) | word0;
+    }
+    operator uint64_t() volatile
+    {
+        return (static_cast<uint64_t>(word1) << 32) | word0;
     }
     scale1_length_r copy() volatile
     {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_value() const
-    {
-        uint32_t value = static_cast<uint32_t>(word0);
-        return value;
-    }
-    uint32_t get_value() const volatile
-    {
-        uint32_t value = static_cast<uint32_t>(word0);
-        return value;
-    }
-    CONSTEXPR scale1_length_r &set_value(uint32_t value)
-    {
-        word0 = static_cast<uint32_t>(value);
         return *this;
     }
 #endif
@@ -13283,17 +15543,22 @@ struct revision_r
     }
     CONSTEXPR uint32_t get_value() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_value() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR revision_r &set_value(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile revision_r &set_value(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -13340,17 +15605,22 @@ struct pid4_r
     }
     CONSTEXPR uint32_t get_PID4() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_PID4() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR pid4_r &set_PID4(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile pid4_r &set_PID4(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -13397,17 +15667,22 @@ struct pid5_r
     }
     CONSTEXPR uint32_t get_PID5() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_PID5() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR pid5_r &set_PID5(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile pid5_r &set_PID5(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -13454,17 +15729,22 @@ struct pid6_r
     }
     CONSTEXPR uint32_t get_PID6() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_PID6() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR pid6_r &set_PID6(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile pid6_r &set_PID6(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -13511,17 +15791,22 @@ struct pid7_r
     }
     CONSTEXPR uint32_t get_PID7() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_PID7() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR pid7_r &set_PID7(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile pid7_r &set_PID7(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -13568,17 +15853,22 @@ struct pid0_r
     }
     CONSTEXPR uint32_t get_PID0() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_PID0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR pid0_r &set_PID0(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile pid0_r &set_PID0(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -13626,17 +15916,22 @@ struct pid1_r
     }
     CONSTEXPR uint32_t get_PID1() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_PID1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR pid1_r &set_PID1(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile pid1_r &set_PID1(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -13683,17 +15978,22 @@ struct pid2_r
     }
     CONSTEXPR uint32_t get_PID2() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_PID2() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR pid2_r &set_PID2(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile pid2_r &set_PID2(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -13740,17 +16040,22 @@ struct pid3_r
     }
     CONSTEXPR uint32_t get_PID3() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_PID3() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR pid3_r &set_PID3(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile pid3_r &set_PID3(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -13797,17 +16102,22 @@ struct cid0_r
     }
     CONSTEXPR uint32_t get_CID0() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_CID0() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR cid0_r &set_CID0(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile cid0_r &set_CID0(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -13854,17 +16164,22 @@ struct cid1_r
     }
     CONSTEXPR uint32_t get_CID1() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_CID1() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR cid1_r &set_CID1(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile cid1_r &set_CID1(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -13911,17 +16226,22 @@ struct cid2_r
     }
     CONSTEXPR uint32_t get_CID2() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_CID2() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR cid2_r &set_CID2(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile cid2_r &set_CID2(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -13968,17 +16288,22 @@ struct cid3_r
     }
     CONSTEXPR uint32_t get_CID3() const
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     uint32_t get_CID3() const volatile
     {
-        uint32_t value = static_cast<uint32_t>(word0);
+        uint32_t value = word0;
         return value;
     }
     CONSTEXPR cid3_r &set_CID3(uint32_t value)
     {
-        word0 = static_cast<uint32_t>(value);
+        word0 = value;
+        return *this;
+    }
+    volatile cid3_r &set_CID3(uint32_t value) volatile
+    {
+        word0 = value;
         return *this;
     }
 #endif
@@ -14147,24 +16472,22 @@ struct NPU_REG
     STRUCT ofm_stride_y_r OFM_STRIDE_Y; // 0x0A68
     STRUCT ofm_stride_c_r OFM_STRIDE_C; // 0x0A70
     uint32_t unused26[2];
-    STRUCT weight_base_r WEIGHT_BASE;     // 0x0A80
-    STRUCT weight_length_r WEIGHT_LENGTH; // 0x0A88
-    uint32_t unused27[1];
-    STRUCT scale_base_r SCALE_BASE;     // 0x0A90
-    STRUCT scale_length_r SCALE_LENGTH; // 0x0A98
-    uint32_t unused28[1];
+    STRUCT weight_base_r WEIGHT_BASE;         // 0x0A80
+    STRUCT weight_length_r WEIGHT_LENGTH;     // 0x0A88
+    STRUCT scale_base_r SCALE_BASE;           // 0x0A90
+    STRUCT scale_length_r SCALE_LENGTH;       // 0x0A98
     STRUCT ofm_scale_r OFM_SCALE;             // 0x0AA0
     STRUCT ofm_scale_shift_r OFM_SCALE_SHIFT; // 0x0AA4
     STRUCT opa_scale_r OPA_SCALE;             // 0x0AA8
     STRUCT opa_scale_shift_r OPA_SCALE_SHIFT; // 0x0AAC
     STRUCT opb_scale_r OPB_SCALE;             // 0x0AB0
-    uint32_t unused29[3];
+    uint32_t unused27[3];
     STRUCT dma0_src_r DMA0_SRC;     // 0x0AC0
     STRUCT dma0_dst_r DMA0_DST;     // 0x0AC8
     STRUCT dma0_len_r DMA0_LEN;     // 0x0AD0
     STRUCT dma0_skip0_r DMA0_SKIP0; // 0x0AD8
     STRUCT dma0_skip1_r DMA0_SKIP1; // 0x0AE0
-    uint32_t unused30[6];
+    uint32_t unused28[6];
     STRUCT ifm2_base0_r IFM2_BASE0;       // 0x0B00
     STRUCT ifm2_base1_r IFM2_BASE1;       // 0x0B08
     STRUCT ifm2_base2_r IFM2_BASE2;       // 0x0B10
@@ -14172,15 +16495,14 @@ struct NPU_REG
     STRUCT ifm2_stride_x_r IFM2_STRIDE_X; // 0x0B20
     STRUCT ifm2_stride_y_r IFM2_STRIDE_Y; // 0x0B28
     STRUCT ifm2_stride_c_r IFM2_STRIDE_C; // 0x0B30
-    uint32_t unused31[2];
+    uint32_t unused29[2];
     STRUCT weight1_base_r WEIGHT1_BASE;     // 0x0B40
     STRUCT weight1_length_r WEIGHT1_LENGTH; // 0x0B48
-    uint32_t unused32[1];
-    STRUCT scale1_base_r SCALE1_BASE;     // 0x0B50
-    STRUCT scale1_length_r SCALE1_LENGTH; // 0x0B58
-    uint32_t unused33[281];
+    STRUCT scale1_base_r SCALE1_BASE;       // 0x0B50
+    STRUCT scale1_length_r SCALE1_LENGTH;   // 0x0B58
+    uint32_t unused30[280];
     STRUCT revision_r REVISION; // 0x0FC0
-    uint32_t unused34[3];
+    uint32_t unused31[3];
     STRUCT pid4_r PID4; // 0x0FD0
     STRUCT pid5_r PID5; // 0x0FD4
     STRUCT pid6_r PID6; // 0x0FD8
@@ -16084,8 +18406,7 @@ struct isa
       public:
         npu_op_stop_t(uint32_t _mask) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_OP_STOP)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            mask(static_cast<uint16_t>(_mask) & ((1U << 16) - 1))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), mask(_mask & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_op_stop_t() :
@@ -16158,8 +18479,7 @@ struct isa
       public:
         npu_op_irq_t(uint32_t _mask) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_OP_IRQ)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            mask(static_cast<uint16_t>(_mask) & ((1U << 16) - 1))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), mask(_mask & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_op_irq_t() :
@@ -16559,8 +18879,7 @@ struct isa
       public:
         npu_op_dma_wait_t(uint32_t _k) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_OP_DMA_WAIT)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            k(static_cast<uint8_t>(_k) & ((1U << 4) - 1)), reserved1(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), k(_k & ((1U << 4) - 1)), reserved1(0)
         {
         }
         CONSTEXPR npu_op_dma_wait_t() :
@@ -16634,8 +18953,7 @@ struct isa
       public:
         npu_op_kernel_wait_t(uint32_t _n) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_OP_KERNEL_WAIT)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            n(static_cast<uint8_t>(_n) & ((1U << 2) - 1)), reserved1(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), n(_n & ((1U << 2) - 1)), reserved1(0)
         {
         }
         CONSTEXPR npu_op_kernel_wait_t() :
@@ -16709,8 +19027,8 @@ struct isa
       public:
         npu_op_pmu_mask_t(uint32_t _enable) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_OP_PMU_MASK)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            enable(static_cast<uint8_t>(_enable) & ((1U << 1) - 1)), reserved1(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), enable(_enable & ((1U << 1) - 1)),
+            reserved1(0)
         {
         }
         CONSTEXPR npu_op_pmu_mask_t() :
@@ -16784,8 +19102,7 @@ struct isa
       public:
         npu_set_ifm_pad_top_t(uint32_t _pad) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_IFM_PAD_TOP)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            pad(static_cast<uint8_t>(_pad) & ((1U << 7) - 1)), reserved1(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), pad(_pad & ((1U << 7) - 1)), reserved1(0)
         {
         }
         CONSTEXPR npu_set_ifm_pad_top_t() :
@@ -16859,8 +19176,7 @@ struct isa
       public:
         npu_set_ifm_pad_left_t(uint32_t _pad) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_IFM_PAD_LEFT)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            pad(static_cast<uint8_t>(_pad) & ((1U << 7) - 1)), reserved1(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), pad(_pad & ((1U << 7) - 1)), reserved1(0)
         {
         }
         CONSTEXPR npu_set_ifm_pad_left_t() :
@@ -16934,8 +19250,7 @@ struct isa
       public:
         npu_set_ifm_pad_right_t(uint32_t _pad) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_IFM_PAD_RIGHT)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            pad(static_cast<uint8_t>(_pad) & ((1U << 8) - 1)), reserved1(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), pad(_pad & ((1U << 8) - 1)), reserved1(0)
         {
         }
         CONSTEXPR npu_set_ifm_pad_right_t() :
@@ -17009,8 +19324,7 @@ struct isa
       public:
         npu_set_ifm_pad_bottom_t(uint32_t _pad) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_IFM_PAD_BOTTOM)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            pad(static_cast<uint8_t>(_pad) & ((1U << 8) - 1)), reserved1(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), pad(_pad & ((1U << 8) - 1)), reserved1(0)
         {
         }
         CONSTEXPR npu_set_ifm_pad_bottom_t() :
@@ -17083,8 +19397,7 @@ struct isa
       public:
         npu_set_ifm_depth_m1_t(uint32_t _depth_m1) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_IFM_DEPTH_M1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            depth_m1(static_cast<uint16_t>(_depth_m1) & ((1U << 16) - 1))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), depth_m1(_depth_m1 & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_set_ifm_depth_m1_t() :
@@ -17385,7 +19698,7 @@ struct isa
         npu_set_ifm_zero_point_t(uint32_t _zero_point) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_IFM_ZERO_POINT)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            zero_point(static_cast<uint16_t>(_zero_point) & ((1U << 16) - 1))
+            zero_point(_zero_point & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_set_ifm_zero_point_t() :
@@ -17458,8 +19771,7 @@ struct isa
       public:
         npu_set_ifm_width0_m1_t(uint32_t _width_m1) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_IFM_WIDTH0_M1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            width_m1(static_cast<uint16_t>(_width_m1) & ((1U << 16) - 1))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), width_m1(_width_m1 & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_set_ifm_width0_m1_t() :
@@ -17532,8 +19844,7 @@ struct isa
       public:
         npu_set_ifm_height0_m1_t(uint32_t _height_m1) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_IFM_HEIGHT0_M1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            height_m1(static_cast<uint16_t>(_height_m1) & ((1U << 16) - 1))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), height_m1(_height_m1 & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_set_ifm_height0_m1_t() :
@@ -17606,8 +19917,7 @@ struct isa
       public:
         npu_set_ifm_height1_m1_t(uint32_t _height_m1) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_IFM_HEIGHT1_M1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            height_m1(static_cast<uint16_t>(_height_m1) & ((1U << 16) - 1))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), height_m1(_height_m1 & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_set_ifm_height1_m1_t() :
@@ -17681,8 +19991,8 @@ struct isa
       public:
         npu_set_ifm_ib_end_t(uint32_t _ib_end) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_IFM_IB_END)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            ib_end(static_cast<uint8_t>(_ib_end) & ((1U << 6) - 1)), reserved1(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), ib_end(_ib_end & ((1U << 6) - 1)),
+            reserved1(0)
         {
         }
         CONSTEXPR npu_set_ifm_ib_end_t() :
@@ -17756,8 +20066,8 @@ struct isa
       public:
         npu_set_ifm_region_t(uint32_t _region) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_IFM_REGION)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            region(static_cast<uint8_t>(_region) & ((1U << 3) - 1)), reserved1(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), region(_region & ((1U << 3) - 1)),
+            reserved1(0)
         {
         }
         CONSTEXPR npu_set_ifm_region_t() :
@@ -17830,8 +20140,7 @@ struct isa
       public:
         npu_set_ofm_width_m1_t(uint32_t _width_m1) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_OFM_WIDTH_M1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            width_m1(static_cast<uint16_t>(_width_m1) & ((1U << 16) - 1))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), width_m1(_width_m1 & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_set_ofm_width_m1_t() :
@@ -17904,8 +20213,7 @@ struct isa
       public:
         npu_set_ofm_height_m1_t(uint32_t _height_m1) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_OFM_HEIGHT_M1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            height_m1(static_cast<uint16_t>(_height_m1) & ((1U << 16) - 1))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), height_m1(_height_m1 & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_set_ofm_height_m1_t() :
@@ -17978,8 +20286,7 @@ struct isa
       public:
         npu_set_ofm_depth_m1_t(uint32_t _depth_m1) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_OFM_DEPTH_M1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            depth_m1(static_cast<uint16_t>(_depth_m1) & ((1U << 16) - 1))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), depth_m1(_depth_m1 & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_set_ofm_depth_m1_t() :
@@ -18201,8 +20508,8 @@ struct isa
       public:
         npu_set_ofm_blk_width_m1_t(uint32_t _width_m1) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_OFM_BLK_WIDTH_M1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            width_m1(static_cast<uint8_t>(_width_m1) & ((1U << 6) - 1)), reserved1(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), width_m1(_width_m1 & ((1U << 6) - 1)),
+            reserved1(0)
         {
         }
         CONSTEXPR npu_set_ofm_blk_width_m1_t() :
@@ -18276,8 +20583,8 @@ struct isa
       public:
         npu_set_ofm_blk_height_m1_t(uint32_t _height_m1) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_OFM_BLK_HEIGHT_M1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            height_m1(static_cast<uint8_t>(_height_m1) & ((1U << 5) - 1)), reserved1(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), height_m1(_height_m1 & ((1U << 5) - 1)),
+            reserved1(0)
         {
         }
         CONSTEXPR npu_set_ofm_blk_height_m1_t() :
@@ -18351,8 +20658,8 @@ struct isa
       public:
         npu_set_ofm_blk_depth_m1_t(uint32_t _depth_m1) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_OFM_BLK_DEPTH_M1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            depth_m1(static_cast<uint8_t>(_depth_m1) & ((1U << 7) - 1)), reserved1(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), depth_m1(_depth_m1 & ((1U << 7) - 1)),
+            reserved1(0)
         {
         }
         CONSTEXPR npu_set_ofm_blk_depth_m1_t() :
@@ -18426,7 +20733,7 @@ struct isa
         npu_set_ofm_zero_point_t(uint32_t _zero_point) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_OFM_ZERO_POINT)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            zero_point(static_cast<uint16_t>(_zero_point) & ((1U << 16) - 1))
+            zero_point(_zero_point & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_set_ofm_zero_point_t() :
@@ -18499,8 +20806,7 @@ struct isa
       public:
         npu_set_ofm_width0_m1_t(uint32_t _width_m1) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_OFM_WIDTH0_M1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            width_m1(static_cast<uint16_t>(_width_m1) & ((1U << 16) - 1))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), width_m1(_width_m1 & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_set_ofm_width0_m1_t() :
@@ -18573,8 +20879,7 @@ struct isa
       public:
         npu_set_ofm_height0_m1_t(uint32_t _height_m1) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_OFM_HEIGHT0_M1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            height_m1(static_cast<uint16_t>(_height_m1) & ((1U << 16) - 1))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), height_m1(_height_m1 & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_set_ofm_height0_m1_t() :
@@ -18647,8 +20952,7 @@ struct isa
       public:
         npu_set_ofm_height1_m1_t(uint32_t _height_m1) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_OFM_HEIGHT1_M1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            height_m1(static_cast<uint16_t>(_height_m1) & ((1U << 16) - 1))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), height_m1(_height_m1 & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_set_ofm_height1_m1_t() :
@@ -18722,8 +21026,8 @@ struct isa
       public:
         npu_set_ofm_region_t(uint32_t _region) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_OFM_REGION)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            region(static_cast<uint8_t>(_region) & ((1U << 3) - 1)), reserved1(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), region(_region & ((1U << 3) - 1)),
+            reserved1(0)
         {
         }
         CONSTEXPR npu_set_ofm_region_t() :
@@ -18796,8 +21100,7 @@ struct isa
       public:
         npu_set_kernel_width_m1_t(uint32_t _width_m1) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_KERNEL_WIDTH_M1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            width_m1(static_cast<uint16_t>(_width_m1) & ((1U << 16) - 1))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), width_m1(_width_m1 & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_set_kernel_width_m1_t() :
@@ -18870,8 +21173,7 @@ struct isa
       public:
         npu_set_kernel_height_m1_t(uint32_t _height_m1) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_KERNEL_HEIGHT_M1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            height_m1(static_cast<uint16_t>(_height_m1) & ((1U << 16) - 1))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), height_m1(_height_m1 & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_set_kernel_height_m1_t() :
@@ -18961,14 +21263,13 @@ struct isa
                                 uint32_t _stride_y_msb) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_KERNEL_STRIDE)),
             reserved0(0), control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            stride_x_lsb(static_cast<uint8_t>(_stride_x_lsb) & ((1U << 1) - 1)),
-            stride_y_lsb(static_cast<uint8_t>(_stride_y_lsb) & ((1U << 1) - 1)),
+            stride_x_lsb(_stride_x_lsb & ((1U << 1) - 1)), stride_y_lsb(_stride_y_lsb & ((1U << 1) - 1)),
             weight_order(static_cast<uint8_t>(_weight_order) & ((1U << 1) - 1)),
             dilation_x(static_cast<uint8_t>(_dilation_x) & ((1U << 1) - 1)),
             dilation_y(static_cast<uint8_t>(_dilation_y) & ((1U << 1) - 1)),
             decomposition(static_cast<uint8_t>(_decomposition) & ((1U << 1) - 1)),
-            stride_x_msb(static_cast<uint8_t>(_stride_x_msb) & ((1U << 1) - 1)), reserved1(0),
-            stride_y_msb(static_cast<uint8_t>(_stride_y_msb) & ((1U << 1) - 1)), reserved2(0)
+            stride_x_msb(_stride_x_msb & ((1U << 1) - 1)), reserved1(0), stride_y_msb(_stride_y_msb & ((1U << 1) - 1)),
+            reserved2(0)
         {
         }
         CONSTEXPR npu_set_kernel_stride_t() :
@@ -19385,7 +21686,7 @@ struct isa
         npu_set_activation_min_t(uint32_t _clip_boundary) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_ACTIVATION_MIN)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            clip_boundary(static_cast<uint16_t>(_clip_boundary) & ((1U << 16) - 1))
+            clip_boundary(_clip_boundary & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_set_activation_min_t() :
@@ -19459,7 +21760,7 @@ struct isa
         npu_set_activation_max_t(uint32_t _clip_boundary) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_ACTIVATION_MAX)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            clip_boundary(static_cast<uint16_t>(_clip_boundary) & ((1U << 16) - 1))
+            clip_boundary(_clip_boundary & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_set_activation_max_t() :
@@ -19533,8 +21834,8 @@ struct isa
       public:
         npu_set_weight_region_t(uint32_t _region) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_WEIGHT_REGION)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            region(static_cast<uint8_t>(_region) & ((1U << 3) - 1)), reserved1(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), region(_region & ((1U << 3) - 1)),
+            reserved1(0)
         {
         }
         CONSTEXPR npu_set_weight_region_t() :
@@ -19608,8 +21909,8 @@ struct isa
       public:
         npu_set_scale_region_t(uint32_t _region) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_SCALE_REGION)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            region(static_cast<uint8_t>(_region) & ((1U << 3) - 1)), reserved1(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), region(_region & ((1U << 3) - 1)),
+            reserved1(0)
         {
         }
         CONSTEXPR npu_set_scale_region_t() :
@@ -19683,8 +21984,8 @@ struct isa
       public:
         npu_set_ab_start_t(uint32_t _ab_start) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_AB_START)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            ab_start(static_cast<uint8_t>(_ab_start) & ((1U << 6) - 1)), reserved1(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), ab_start(_ab_start & ((1U << 6) - 1)),
+            reserved1(0)
         {
         }
         CONSTEXPR npu_set_ab_start_t() :
@@ -19758,8 +22059,8 @@ struct isa
       public:
         npu_set_blockdep_t(uint32_t _blockdep) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_BLOCKDEP)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            blockdep(static_cast<uint8_t>(_blockdep) & ((1U << 2) - 1)), reserved1(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), blockdep(_blockdep & ((1U << 2) - 1)),
+            reserved1(0)
         {
         }
         CONSTEXPR npu_set_blockdep_t() :
@@ -19839,7 +22140,7 @@ struct isa
                                   NPU_NAMESPACE::dma_stride_mode _stride_mode) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_DMA0_SRC_REGION)),
             reserved0(0), control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            region(static_cast<uint8_t>(_region) & ((1U << 3) - 1)), reserved1(0),
+            region(_region & ((1U << 3) - 1)), reserved1(0),
             region_mode(static_cast<uint8_t>(_region_mode) & ((1U << 1) - 1)),
             stride_mode(static_cast<uint8_t>(_stride_mode) & ((1U << 2) - 1)), reserved2(0)
         {
@@ -19951,7 +22252,7 @@ struct isa
                                   NPU_NAMESPACE::dma_stride_mode _stride_mode) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_DMA0_DST_REGION)),
             reserved0(0), control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            region(static_cast<uint8_t>(_region) & ((1U << 3) - 1)), reserved1(0),
+            region(_region & ((1U << 3) - 1)), reserved1(0),
             region_mode(static_cast<uint8_t>(_region_mode) & ((1U << 1) - 1)),
             stride_mode(static_cast<uint8_t>(_stride_mode) & ((1U << 2) - 1)), reserved2(0)
         {
@@ -20055,8 +22356,7 @@ struct isa
       public:
         npu_set_dma0_size0_t(uint32_t _size) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_DMA0_SIZE0)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            size(static_cast<uint16_t>(_size) & ((1U << 16) - 1))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), size(_size & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_set_dma0_size0_t() :
@@ -20129,8 +22429,7 @@ struct isa
       public:
         npu_set_dma0_size1_t(uint32_t _size) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_DMA0_SIZE1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            size(static_cast<uint16_t>(_size) & ((1U << 16) - 1))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), size(_size & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_set_dma0_size1_t() :
@@ -20353,8 +22652,7 @@ struct isa
       public:
         npu_set_ifm2_scalar_t(uint32_t _scalar) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_IFM2_SCALAR)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            scalar(static_cast<uint16_t>(_scalar) & ((1U << 16) - 1))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), scalar(_scalar & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_set_ifm2_scalar_t() :
@@ -20544,7 +22842,7 @@ struct isa
         npu_set_ifm2_zero_point_t(uint32_t _zero_point) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_IFM2_ZERO_POINT)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            zero_point(static_cast<uint16_t>(_zero_point) & ((1U << 16) - 1))
+            zero_point(_zero_point & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_set_ifm2_zero_point_t() :
@@ -20617,8 +22915,7 @@ struct isa
       public:
         npu_set_ifm2_width0_m1_t(uint32_t _width_m1) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_IFM2_WIDTH0_M1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            width_m1(static_cast<uint16_t>(_width_m1) & ((1U << 16) - 1))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), width_m1(_width_m1 & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_set_ifm2_width0_m1_t() :
@@ -20691,8 +22988,7 @@ struct isa
       public:
         npu_set_ifm2_height0_m1_t(uint32_t _height_m1) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_IFM2_HEIGHT0_M1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            height_m1(static_cast<uint16_t>(_height_m1) & ((1U << 16) - 1))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), height_m1(_height_m1 & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_set_ifm2_height0_m1_t() :
@@ -20765,8 +23061,7 @@ struct isa
       public:
         npu_set_ifm2_height1_m1_t(uint32_t _height_m1) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_IFM2_HEIGHT1_M1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            height_m1(static_cast<uint16_t>(_height_m1) & ((1U << 16) - 1))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), height_m1(_height_m1 & ((1U << 16) - 1))
         {
         }
         CONSTEXPR npu_set_ifm2_height1_m1_t() :
@@ -20840,8 +23135,8 @@ struct isa
       public:
         npu_set_ifm2_ib_start_t(uint32_t _ib_start) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_IFM2_IB_START)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            ib_start(static_cast<uint8_t>(_ib_start) & ((1U << 6) - 1)), reserved1(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), ib_start(_ib_start & ((1U << 6) - 1)),
+            reserved1(0)
         {
         }
         CONSTEXPR npu_set_ifm2_ib_start_t() :
@@ -20915,8 +23210,8 @@ struct isa
       public:
         npu_set_ifm2_region_t(uint32_t _region) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_IFM2_REGION)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            region(static_cast<uint8_t>(_region) & ((1U << 3) - 1)), reserved1(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), region(_region & ((1U << 3) - 1)),
+            reserved1(0)
         {
         }
         CONSTEXPR npu_set_ifm2_region_t() :
@@ -20992,9 +23287,8 @@ struct isa
         npu_set_ifm_base0_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM_BASE0)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_ifm_base0_t() :
@@ -21024,8 +23318,8 @@ struct isa
         }
         CONSTEXPR npu_set_ifm_base0_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -21055,9 +23349,8 @@ struct isa
         npu_set_ifm_base1_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM_BASE1)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_ifm_base1_t() :
@@ -21087,8 +23380,8 @@ struct isa
         }
         CONSTEXPR npu_set_ifm_base1_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -21118,9 +23411,8 @@ struct isa
         npu_set_ifm_base2_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM_BASE2)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_ifm_base2_t() :
@@ -21150,8 +23442,8 @@ struct isa
         }
         CONSTEXPR npu_set_ifm_base2_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -21181,9 +23473,8 @@ struct isa
         npu_set_ifm_base3_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM_BASE3)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_ifm_base3_t() :
@@ -21213,8 +23504,8 @@ struct isa
         }
         CONSTEXPR npu_set_ifm_base3_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -21244,9 +23535,8 @@ struct isa
         npu_set_ifm_stride_x_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM_STRIDE_X)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_ifm_stride_x_t() :
@@ -21276,8 +23566,8 @@ struct isa
         }
         CONSTEXPR npu_set_ifm_stride_x_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -21307,9 +23597,8 @@ struct isa
         npu_set_ifm_stride_y_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM_STRIDE_Y)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_ifm_stride_y_t() :
@@ -21339,8 +23628,8 @@ struct isa
         }
         CONSTEXPR npu_set_ifm_stride_y_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -21370,9 +23659,8 @@ struct isa
         npu_set_ifm_stride_c_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM_STRIDE_C)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_ifm_stride_c_t() :
@@ -21402,8 +23690,8 @@ struct isa
         }
         CONSTEXPR npu_set_ifm_stride_c_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -21433,9 +23721,8 @@ struct isa
         npu_set_ofm_base0_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_OFM_BASE0)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_ofm_base0_t() :
@@ -21465,8 +23752,8 @@ struct isa
         }
         CONSTEXPR npu_set_ofm_base0_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -21496,9 +23783,8 @@ struct isa
         npu_set_ofm_base1_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_OFM_BASE1)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_ofm_base1_t() :
@@ -21528,8 +23814,8 @@ struct isa
         }
         CONSTEXPR npu_set_ofm_base1_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -21559,9 +23845,8 @@ struct isa
         npu_set_ofm_base2_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_OFM_BASE2)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_ofm_base2_t() :
@@ -21591,8 +23876,8 @@ struct isa
         }
         CONSTEXPR npu_set_ofm_base2_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -21622,9 +23907,8 @@ struct isa
         npu_set_ofm_base3_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_OFM_BASE3)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_ofm_base3_t() :
@@ -21654,8 +23938,8 @@ struct isa
         }
         CONSTEXPR npu_set_ofm_base3_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -21685,9 +23969,8 @@ struct isa
         npu_set_ofm_stride_x_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_OFM_STRIDE_X)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_ofm_stride_x_t() :
@@ -21717,8 +24000,8 @@ struct isa
         }
         CONSTEXPR npu_set_ofm_stride_x_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -21748,9 +24031,8 @@ struct isa
         npu_set_ofm_stride_y_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_OFM_STRIDE_Y)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_ofm_stride_y_t() :
@@ -21780,8 +24062,8 @@ struct isa
         }
         CONSTEXPR npu_set_ofm_stride_y_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -21811,9 +24093,8 @@ struct isa
         npu_set_ofm_stride_c_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_OFM_STRIDE_C)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_ofm_stride_c_t() :
@@ -21843,8 +24124,8 @@ struct isa
         }
         CONSTEXPR npu_set_ofm_stride_c_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -21874,9 +24155,8 @@ struct isa
         npu_set_weight_base_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_WEIGHT_BASE)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_weight_base_t() :
@@ -21906,8 +24186,8 @@ struct isa
         }
         CONSTEXPR npu_set_weight_base_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -21935,8 +24215,7 @@ struct isa
       public:
         npu_set_weight_length_t(uint32_t _length) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_WEIGHT_LENGTH)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0),
-            length(static_cast<uint32_t>(_length))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), length(_length)
         {
         }
         CONSTEXPR npu_set_weight_length_t() :
@@ -21984,7 +24263,7 @@ struct isa
         }
         CONSTEXPR npu_set_weight_length_t &set_length(uint32_t value)
         {
-            length = static_cast<uint32_t>(value);
+            length = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -22012,9 +24291,8 @@ struct isa
         npu_set_scale_base_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_SCALE_BASE)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_scale_base_t() :
@@ -22044,8 +24322,8 @@ struct isa
         }
         CONSTEXPR npu_set_scale_base_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -22075,7 +24353,7 @@ struct isa
         npu_set_scale_length_t(uint32_t _length) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_SCALE_LENGTH)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0),
-            length(static_cast<uint32_t>(_length) & ((1U << 20) - 1)), reserved2(0)
+            length(_length & ((1U << 20) - 1)), reserved2(0)
         {
         }
         CONSTEXPR npu_set_scale_length_t() :
@@ -22123,7 +24401,7 @@ struct isa
         }
         CONSTEXPR npu_set_scale_length_t &set_length(uint32_t value)
         {
-            length = static_cast<uint32_t>(value) & ((1U << 20) - 1);
+            length = value & ((1U << 20) - 1);
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -22150,8 +24428,8 @@ struct isa
       public:
         npu_set_ofm_scale_t(uint32_t _shift, uint32_t _scale) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_OFM_SCALE)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            shift(static_cast<uint8_t>(_shift) & ((1U << 6) - 1)), reserved1(0), scale(static_cast<uint32_t>(_scale))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), shift(_shift & ((1U << 6) - 1)),
+            reserved1(0), scale(_scale)
         {
         }
         CONSTEXPR npu_set_ofm_scale_t() :
@@ -22208,7 +24486,7 @@ struct isa
         }
         CONSTEXPR npu_set_ofm_scale_t &set_scale(uint32_t value)
         {
-            scale = static_cast<uint32_t>(value);
+            scale = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -22236,8 +24514,8 @@ struct isa
       public:
         npu_set_opa_scale_t(uint32_t _shift, uint32_t _scale) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_OPA_SCALE)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            shift(static_cast<uint8_t>(_shift) & ((1U << 6) - 1)), reserved1(0), scale(static_cast<uint32_t>(_scale))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), shift(_shift & ((1U << 6) - 1)),
+            reserved1(0), scale(_scale)
         {
         }
         CONSTEXPR npu_set_opa_scale_t() :
@@ -22294,7 +24572,7 @@ struct isa
         }
         CONSTEXPR npu_set_opa_scale_t &set_scale(uint32_t value)
         {
-            scale = static_cast<uint32_t>(value);
+            scale = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -22323,7 +24601,7 @@ struct isa
         npu_set_opb_scale_t(uint32_t _scale) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_OPB_SCALE)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0),
-            scale(static_cast<uint16_t>(_scale) & ((1U << 16) - 1)), reserved2(0)
+            scale(_scale & ((1U << 16) - 1)), reserved2(0)
         {
         }
         CONSTEXPR npu_set_opb_scale_t() :
@@ -22399,9 +24677,8 @@ struct isa
         npu_set_dma0_src_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_DMA0_SRC)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_dma0_src_t() :
@@ -22431,8 +24708,8 @@ struct isa
         }
         CONSTEXPR npu_set_dma0_src_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -22462,9 +24739,8 @@ struct isa
         npu_set_dma0_dst_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_DMA0_DST)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_dma0_dst_t() :
@@ -22494,8 +24770,8 @@ struct isa
         }
         CONSTEXPR npu_set_dma0_dst_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -22508,7 +24784,7 @@ struct isa
 #endif
 #endif
     };
-    // DMA user channel 0 transfer length in bytes for 1D mode
+    // DMA user channel 0 transfer length in bytes for each 1D transfer
     struct npu_set_dma0_len_t
     {
 #ifdef __cplusplus
@@ -22525,9 +24801,8 @@ struct isa
         npu_set_dma0_len_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_DMA0_LEN)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_dma0_len_t() :
@@ -22557,8 +24832,8 @@ struct isa
         }
         CONSTEXPR npu_set_dma0_len_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -22588,9 +24863,8 @@ struct isa
         npu_set_dma0_skip0_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_DMA0_SKIP0)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_dma0_skip0_t() :
@@ -22620,8 +24894,8 @@ struct isa
         }
         CONSTEXPR npu_set_dma0_skip0_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -22651,9 +24925,8 @@ struct isa
         npu_set_dma0_skip1_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_DMA0_SKIP1)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_dma0_skip1_t() :
@@ -22683,8 +24956,8 @@ struct isa
         }
         CONSTEXPR npu_set_dma0_skip1_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -22714,9 +24987,8 @@ struct isa
         npu_set_ifm2_base0_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM2_BASE0)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_ifm2_base0_t() :
@@ -22746,8 +25018,8 @@ struct isa
         }
         CONSTEXPR npu_set_ifm2_base0_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -22777,9 +25049,8 @@ struct isa
         npu_set_ifm2_base1_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM2_BASE1)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_ifm2_base1_t() :
@@ -22809,8 +25080,8 @@ struct isa
         }
         CONSTEXPR npu_set_ifm2_base1_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -22840,9 +25111,8 @@ struct isa
         npu_set_ifm2_base2_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM2_BASE2)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_ifm2_base2_t() :
@@ -22872,8 +25142,8 @@ struct isa
         }
         CONSTEXPR npu_set_ifm2_base2_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -22903,9 +25173,8 @@ struct isa
         npu_set_ifm2_base3_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM2_BASE3)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_ifm2_base3_t() :
@@ -22935,8 +25204,8 @@ struct isa
         }
         CONSTEXPR npu_set_ifm2_base3_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -22966,9 +25235,8 @@ struct isa
         npu_set_ifm2_stride_x_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM2_STRIDE_X)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_ifm2_stride_x_t() :
@@ -22998,8 +25266,8 @@ struct isa
         }
         CONSTEXPR npu_set_ifm2_stride_x_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -23029,9 +25297,8 @@ struct isa
         npu_set_ifm2_stride_y_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM2_STRIDE_Y)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_ifm2_stride_y_t() :
@@ -23061,8 +25328,8 @@ struct isa
         }
         CONSTEXPR npu_set_ifm2_stride_y_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -23092,9 +25359,8 @@ struct isa
         npu_set_ifm2_stride_c_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM2_STRIDE_C)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_ifm2_stride_c_t() :
@@ -23124,8 +25390,8 @@ struct isa
         }
         CONSTEXPR npu_set_ifm2_stride_c_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -23155,9 +25421,8 @@ struct isa
         npu_set_weight1_base_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_WEIGHT1_BASE)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_weight1_base_t() :
@@ -23187,8 +25452,8 @@ struct isa
         }
         CONSTEXPR npu_set_weight1_base_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -23216,8 +25481,7 @@ struct isa
       public:
         npu_set_weight1_length_t(uint32_t _length) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_WEIGHT1_LENGTH)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0),
-            length(static_cast<uint32_t>(_length))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), length(_length)
         {
         }
         CONSTEXPR npu_set_weight1_length_t() :
@@ -23265,7 +25529,7 @@ struct isa
         }
         CONSTEXPR npu_set_weight1_length_t &set_length(uint32_t value)
         {
-            length = static_cast<uint32_t>(value);
+            length = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -23293,9 +25557,8 @@ struct isa
         npu_set_scale1_base_t(uint64_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_SCALE1_BASE)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()))),
-            reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max())))
+            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
+            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
         {
         }
         CONSTEXPR npu_set_scale1_base_t() :
@@ -23325,8 +25588,8 @@ struct isa
         }
         CONSTEXPR npu_set_scale1_base_t &set_addr(uint64_t value)
         {
-            addr_lo = static_cast<uint32_t>((value) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
-            addr_hi = static_cast<uint8_t>((value >> 32) & static_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
+            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -23356,7 +25619,7 @@ struct isa
         npu_set_scale1_length_t(uint32_t _length) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_SCALE1_LENGTH)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0),
-            length(static_cast<uint32_t>(_length) & ((1U << 20) - 1)), reserved2(0)
+            length(_length & ((1U << 20) - 1)), reserved2(0)
         {
         }
         CONSTEXPR npu_set_scale1_length_t() :
@@ -23404,7 +25667,7 @@ struct isa
         }
         CONSTEXPR npu_set_scale1_length_t &set_length(uint32_t value)
         {
-            length = static_cast<uint32_t>(value) & ((1U << 20) - 1);
+            length = value & ((1U << 20) - 1);
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
