@@ -278,33 +278,27 @@ bool ethosu_dev_verify_optimizer_config(struct ethosu_device *dev, uint32_t cfg_
     hw_cfg.word = dev->reg->CONFIG.word;
     hw_id.word  = dev->reg->ID.word;
 
-    LOG_INFO("Optimizer config cmd_stream_version: %" PRIu32 " macs_per_cc: %" PRIu32 " shram_size: %" PRIu32
-             " custom_dma: %" PRIu32,
+    LOG_INFO("Optimizer config. cmd_stream_version=%d, macs_per_cc=%d, shram_size=%d, custom_dma=%d",
              opt_cfg->cmd_stream_version,
              opt_cfg->macs_per_cc,
              opt_cfg->shram_size,
              opt_cfg->custom_dma);
-    LOG_INFO("Optimizer config Ethos-U version: %" PRIu32 ".%" PRIu32 ".%" PRIu32,
+    LOG_INFO("Optimizer config. Ethos-U version: %d.%d.%d",
              opt_id->arch_major_rev,
              opt_id->arch_minor_rev,
              opt_id->arch_patch_rev);
-
-    LOG_INFO("Ethos-U config cmd_stream_version: %" PRIu32 " macs_per_cc: %" PRIu32 " shram_size: %" PRIu32
-             " custom_dma: %" PRIu32,
+    LOG_INFO("Ethos-U config. cmd_stream_version=%d, macs_per_cc=%d, shram_size=%d, custom_dma=%d",
              hw_cfg.cmd_stream_version,
              hw_cfg.macs_per_cc,
              hw_cfg.shram_size,
              hw_cfg.custom_dma);
-    LOG_INFO("Ethos-U version: %" PRIu32 ".%" PRIu32 ".%" PRIu32,
-             hw_id.arch_major_rev,
-             hw_id.arch_minor_rev,
-             hw_id.arch_patch_rev);
+    LOG_INFO("Ethos-U. version=%d.%d.%d", hw_id.arch_major_rev, hw_id.arch_minor_rev, hw_id.arch_patch_rev);
 
     if (opt_cfg->word != hw_cfg.word)
     {
         if (hw_cfg.macs_per_cc != opt_cfg->macs_per_cc)
         {
-            LOG_ERR("NPU config mismatch: npu.macs_per_cc=%" PRIu32 " optimizer.macs_per_cc=%" PRIu32,
+            LOG_ERR("NPU config mismatch. npu.macs_per_cc=%d, optimizer.macs_per_cc=%d",
                     hw_cfg.macs_per_cc,
                     opt_cfg->macs_per_cc);
             ret = false;
@@ -312,7 +306,7 @@ bool ethosu_dev_verify_optimizer_config(struct ethosu_device *dev, uint32_t cfg_
 
         if (hw_cfg.shram_size != opt_cfg->shram_size)
         {
-            LOG_ERR("NPU config mismatch: npu.shram_size=%" PRIu32 " optimizer.shram_size=%" PRIu32,
+            LOG_ERR("NPU config mismatch. npu.shram_size=%d, optimizer.shram_size=%d",
                     hw_cfg.shram_size,
                     opt_cfg->shram_size);
             ret = false;
@@ -320,7 +314,7 @@ bool ethosu_dev_verify_optimizer_config(struct ethosu_device *dev, uint32_t cfg_
 
         if (hw_cfg.cmd_stream_version != opt_cfg->cmd_stream_version)
         {
-            LOG_ERR("NPU config mismatch: npu.cmd_stream_version=%" PRIu32 " optimizer.cmd_stream_version=%" PRIu32,
+            LOG_ERR("NPU config mismatch. npu.cmd_stream_version=%d, optimizer.cmd_stream_version=%d",
                     hw_cfg.cmd_stream_version,
                     opt_cfg->cmd_stream_version);
             ret = false;
@@ -328,7 +322,7 @@ bool ethosu_dev_verify_optimizer_config(struct ethosu_device *dev, uint32_t cfg_
 
         if (!hw_cfg.custom_dma && opt_cfg->custom_dma)
         {
-            LOG_ERR("NPU config mismatch: npu.custom_dma=%" PRIu32 " optimizer.custom_dma=%" PRIu32,
+            LOG_ERR("NPU config mismatch. npu.custom_dma=%d, optimizer.custom_dma=%d",
                     hw_cfg.custom_dma,
                     opt_cfg->custom_dma);
             ret = false;
@@ -337,8 +331,7 @@ bool ethosu_dev_verify_optimizer_config(struct ethosu_device *dev, uint32_t cfg_
 
     if ((hw_id.arch_major_rev != opt_id->arch_major_rev) || (hw_id.arch_minor_rev < opt_id->arch_minor_rev))
     {
-        LOG_ERR("NPU arch mismatch: npu.arch=%" PRIu32 ".%" PRIu32 ".%" PRIu32 " optimizer.arch=%" PRIu32 ".%" PRIu32
-                ".%" PRIu32,
+        LOG_ERR("NPU arch mismatch. npu.arch=%d.%d.%d, optimizer.arch=%d.%d.%d",
                 hw_id.arch_major_rev,
                 hw_id.arch_minor_rev,
                 hw_id.arch_patch_rev,
