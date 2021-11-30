@@ -166,16 +166,18 @@ bool ethosu_dev_handle_interrupt(struct ethosu_device *dev)
 
     // If a fault has occured, the NPU needs to be reset
     if (dev->reg->STATUS.bus_status || dev->reg->STATUS.cmd_parse_error || dev->reg->STATUS.wd_fault ||
-        dev->reg->STATUS.ecc_fault)
+        dev->reg->STATUS.ecc_fault || !dev->reg->STATUS.cmd_end_reached)
     {
-        LOG_DEBUG("NPU fault. status=0x%08x, qread=%" PRIu32, dev->reg->STATUS.word, dev->reg->QREAD.word);
+        LOG_ERR("NPU fault. status=0x%08x, qread=%" PRIu32 ", cmd_end_reached=%" PRIu32,
+                dev->reg->STATUS.word,
+                dev->reg->QREAD.word,
+                dev->reg->STATUS.cmd_end_reached);
         ethosu_dev_soft_reset(dev);
         ethosu_dev_set_clock_and_power(dev, ETHOSU_CLOCK_Q_UNCHANGED, ETHOSU_POWER_Q_DISABLE);
         return false;
     }
 
-    // Verify that the cmd stream finished executing
-    return dev->reg->STATUS.cmd_end_reached ? true : false;
+    return true;
 }
 
 bool ethosu_dev_verify_access_state(struct ethosu_device *dev)

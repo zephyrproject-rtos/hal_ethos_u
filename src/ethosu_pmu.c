@@ -97,8 +97,8 @@ void ETHOSU_PMU_Enable(struct ethosu_driver *drv)
 void ETHOSU_PMU_Disable(struct ethosu_driver *drv)
 {
     LOG_DEBUG("Disable PMU");
-    set_clock_and_power_request(drv, ETHOSU_PMU_REQUEST, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
     drv->dev->reg->PMCR.word = 0;
+    set_clock_and_power_request(drv, ETHOSU_PMU_REQUEST, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
 }
 
 void ETHOSU_PMU_Set_EVTYPER(struct ethosu_driver *drv, uint32_t num, enum ethosu_pmu_event_type type)

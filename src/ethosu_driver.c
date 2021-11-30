@@ -522,25 +522,12 @@ int ethosu_invoke(struct ethosu_driver *drv,
     // NPU might have lost power and thus its settings and state
     if (!drv->dev_power_always_on)
     {
-        bool axi_reinit = true;
-        // Only soft reset if security state or privilege level needs changing
-        if (ethosu_dev_verify_access_state(drv->dev) != true)
-        {
-            if (ethosu_dev_soft_reset(drv->dev) != ETHOSU_SUCCESS)
-            {
-                return -1;
-            }
-            axi_reinit = false;
-        }
-
-        // Set power ON during the inference
+        // Set power ON during the inference. Will soft reset if security state or
+        // privilege level needs changing
         set_clock_and_power_request(drv, ETHOSU_INFERENCE_REQUEST, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_DISABLE);
 
-        // If a soft reset occured, AXI reinit has already been performed
-        if (axi_reinit)
-        {
-            ethosu_dev_axi_init(drv->dev);
-        }
+        // Make sure AXI settings are applied
+        ethosu_dev_axi_init(drv->dev);
     }
 
     drv->status_error = false;
