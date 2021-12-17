@@ -35,6 +35,7 @@ extern "C" {
  * Defines
  ******************************************************************************/
 
+// NOTE: Deprecated
 #ifndef ETHOSU_PMU_NCOUNTERS
 #define ETHOSU_PMU_NCOUNTERS 4
 #endif

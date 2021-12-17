@@ -154,6 +154,12 @@ void ETHOSU_PMU_Disable(struct ethosu_driver *drv);
 void ETHOSU_PMU_Set_EVTYPER(struct ethosu_driver *drv, uint32_t num, enum ethosu_pmu_event_type type);
 
 /**
+ * \brief   Get number of PMU event counters
+ * \return                Number of event counters
+ */
+uint32_t ETHOSU_PMU_Get_NumEventCounters(void);
+
+/**
  * \brief   Get event to count for PMU eventer counter
  * \param [in]    num     Event counter (0-ETHOSU_PMU_NCOUNTERS) to configure
  * \return        type    Event to count

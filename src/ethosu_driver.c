@@ -285,7 +285,7 @@ static struct ethosu_driver *ethosu_find_and_reserve_driver(void)
         drv = drv->next;
     }
 
-    LOG_DEBUG("No NPU driver handle available.", drv);
+    LOG_WARN("No NPU driver handle available.");
 
     return NULL;
 }
