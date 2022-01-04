@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Arm Limited. All rights reserved.
+ * Copyright (c) 2019-2022 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "ethosu_interface.h"
 
 #include "ethosu_config.h"
@@ -27,6 +28,9 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#define ETHOSU_PRODUCT_U55 0
+#define ETHOSU_PRODUCT_U65 1
 
 #define BASEP_OFFSET 4
 
@@ -53,14 +57,27 @@ struct ethosu_device *ethosu_dev_init(const void *base_address, uint32_t secure_
     dev->secure     = secure_enable;
     dev->privileged = privilege_enable;
 
+#ifdef ETHOSU55
+    if (dev->reg->CONFIG.product != ETHOSU_PRODUCT_U55)
+#else
+    if (dev->reg->CONFIG.product != ETHOSU_PRODUCT_U65)
+#endif
+    {
+        LOG_ERR("Failed to initialize device. Driver has not been compiled for this product");
+        goto err;
+    }
+
     // Make sure the NPU is in a known state
     if (ethosu_dev_soft_reset(dev) != ETHOSU_SUCCESS)
     {
-        free(dev);
-        return NULL;
+        goto err;
     }
 
     return dev;
+
+err:
+    free(dev);
+    return NULL;
 }
 
 void ethosu_dev_deinit(struct ethosu_device *dev)
@@ -280,37 +297,37 @@ bool ethosu_dev_verify_optimizer_config(struct ethosu_device *dev, uint32_t cfg_
     hw_cfg.word = dev->reg->CONFIG.word;
     hw_id.word  = dev->reg->ID.word;
 
-    LOG_INFO("Optimizer config. cmd_stream_version=%d, macs_per_cc=%d, shram_size=%d, custom_dma=%d",
+    LOG_INFO("Optimizer config. product=%d, cmd_stream_version=%d, macs_per_cc=%d, shram_size=%d, custom_dma=%d",
+             opt_cfg->product,
              opt_cfg->cmd_stream_version,
              opt_cfg->macs_per_cc,
              opt_cfg->shram_size,
              opt_cfg->custom_dma);
-    LOG_INFO("Optimizer config. Ethos-U version: %d.%d.%d",
+    LOG_INFO("Optimizer config. arch version: %d.%d.%d",
              opt_id->arch_major_rev,
              opt_id->arch_minor_rev,
              opt_id->arch_patch_rev);
-    LOG_INFO("Ethos-U config. cmd_stream_version=%d, macs_per_cc=%d, shram_size=%d, custom_dma=%d",
+    LOG_INFO("Ethos-U config. product=%d, cmd_stream_version=%d, macs_per_cc=%d, shram_size=%d, custom_dma=%d",
+             hw_cfg.product,
              hw_cfg.cmd_stream_version,
              hw_cfg.macs_per_cc,
              hw_cfg.shram_size,
              hw_cfg.custom_dma);
-    LOG_INFO("Ethos-U. version=%d.%d.%d", hw_id.arch_major_rev, hw_id.arch_minor_rev, hw_id.arch_patch_rev);
+    LOG_INFO("Ethos-U. arch version=%d.%d.%d", hw_id.arch_major_rev, hw_id.arch_minor_rev, hw_id.arch_patch_rev);
 
     if (opt_cfg->word != hw_cfg.word)
     {
+        if (hw_cfg.product != opt_cfg->product)
+        {
+            LOG_ERR("NPU config mismatch. npu.product=%d, optimizer.product=%d", hw_cfg.product, opt_cfg->product);
+            ret = false;
+        }
+
         if (hw_cfg.macs_per_cc != opt_cfg->macs_per_cc)
         {
             LOG_ERR("NPU config mismatch. npu.macs_per_cc=%d, optimizer.macs_per_cc=%d",
                     hw_cfg.macs_per_cc,
                     opt_cfg->macs_per_cc);
-            ret = false;
-        }
-
-        if (hw_cfg.shram_size != opt_cfg->shram_size)
-        {
-            LOG_ERR("NPU config mismatch. npu.shram_size=%d, optimizer.shram_size=%d",
-                    hw_cfg.shram_size,
-                    opt_cfg->shram_size);
             ret = false;
         }
 
