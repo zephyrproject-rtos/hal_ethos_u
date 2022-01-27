@@ -185,7 +185,7 @@ bool ethosu_dev_handle_interrupt(struct ethosu_device *dev)
     if (dev->reg->STATUS.bus_status || dev->reg->STATUS.cmd_parse_error || dev->reg->STATUS.wd_fault ||
         dev->reg->STATUS.ecc_fault || !dev->reg->STATUS.cmd_end_reached)
     {
-        LOG_ERR("NPU fault. status=0x%08x, qread=%" PRIu32 ", cmd_end_reached=%" PRIu32,
+        LOG_ERR("NPU fault. status=0x%08" PRIx32 ", qread=%" PRIu32 ", cmd_end_reached=%d",
                 dev->reg->STATUS.word,
                 dev->reg->QREAD.word,
                 dev->reg->STATUS.cmd_end_reached);

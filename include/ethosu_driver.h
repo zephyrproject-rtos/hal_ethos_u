@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Arm Limited. All rights reserved.
+ * Copyright (c) 2019-2022 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -109,11 +109,11 @@ void ethosu_semaphore_take(void *sem);
 void ethosu_semaphore_give(void *sem);
 
 /*
- * Callbacks for begin/end of inference. inference_data pointer is set in the
- * ethosu_invoke() call, referenced as custom_data_ptr.
+ * Callbacks for begin/end of inference. user_data pointer is passed to the
+ * ethosu_invoke() call and forwarded to the callback functions.
  */
-void ethosu_inference_begin(struct ethosu_driver *drv, const void *inference_data);
-void ethosu_inference_end(struct ethosu_driver *drv, const void *inference_data);
+void ethosu_inference_begin(struct ethosu_driver *drv, void *user_arg);
+void ethosu_inference_end(struct ethosu_driver *drv, void *user_arg);
 
 /******************************************************************************
  * Prototypes
@@ -147,12 +147,16 @@ void ethosu_get_hw_info(struct ethosu_driver *drv, struct ethosu_hw_info *hw);
 /**
  * Invoke Vela command stream.
  */
-int ethosu_invoke(struct ethosu_driver *drv,
-                  const void *custom_data_ptr,
-                  const int custom_data_size,
-                  const uint64_t *base_addr,
-                  const size_t *base_addr_size,
-                  const int num_base_addr);
+int ethosu_invoke_v3(struct ethosu_driver *drv,
+                     const void *custom_data_ptr,
+                     const int custom_data_size,
+                     const uint64_t *base_addr,
+                     const size_t *base_addr_size,
+                     const int num_base_addr,
+                     void *user_arg);
+
+#define ethosu_invoke(drv, custom_data_ptr, custom_data_size, base_addr, base_addr_size, num_base_addr)                \
+    ethosu_invoke_v3(drv, custom_data_ptr, custom_data_size, base_addr, base_addr_size, num_base_addr, 0)
 
 /**
  * Set Ethos-U power mode.
@@ -187,7 +191,7 @@ static inline int ethosu_invoke_v2(const void *custom_data_ptr,
                                    const int num_base_addr)
 {
     struct ethosu_driver *drv = ethosu_reserve_driver();
-    int result = ethosu_invoke(drv, custom_data_ptr, custom_data_size, base_addr, base_addr_size, num_base_addr);
+    int result = ethosu_invoke_v3(drv, custom_data_ptr, custom_data_size, base_addr, base_addr_size, num_base_addr, 0);
     ethosu_release_driver(drv);
     return result;
 }

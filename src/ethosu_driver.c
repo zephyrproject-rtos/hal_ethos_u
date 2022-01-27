@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Arm Limited. All rights reserved.
+ * Copyright (c) 2019-2022 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -209,15 +209,15 @@ void __attribute__((weak)) ethosu_semaphore_give(void *sem)
  * Weak functions - Inference begin/end callbacks
  ******************************************************************************/
 
-void __attribute__((weak)) ethosu_inference_begin(struct ethosu_driver *drv, const void *inference_data)
+void __attribute__((weak)) ethosu_inference_begin(struct ethosu_driver *drv, void *user_arg)
 {
-    UNUSED(inference_data);
+    UNUSED(user_arg);
     UNUSED(drv);
 }
 
-void __attribute__((weak)) ethosu_inference_end(struct ethosu_driver *drv, const void *inference_data)
+void __attribute__((weak)) ethosu_inference_end(struct ethosu_driver *drv, void *user_arg)
 {
-    UNUSED(inference_data);
+    UNUSED(user_arg);
     UNUSED(drv);
 }
 
@@ -476,12 +476,13 @@ void ethosu_get_hw_info(struct ethosu_driver *drv, struct ethosu_hw_info *hw)
     ethosu_dev_get_hw_info(drv->dev, hw);
 }
 
-int ethosu_invoke(struct ethosu_driver *drv,
-                  const void *custom_data_ptr,
-                  const int custom_data_size,
-                  const uint64_t *base_addr,
-                  const size_t *base_addr_size,
-                  const int num_base_addr)
+int ethosu_invoke_v3(struct ethosu_driver *drv,
+                     const void *custom_data_ptr,
+                     const int custom_data_size,
+                     const uint64_t *base_addr,
+                     const size_t *base_addr_size,
+                     const int num_base_addr,
+                     void *user_arg)
 {
     const struct cop_data_s *data_ptr = custom_data_ptr;
     const struct cop_data_s *data_end = custom_data_ptr + custom_data_size;
@@ -532,7 +533,8 @@ int ethosu_invoke(struct ethosu_driver *drv,
 
     drv->status_error = false;
 
-    ethosu_inference_begin(drv, custom_data_ptr);
+    ethosu_inference_begin(drv, user_arg);
+
     while (data_ptr < data_end)
     {
         int ret = 0;
@@ -577,7 +579,7 @@ int ethosu_invoke(struct ethosu_driver *drv,
         }
     }
 
-    ethosu_inference_end(drv, custom_data_ptr);
+    ethosu_inference_end(drv, user_arg);
 
     if (!drv->status_error && !drv->dev_power_always_on)
     {
