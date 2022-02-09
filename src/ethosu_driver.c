@@ -485,7 +485,7 @@ int ethosu_invoke_v3(struct ethosu_driver *drv,
                      void *user_arg)
 {
     const struct cop_data_s *data_ptr = custom_data_ptr;
-    const struct cop_data_s *data_end = custom_data_ptr + custom_data_size;
+    const struct cop_data_s *data_end = (struct cop_data_s *)((ptrdiff_t)custom_data_ptr + custom_data_size);
     int return_code                   = 0;
 
     // First word in custom_data_ptr should contain "Custom Operator Payload 1"
