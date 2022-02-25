@@ -133,11 +133,11 @@ enum ethosu_error_codes ethosu_dev_axi_init(struct ethosu_device *dev)
     return ETHOSU_SUCCESS;
 }
 
-enum ethosu_error_codes ethosu_dev_run_command_stream(struct ethosu_device *dev,
-                                                      const uint8_t *cmd_stream_ptr,
-                                                      uint32_t cms_length,
-                                                      const uint64_t *base_addr,
-                                                      int num_base_addr)
+void ethosu_dev_run_command_stream(struct ethosu_device *dev,
+                                   const uint8_t *cmd_stream_ptr,
+                                   uint32_t cms_length,
+                                   const uint64_t *base_addr,
+                                   int num_base_addr)
 {
     assert(num_base_addr <= NPU_REG_BASEP_ARRLEN);
 
@@ -168,8 +168,14 @@ enum ethosu_error_codes ethosu_dev_run_command_stream(struct ethosu_device *dev,
 
     dev->reg->CMD.word = cmd.word;
     LOG_DEBUG("CMD=0x%08x", cmd.word);
+}
 
-    return ETHOSU_SUCCESS;
+void ethosu_dev_print_err_status(struct ethosu_device *dev)
+{
+    LOG_ERR("NPU status=0x%08" PRIx32 ", qread=%" PRIu32 ", cmd_end_reached=%d",
+            dev->reg->STATUS.word,
+            dev->reg->QREAD.word,
+            dev->reg->STATUS.cmd_end_reached);
 }
 
 bool ethosu_dev_handle_interrupt(struct ethosu_device *dev)
@@ -185,12 +191,6 @@ bool ethosu_dev_handle_interrupt(struct ethosu_device *dev)
     if (dev->reg->STATUS.bus_status || dev->reg->STATUS.cmd_parse_error || dev->reg->STATUS.wd_fault ||
         dev->reg->STATUS.ecc_fault || !dev->reg->STATUS.cmd_end_reached)
     {
-        LOG_ERR("NPU fault. status=0x%08" PRIx32 ", qread=%" PRIu32 ", cmd_end_reached=%d",
-                dev->reg->STATUS.word,
-                dev->reg->QREAD.word,
-                dev->reg->STATUS.cmd_end_reached);
-        ethosu_dev_soft_reset(dev);
-        ethosu_dev_set_clock_and_power(dev, ETHOSU_CLOCK_Q_UNCHANGED, ETHOSU_POWER_Q_DISABLE);
         return false;
     }
 

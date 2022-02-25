@@ -48,17 +48,35 @@ extern "C" {
 // Forward declare
 struct ethosu_device;
 
+enum ethosu_job_state
+{
+    ETHOSU_JOB_IDLE = 0,
+    ETHOSU_JOB_RUNNING,
+    ETHOSU_JOB_DONE
+};
+
+struct ethosu_job
+{
+    volatile enum ethosu_job_state state;
+    const void *custom_data_ptr;
+    int custom_data_size;
+    const uint64_t *base_addr;
+    const size_t *base_addr_size;
+    int num_base_addr;
+    void *user_arg;
+};
+
 struct ethosu_driver
 {
     struct ethosu_device *dev;
     struct ethosu_driver *next;
+    struct ethosu_job job;
     void *semaphore;
     uint64_t fast_memory;
     size_t fast_memory_size;
     bool status_error;
     bool dev_power_always_on;
     bool reserved;
-    volatile bool irq_triggered;
     uint8_t clock_request;
     uint8_t power_request;
 };
@@ -157,6 +175,33 @@ int ethosu_invoke_v3(struct ethosu_driver *drv,
 
 #define ethosu_invoke(drv, custom_data_ptr, custom_data_size, base_addr, base_addr_size, num_base_addr)                \
     ethosu_invoke_v3(drv, custom_data_ptr, custom_data_size, base_addr, base_addr_size, num_base_addr, 0)
+
+/**
+ * Invoke Vela command stream using async interface.
+ * Must be followed by call(s) to ethosu_wait() upon successful return.
+ * Returns
+ *   -1 on error
+ *    0 on success
+ */
+int ethosu_invoke_async(struct ethosu_driver *drv,
+                        const void *custom_data_ptr,
+                        const int custom_data_size,
+                        const uint64_t *base_addr,
+                        const size_t *base_addr_size,
+                        const int num_base_addr,
+                        void *user_arg);
+
+/**
+ * Wait for inference to complete (block=true)
+ * Poll status or finish up if inference is complete (block=false)
+ * (This function is only intended to be used in conjuction with ethosu_invoke_async)
+ * Returns
+ *    1 on inference running (only for block=false)
+ *    0 on inference success
+ *   -1 on inference error
+ *   -2 on inference not invoked
+ */
+int ethosu_wait(struct ethosu_driver *drv, bool block);
 
 /**
  * Set Ethos-U power mode.

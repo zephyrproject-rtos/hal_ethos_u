@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Arm Limited. All rights reserved.
+ * Copyright (c) 2019-2022 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -81,13 +81,17 @@ enum ethosu_error_codes ethosu_dev_axi_init(struct ethosu_device *dev);
  *                             - All input tensors
  *                             - All output tensors
  * \param[in] num_base_addr    Number of base addresses.
- * \return                     \ref ethosu_error_codes
  */
-enum ethosu_error_codes ethosu_dev_run_command_stream(struct ethosu_device *dev,
-                                                      const uint8_t *cmd_stream_ptr,
-                                                      uint32_t cms_length,
-                                                      const uint64_t *base_addr,
-                                                      int num_base_addr);
+void ethosu_dev_run_command_stream(struct ethosu_device *dev,
+                                   const uint8_t *cmd_stream_ptr,
+                                   uint32_t cms_length,
+                                   const uint64_t *base_addr,
+                                   int num_base_addr);
+
+/**
+ * Print information on NPU error status
+ */
+void ethosu_dev_print_err_status(struct ethosu_device *dev);
 
 /**
  *  Interrupt handler on device layer
