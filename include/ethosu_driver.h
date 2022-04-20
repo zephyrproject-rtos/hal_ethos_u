@@ -120,11 +120,16 @@ void ethosu_invalidate_dcache(uint32_t *p, size_t bytes);
  * ethosu_driver.c.
  */
 void *ethosu_mutex_create(void);
-void ethosu_mutex_lock(void *mutex);
-void ethosu_mutex_unlock(void *mutex);
 void *ethosu_semaphore_create(void);
-void ethosu_semaphore_take(void *sem);
-void ethosu_semaphore_give(void *sem);
+/*
+ * Returns:
+ *   -1 on error
+ *    0 on success
+ */
+int ethosu_mutex_lock(void *mutex);
+int ethosu_mutex_unlock(void *mutex);
+int ethosu_semaphore_take(void *sem);
+int ethosu_semaphore_give(void *sem);
 
 /*
  * Callbacks for begin/end of inference. user_data pointer is passed to the

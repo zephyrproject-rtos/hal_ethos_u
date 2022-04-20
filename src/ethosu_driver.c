@@ -163,14 +163,16 @@ void __attribute__((weak)) ethosu_mutex_destroy(void *mutex)
     UNUSED(mutex);
 }
 
-void __attribute__((weak)) ethosu_mutex_lock(void *mutex)
+int __attribute__((weak)) ethosu_mutex_lock(void *mutex)
 {
     UNUSED(mutex);
+    return 0;
 }
 
-void __attribute__((weak)) ethosu_mutex_unlock(void *mutex)
+int __attribute__((weak)) ethosu_mutex_unlock(void *mutex)
 {
     UNUSED(mutex);
+    return 0;
 }
 
 // Baremetal implementation of creating a semaphore
@@ -187,7 +189,7 @@ void __attribute__((weak)) ethosu_semaphore_destroy(void *sem)
 }
 
 // Baremetal simulation of waiting/sleeping for and then taking a semaphore using intrisics
-void __attribute__((weak)) ethosu_semaphore_take(void *sem)
+int __attribute__((weak)) ethosu_semaphore_take(void *sem)
 {
     struct ethosu_semaphore_t *s = sem;
     while (s->count == 0)
@@ -195,14 +197,16 @@ void __attribute__((weak)) ethosu_semaphore_take(void *sem)
         __WFE();
     }
     s->count = 0;
+    return 0;
 }
 
 // Baremetal simulation of giving a semaphore and waking up processes using intrinsics
-void __attribute__((weak)) ethosu_semaphore_give(void *sem)
+int __attribute__((weak)) ethosu_semaphore_give(void *sem)
 {
     struct ethosu_semaphore_t *s = sem;
     s->count                     = 1;
     __SEV();
+    return 0;
 }
 
 /******************************************************************************
@@ -369,6 +373,7 @@ void __attribute__((weak)) ethosu_irq_handler(struct ethosu_driver *drv)
     {
         drv->status_error = true;
     }
+    /* TODO: feedback needed aout how to handle error (-1) return value */
     ethosu_semaphore_give(drv->semaphore);
 }
 
@@ -475,6 +480,7 @@ int ethosu_wait(struct ethosu_driver *drv, bool block)
     case ETHOSU_JOB_DONE:
         // Wait for interrupt in blocking mode. In non-blocking mode
         // the interrupt has already triggered
+        /* TODO: feedback needed aout how to handle error (-1) return value */
         ethosu_semaphore_take(drv->semaphore);
 
         // Inference done callback
@@ -689,8 +695,10 @@ struct ethosu_driver *ethosu_reserve_driver(void)
 
     do
     {
+        /* TODO: feedback needed aout how to handle error (-1) return value */
         ethosu_mutex_lock(ethosu_mutex);
         drv = ethosu_find_and_reserve_driver();
+        /* TODO: feedback needed aout how to handle error (-1) return value */
         ethosu_mutex_unlock(ethosu_mutex);
 
         if (drv != NULL)
@@ -699,6 +707,7 @@ struct ethosu_driver *ethosu_reserve_driver(void)
         }
 
         LOG_INFO("Waiting for NPU driver handle to become available...");
+        /* TODO: feedback needed aout how to handle error (-1) return value */
         ethosu_semaphore_take(ethosu_semaphore);
 
     } while (1);
@@ -708,6 +717,7 @@ struct ethosu_driver *ethosu_reserve_driver(void)
 
 void ethosu_release_driver(struct ethosu_driver *drv)
 {
+    /* TODO: feedback needed aout how to handle error (-1) return value */
     ethosu_mutex_lock(ethosu_mutex);
     if (drv != NULL && drv->reserved)
     {
@@ -720,6 +730,7 @@ void ethosu_release_driver(struct ethosu_driver *drv)
                 ethosu_dev_soft_reset(drv->dev);
                 ethosu_reset_job(drv);
                 drv->status_error = false;
+                /* TODO: feedback needed aout how to handle error (-1) return value */
                 ethosu_semaphore_give(drv->semaphore);
                 (void)set_clock_and_power_request(
                     drv, ETHOSU_INFERENCE_REQUEST, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
@@ -728,8 +739,10 @@ void ethosu_release_driver(struct ethosu_driver *drv)
 
         drv->reserved = false;
         LOG_DEBUG("NPU driver handle %p released", drv);
+        /* TODO: feedback needed aout how to handle error (-1) return value */
         ethosu_semaphore_give(ethosu_semaphore);
     }
+    /* TODO: feedback needed aout how to handle error (-1) return value */
     ethosu_mutex_unlock(ethosu_mutex);
 }
 
