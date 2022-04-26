@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Arm Limited. All rights reserved.
+ * Copyright (c) 2019-2022 Arm Limited.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -90,7 +90,7 @@ void ETHOSU_PMU_Enable(struct ethosu_driver *drv)
     LOG_DEBUG("Enable PMU");
     struct pmcr_r pmcr = {0};
     pmcr.cnt_en        = 1;
-    set_clock_and_power_request(drv, ETHOSU_PMU_REQUEST, ETHOSU_CLOCK_Q_DISABLE, ETHOSU_POWER_Q_DISABLE);
+    ethosu_request_power(drv);
     drv->dev->reg->PMCR.word = pmcr.word;
 }
 
@@ -98,7 +98,7 @@ void ETHOSU_PMU_Disable(struct ethosu_driver *drv)
 {
     LOG_DEBUG("Disable PMU");
     drv->dev->reg->PMCR.word = 0;
-    set_clock_and_power_request(drv, ETHOSU_PMU_REQUEST, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
+    ethosu_release_power(drv);
 }
 
 uint32_t ETHOSU_PMU_Get_NumEventCounters(void)

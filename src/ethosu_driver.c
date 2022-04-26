@@ -320,8 +320,6 @@ static int handle_command_stream(struct ethosu_driver *drv, const uint8_t *cmd_s
         }
     }
 
-    drv->job.state = ETHOSU_JOB_RUNNING;
-
     // Flush the cache if available on CPU.
     // The upcasting to uin32_t* is ok since the pointer never is dereferenced.
     // The base_addr_size is null if invoking from prior to invoke_V2, in that case
@@ -341,16 +339,13 @@ static int handle_command_stream(struct ethosu_driver *drv, const uint8_t *cmd_s
     }
 
     // Request power gating disabled during inference run
-    if (!drv->dev_power_always_on)
+    if (!ethosu_request_power(drv))
     {
-        // Will soft reset if security state or privilege level needs changing.
-        // Also note that any configurations done in the NPU prior to this point
-        // are lost in case power gating has been in effect.
-        set_clock_and_power_request(drv, ETHOSU_INFERENCE_REQUEST, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_DISABLE);
-
-        // Make sure AXI settings are applied
-        ethosu_dev_axi_init(drv->dev);
+        LOG_ERR("Failed to request power");
+        return -1;
     }
+
+    drv->job.state = ETHOSU_JOB_RUNNING;
 
     // Inference begin callback
     ethosu_inference_begin(drv, drv->job.user_arg);
@@ -406,8 +401,9 @@ int ethosu_init(struct ethosu_driver *drv,
         ethosu_semaphore = ethosu_semaphore_create();
     }
 
-    drv->fast_memory      = (uint32_t)fast_memory;
-    drv->fast_memory_size = fast_memory_size;
+    drv->fast_memory           = (uint32_t)fast_memory;
+    drv->fast_memory_size      = fast_memory_size;
+    drv->power_request_counter = 0;
 
     // Initialize the device and set requested security state and privilege mode
     drv->dev = ethosu_dev_init(base_address, secure_enable, privilege_enable);
@@ -418,19 +414,10 @@ int ethosu_init(struct ethosu_driver *drv,
         return -1;
     }
 
-    // Power always ON requested
-    if (drv->dev_power_always_on)
-    {
-        if (set_clock_and_power_request(drv, ETHOSU_INFERENCE_REQUEST, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_DISABLE) !=
-            ETHOSU_SUCCESS)
-        {
-            LOG_ERR("Failed to disable power-q for Ethos-U");
-            return -1;
-        }
-    }
-
     drv->semaphore    = ethosu_semaphore_create();
     drv->status_error = false;
+
+    ethosu_reset_job(drv);
 
     ethosu_register_driver(drv);
 
@@ -443,6 +430,56 @@ void ethosu_deinit(struct ethosu_driver *drv)
     ethosu_semaphore_destroy(drv->semaphore);
     ethosu_dev_deinit(drv->dev);
     drv->dev = NULL;
+}
+
+bool ethosu_soft_reset(struct ethosu_driver *drv)
+{
+    // Soft reset the NPU
+    if (ethosu_dev_soft_reset(drv->dev) != ETHOSU_SUCCESS)
+    {
+        LOG_ERR("Failed to soft-reset NPU");
+        return false;
+    }
+
+    // Update power and clock gating after the soft reset
+    ethosu_dev_set_clock_and_power(drv->dev,
+                                   drv->power_request_counter > 0 ? ETHOSU_CLOCK_Q_DISABLE : ETHOSU_CLOCK_Q_ENABLE,
+                                   drv->power_request_counter > 0 ? ETHOSU_POWER_Q_DISABLE : ETHOSU_POWER_Q_ENABLE);
+
+    return true;
+}
+
+bool ethosu_request_power(struct ethosu_driver *drv)
+{
+    // Check if this is the first power request, increase counter
+    if (drv->power_request_counter++ == 0)
+    {
+        // Always reset to a known state. Changes to requested
+        // security state/privilege mode if necessary.
+        if (ethosu_soft_reset(drv) == false)
+        {
+            LOG_ERR("Failed to request power for Ethos-U");
+            drv->power_request_counter--;
+            return false;
+        }
+    }
+    return true;
+}
+
+void ethosu_release_power(struct ethosu_driver *drv)
+{
+    if (drv->power_request_counter == 0)
+    {
+        LOG_WARN("No power request left to release, reference counter is 0");
+    }
+    else
+    {
+        // Decrement ref counter and enable power gating if no requests remain
+        if (--drv->power_request_counter == 0)
+        {
+            ethosu_dev_set_clock_and_power(drv->dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
+        }
+    }
 }
 
 void ethosu_get_driver_version(struct ethosu_driver_version *ver)
@@ -486,6 +523,9 @@ int ethosu_wait(struct ethosu_driver *drv, bool block)
         // Inference done callback
         ethosu_inference_end(drv, drv->job.user_arg);
 
+        // Relase power gating disabled requirement
+        ethosu_release_power(drv);
+
         // Check NPU and interrupt status
         if (drv->status_error)
         {
@@ -493,19 +533,11 @@ int ethosu_wait(struct ethosu_driver *drv, bool block)
             ethosu_dev_print_err_status(drv->dev);
 
             // Reset the NPU
-            (void)ethosu_dev_soft_reset(drv->dev);
+            (void)ethosu_soft_reset(drv);
             // NPU is no longer in error state
             drv->status_error = false;
 
             ret = -1;
-        }
-
-        // Clear the clock/power gating disable request
-        if (!drv->dev_power_always_on)
-        {
-            // NOTE: Other requesters (like PMU) can be active, keeping
-            // clock/power gating disabled until no requests remain.
-            set_clock_and_power_request(drv, ETHOSU_INFERENCE_REQUEST, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
         }
 
         if (ret == 0)
@@ -664,31 +696,6 @@ int ethosu_invoke_v3(struct ethosu_driver *drv,
     return ethosu_wait(drv, true);
 }
 
-void ethosu_set_power_mode(struct ethosu_driver *drv, bool always_on)
-{
-    drv->dev_power_always_on = always_on;
-
-    if (always_on)
-    {
-        if (ethosu_dev_verify_access_state(drv->dev) == false)
-        {
-            // Reset to enter correct security state/privilege mode
-            if (ethosu_dev_soft_reset(drv->dev) == false)
-            {
-                LOG_ERR("Failed to set power mode for Ethos-U");
-                return;
-            }
-        }
-
-        ethosu_dev_set_clock_and_power(drv->dev, ETHOSU_CLOCK_Q_UNCHANGED, ETHOSU_POWER_Q_DISABLE);
-        ethosu_dev_axi_init(drv->dev);
-    }
-    else
-    {
-        ethosu_dev_set_clock_and_power(drv->dev, ETHOSU_CLOCK_Q_UNCHANGED, ETHOSU_POWER_Q_ENABLE);
-    }
-}
-
 struct ethosu_driver *ethosu_reserve_driver(void)
 {
     struct ethosu_driver *drv = NULL;
@@ -727,13 +734,12 @@ void ethosu_release_driver(struct ethosu_driver *drv)
             if (ethosu_wait(drv, false) == 1)
             {
                 // Still running, soft reset the NPU and reset driver
-                ethosu_dev_soft_reset(drv->dev);
+                drv->power_request_counter = 0;
+                ethosu_soft_reset(drv);
                 ethosu_reset_job(drv);
                 drv->status_error = false;
                 /* TODO: feedback needed aout how to handle error (-1) return value */
                 ethosu_semaphore_give(drv->semaphore);
-                (void)set_clock_and_power_request(
-                    drv, ETHOSU_INFERENCE_REQUEST, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
             }
         }
 
@@ -744,59 +750,4 @@ void ethosu_release_driver(struct ethosu_driver *drv)
     }
     /* TODO: feedback needed aout how to handle error (-1) return value */
     ethosu_mutex_unlock(ethosu_mutex);
-}
-
-enum ethosu_error_codes set_clock_and_power_request(struct ethosu_driver *drv,
-                                                    enum ethosu_request_clients client,
-                                                    enum ethosu_clock_q_request clock_request,
-                                                    enum ethosu_power_q_request power_request)
-{
-    // Keep track of which client requests clock gating to be disabled
-    if (clock_request == ETHOSU_CLOCK_Q_DISABLE)
-    {
-        drv->clock_request |= (1 << client);
-    }
-    else if (clock_request == ETHOSU_CLOCK_Q_ENABLE) // Remove client from bitmask
-    {
-        drv->clock_request &= ~(1 << client);
-    }
-
-    // Only enable clock gating when no client has asked for it to be disabled
-    clock_request = drv->clock_request == 0 ? ETHOSU_CLOCK_Q_ENABLE : ETHOSU_CLOCK_Q_DISABLE;
-
-    // Keep track of which client requests power gating to be disabled
-    if (power_request == ETHOSU_POWER_Q_DISABLE)
-    {
-        drv->power_request |= (1 << client);
-    }
-    else if (power_request == ETHOSU_POWER_Q_ENABLE)
-    {
-        drv->power_request &= ~(1 << client);
-    }
-
-    // Override if power has been requested to be always on
-    if (drv->dev_power_always_on == true)
-    {
-        power_request = ETHOSU_POWER_Q_DISABLE;
-    }
-    else
-    {
-        // Only enable power gating when no client has asked for it to be disabled
-        power_request = drv->power_request == 0 ? ETHOSU_POWER_Q_ENABLE : ETHOSU_POWER_Q_DISABLE;
-    }
-
-    // Verify security state and privilege mode if power is requested to be on
-    if (power_request == ETHOSU_POWER_Q_DISABLE)
-    {
-        if (ethosu_dev_verify_access_state(drv->dev) == false)
-        {
-            if (ethosu_dev_soft_reset(drv->dev) != ETHOSU_SUCCESS)
-            {
-                LOG_ERR("Failed to set clock and power q channels for Ethos-U");
-                return ETHOSU_GENERIC_FAILURE;
-            }
-        }
-    }
-    // Set clock and power
-    return ethosu_dev_set_clock_and_power(drv->dev, clock_request, power_request);
 }

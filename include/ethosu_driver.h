@@ -74,11 +74,9 @@ struct ethosu_driver
     void *semaphore;
     uint64_t fast_memory;
     size_t fast_memory_size;
+    uint32_t power_request_counter;
     bool status_error;
-    bool dev_power_always_on;
     bool reserved;
-    uint8_t clock_request;
-    uint8_t power_request;
 };
 
 struct ethosu_driver_version
@@ -158,6 +156,24 @@ int ethosu_init(struct ethosu_driver *drv,
 void ethosu_deinit(struct ethosu_driver *drv);
 
 /**
+ * Soft resets the Ethos-U device.
+ */
+bool ethosu_soft_reset(struct ethosu_driver *drv);
+
+/**
+ * Request to disable Q-channel power gating of the Ethos-U device.
+ * Power requests are ref.counted. Increases count.
+ * (Note: clock gating is made to follow power gating)
+ */
+bool ethosu_request_power(struct ethosu_driver *drv);
+
+/**
+ * Release disable request for Q-channel power gating of the Ethos-U device.
+ * Power requests are ref.counted. Decreases count.
+ */
+void ethosu_release_power(struct ethosu_driver *drv);
+
+/**
  * Get Ethos-U driver version.
  */
 void ethosu_get_driver_version(struct ethosu_driver_version *ver);
@@ -209,11 +225,6 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
 int ethosu_wait(struct ethosu_driver *drv, bool block);
 
 /**
- * Set Ethos-U power mode.
- */
-void ethosu_set_power_mode(struct ethosu_driver *drv, bool always_on);
-
-/**
  * Reserves a driver to execute inference with
  */
 struct ethosu_driver *ethosu_reserve_driver(void);
@@ -222,14 +233,6 @@ struct ethosu_driver *ethosu_reserve_driver(void);
  * Change driver status to available
  */
 void ethosu_release_driver(struct ethosu_driver *drv);
-
-/**
- * Set clock and power request bits
- */
-enum ethosu_error_codes set_clock_and_power_request(struct ethosu_driver *drv,
-                                                    enum ethosu_request_clients client,
-                                                    enum ethosu_clock_q_request clock_request,
-                                                    enum ethosu_power_q_request power_request);
 
 /**
  * Static inline for backwards-compatibility

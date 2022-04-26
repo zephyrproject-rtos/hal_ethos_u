@@ -209,6 +209,9 @@ bool ethosu_dev_verify_access_state(struct ethosu_device *dev)
 
 enum ethosu_error_codes ethosu_dev_soft_reset(struct ethosu_device *dev)
 {
+    // Note that after a soft-reset, the NPU is unconditionally
+    // powered until the next CMD gets written.
+
     struct reset_r reset;
 
     reset.word        = 0;
