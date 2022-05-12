@@ -18,9 +18,14 @@
 
 #include "ethosu_interface.h"
 
-#include "ethosu_config.h"
 #include "ethosu_device.h"
 #include "ethosu_log.h"
+
+#ifdef ETHOSU55
+#include "ethosu_config_u55.h"
+#else
+#include "ethosu_config_u65.h"
+#endif
 
 #include <assert.h>
 #include <inttypes.h>
