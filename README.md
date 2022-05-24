@@ -8,8 +8,16 @@ The source code comes with a CMake based build system. The driver is expected to
 be cross compiled for any of the supported Arm Cortex(R)-M CPUs, which requires
 the user to configure the build to match their system configuration.
 
-One such requirement is to define `CMAKE_SYSTEM_PROCESSOR` for the target CPU,
-for example "cortex-m55+nodsp+nofp". Similarly the target NPU configuration is
+
+One such requirement is to define the target CPU, normally by setting
+`CMAKE_SYSTEM_PROCESSOR`. **Note** that when using the toolchain files provided
+in [core_platform](https://git.mlplatform.org/ml/ethos-u/ethos-u-core-platform.git),
+the variable `TARGET_CPU` must be used instead of `CMAKE_SYSTEM_PROCESSOR`.
+
+Target CPU is specified on the form "cortex-m<nr><features>", for example:
+"cortex-m55+nodsp+nofp".
+
+Similarly the target NPU configuration is
 controlled by setting `ETHOSU_TARGET_NPU_CONFIG`, for example "ethos-u55-128".
 
 The build configuration can be defined either in the toolchain file or
@@ -19,6 +27,16 @@ by passing options on the command line.
 $ cmake -B build  \
     -DCMAKE_TOOLCHAIN_FILE=<toolchain> \
     -DCMAKE_SYSTEM_PROCESSOR=cortex-m<nr><features> \
+    -DETHOSU_TARGET_NPU_CONFIG=ethos-u<nr>-<macs>
+$ cmake --build build
+```
+
+or when using toolchain files from [core_platform](https://git.mlplatform.org/ml/ethos-u/ethos-u-core-platform.git)
+
+```[bash]
+$ cmake -B build  \
+    -DCMAKE_TOOLCHAIN_FILE=<core_platform_toolchain> \
+    -DTARGET_CPU=cortex-m<nr><features> \
     -DETHOSU_TARGET_NPU_CONFIG=ethos-u<nr>-<macs>
 $ cmake --build build
 ```
