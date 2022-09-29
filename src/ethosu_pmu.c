@@ -285,3 +285,17 @@ void ETHOSU_PMU_PMCCNTR_CFG_Set_Stop_Event(struct ethosu_driver *drv, enum ethos
     cfg.CYCLE_CNT_CFG_STOP          = val;
     drv->dev->reg->PMCCNTR_CFG.word = cfg.word;
 }
+
+uint32_t ETHOSU_PMU_Get_QREAD(struct ethosu_driver *drv)
+{
+    uint32_t val = drv->dev->reg->QREAD.word;
+    LOG_DEBUG("qread=%u", val);
+    return val;
+}
+
+uint32_t ETHOSU_PMU_Get_STATUS(struct ethosu_driver *drv)
+{
+    uint32_t val = drv->dev->reg->STATUS.word;
+    LOG_DEBUG("status=0x%x", val);
+    return val;
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Arm Limited. All rights reserved.
+ * SPDX-FileCopyrightText: Copyright 2019-2022 Arm Limited and/or its affiliates <open-source-office@arm.com>
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -308,6 +308,16 @@ void ETHOSU_PMU_PMCCNTR_CFG_Set_Start_Event(struct ethosu_driver *drv, enum etho
  * \note   Sets the event number that stops the cycle counter.
  */
 void ETHOSU_PMU_PMCCNTR_CFG_Set_Stop_Event(struct ethosu_driver *drv, enum ethosu_pmu_event_type stop_event);
+
+/**
+ * \brief   Read qread register
+ */
+uint32_t ETHOSU_PMU_Get_QREAD(struct ethosu_driver *drv);
+
+/**
+ * \brief   Read status register
+ */
+uint32_t ETHOSU_PMU_Get_STATUS(struct ethosu_driver *drv);
 
 #ifdef __cplusplus
 }
