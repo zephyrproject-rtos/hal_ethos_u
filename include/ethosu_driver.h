@@ -136,6 +136,16 @@ int ethosu_semaphore_give(void *sem);
 void ethosu_inference_begin(struct ethosu_driver *drv, void *user_arg);
 void ethosu_inference_end(struct ethosu_driver *drv, void *user_arg);
 
+/**
+ * Remapping command stream and base pointer addresses.
+ *
+ * @param address   Address to be remapped.
+ * @param index     -1: command stream, 0-n base address index
+ *
+ * @return Remapped address
+ */
+uint64_t ethosu_address_remap(uint64_t address, int index);
+
 /******************************************************************************
  * Prototypes
  ******************************************************************************/
