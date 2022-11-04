@@ -254,6 +254,13 @@ Signed-off-by: Foo Bar foo.bar@example.org
 The contributions will be code reviewed by Arm before they can be accepted into
 the repository.
 
+In order to submit a contribution push your patch to
+`ssh://<GITHUB_USER_ID>@review.mlplatform.org:29418/ml/ethos-u/ethos-u-core-driver`.
+To do this you will need to sign-in to
+[review.mlplatform.org](https://review.mlplatform.org) using a GitHub account
+and add your SSH key under your settings. If there is a problem adding the SSH
+key make sure there is a valid email address in the Email Addresses field.
+
 ## Security
 
 Please see [Security](SECURITY.md).
