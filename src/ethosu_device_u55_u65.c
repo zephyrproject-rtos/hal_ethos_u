@@ -16,6 +16,10 @@
  * limitations under the License.
  */
 
+/******************************************************************************
+ * Includes
+ ******************************************************************************/
+
 #include "ethosu_interface.h"
 
 #include "ethosu_device.h"
@@ -34,6 +38,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/******************************************************************************
+ * Defines
+ ******************************************************************************/
+
 #define ETHOSU_PRODUCT_U55 0
 #define ETHOSU_PRODUCT_U65 1
 
@@ -48,6 +56,16 @@
 #define ADDRESS_MASK ((1ull << ADDRESS_BITS) - 1)
 
 #define NPU_CMD_PWR_CLK_MASK (0xC)
+
+/******************************************************************************
+ * Functions
+ ******************************************************************************/
+
+uint64_t __attribute__((weak)) ethosu_address_remap(uint64_t address, int index)
+{
+    (void)(index);
+    return address;
+}
 
 struct ethosu_device *ethosu_dev_init(const void *base_address, uint32_t secure_enable, uint32_t privilege_enable)
 {
@@ -147,9 +165,9 @@ void ethosu_dev_run_command_stream(struct ethosu_device *dev,
     assert(num_base_addr <= NPU_REG_BASEP_ARRLEN);
 
     struct cmd_r cmd;
-    uint64_t qbase = (uintptr_t)cmd_stream_ptr + BASE_POINTER_OFFSET;
+    uint64_t qbase = ethosu_address_remap((uintptr_t)cmd_stream_ptr, -1);
     assert(qbase <= ADDRESS_MASK);
-    LOG_DEBUG("QBASE=0x%016llx, QSIZE=%u, base_pointer_offset=0x%08x", qbase, cms_length, BASE_POINTER_OFFSET);
+    LOG_DEBUG("QBASE=0x%016llx, QSIZE=%u, cmd_stream_ptr=%p", qbase, cms_length, cmd_stream_ptr);
 
     dev->reg->QBASE.word[0] = qbase & 0xffffffff;
 #ifdef ETHOSU65
@@ -159,7 +177,7 @@ void ethosu_dev_run_command_stream(struct ethosu_device *dev,
 
     for (int i = 0; i < num_base_addr; i++)
     {
-        uint64_t addr = base_addr[i] + BASE_POINTER_OFFSET;
+        uint64_t addr = ethosu_address_remap(base_addr[i], i);
         assert(addr <= ADDRESS_MASK);
         LOG_DEBUG("BASEP%d=0x%016llx", i, addr);
         dev->reg->BASEP[i].word[0] = addr & 0xffffffff;
