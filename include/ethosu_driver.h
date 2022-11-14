@@ -98,49 +98,102 @@ enum ethosu_request_clients
 
 /**
  * Interrupt handler to be called on IRQ from Ethos-U
+ *
+ * @param drv       Pointer to driver handle
  */
 void ethosu_irq_handler(struct ethosu_driver *drv);
 
-/*
+/**
  * Flush/clean the data cache by address and size. Passing NULL as p argument
  * expects the whole cache to be flushed.
+ *
+ * Addresses passed to this function must be 16 byte aligned.
+ *
+ * @param p         16 byte aligned address
+ * @param bytes     Size of memory block in bytes
  */
-
 void ethosu_flush_dcache(uint32_t *p, size_t bytes);
-/*
+
+/**
  * Invalidate the data cache by address and size. Passing NULL as p argument
  * expects the whole cache to be invalidated.
+ *
+ * Addresses passed to this function must be 16 byte aligned.
+ *
+ * @param p         16 byte aligned address
+ * @param bytes     Size in bytes
  */
 void ethosu_invalidate_dcache(uint32_t *p, size_t bytes);
 
-/*
- * Minimal sempahore and mutex implementation for baremetal applications. See
+/**
+ * Minimal mutex implementation for baremetal applications. See
  * ethosu_driver.c.
+ *
+ * @return Pointer to mutex handle
  */
 void *ethosu_mutex_create(void);
+
+/**
+ * Minimal sempahore implementation for baremetal applications. See
+ * ethosu_driver.c.
+ *
+ * @return Pointer to semaphore handle
+ */
 void *ethosu_semaphore_create(void);
-/*
- * Returns:
- *   -1 on error
- *    0 on success
+
+/**
+ * Lock mutex.
+ *
+ * @param mutex     Pointer to mutex handle
+ * @returns 0 on success, else negative error code
  */
 int ethosu_mutex_lock(void *mutex);
+
+/**
+ * Unlock mutex.
+ *
+ * @param mutex     Pointer to mutex handle
+ * @returns 0 on success, else negative error code
+ */
 int ethosu_mutex_unlock(void *mutex);
+
+/**
+ * Take semaphore.
+ *
+ * @param sem       Pointer to semaphore handle
+ * @returns 0 on success, else negative error code
+ */
 int ethosu_semaphore_take(void *sem);
+
+/**
+ * Give semaphore.
+ *
+ * @param sem       Pointer to semaphore handle
+ * @returns 0 on success, else negative error code
+ */
 int ethosu_semaphore_give(void *sem);
 
-/*
- * Callbacks for begin/end of inference. user_data pointer is passed to the
- * ethosu_invoke() call and forwarded to the callback functions.
+/**
+ * Callback invoked just before the inference is started.
+ *
+ * @param drv       Pointer to driver handle
+ * @param user_arg  User argument provided to ethosu_invoke_*()
  */
 void ethosu_inference_begin(struct ethosu_driver *drv, void *user_arg);
+
+/**
+ * Callback invoked just after the inference has completed.
+ *
+ * @param drv       Pointer to driver handle
+ * @param user_arg  User argument provided to ethosu_invoke_*()
+ */
 void ethosu_inference_end(struct ethosu_driver *drv, void *user_arg);
 
 /**
  * Remapping command stream and base pointer addresses.
  *
  * @param address   Address to be remapped.
- * @param index     -1: command stream, 0-n base address index
+ * @param index     -1 command stream, 0-n base address index
  *
  * @return Remapped address
  */
@@ -152,6 +205,14 @@ uint64_t ethosu_address_remap(uint64_t address, int index);
 
 /**
  * Initialize the Ethos-U driver.
+ *
+ * @param drv               Pointer to driver handle
+ * @param base_address      NPU register base address
+ * @param fast_memory       Fast memory area, used for Ethos-U65 with spilling
+ * @param fast_memory_size  Size in bytes of fast memory area
+ * @param secure_enable     Configure NPU in secure- or non-secure mode
+ * @param privilege_enable  Configure NPU in privileged- or non-privileged mode
+ * @return 0 on success, else negative error code
  */
 int ethosu_init(struct ethosu_driver *drv,
                 const void *base_address,
@@ -162,39 +223,64 @@ int ethosu_init(struct ethosu_driver *drv,
 
 /**
  * Deinitialize the Ethos-U driver.
+ *
+ * @param drv       Pointer to driver handle
  */
 void ethosu_deinit(struct ethosu_driver *drv);
 
 /**
  * Soft resets the Ethos-U device.
+ *
+ * @param drv       Pointer to driver handle
+ * @return 0 on success, else negative error code
  */
-bool ethosu_soft_reset(struct ethosu_driver *drv);
+int ethosu_soft_reset(struct ethosu_driver *drv);
 
 /**
  * Request to disable Q-channel power gating of the Ethos-U device.
  * Power requests are ref.counted. Increases count.
  * (Note: clock gating is made to follow power gating)
+ *
+ * @param drv       Pointer to driver handle
+ * @return 0 on success, else negative error code
  */
-bool ethosu_request_power(struct ethosu_driver *drv);
+int ethosu_request_power(struct ethosu_driver *drv);
 
 /**
  * Release disable request for Q-channel power gating of the Ethos-U device.
  * Power requests are ref.counted. Decreases count.
+ *
+ * @param drv       Pointer to driver handle
  */
 void ethosu_release_power(struct ethosu_driver *drv);
 
 /**
  * Get Ethos-U driver version.
+ *
+ * @param ver       Driver version struct
  */
 void ethosu_get_driver_version(struct ethosu_driver_version *ver);
 
 /**
  * Get Ethos-U hardware information.
+ *
+ * @param drv       Pointer to driver handle
+ * @param hw        Hardware information struct
  */
 void ethosu_get_hw_info(struct ethosu_driver *drv, struct ethosu_hw_info *hw);
 
 /**
- * Invoke Vela command stream.
+ * Invoke command stream.
+ *
+ * @param drv               Pointer to driver handle
+ * @param custom_data_ptr   Custom data payload
+ * @param custom_data_size  Size in bytes of custom data
+ * @param base_addr         Array of base address pointers
+ * @param base_addr_size    Size in bytes of each address in base_addr
+ * @param num_base_addr     Number of elements in base_addr array
+ * @param user_arg          User argument, will be passed to
+ *                          ethosu_inference_begin() and ethosu_inference_end()
+ * @return 0 on success, else negative error code
  */
 int ethosu_invoke_v3(struct ethosu_driver *drv,
                      const void *custom_data_ptr,
@@ -208,11 +294,10 @@ int ethosu_invoke_v3(struct ethosu_driver *drv,
     ethosu_invoke_v3(drv, custom_data_ptr, custom_data_size, base_addr, base_addr_size, num_base_addr, 0)
 
 /**
- * Invoke Vela command stream using async interface.
+ * Invoke command stream using async interface.
  * Must be followed by call(s) to ethosu_wait() upon successful return.
- * Returns
- *   -1 on error
- *    0 on success
+ *
+ * @see ethosu_invoke_v3 for documentation.
  */
 int ethosu_invoke_async(struct ethosu_driver *drv,
                         const void *custom_data_ptr,
@@ -226,26 +311,32 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
  * Wait for inference to complete (block=true)
  * Poll status or finish up if inference is complete (block=false)
  * (This function is only intended to be used in conjuction with ethosu_invoke_async)
- * Returns
- *    1 on inference running (only for block=false)
- *    0 on inference success
- *   -1 on inference error
- *   -2 on inference not invoked
+ *
+ * @param drv       Pointer to driver handle
+ * @param block     If call should block if inference is running
+ * @return -2 on inference not invoked, -1 on inference error, 0 on success, 1 on inference running
  */
 int ethosu_wait(struct ethosu_driver *drv, bool block);
 
 /**
- * Reserves a driver to execute inference with
+ * Reserves a driver to execute inference with. Call will block until a driver
+ * is available.
+ *
+ * @return Pointer to driver handle.
  */
 struct ethosu_driver *ethosu_reserve_driver(void);
 
 /**
- * Change driver status to available
+ * Release driver that was previously reserved with @see ethosu_reserve_driver.
+ *
+ * @param drv       Pointer to driver handle
  */
 void ethosu_release_driver(struct ethosu_driver *drv);
 
 /**
- * Static inline for backwards-compatibility
+ * Static inline for backwards-compatibility.
+ *
+ * @see ethosu_invoke_v3 for documentation.
  */
 static inline int ethosu_invoke_v2(const void *custom_data_ptr,
                                    const int custom_data_size,
