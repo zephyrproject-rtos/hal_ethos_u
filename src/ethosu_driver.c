@@ -344,7 +344,7 @@ static int handle_command_stream(struct ethosu_driver *drv, const uint8_t *cmd_s
     }
 
     // Request power gating disabled during inference run
-    if (!ethosu_request_power(drv))
+    if (ethosu_request_power(drv))
     {
         LOG_ERR("Failed to request power");
         return -1;
@@ -437,13 +437,13 @@ void ethosu_deinit(struct ethosu_driver *drv)
     drv->dev = NULL;
 }
 
-bool ethosu_soft_reset(struct ethosu_driver *drv)
+int ethosu_soft_reset(struct ethosu_driver *drv)
 {
     // Soft reset the NPU
     if (ethosu_dev_soft_reset(drv->dev) != ETHOSU_SUCCESS)
     {
         LOG_ERR("Failed to soft-reset NPU");
-        return false;
+        return -1;
     }
 
     // Update power and clock gating after the soft reset
@@ -451,24 +451,24 @@ bool ethosu_soft_reset(struct ethosu_driver *drv)
                                    drv->power_request_counter > 0 ? ETHOSU_CLOCK_Q_DISABLE : ETHOSU_CLOCK_Q_ENABLE,
                                    drv->power_request_counter > 0 ? ETHOSU_POWER_Q_DISABLE : ETHOSU_POWER_Q_ENABLE);
 
-    return true;
+    return 0;
 }
 
-bool ethosu_request_power(struct ethosu_driver *drv)
+int ethosu_request_power(struct ethosu_driver *drv)
 {
     // Check if this is the first power request, increase counter
     if (drv->power_request_counter++ == 0)
     {
         // Always reset to a known state. Changes to requested
         // security state/privilege mode if necessary.
-        if (ethosu_soft_reset(drv) == false)
+        if (ethosu_soft_reset(drv))
         {
             LOG_ERR("Failed to request power for Ethos-U");
             drv->power_request_counter--;
-            return false;
+            return -1;
         }
     }
-    return true;
+    return 0;
 }
 
 void ethosu_release_power(struct ethosu_driver *drv)
