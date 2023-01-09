@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022 Arm Limited. All rights reserved.
+ * SPDX-FileCopyrightText: Copyright 2019-2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -201,7 +201,7 @@ int __attribute__((weak)) ethosu_semaphore_take(void *sem)
     {
         __WFE();
     }
-    s->count = 0;
+    s->count--;
     return 0;
 }
 
@@ -209,7 +209,7 @@ int __attribute__((weak)) ethosu_semaphore_take(void *sem)
 int __attribute__((weak)) ethosu_semaphore_give(void *sem)
 {
     struct ethosu_semaphore_t *s = sem;
-    s->count                     = 1;
+    s->count++;
     __SEV();
     return 0;
 }
@@ -235,54 +235,48 @@ void __attribute__((weak)) ethosu_inference_end(struct ethosu_driver *drv, void 
  ******************************************************************************/
 static void ethosu_register_driver(struct ethosu_driver *drv)
 {
-    // Register driver as new HEAD of list
+    ethosu_mutex_lock(ethosu_mutex);
     drv->next          = registered_drivers;
     registered_drivers = drv;
+    ethosu_mutex_unlock(ethosu_mutex);
+
+    ethosu_semaphore_give(ethosu_semaphore);
 
     LOG_INFO("New NPU driver registered (handle: 0x%p, NPU: 0x%p)", drv, drv->dev->reg);
 }
 
 static int ethosu_deregister_driver(struct ethosu_driver *drv)
 {
-    struct ethosu_driver *cur   = registered_drivers;
-    struct ethosu_driver **prev = &registered_drivers;
+    struct ethosu_driver *curr;
+    struct ethosu_driver **prev;
 
-    while (cur != NULL)
+    ethosu_mutex_lock(ethosu_mutex);
+    curr = registered_drivers;
+    prev = &registered_drivers;
+
+    while (curr != NULL)
     {
-        if (cur == drv)
+        if (curr == drv)
         {
-            *prev = cur->next;
+            *prev = curr->next;
             LOG_INFO("NPU driver handle %p deregistered.", drv);
-            return 0;
+            ethosu_semaphore_take(ethosu_semaphore);
+            break;
         }
 
-        prev = &cur->next;
-        cur  = cur->next;
+        prev = &curr->next;
+        curr = curr->next;
     }
 
-    LOG_ERR("No NPU driver handle registered at address %p.", drv);
+    ethosu_mutex_unlock(ethosu_mutex);
 
-    return -1;
-}
-
-static struct ethosu_driver *ethosu_find_and_reserve_driver(void)
-{
-    struct ethosu_driver *drv = registered_drivers;
-
-    while (drv != NULL)
+    if (curr == NULL)
     {
-        if (!drv->reserved)
-        {
-            drv->reserved = true;
-            LOG_DEBUG("NPU driver handle %p reserved.", drv);
-            return drv;
-        }
-        drv = drv->next;
+        LOG_ERR("No NPU driver handle registered at address %p.", drv);
+        return -1;
     }
 
-    LOG_WARN("No NPU driver handle available.");
-
-    return NULL;
+    return 0;
 }
 
 static void ethosu_reset_job(struct ethosu_driver *drv)
@@ -373,7 +367,6 @@ void __attribute__((weak)) ethosu_irq_handler(struct ethosu_driver *drv)
     {
         drv->status_error = true;
     }
-    /* TODO: feedback needed aout how to handle error (-1) return value */
     ethosu_semaphore_give(drv->semaphore);
 }
 
@@ -404,6 +397,11 @@ int ethosu_init(struct ethosu_driver *drv,
     if (!ethosu_semaphore)
     {
         ethosu_semaphore = ethosu_semaphore_create();
+        if (!ethosu_semaphore)
+        {
+            LOG_ERR("Failed to create global driver semaphore");
+            return -1;
+        }
     }
 
     drv->fast_memory           = (uint32_t)fast_memory;
@@ -419,11 +417,18 @@ int ethosu_init(struct ethosu_driver *drv,
         return -1;
     }
 
-    drv->semaphore    = ethosu_semaphore_create();
+    drv->semaphore = ethosu_semaphore_create();
+    if (!drv->semaphore)
+    {
+        LOG_ERR("Failed to create driver semaphore");
+        ethosu_dev_deinit(drv->dev);
+        drv->dev = NULL;
+        return -1;
+    }
+
     drv->status_error = false;
 
     ethosu_reset_job(drv);
-
     ethosu_register_driver(drv);
 
     return 0;
@@ -522,7 +527,6 @@ int ethosu_wait(struct ethosu_driver *drv, bool block)
     case ETHOSU_JOB_DONE:
         // Wait for interrupt in blocking mode. In non-blocking mode
         // the interrupt has already triggered
-        /* TODO: feedback needed aout how to handle error (-1) return value */
         ethosu_semaphore_take(drv->semaphore);
 
         // Inference done callback
@@ -705,31 +709,34 @@ struct ethosu_driver *ethosu_reserve_driver(void)
 {
     struct ethosu_driver *drv = NULL;
 
-    do
-    {
-        /* TODO: feedback needed aout how to handle error (-1) return value */
-        ethosu_mutex_lock(ethosu_mutex);
-        drv = ethosu_find_and_reserve_driver();
-        /* TODO: feedback needed aout how to handle error (-1) return value */
-        ethosu_mutex_unlock(ethosu_mutex);
+    LOG_INFO("Acquiring NPU driver handle");
+    ethosu_semaphore_take(ethosu_semaphore); // This is meant to block until available
 
-        if (drv != NULL)
+    ethosu_mutex_lock(ethosu_mutex);
+    drv = registered_drivers;
+
+    while (drv != NULL)
+    {
+        if (!drv->reserved)
         {
+            drv->reserved = true;
+            LOG_DEBUG("NPU driver handle %p reserved", drv);
             break;
         }
+        drv = drv->next;
+    }
+    ethosu_mutex_unlock(ethosu_mutex);
 
-        LOG_INFO("Waiting for NPU driver handle to become available...");
-        /* TODO: feedback needed aout how to handle error (-1) return value */
-        ethosu_semaphore_take(ethosu_semaphore);
-
-    } while (1);
+    if (!drv)
+    {
+        LOG_ERR("No NPU driver handle available, but semaphore taken");
+    }
 
     return drv;
 }
 
 void ethosu_release_driver(struct ethosu_driver *drv)
 {
-    /* TODO: feedback needed aout how to handle error (-1) return value */
     ethosu_mutex_lock(ethosu_mutex);
     if (drv != NULL && drv->reserved)
     {
@@ -743,16 +750,12 @@ void ethosu_release_driver(struct ethosu_driver *drv)
                 ethosu_soft_reset(drv);
                 ethosu_reset_job(drv);
                 drv->status_error = false;
-                /* TODO: feedback needed aout how to handle error (-1) return value */
-                ethosu_semaphore_give(drv->semaphore);
             }
         }
 
         drv->reserved = false;
         LOG_DEBUG("NPU driver handle %p released", drv);
-        /* TODO: feedback needed aout how to handle error (-1) return value */
         ethosu_semaphore_give(ethosu_semaphore);
     }
-    /* TODO: feedback needed aout how to handle error (-1) return value */
     ethosu_mutex_unlock(ethosu_mutex);
 }
