@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Arm Limited. All rights reserved.
+ * SPDX-FileCopyrightText: Copyright 2021-2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -42,29 +42,29 @@
 #endif
 
 // Log formatting
-
-#define LOG(f, ...) fprintf(stdout, f, ##__VA_ARGS__)
+#define LOG(f, ...) (void)fprintf(stdout, f, ##__VA_ARGS__)
 
 #if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_ERR
-#define LOG_ERR(f, ...) fprintf(stderr, "E: " f " (%s:%d)\n", ##__VA_ARGS__, strrchr("/" __FILE__, '/') + 1, __LINE__)
+#define LOG_ERR(f, ...)                                                                                                \
+    (void)fprintf(stderr, "E: " f " (%s:%d)\n", ##__VA_ARGS__, strrchr("/" __FILE__, '/') + 1, __LINE__)
 #else
 #define LOG_ERR(f, ...)
 #endif
 
 #if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_WARN
-#define LOG_WARN(f, ...) fprintf(stdout, "W: " f "\n", ##__VA_ARGS__)
+#define LOG_WARN(f, ...) (void)fprintf(stdout, "W: " f "\n", ##__VA_ARGS__)
 #else
 #define LOG_WARN(f, ...)
 #endif
 
 #if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_INFO
-#define LOG_INFO(f, ...) fprintf(stdout, "I: " f "\n", ##__VA_ARGS__)
+#define LOG_INFO(f, ...) (void)fprintf(stdout, "I: " f "\n", ##__VA_ARGS__)
 #else
 #define LOG_INFO(f, ...)
 #endif
 
 #if ETHOSU_LOG_SEVERITY >= ETHOSU_LOG_DEBUG
-#define LOG_DEBUG(f, ...) fprintf(stdout, "D: %s(): " f "\n", __FUNCTION__, ##__VA_ARGS__)
+#define LOG_DEBUG(f, ...) (void)fprintf(stdout, "D: %s(): " f "\n", __FUNCTION__, ##__VA_ARGS__)
 #else
 #define LOG_DEBUG(f, ...)
 #endif

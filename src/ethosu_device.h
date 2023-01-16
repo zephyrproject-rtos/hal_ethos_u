@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022 Arm Limited. All rights reserved.
+ * SPDX-FileCopyrightText: Copyright 2019-2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -59,7 +59,7 @@ struct ethosu_device
 /**
  * Initialize the device.
  */
-struct ethosu_device *ethosu_dev_init(const void *base_address, uint32_t secure_enable, uint32_t privilege_enable);
+struct ethosu_device *ethosu_dev_init(void *const base_address, uint32_t secure_enable, uint32_t privilege_enable);
 
 /**
  * Deinitialize the device.

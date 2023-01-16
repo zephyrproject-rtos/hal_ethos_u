@@ -184,7 +184,10 @@ int __attribute__((weak)) ethosu_mutex_unlock(void *mutex)
 void *__attribute__((weak)) ethosu_semaphore_create(void)
 {
     struct ethosu_semaphore_t *sem = malloc(sizeof(*sem));
-    sem->count                     = 0;
+    if (sem != NULL)
+    {
+        sem->count = 0;
+    }
     return sem;
 }
 
@@ -284,9 +287,9 @@ static void ethosu_reset_job(struct ethosu_driver *drv)
     memset(&drv->job, 0, sizeof(struct ethosu_job));
 }
 
-static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s *opt_cfg_p)
+static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s const *opt_cfg_p)
 {
-    LOG_INFO("Optimizer release nbr: %d patch: %d", opt_cfg_p->da_data.rel_nbr, opt_cfg_p->da_data.patch_nbr);
+    LOG_INFO("Optimizer release nbr: %u patch: %u", opt_cfg_p->da_data.rel_nbr, opt_cfg_p->da_data.patch_nbr);
 
     if (ethosu_dev_verify_optimizer_config(drv->dev, opt_cfg_p->cfg, opt_cfg_p->id) != true)
     {
@@ -375,7 +378,7 @@ void __attribute__((weak)) ethosu_irq_handler(struct ethosu_driver *drv)
  ******************************************************************************/
 
 int ethosu_init(struct ethosu_driver *drv,
-                const void *base_address,
+                void *const base_address,
                 const void *fast_memory,
                 const size_t fast_memory_size,
                 uint32_t secure_enable,
@@ -585,7 +588,7 @@ int ethosu_wait(struct ethosu_driver *drv, bool block)
 int ethosu_invoke_async(struct ethosu_driver *drv,
                         const void *custom_data_ptr,
                         const int custom_data_size,
-                        const uint64_t *base_addr,
+                        uint64_t *const base_addr,
                         const size_t *base_addr_size,
                         const int num_base_addr,
                         void *user_arg)
@@ -619,7 +622,7 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
     // Custom data length must be a multiple of 32 bits
     if ((custom_data_size % BYTES_IN_32_BITS) != 0)
     {
-        LOG_ERR("custom_data_size=0x%x not a multiple of 4", custom_data_size);
+        LOG_ERR("custom_data_size=0x%x not a multiple of 4", (unsigned)custom_data_size);
         goto err;
     }
 
@@ -628,7 +631,6 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
     // Adjust base address to fast memory area
     if (drv->fast_memory != 0 && num_base_addr >= FAST_MEMORY_BASE_ADDR_INDEX)
     {
-        uint64_t *fast_memory = (uint64_t *)&base_addr[FAST_MEMORY_BASE_ADDR_INDEX];
 
         if (base_addr_size != NULL && base_addr_size[FAST_MEMORY_BASE_ADDR_INDEX] > drv->fast_memory_size)
         {
@@ -638,7 +640,7 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
             goto err;
         }
 
-        *fast_memory = drv->fast_memory;
+        base_addr[FAST_MEMORY_BASE_ADDR_INDEX] = drv->fast_memory;
     }
 
     drv->status_error = false;
@@ -650,7 +652,7 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
         {
         case OPTIMIZER_CONFIG:
             LOG_DEBUG("OPTIMIZER_CONFIG");
-            struct opt_cfg_s *opt_cfg_p = (struct opt_cfg_s *)data_ptr;
+            struct opt_cfg_s const *opt_cfg_p = (const struct opt_cfg_s *)data_ptr;
 
             if (handle_optimizer_config(drv, opt_cfg_p) < 0)
             {
@@ -661,8 +663,8 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
         case COMMAND_STREAM:
             // Vela only supports putting one COMMAND_STREAM per op
             LOG_DEBUG("COMMAND_STREAM");
-            void *command_stream = (uint8_t *)(data_ptr) + sizeof(struct cop_data_s);
-            int cms_length       = (data_ptr->reserved << 16) | data_ptr->length;
+            const uint8_t *command_stream = (const uint8_t *)(data_ptr + 1);
+            int cms_length                = (data_ptr->reserved << 16) | data_ptr->length;
 
             if (handle_command_stream(drv, command_stream, cms_length) < 0)
             {
@@ -675,7 +677,7 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD;
             break;
         default:
-            LOG_ERR("UNSUPPORTED driver_action_command: %d", data_ptr->driver_action_command);
+            LOG_ERR("UNSUPPORTED driver_action_command: %u", data_ptr->driver_action_command);
             goto err;
             break;
         }
@@ -691,7 +693,7 @@ err:
 int ethosu_invoke_v3(struct ethosu_driver *drv,
                      const void *custom_data_ptr,
                      const int custom_data_size,
-                     const uint64_t *base_addr,
+                     uint64_t *const base_addr,
                      const size_t *base_addr_size,
                      const int num_base_addr,
                      void *user_arg)
