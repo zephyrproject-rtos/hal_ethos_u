@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022 Arm Limited. All rights reserved.
+ * SPDX-FileCopyrightText: Copyright 2019-2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -67,7 +67,7 @@ uint64_t __attribute__((weak)) ethosu_address_remap(uint64_t address, int index)
     return address;
 }
 
-struct ethosu_device *ethosu_dev_init(const void *base_address, uint32_t secure_enable, uint32_t privilege_enable)
+struct ethosu_device *ethosu_dev_init(void *const base_address, uint32_t secure_enable, uint32_t privilege_enable)
 {
     struct ethosu_device *dev = malloc(sizeof(struct ethosu_device));
     if (!dev)
@@ -167,7 +167,7 @@ void ethosu_dev_run_command_stream(struct ethosu_device *dev,
     struct cmd_r cmd;
     uint64_t qbase = ethosu_address_remap((uintptr_t)cmd_stream_ptr, -1);
     assert(qbase <= ADDRESS_MASK);
-    LOG_DEBUG("QBASE=0x%016llx, QSIZE=%u, cmd_stream_ptr=%p", qbase, cms_length, cmd_stream_ptr);
+    LOG_DEBUG("QBASE=0x%016llx, QSIZE=%" PRIu32 ", cmd_stream_ptr=%p", qbase, cms_length, cmd_stream_ptr);
 
     dev->reg->QBASE.word[0] = qbase & 0xffffffff;
 #ifdef ETHOSU65
@@ -190,12 +190,12 @@ void ethosu_dev_run_command_stream(struct ethosu_device *dev,
     cmd.transition_to_running_state = 1;
 
     dev->reg->CMD.word = cmd.word;
-    LOG_DEBUG("CMD=0x%08x", cmd.word);
+    LOG_DEBUG("CMD=0x%08" PRIx32, cmd.word);
 }
 
 void ethosu_dev_print_err_status(struct ethosu_device *dev)
 {
-    LOG_ERR("NPU status=0x%08" PRIx32 ", qread=%" PRIu32 ", cmd_end_reached=%d",
+    LOG_ERR("NPU status=0x%08" PRIx32 ", qread=%" PRIu32 ", cmd_end_reached=%u",
             dev->reg->STATUS.word,
             dev->reg->QREAD.word,
             dev->reg->STATUS.cmd_end_reached);
@@ -307,7 +307,7 @@ enum ethosu_error_codes ethosu_dev_set_clock_and_power(struct ethosu_device *dev
     }
 
     dev->reg->CMD.word = cmd.word;
-    LOG_DEBUG("CMD=0x%08x", cmd.word);
+    LOG_DEBUG("CMD=0x%08" PRIx32, cmd.word);
 
     return ETHOSU_SUCCESS;
 }
@@ -323,35 +323,35 @@ bool ethosu_dev_verify_optimizer_config(struct ethosu_device *dev, uint32_t cfg_
     hw_cfg.word = dev->reg->CONFIG.word;
     hw_id.word  = dev->reg->ID.word;
 
-    LOG_INFO("Optimizer config. product=%d, cmd_stream_version=%d, macs_per_cc=%d, shram_size=%d, custom_dma=%d",
+    LOG_INFO("Optimizer config. product=%u, cmd_stream_version=%u, macs_per_cc=%u, shram_size=%u, custom_dma=%u",
              opt_cfg->product,
              opt_cfg->cmd_stream_version,
              opt_cfg->macs_per_cc,
              opt_cfg->shram_size,
              opt_cfg->custom_dma);
-    LOG_INFO("Optimizer config. arch version: %d.%d.%d",
+    LOG_INFO("Optimizer config. arch version: %u.%u.%u",
              opt_id->arch_major_rev,
              opt_id->arch_minor_rev,
              opt_id->arch_patch_rev);
-    LOG_INFO("Ethos-U config. product=%d, cmd_stream_version=%d, macs_per_cc=%d, shram_size=%d, custom_dma=%d",
+    LOG_INFO("Ethos-U config. product=%u, cmd_stream_version=%u, macs_per_cc=%u, shram_size=%u, custom_dma=%u",
              hw_cfg.product,
              hw_cfg.cmd_stream_version,
              hw_cfg.macs_per_cc,
              hw_cfg.shram_size,
              hw_cfg.custom_dma);
-    LOG_INFO("Ethos-U. arch version=%d.%d.%d", hw_id.arch_major_rev, hw_id.arch_minor_rev, hw_id.arch_patch_rev);
+    LOG_INFO("Ethos-U. arch version=%u.%u.%u", hw_id.arch_major_rev, hw_id.arch_minor_rev, hw_id.arch_patch_rev);
 
     if (opt_cfg->word != hw_cfg.word)
     {
         if (hw_cfg.product != opt_cfg->product)
         {
-            LOG_ERR("NPU config mismatch. npu.product=%d, optimizer.product=%d", hw_cfg.product, opt_cfg->product);
+            LOG_ERR("NPU config mismatch. npu.product=%u, optimizer.product=%u", hw_cfg.product, opt_cfg->product);
             ret = false;
         }
 
         if (hw_cfg.macs_per_cc != opt_cfg->macs_per_cc)
         {
-            LOG_ERR("NPU config mismatch. npu.macs_per_cc=%d, optimizer.macs_per_cc=%d",
+            LOG_ERR("NPU config mismatch. npu.macs_per_cc=%u, optimizer.macs_per_cc=%u",
                     hw_cfg.macs_per_cc,
                     opt_cfg->macs_per_cc);
             ret = false;
@@ -359,7 +359,7 @@ bool ethosu_dev_verify_optimizer_config(struct ethosu_device *dev, uint32_t cfg_
 
         if (hw_cfg.cmd_stream_version != opt_cfg->cmd_stream_version)
         {
-            LOG_ERR("NPU config mismatch. npu.cmd_stream_version=%d, optimizer.cmd_stream_version=%d",
+            LOG_ERR("NPU config mismatch. npu.cmd_stream_version=%u, optimizer.cmd_stream_version=%u",
                     hw_cfg.cmd_stream_version,
                     opt_cfg->cmd_stream_version);
             ret = false;
@@ -367,7 +367,7 @@ bool ethosu_dev_verify_optimizer_config(struct ethosu_device *dev, uint32_t cfg_
 
         if (!hw_cfg.custom_dma && opt_cfg->custom_dma)
         {
-            LOG_ERR("NPU config mismatch. npu.custom_dma=%d, optimizer.custom_dma=%d",
+            LOG_ERR("NPU config mismatch. npu.custom_dma=%u, optimizer.custom_dma=%u",
                     hw_cfg.custom_dma,
                     opt_cfg->custom_dma);
             ret = false;
@@ -376,7 +376,7 @@ bool ethosu_dev_verify_optimizer_config(struct ethosu_device *dev, uint32_t cfg_
 
     if ((hw_id.arch_major_rev != opt_id->arch_major_rev) || (hw_id.arch_minor_rev < opt_id->arch_minor_rev))
     {
-        LOG_ERR("NPU arch mismatch. npu.arch=%d.%d.%d, optimizer.arch=%d.%d.%d",
+        LOG_ERR("NPU arch mismatch. npu.arch=%u.%u.%u, optimizer.arch=%u.%u.%u",
                 hw_id.arch_major_rev,
                 hw_id.arch_minor_rev,
                 hw_id.arch_patch_rev,

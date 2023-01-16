@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022 Arm Limited. All rights reserved.
+ * SPDX-FileCopyrightText: Copyright 2019-2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -215,7 +215,7 @@ uint64_t ethosu_address_remap(uint64_t address, int index);
  * @return 0 on success, else negative error code
  */
 int ethosu_init(struct ethosu_driver *drv,
-                const void *base_address,
+                void *const base_address,
                 const void *fast_memory,
                 const size_t fast_memory_size,
                 uint32_t secure_enable,
@@ -285,7 +285,7 @@ void ethosu_get_hw_info(struct ethosu_driver *drv, struct ethosu_hw_info *hw);
 int ethosu_invoke_v3(struct ethosu_driver *drv,
                      const void *custom_data_ptr,
                      const int custom_data_size,
-                     const uint64_t *base_addr,
+                     uint64_t *const base_addr,
                      const size_t *base_addr_size,
                      const int num_base_addr,
                      void *user_arg);
@@ -302,7 +302,7 @@ int ethosu_invoke_v3(struct ethosu_driver *drv,
 int ethosu_invoke_async(struct ethosu_driver *drv,
                         const void *custom_data_ptr,
                         const int custom_data_size,
-                        const uint64_t *base_addr,
+                        uint64_t *const base_addr,
                         const size_t *base_addr_size,
                         const int num_base_addr,
                         void *user_arg);
@@ -340,11 +340,15 @@ void ethosu_release_driver(struct ethosu_driver *drv);
  */
 static inline int ethosu_invoke_v2(const void *custom_data_ptr,
                                    const int custom_data_size,
-                                   const uint64_t *base_addr,
+                                   uint64_t *const base_addr,
                                    const size_t *base_addr_size,
                                    const int num_base_addr)
 {
     struct ethosu_driver *drv = ethosu_reserve_driver();
+    if (!drv)
+    {
+        return -1;
+    }
     int result = ethosu_invoke_v3(drv, custom_data_ptr, custom_data_size, base_addr, base_addr_size, num_base_addr, 0);
     ethosu_release_driver(drv);
     return result;
