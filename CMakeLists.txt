@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2019-2021 Arm Limited. All rights reserved.
+# SPDX-FileCopyrightText: Copyright 2019-2021, 2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -82,6 +82,9 @@ target_compile_definitions(ethosu_core_driver PRIVATE ETHOSU_LOG_SEVERITY=${LOG_
 install(TARGETS ethosu_core_driver LIBRARY DESTINATION "lib")
 install(FILES include/ethosu_device.h include/ethosu_driver.h include/pmu_ethosu.h
         DESTINATION "include")
+
+# Define ETHOSU macro
+target_compile_definitions(ethosu_core_driver PUBLIC ETHOSU)
 
 #
 # Print build status
