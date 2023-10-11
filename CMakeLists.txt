@@ -29,6 +29,7 @@ option(DRIVER_PMU_AUTOINIT "Enable PMU boot auto-initialization" OFF)
 set(CMSIS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmsis" CACHE PATH "Path to CMSIS.")
 
 set(LOG_NAMES err warning info debug)
+set(ETHOSU_LOG_ENABLE ON CACHE BOOL "Toggle driver logs on/off (Defaults to ON)")
 set(ETHOSU_LOG_SEVERITY "warning" CACHE STRING "Driver log severity level ${LOG_NAMES} (Defaults to 'warning')")
 set(ETHOSU_TARGET_NPU_CONFIG "ethos-u55-128" CACHE STRING "Default NPU configuration")
 set_property(CACHE ETHOSU_LOG_SEVERITY PROPERTY STRINGS ${LOG_NAMES})
@@ -76,7 +77,9 @@ endif()
 
 
 # Set the log level for the target
-target_compile_definitions(ethosu_core_driver PRIVATE ETHOSU_LOG_SEVERITY=${LOG_SEVERITY})
+target_compile_definitions(ethosu_core_driver PRIVATE
+    ETHOSU_LOG_SEVERITY=${LOG_SEVERITY}
+    ETHOSU_LOG_ENABLE=$<BOOL:${ETHOSU_LOG_ENABLE}>)
 
 # Install library and include files
 install(TARGETS ethosu_core_driver LIBRARY DESTINATION "lib")
@@ -95,5 +98,6 @@ message(STATUS "PROJECT_NAME                           : ${PROJECT_NAME}")
 message(STATUS "ETHOSU_TARGET_NPU_CONFIG               : ${ETHOSU_TARGET_NPU_CONFIG}")
 message(STATUS "CMAKE_SYSTEM_PROCESSOR                 : ${CMAKE_SYSTEM_PROCESSOR}")
 message(STATUS "CMSIS_PATH                             : ${CMSIS_PATH}")
+message(STATUS "ETHOSU_LOG_ENABLE                      : ${ETHOSU_LOG_ENABLE}")
 message(STATUS "ETHOSU_LOG_SEVERITY                    : ${ETHOSU_LOG_SEVERITY}")
 message(STATUS "*******************************************************")
