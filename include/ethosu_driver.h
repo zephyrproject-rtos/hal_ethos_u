@@ -41,6 +41,12 @@ extern "C" {
 #define ETHOSU_DRIVER_VERSION_MINOR 16 ///< Driver minor version
 #define ETHOSU_DRIVER_VERSION_PATCH 0  ///< Driver patch version
 
+#define ETHOSU_SEMAPHORE_WAIT_FOREVER (UINT64_MAX)
+
+#ifndef ETHOSU_SEMAPHORE_WAIT_INFERENCE
+#define ETHOSU_SEMAPHORE_WAIT_INFERENCE ETHOSU_SEMAPHORE_WAIT_FOREVER
+#endif
+
 /******************************************************************************
  * Types
  ******************************************************************************/
@@ -55,9 +61,17 @@ enum ethosu_job_state
     ETHOSU_JOB_DONE
 };
 
+enum ethosu_job_result
+{
+    ETHOSU_JOB_RESULT_OK = 0,
+    ETHOSU_JOB_RESULT_TIMEOUT,
+    ETHOSU_JOB_RESULT_ERROR
+};
+
 struct ethosu_job
 {
     volatile enum ethosu_job_state state;
+    volatile enum ethosu_job_result result;
     const void *custom_data_ptr;
     int custom_data_size;
     const uint64_t *base_addr;
@@ -75,7 +89,6 @@ struct ethosu_driver
     uint64_t fast_memory;
     size_t fast_memory_size;
     uint32_t power_request_counter;
-    bool status_error;
     bool reserved;
 };
 
@@ -161,9 +174,10 @@ int ethosu_mutex_unlock(void *mutex);
  * Take semaphore.
  *
  * @param sem       Pointer to semaphore handle
- * @returns 0 on success, else negative error code
+ * @param timeout   Timeout value (unit impl. defined)
+ * @returns 0 on success else negative error code
  */
-int ethosu_semaphore_take(void *sem);
+int ethosu_semaphore_take(void *sem, uint64_t timeout);
 
 /**
  * Give semaphore.

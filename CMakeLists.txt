@@ -32,6 +32,7 @@ set(LOG_NAMES err warning info debug)
 set(ETHOSU_LOG_ENABLE ON CACHE BOOL "Toggle driver logs on/off (Defaults to ON)")
 set(ETHOSU_LOG_SEVERITY "warning" CACHE STRING "Driver log severity level ${LOG_NAMES} (Defaults to 'warning')")
 set(ETHOSU_TARGET_NPU_CONFIG "ethos-u55-128" CACHE STRING "Default NPU configuration")
+set(ETHOSU_INFERENCE_TIMEOUT "" CACHE STRING "Inference timeout (unit is implementation defined)")
 set_property(CACHE ETHOSU_LOG_SEVERITY PROPERTY STRINGS ${LOG_NAMES})
 
 #
@@ -75,7 +76,13 @@ else()
     message(FATAL_ERROR "Invalid NPU configuration")
 endif()
 
-
+if(NOT "${ETHOSU_INFERENCE_TIMEOUT}" STREQUAL "")
+    target_compile_definitions(ethosu_core_driver PRIVATE
+        ETHOSU_SEMAPHORE_WAIT_INFERENCE=${ETHOSU_INFERENCE_TIMEOUT})
+    set(ETHOSU_INFERENCE_TIMEOUT_TEXT ${ETHOSU_INFERENCE_TIMEOUT})
+else()
+    set(ETHOSU_INFERENCE_TIMEOUT_TEXT "Default (no timeout)")
+endif()
 # Set the log level for the target
 target_compile_definitions(ethosu_core_driver PRIVATE
     ETHOSU_LOG_SEVERITY=${LOG_SEVERITY}
@@ -100,4 +107,5 @@ message(STATUS "CMAKE_SYSTEM_PROCESSOR                 : ${CMAKE_SYSTEM_PROCESSO
 message(STATUS "CMSIS_PATH                             : ${CMSIS_PATH}")
 message(STATUS "ETHOSU_LOG_ENABLE                      : ${ETHOSU_LOG_ENABLE}")
 message(STATUS "ETHOSU_LOG_SEVERITY                    : ${ETHOSU_LOG_SEVERITY}")
+message(STATUS "ETHOSU_INFERENCE_TIMEOUT               : ${ETHOSU_INFERENCE_TIMEOUT_TEXT}")
 message(STATUS "*******************************************************")

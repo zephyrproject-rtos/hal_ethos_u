@@ -160,6 +160,23 @@ environemnts where multi-threading is possible, e.g., RTOS, the user is
 responsible to provide implementation for mutexes and semaphores to be used by
 the driver.
 
+The mutex and semaphores are used as synchronisation mechanisms and unless
+specified, the timeout is required to be 'forever'.
+
+The driver allows for an RTOS to set a timeout for the NPU interrupt semaphore.
+The timeout can be set with the CMake variable `ETHOSU_INFERENCE_TIMEOUT`, which
+is then used as `timeout` argument for the interrupt semaphore take call. Note
+that the unit is implementation defined, the value is shipped as is to the
+`ethosu_semaphore_take()` function and an override implementation should cast it
+to the appropriate type and/or convert it to the unit desired.
+
+A macro `ETHOSU_SEMAPHORE_WAIT_FOREVER` is defined in the driver header file,
+and should be made sure to map to the RTOS' equivalent of
+'no timeout/wait forever'. Inference timeout value defaults to this if left
+unset. The macro is used internally in the driver for the available NPU's, thus
+the driver does NOT support setting a timeout other than forever when waiting
+for an NPU to become available (global ethosu_semaphore).
+
 The mutex and semaphore APIs are defined as weak linked functions that can be
 overridden by the user. The APIs are the usual ones and described below:
 
@@ -167,16 +184,16 @@ overridden by the user. The APIs are the usual ones and described below:
 // create a mutex by returning back a handle
 void *ethosu_mutex_create(void);
 // lock the given mutex
-void ethosu_mutex_lock(void *mutex);
+int ethosu_mutex_lock(void *mutex);
 // unlock the given mutex
-void ethosu_mutex_unlock(void *mutex);
+int ethosu_mutex_unlock(void *mutex);
 
 // create a (binary) semaphore by returning back a handle
 void *ethosu_semaphore_create(void);
-// take from the given semaphore
-void ethosu_semaphore_take(void *sem);
+// take from the given semaphore, accepting a timeout (unit impl. defined)
+int ethosu_semaphore_take(void *sem, uint64_t timeout);
 // give from the given semaphore
-void ethosu_semaphore_give(void *sem);
+int ethosu_semaphore_give(void *sem);
 ```
 
 ## Begin/End inference callbacks
@@ -186,6 +203,9 @@ an inference begins and ends. The user can override such functions when needed.
 To avoid memory leaks, any allocations done in the ethosu_inference_begin() must
 be balanced by a corresponding free of the memory in the ethosu_inference_end()
 callback.
+
+The end callback will always be called if the begin callback has been called,
+including in the event of an interrupt semaphore take timeout.
 
 ```[C]
 void ethosu_inference_begin(struct ethosu_driver *drv, void *user_arg);
