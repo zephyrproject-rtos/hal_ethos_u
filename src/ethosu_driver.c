@@ -160,7 +160,8 @@ static void *ethosu_semaphore;
 
 void *__attribute__((weak)) ethosu_mutex_create(void)
 {
-    return NULL;
+    static uint8_t mutex_placeholder;
+    return &mutex_placeholder;
 }
 
 void __attribute__((weak)) ethosu_mutex_destroy(void *mutex)
@@ -197,12 +198,21 @@ void __attribute__((weak)) ethosu_semaphore_destroy(void *sem)
 }
 
 // Baremetal simulation of waiting/sleeping for and then taking a semaphore using intrisics
-int __attribute__((weak)) ethosu_semaphore_take(void *sem)
+int __attribute__((weak)) ethosu_semaphore_take(void *sem, uint64_t timeout)
 {
+    UNUSED(timeout);
+    // Baremetal pseudo-example on how to trigger a timeout:
+    // if (timeout != ETHOSU_SEMAPHORE_WAIT_FOREVER) {
+    //     setup_a_timer_to_call_SEV_after_time(timeout);
+    // }
     struct ethosu_semaphore_t *s = sem;
     while (s->count == 0)
     {
         __WFE();
+        // Baremetal pseudo-example check if timeout triggered:
+        // if (SEV_timer_triggered()) {
+        //     return -1;
+        // }
     }
     s->count--;
     return 0;
@@ -263,7 +273,7 @@ static int ethosu_deregister_driver(struct ethosu_driver *drv)
         {
             *prev = curr->next;
             LOG_INFO("NPU driver handle %p deregistered.", drv);
-            ethosu_semaphore_take(ethosu_semaphore);
+            ethosu_semaphore_take(ethosu_semaphore, ETHOSU_SEMAPHORE_WAIT_FOREVER);
             break;
         }
 
@@ -365,11 +375,15 @@ void __attribute__((weak)) ethosu_irq_handler(struct ethosu_driver *drv)
 {
     LOG_DEBUG("Got interrupt from Ethos-U");
 
-    drv->job.state = ETHOSU_JOB_DONE;
-    if (!ethosu_dev_handle_interrupt(drv->dev))
+    // Prevent race condition where interrupt triggered after a timeout waiting
+    // for semaphore, but before NPU is reset.
+    if (drv->job.result == ETHOSU_JOB_RESULT_TIMEOUT)
     {
-        drv->status_error = true;
+        return;
     }
+
+    drv->job.state  = ETHOSU_JOB_DONE;
+    drv->job.result = ethosu_dev_handle_interrupt(drv->dev) ? ETHOSU_JOB_RESULT_OK : ETHOSU_JOB_RESULT_ERROR;
     ethosu_semaphore_give(drv->semaphore);
 }
 
@@ -395,6 +409,11 @@ int ethosu_init(struct ethosu_driver *drv,
     if (!ethosu_mutex)
     {
         ethosu_mutex = ethosu_mutex_create();
+        if (!ethosu_mutex)
+        {
+            LOG_ERR("Failed to create global driver mutex");
+            return -1;
+        }
     }
 
     if (!ethosu_semaphore)
@@ -428,8 +447,6 @@ int ethosu_init(struct ethosu_driver *drv,
         drv->dev = NULL;
         return -1;
     }
-
-    drv->status_error = false;
 
     ethosu_reset_job(drv);
     ethosu_register_driver(drv);
@@ -530,29 +547,48 @@ int ethosu_wait(struct ethosu_driver *drv, bool block)
     case ETHOSU_JOB_DONE:
         // Wait for interrupt in blocking mode. In non-blocking mode
         // the interrupt has already triggered
-        ethosu_semaphore_take(drv->semaphore);
+        ret = ethosu_semaphore_take(drv->semaphore, ETHOSU_SEMAPHORE_WAIT_INFERENCE);
+        if (ret < 0)
+        {
+            drv->job.result = ETHOSU_JOB_RESULT_TIMEOUT;
 
-        // Inference done callback
+            // There's a race where the NPU interrupt can have fired between semaphore
+            // timing out and setting the result above (checked in interrupt handler).
+            // By checking if the job state has been changed (only set to DONE by interrupt
+            // handler), we know if the interrupt handler has run, if so decrement the
+            // semaphore count by one (given in interrupt handler).
+            if (drv->job.state == ETHOSU_JOB_DONE)
+            {
+                drv->job.result = ETHOSU_JOB_RESULT_TIMEOUT; // Reset back to timeout
+                ethosu_semaphore_take(drv->semaphore, ETHOSU_SEMAPHORE_WAIT_INFERENCE);
+            }
+        }
+
+        // Inference done callback - always called even in case of timeout
         ethosu_inference_end(drv, drv->job.user_arg);
 
-        // Relase power gating disabled requirement
+        // Release power gating disabled requirement
         ethosu_release_power(drv);
 
         // Check NPU and interrupt status
-        if (drv->status_error)
+        if (drv->job.result)
         {
-            LOG_ERR("NPU error(s) occured during inference.");
-            ethosu_dev_print_err_status(drv->dev);
+            if (drv->job.result == ETHOSU_JOB_RESULT_ERROR)
+            {
+                LOG_ERR("NPU error(s) occured during inference.");
+                ethosu_dev_print_err_status(drv->dev);
+            }
+            else
+            {
+                LOG_ERR("NPU inference timed out.");
+            }
 
             // Reset the NPU
             (void)ethosu_soft_reset(drv);
-            // NPU is no longer in error state
-            drv->status_error = false;
 
             ret = -1;
         }
-
-        if (ret == 0)
+        else
         {
             // Invalidate cache
             if (drv->job.base_addr_size != NULL)
@@ -568,6 +604,7 @@ int ethosu_wait(struct ethosu_driver *drv, bool block)
             }
 
             LOG_DEBUG("Inference finished successfully...");
+            ret = 0;
         }
 
         // Reset internal job (state resets to IDLE)
@@ -643,8 +680,6 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
         base_addr[FAST_MEMORY_BASE_ADDR_INDEX] = drv->fast_memory;
     }
 
-    drv->status_error = false;
-
     // Parse Custom Operator Payload data
     while (data_ptr < data_end)
     {
@@ -712,7 +747,7 @@ struct ethosu_driver *ethosu_reserve_driver(void)
     struct ethosu_driver *drv = NULL;
 
     LOG_INFO("Acquiring NPU driver handle");
-    ethosu_semaphore_take(ethosu_semaphore); // This is meant to block until available
+    ethosu_semaphore_take(ethosu_semaphore, ETHOSU_SEMAPHORE_WAIT_FOREVER); // This is meant to block until available
 
     ethosu_mutex_lock(ethosu_mutex);
     drv = registered_drivers;
@@ -751,7 +786,6 @@ void ethosu_release_driver(struct ethosu_driver *drv)
                 drv->power_request_counter = 0;
                 ethosu_soft_reset(drv);
                 ethosu_reset_job(drv);
-                drv->status_error = false;
             }
         }
 
