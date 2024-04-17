@@ -1,6 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright 2019-2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
- *
+ * SPDX-FileCopyrightText: Copyright 2019-2024 Arm Limited and/or its affiliates <open-source-office@arm.com>
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the License); you may
@@ -147,12 +146,26 @@ void ethosu_invalidate_dcache(uint32_t *p, size_t bytes);
 void *ethosu_mutex_create(void);
 
 /**
+ * Destroy mutex.
+ *
+ * @param mutex     Pointer to mutex handle
+ */
+void ethosu_mutex_destroy(void *mutex);
+
+/**
  * Minimal sempahore implementation for baremetal applications. See
  * ethosu_driver.c.
  *
  * @return Pointer to semaphore handle
  */
 void *ethosu_semaphore_create(void);
+
+/**
+ * Destroy semaphore.
+ *
+ * @param sem       Pointer to semaphore handle
+ */
+void ethosu_semaphore_destroy(void *sem);
 
 /**
  * Lock mutex.
