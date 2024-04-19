@@ -20,6 +20,12 @@ cmake_minimum_required(VERSION 3.15.6)
 project(ethosu_core_driver VERSION 0.0.1)
 
 #
+# Compile options
+#
+
+add_compile_options(-Werror)
+
+#
 # Build options
 #
 
