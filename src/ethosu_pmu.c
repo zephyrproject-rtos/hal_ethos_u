@@ -1,6 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright 2019-2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
- *
+ * SPDX-FileCopyrightText: Copyright 2019-2024 Arm Limited and/or its affiliates <open-source-office@arm.com>
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the License); you may
@@ -75,10 +74,8 @@ static uint32_t pmu_event_value(enum ethosu_pmu_event_type event)
     {
         return eventbyid[event];
     }
-    else
-    {
-        return (uint32_t)(-1);
-    }
+
+    return UINT32_MAX;
 }
 
 /*****************************************************************************
@@ -110,6 +107,12 @@ void ETHOSU_PMU_Set_EVTYPER(struct ethosu_driver *drv, uint32_t num, enum ethosu
 {
     assert(num < ETHOSU_PMU_NCOUNTERS);
     uint32_t val = pmu_event_value(type);
+    if (val == UINT32_MAX)
+    {
+        LOG_ERR("Invalid ethosu_pmu_event_type: %d", type);
+        return;
+    }
+
     LOG_DEBUG("num=%" PRIu32 ", type=%d, val=%" PRIu32, num, type, val);
     drv->dev->reg->PMEVTYPER[num].word = val;
 }
@@ -269,8 +272,14 @@ void ETHOSU_PMU_CNTR_Increment(struct ethosu_driver *drv, uint32_t mask)
 void ETHOSU_PMU_PMCCNTR_CFG_Set_Start_Event(struct ethosu_driver *drv, enum ethosu_pmu_event_type start_event)
 {
     LOG_DEBUG("start_event=%u", start_event);
-    uint32_t val = pmu_event_value(start_event);
     struct pmccntr_cfg_r cfg;
+    uint32_t val = pmu_event_value(start_event);
+    if (val == UINT32_MAX)
+    {
+        LOG_ERR("Invalid ethosu_pmu_event_type: %d", start_event);
+        return;
+    }
+
     cfg.word                        = drv->dev->reg->PMCCNTR_CFG.word;
     cfg.CYCLE_CNT_CFG_START         = val;
     drv->dev->reg->PMCCNTR_CFG.word = cfg.word;
@@ -279,8 +288,14 @@ void ETHOSU_PMU_PMCCNTR_CFG_Set_Start_Event(struct ethosu_driver *drv, enum etho
 void ETHOSU_PMU_PMCCNTR_CFG_Set_Stop_Event(struct ethosu_driver *drv, enum ethosu_pmu_event_type stop_event)
 {
     LOG_DEBUG("stop_event=%u", stop_event);
-    uint32_t val = pmu_event_value(stop_event);
     struct pmccntr_cfg_r cfg;
+    uint32_t val = pmu_event_value(stop_event);
+    if (val == UINT32_MAX)
+    {
+        LOG_ERR("Invalid ethosu_pmu_event_type: %d", stop_event);
+        return;
+    }
+
     cfg.word                        = drv->dev->reg->PMCCNTR_CFG.word;
     cfg.CYCLE_CNT_CFG_STOP          = val;
     drv->dev->reg->PMCCNTR_CFG.word = cfg.word;
