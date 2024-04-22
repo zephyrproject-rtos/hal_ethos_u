@@ -1,6 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright 2019-2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
- *
+ * SPDX-FileCopyrightText: Copyright 2019-2024 Arm Limited and/or its affiliates <open-source-office@arm.com>
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the License); you may
@@ -327,7 +326,7 @@ static int handle_command_stream(struct ethosu_driver *drv, const uint8_t *cmd_s
     {
         if (0 != (drv->job.base_addr[i] & MASK_16_BYTE_ALIGN))
         {
-            LOG_ERR("Base addr %d: 0x%llx not aligned to 16 bytes", i, drv->job.base_addr[i]);
+            LOG_ERR("Base addr %d: 0x%" PRIx64 "not aligned to 16 bytes", i, drv->job.base_addr[i]);
             return -1;
         }
     }
@@ -426,7 +425,7 @@ int ethosu_init(struct ethosu_driver *drv,
         }
     }
 
-    drv->fast_memory           = (uint32_t)fast_memory;
+    drv->fast_memory           = (uint64_t)fast_memory;
     drv->fast_memory_size      = fast_memory_size;
     drv->power_request_counter = 0;
 
@@ -671,7 +670,7 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
 
         if (base_addr_size != NULL && base_addr_size[FAST_MEMORY_BASE_ADDR_INDEX] > drv->fast_memory_size)
         {
-            LOG_ERR("Fast memory area too small. fast_memory_size=%u, base_addr_size=%u",
+            LOG_ERR("Fast memory area too small. fast_memory_size=%zu, base_addr_size=%zu",
                     drv->fast_memory_size,
                     base_addr_size[FAST_MEMORY_BASE_ADDR_INDEX]);
             goto err;
