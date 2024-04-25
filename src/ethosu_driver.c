@@ -23,10 +23,14 @@
 #include "ethosu_device.h"
 #include "ethosu_log.h"
 
-#ifdef ETHOSU55
+#if defined(ETHOSU55)
 #include "ethosu_config_u55.h"
-#else
+#elif defined(ETHOSU65)
 #include "ethosu_config_u65.h"
+#elif defined(ETHOSU85)
+#include "ethosu_config_u85.h"
+#else
+#error Missing device type macro
 #endif
 
 #include <assert.h>
