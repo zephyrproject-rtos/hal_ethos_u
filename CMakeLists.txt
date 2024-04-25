@@ -1,6 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright 2019-2021, 2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
-#
+# SPDX-FileCopyrightText: Copyright 2019-2021, 2023-2024 Arm Limited and/or its affiliates <open-source-office@arm.com>
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the License); you may
@@ -59,19 +58,21 @@ target_include_directories(ethosu_core_driver PUBLIC include)
 target_sources(ethosu_core_driver PRIVATE src/ethosu_driver.c src/ethosu_pmu.c)
 
 string(TOLOWER ${ETHOSU_TARGET_NPU_CONFIG} ETHOSU_TARGET_NPU_CONFIG)
-if(ETHOSU_TARGET_NPU_CONFIG MATCHES "^ethos-(u[0-9]+|uz)-([0-9]+$)")
+if(ETHOSU_TARGET_NPU_CONFIG MATCHES "^ethos-(u[0-9]+)-([0-9]+$)")
     set(ETHOSU_ARCH ${CMAKE_MATCH_1})
     set(ETHOSU_MACS ${CMAKE_MATCH_2})
 else()
     message(FATAL_ERROR "Invalid Ethos-U target configuration '${ETHOSU_TARGET_NPU_CONFIG}")
 endif()
 
-target_compile_definitions(ethosu_core_driver PRIVATE
+target_compile_definitions(ethosu_core_driver PUBLIC
     ETHOSU_ARCH=${ETHOSU_ARCH}
     ETHOS$<UPPER_CASE:${ETHOSU_ARCH}>)
 
 if (ETHOSU_ARCH STREQUAL "u55" OR ETHOSU_ARCH STREQUAL "u65")
     target_sources(ethosu_core_driver PRIVATE src/ethosu_device_u55_u65.c)
+elseif (ETHOSU_ARCH STREQUAL "u85")
+    target_sources(ethosu_core_driver PRIVATE src/ethosu_device_u85.c)
 else()
     message(FATAL_ERROR "Invalid NPU configuration")
 endif()
@@ -96,10 +97,7 @@ install(FILES include/ethosu_device.h include/ethosu_driver.h include/pmu_ethosu
 # Define ETHOSU macro
 target_compile_definitions(ethosu_core_driver PUBLIC ETHOSU)
 
-#
 # Print build status
-#
-
 message(STATUS "*******************************************************")
 message(STATUS "PROJECT_NAME                           : ${PROJECT_NAME}")
 message(STATUS "ETHOSU_TARGET_NPU_CONFIG               : ${ETHOSU_TARGET_NPU_CONFIG}")
