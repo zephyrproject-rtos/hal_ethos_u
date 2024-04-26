@@ -425,7 +425,7 @@ int ethosu_init(struct ethosu_driver *drv,
         }
     }
 
-    drv->fast_memory           = (uint64_t)fast_memory;
+    drv->fast_memory           = (uintptr_t)fast_memory;
     drv->fast_memory_size      = fast_memory_size;
     drv->power_request_counter = 0;
 
