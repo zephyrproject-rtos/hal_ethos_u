@@ -31,30 +31,13 @@ extern "C" {
 #endif
 
 /******************************************************************************
- * Types
- ******************************************************************************/
-struct NPU_REG; // Forward declare, to be implemented by each device
-
-struct ethosu_device
-{
-    volatile struct NPU_REG *reg; // Register map
-    uint32_t secure;
-    uint32_t privileged;
-};
-
-/******************************************************************************
  * Prototypes
  ******************************************************************************/
 
 /**
  * Initialize the device.
  */
-struct ethosu_device *ethosu_dev_init(void *const base_address, uint32_t secure_enable, uint32_t privilege_enable);
-
-/**
- * Deinitialize the device.
- */
-void ethosu_dev_deinit(struct ethosu_device *dev);
+bool ethosu_dev_init(struct ethosu_device *dev, void *base_address, uint32_t secure_enable, uint32_t privilege_enable);
 
 /**
  * Initialize AXI settings for device.

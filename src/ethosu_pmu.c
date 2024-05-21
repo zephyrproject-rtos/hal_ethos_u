@@ -88,13 +88,13 @@ void ETHOSU_PMU_Enable(struct ethosu_driver *drv)
     struct pmcr_r pmcr = {0};
     pmcr.cnt_en        = 1;
     ethosu_request_power(drv);
-    drv->dev->reg->PMCR.word = pmcr.word;
+    drv->dev.reg->PMCR.word = pmcr.word;
 }
 
 void ETHOSU_PMU_Disable(struct ethosu_driver *drv)
 {
     LOG_DEBUG("Disable PMU");
-    drv->dev->reg->PMCR.word = 0;
+    drv->dev.reg->PMCR.word = 0;
     ethosu_release_power(drv);
 }
 
@@ -114,13 +114,13 @@ void ETHOSU_PMU_Set_EVTYPER(struct ethosu_driver *drv, uint32_t num, enum ethosu
     }
 
     LOG_DEBUG("num=%" PRIu32 ", type=%d, val=%" PRIu32, num, type, val);
-    drv->dev->reg->PMEVTYPER[num].word = val;
+    drv->dev.reg->PMEVTYPER[num].word = val;
 }
 
 enum ethosu_pmu_event_type ETHOSU_PMU_Get_EVTYPER(struct ethosu_driver *drv, uint32_t num)
 {
     assert(num < ETHOSU_PMU_NCOUNTERS);
-    uint32_t val                    = drv->dev->reg->PMEVTYPER[num].word;
+    uint32_t val                    = drv->dev.reg->PMEVTYPER[num].word;
     enum ethosu_pmu_event_type type = pmu_event_type(val);
     LOG_DEBUG("num=%" PRIu32 ", type=%d, val=%" PRIu32, num, type, val);
     return type;
@@ -130,43 +130,43 @@ void ETHOSU_PMU_CYCCNT_Reset(struct ethosu_driver *drv)
 {
     LOG_DEBUG("Reset PMU cycle counter");
     struct pmcr_r pmcr;
-    pmcr.word                = drv->dev->reg->PMCR.word;
-    pmcr.cycle_cnt_rst       = 1;
-    drv->dev->reg->PMCR.word = pmcr.word;
+    pmcr.word               = drv->dev.reg->PMCR.word;
+    pmcr.cycle_cnt_rst      = 1;
+    drv->dev.reg->PMCR.word = pmcr.word;
 }
 
 void ETHOSU_PMU_EVCNTR_ALL_Reset(struct ethosu_driver *drv)
 {
     LOG_DEBUG("Reset all events");
     struct pmcr_r pmcr;
-    pmcr.word                = drv->dev->reg->PMCR.word;
-    pmcr.event_cnt_rst       = 1;
-    drv->dev->reg->PMCR.word = pmcr.word;
+    pmcr.word               = drv->dev.reg->PMCR.word;
+    pmcr.event_cnt_rst      = 1;
+    drv->dev.reg->PMCR.word = pmcr.word;
 }
 
 void ETHOSU_PMU_CNTR_Enable(struct ethosu_driver *drv, uint32_t mask)
 {
     LOG_DEBUG("mask=0x%08" PRIx32, mask);
-    drv->dev->reg->PMCNTENSET.word = mask;
+    drv->dev.reg->PMCNTENSET.word = mask;
 }
 
 void ETHOSU_PMU_CNTR_Disable(struct ethosu_driver *drv, uint32_t mask)
 {
     LOG_DEBUG("mask=0x%08" PRIx32, mask);
-    drv->dev->reg->PMCNTENCLR.word = mask;
+    drv->dev.reg->PMCNTENCLR.word = mask;
 }
 
 uint32_t ETHOSU_PMU_CNTR_Status(struct ethosu_driver *drv)
 {
-    uint32_t pmcntenset = drv->dev->reg->PMCNTENSET.word;
+    uint32_t pmcntenset = drv->dev.reg->PMCNTENSET.word;
     LOG_DEBUG("mask=0x%08" PRIx32, pmcntenset);
     return pmcntenset;
 }
 
 uint64_t ETHOSU_PMU_Get_CCNTR(struct ethosu_driver *drv)
 {
-    uint32_t val_lo = drv->dev->reg->PMCCNTR.CYCLE_CNT_LO;
-    uint32_t val_hi = drv->dev->reg->PMCCNTR.CYCLE_CNT_HI;
+    uint32_t val_lo = drv->dev.reg->PMCCNTR.CYCLE_CNT_LO;
+    uint32_t val_hi = drv->dev.reg->PMCCNTR.CYCLE_CNT_HI;
     uint64_t val    = ((uint64_t)val_hi << 32) | val_lo;
 
     LOG_DEBUG("val=%" PRIu64, val);
@@ -184,8 +184,8 @@ void ETHOSU_PMU_Set_CCNTR(struct ethosu_driver *drv, uint64_t val)
         ETHOSU_PMU_CNTR_Disable(drv, ETHOSU_PMU_CCNT_Msk);
     }
 
-    drv->dev->reg->PMCCNTR.CYCLE_CNT_LO = val & MASK_0_31_BITS;
-    drv->dev->reg->PMCCNTR.CYCLE_CNT_HI = (val & MASK_32_47_BITS) >> 32;
+    drv->dev.reg->PMCCNTR.CYCLE_CNT_LO = val & MASK_0_31_BITS;
+    drv->dev.reg->PMCCNTR.CYCLE_CNT_HI = (val & MASK_32_47_BITS) >> 32;
 
     if (active)
     {
@@ -196,7 +196,7 @@ void ETHOSU_PMU_Set_CCNTR(struct ethosu_driver *drv, uint64_t val)
 uint32_t ETHOSU_PMU_Get_EVCNTR(struct ethosu_driver *drv, uint32_t num)
 {
     assert(num < ETHOSU_PMU_NCOUNTERS);
-    uint32_t val = drv->dev->reg->PMEVCNTR[num].word;
+    uint32_t val = drv->dev.reg->PMEVCNTR[num].word;
     LOG_DEBUG("num=%" PRIu32 ", val=%" PRIu32, num, val);
 
     return val;
@@ -206,36 +206,36 @@ void ETHOSU_PMU_Set_EVCNTR(struct ethosu_driver *drv, uint32_t num, uint32_t val
 {
     assert(num < ETHOSU_PMU_NCOUNTERS);
     LOG_DEBUG("num=%" PRIu32 ", val=%" PRIu32, num, val);
-    drv->dev->reg->PMEVCNTR[num].word = val;
+    drv->dev.reg->PMEVCNTR[num].word = val;
 }
 
 uint32_t ETHOSU_PMU_Get_CNTR_OVS(struct ethosu_driver *drv)
 {
     LOG_DEBUG("");
-    return drv->dev->reg->PMOVSSET.word;
+    return drv->dev.reg->PMOVSSET.word;
 }
 
 void ETHOSU_PMU_Set_CNTR_OVS(struct ethosu_driver *drv, uint32_t mask)
 {
     LOG_DEBUG("");
-    drv->dev->reg->PMOVSCLR.word = mask;
+    drv->dev.reg->PMOVSCLR.word = mask;
 }
 
 void ETHOSU_PMU_Set_CNTR_IRQ_Enable(struct ethosu_driver *drv, uint32_t mask)
 {
     LOG_DEBUG("mask=0x%08" PRIx32, mask);
-    drv->dev->reg->PMINTSET.word = mask;
+    drv->dev.reg->PMINTSET.word = mask;
 }
 
 void ETHOSU_PMU_Set_CNTR_IRQ_Disable(struct ethosu_driver *drv, uint32_t mask)
 {
     LOG_DEBUG("mask=0x%08" PRIx32, mask);
-    drv->dev->reg->PMINTCLR.word = mask;
+    drv->dev.reg->PMINTCLR.word = mask;
 }
 
 uint32_t ETHOSU_PMU_Get_IRQ_Enable(struct ethosu_driver *drv)
 {
-    uint32_t pmint = drv->dev->reg->PMINTSET.word;
+    uint32_t pmint = drv->dev.reg->PMINTSET.word;
     LOG_DEBUG("mask=0x%08" PRIx32, pmint);
     return pmint;
 }
@@ -251,17 +251,17 @@ void ETHOSU_PMU_CNTR_Increment(struct ethosu_driver *drv, uint32_t mask)
     // Increment cycle counter
     if (mask & ETHOSU_PMU_CCNT_Msk)
     {
-        uint64_t val                        = ETHOSU_PMU_Get_CCNTR(drv) + 1;
-        drv->dev->reg->PMCCNTR.CYCLE_CNT_LO = val & MASK_0_31_BITS;
-        drv->dev->reg->PMCCNTR.CYCLE_CNT_HI = (val & MASK_32_47_BITS) >> 32;
+        uint64_t val                       = ETHOSU_PMU_Get_CCNTR(drv) + 1;
+        drv->dev.reg->PMCCNTR.CYCLE_CNT_LO = val & MASK_0_31_BITS;
+        drv->dev.reg->PMCCNTR.CYCLE_CNT_HI = (val & MASK_32_47_BITS) >> 32;
     }
 
     for (int i = 0; i < ETHOSU_PMU_NCOUNTERS; i++)
     {
         if (mask & (1u << i))
         {
-            uint32_t val                    = ETHOSU_PMU_Get_EVCNTR(drv, i);
-            drv->dev->reg->PMEVCNTR[i].word = val + 1;
+            uint32_t val                   = ETHOSU_PMU_Get_EVCNTR(drv, i);
+            drv->dev.reg->PMEVCNTR[i].word = val + 1;
         }
     }
 
@@ -280,9 +280,9 @@ void ETHOSU_PMU_PMCCNTR_CFG_Set_Start_Event(struct ethosu_driver *drv, enum etho
         return;
     }
 
-    cfg.word                        = drv->dev->reg->PMCCNTR_CFG.word;
-    cfg.CYCLE_CNT_CFG_START         = val;
-    drv->dev->reg->PMCCNTR_CFG.word = cfg.word;
+    cfg.word                       = drv->dev.reg->PMCCNTR_CFG.word;
+    cfg.CYCLE_CNT_CFG_START        = val;
+    drv->dev.reg->PMCCNTR_CFG.word = cfg.word;
 }
 
 void ETHOSU_PMU_PMCCNTR_CFG_Set_Stop_Event(struct ethosu_driver *drv, enum ethosu_pmu_event_type stop_event)
@@ -296,21 +296,21 @@ void ETHOSU_PMU_PMCCNTR_CFG_Set_Stop_Event(struct ethosu_driver *drv, enum ethos
         return;
     }
 
-    cfg.word                        = drv->dev->reg->PMCCNTR_CFG.word;
-    cfg.CYCLE_CNT_CFG_STOP          = val;
-    drv->dev->reg->PMCCNTR_CFG.word = cfg.word;
+    cfg.word                       = drv->dev.reg->PMCCNTR_CFG.word;
+    cfg.CYCLE_CNT_CFG_STOP         = val;
+    drv->dev.reg->PMCCNTR_CFG.word = cfg.word;
 }
 
 uint32_t ETHOSU_PMU_Get_QREAD(struct ethosu_driver *drv)
 {
-    uint32_t val = drv->dev->reg->QREAD.word;
+    uint32_t val = drv->dev.reg->QREAD.word;
     LOG_DEBUG("qread=%" PRIu32, val);
     return val;
 }
 
 uint32_t ETHOSU_PMU_Get_STATUS(struct ethosu_driver *drv)
 {
-    uint32_t val = drv->dev->reg->STATUS.word;
+    uint32_t val = drv->dev.reg->STATUS.word;
     LOG_DEBUG("status=0x%" PRIx32, val);
     return val;
 }
