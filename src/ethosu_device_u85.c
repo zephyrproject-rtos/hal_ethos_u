@@ -55,15 +55,8 @@ uint64_t __attribute__((weak)) ethosu_address_remap(uint64_t address, int index)
     return address;
 }
 
-struct ethosu_device *ethosu_dev_init(void *const base_address, uint32_t secure_enable, uint32_t privilege_enable)
+bool ethosu_dev_init(struct ethosu_device *dev, void *base_address, uint32_t secure_enable, uint32_t privilege_enable)
 {
-    struct ethosu_device *dev = malloc(sizeof(struct ethosu_device));
-    if (!dev)
-    {
-        LOG_ERR("Failed to allocate memory for Ethos-U device");
-        return NULL;
-    }
-
     dev->reg        = (volatile struct NPU_REG *)base_address;
     dev->secure     = secure_enable;
     dev->privileged = privilege_enable;
@@ -71,25 +64,16 @@ struct ethosu_device *ethosu_dev_init(void *const base_address, uint32_t secure_
     if (dev->reg->CONFIG.product != ETHOSU_PRODUCT_U85)
     {
         LOG_ERR("Failed to initialize device. Driver has not been compiled for this product");
-        goto err;
+        return false;
     }
 
     // Make sure the NPU is in a known state
     if (ethosu_dev_soft_reset(dev) != ETHOSU_SUCCESS)
     {
-        goto err;
+        return false;
     }
 
-    return dev;
-
-err:
-    free(dev);
-    return NULL;
-}
-
-void ethosu_dev_deinit(struct ethosu_device *dev)
-{
-    free(dev);
+    return true;
 }
 
 enum ethosu_error_codes ethosu_dev_axi_init(struct ethosu_device *dev)
