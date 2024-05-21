@@ -50,9 +50,6 @@ extern "C" {
  * Types
  ******************************************************************************/
 
-// Forward declare
-struct ethosu_device;
-
 enum ethosu_job_state
 {
     ETHOSU_JOB_IDLE = 0,
@@ -81,7 +78,7 @@ struct ethosu_job
 
 struct ethosu_driver
 {
-    struct ethosu_device *dev;
+    struct ethosu_device dev;
     struct ethosu_driver *next;
     struct ethosu_job job;
     void *semaphore;

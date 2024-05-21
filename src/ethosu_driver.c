@@ -258,7 +258,7 @@ static void ethosu_register_driver(struct ethosu_driver *drv)
 
     ethosu_semaphore_give(ethosu_semaphore);
 
-    LOG_INFO("New NPU driver registered (handle: 0x%p, NPU: 0x%p)", drv, drv->dev->reg);
+    LOG_INFO("New NPU driver registered (handle: 0x%p, NPU: 0x%p)", drv, drv->dev.reg);
 }
 
 static int ethosu_deregister_driver(struct ethosu_driver *drv)
@@ -304,7 +304,7 @@ static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s c
 {
     LOG_INFO("Optimizer release nbr: %u patch: %u", opt_cfg_p->da_data.rel_nbr, opt_cfg_p->da_data.patch_nbr);
 
-    if (ethosu_dev_verify_optimizer_config(drv->dev, opt_cfg_p->cfg, opt_cfg_p->id) != true)
+    if (ethosu_dev_verify_optimizer_config(&drv->dev, opt_cfg_p->cfg, opt_cfg_p->id) != true)
     {
         return -1;
     }
@@ -366,7 +366,7 @@ static int handle_command_stream(struct ethosu_driver *drv, const uint8_t *cmd_s
     ethosu_inference_begin(drv, drv->job.user_arg);
 
     // Execute the command stream
-    ethosu_dev_run_command_stream(drv->dev, cmd_stream, cms_bytes, drv->job.base_addr, drv->job.num_base_addr);
+    ethosu_dev_run_command_stream(&drv->dev, cmd_stream, cms_bytes, drv->job.base_addr, drv->job.num_base_addr);
 
     return 0;
 }
@@ -386,7 +386,7 @@ void __attribute__((weak)) ethosu_irq_handler(struct ethosu_driver *drv)
     }
 
     drv->job.state  = ETHOSU_JOB_DONE;
-    drv->job.result = ethosu_dev_handle_interrupt(drv->dev) ? ETHOSU_JOB_RESULT_OK : ETHOSU_JOB_RESULT_ERROR;
+    drv->job.result = ethosu_dev_handle_interrupt(&drv->dev) ? ETHOSU_JOB_RESULT_OK : ETHOSU_JOB_RESULT_ERROR;
     ethosu_semaphore_give(drv->semaphore);
 }
 
@@ -434,9 +434,7 @@ int ethosu_init(struct ethosu_driver *drv,
     drv->power_request_counter = 0;
 
     // Initialize the device and set requested security state and privilege mode
-    drv->dev = ethosu_dev_init(base_address, secure_enable, privilege_enable);
-
-    if (drv->dev == NULL)
+    if (!ethosu_dev_init(&drv->dev, base_address, secure_enable, privilege_enable))
     {
         LOG_ERR("Failed to initialize Ethos-U device");
         return -1;
@@ -446,8 +444,6 @@ int ethosu_init(struct ethosu_driver *drv,
     if (!drv->semaphore)
     {
         LOG_ERR("Failed to create driver semaphore");
-        ethosu_dev_deinit(drv->dev);
-        drv->dev = NULL;
         return -1;
     }
 
@@ -461,21 +457,19 @@ void ethosu_deinit(struct ethosu_driver *drv)
 {
     ethosu_deregister_driver(drv);
     ethosu_semaphore_destroy(drv->semaphore);
-    ethosu_dev_deinit(drv->dev);
-    drv->dev = NULL;
 }
 
 int ethosu_soft_reset(struct ethosu_driver *drv)
 {
     // Soft reset the NPU
-    if (ethosu_dev_soft_reset(drv->dev) != ETHOSU_SUCCESS)
+    if (ethosu_dev_soft_reset(&drv->dev) != ETHOSU_SUCCESS)
     {
         LOG_ERR("Failed to soft-reset NPU");
         return -1;
     }
 
     // Update power and clock gating after the soft reset
-    ethosu_dev_set_clock_and_power(drv->dev,
+    ethosu_dev_set_clock_and_power(&drv->dev,
                                    drv->power_request_counter > 0 ? ETHOSU_CLOCK_Q_DISABLE : ETHOSU_CLOCK_Q_ENABLE,
                                    drv->power_request_counter > 0 ? ETHOSU_POWER_Q_DISABLE : ETHOSU_POWER_Q_ENABLE);
 
@@ -510,7 +504,7 @@ void ethosu_release_power(struct ethosu_driver *drv)
         // Decrement ref counter and enable power gating if no requests remain
         if (--drv->power_request_counter == 0)
         {
-            ethosu_dev_set_clock_and_power(drv->dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
+            ethosu_dev_set_clock_and_power(&drv->dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
         }
     }
 }
@@ -526,7 +520,7 @@ void ethosu_get_driver_version(struct ethosu_driver_version *ver)
 void ethosu_get_hw_info(struct ethosu_driver *drv, struct ethosu_hw_info *hw)
 {
     assert(hw != NULL);
-    ethosu_dev_get_hw_info(drv->dev, hw);
+    ethosu_dev_get_hw_info(&drv->dev, hw);
 }
 
 int ethosu_wait(struct ethosu_driver *drv, bool block)
@@ -579,7 +573,7 @@ int ethosu_wait(struct ethosu_driver *drv, bool block)
             if (drv->job.result == ETHOSU_JOB_RESULT_ERROR)
             {
                 LOG_ERR("NPU error(s) occured during inference.");
-                ethosu_dev_print_err_status(drv->dev);
+                ethosu_dev_print_err_status(&drv->dev);
             }
             else
             {
