@@ -29,8 +29,6 @@ add_compile_options(-Werror)
 # Build options
 #
 
-option(DRIVER_PMU_AUTOINIT "Enable PMU boot auto-initialization" OFF)
-
 set(CMSIS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmsis" CACHE PATH "Path to CMSIS.")
 
 set(LOG_NAMES err warning info debug)
@@ -73,6 +71,7 @@ endif()
 
 target_compile_definitions(ethosu_core_driver PUBLIC
     ETHOSU_ARCH=${ETHOSU_ARCH}
+    ETHOSU_MACS=${ETHOSU_MACS}
     ETHOS$<UPPER_CASE:${ETHOSU_ARCH}>)
 
 if (ETHOSU_ARCH STREQUAL "u55" OR ETHOSU_ARCH STREQUAL "u65")
