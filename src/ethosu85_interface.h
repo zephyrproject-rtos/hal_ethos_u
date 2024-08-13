@@ -107,6 +107,7 @@ namespace NPU_NAMESPACE
 #define NPU_REG_CLKFORCE 0x0140
 #define NPU_REG_DEBUG_ADDRESS 0x0144
 #define NPU_REG_DEBUG_MISC 0x0148
+#define NPU_REG_FEATURE_DISABLE 0x0154
 #define DEBUG_REGISTERS_SIZE 0x0180
 
 //
@@ -114,8 +115,6 @@ namespace NPU_NAMESPACE
 //
 #define NPU_REG_DMA_IFM_SRC 0x0240
 #define NPU_REG_DMA_IFM_SRC_HI 0x0244
-#define NPU_REG_DMA_IFM_DST 0x0248
-#define NPU_REG_DMA_OFM_SRC 0x024C
 #define NPU_REG_DMA_OFM_DST 0x0250
 #define NPU_REG_DMA_OFM_DST_HI 0x0254
 #define NPU_REG_DMA_WEIGHT_SRC 0x0258
@@ -678,17 +677,6 @@ enum class custom_dma : uint8_t
     IMPLEMENTED = 1,
 };
 
-enum class dma_fault_channel : uint8_t
-{
-    CMD_READ = 0,
-    IFM_READ = 1,
-    WEIGHT_READ = 2,
-    SBS_READ = 3,
-    MEM2MEM_READ = 4,
-    OFM_WRITE = 8,
-    MEM2MEM_WRITE = 9,
-};
-
 enum class dma_fault_src : uint8_t
 {
     SRAM = 0,
@@ -800,7 +788,6 @@ enum class pmu_event : uint16_t
     CYCLE = 17,
     NPU_IDLE = 32,
     CC_STALLED_ON_BLOCKDEP = 33,
-    CC_STALLED_ON_SHRAM_RECONFIG = 34,
     NPU_ACTIVE = 35,
     MAC_ACTIVE = 48,
     MAC_DPU_ACTIVE = 51,
@@ -1330,17 +1317,6 @@ enum custom_dma
     CUSTOM_DMA_IMPLEMENTED = 1,
 };
 
-enum dma_fault_channel
-{
-    DMA_FAULT_CHANNEL_CMD_READ = 0,
-    DMA_FAULT_CHANNEL_IFM_READ = 1,
-    DMA_FAULT_CHANNEL_WEIGHT_READ = 2,
-    DMA_FAULT_CHANNEL_SBS_READ = 3,
-    DMA_FAULT_CHANNEL_MEM2MEM_READ = 4,
-    DMA_FAULT_CHANNEL_OFM_WRITE = 8,
-    DMA_FAULT_CHANNEL_MEM2MEM_WRITE = 9,
-};
-
 enum dma_fault_src
 {
     DMA_FAULT_SRC_SRAM = 0,
@@ -1452,7 +1428,6 @@ enum pmu_event
     PMU_EVENT_CYCLE = 17,
     PMU_EVENT_NPU_IDLE = 32,
     PMU_EVENT_CC_STALLED_ON_BLOCKDEP = 33,
-    PMU_EVENT_CC_STALLED_ON_SHRAM_RECONFIG = 34,
     PMU_EVENT_NPU_ACTIVE = 35,
     PMU_EVENT_MAC_ACTIVE = 48,
     PMU_EVENT_MAC_DPU_ACTIVE = 51,
@@ -2535,20 +2510,6 @@ static const char* custom_dma_str[] =
     "CUSTOM_DMA_IMPLEMENTED",
 };
 
-static const char* dma_fault_channel_str[] =
-{
-    "DMA_FAULT_CHANNEL_CMD_READ",
-    "DMA_FAULT_CHANNEL_IFM_READ",
-    "DMA_FAULT_CHANNEL_WEIGHT_READ",
-    "DMA_FAULT_CHANNEL_SBS_READ",
-    "DMA_FAULT_CHANNEL_MEM2MEM_READ",
-    "****",
-    "****",
-    "****",
-    "DMA_FAULT_CHANNEL_OFM_WRITE",
-    "DMA_FAULT_CHANNEL_MEM2MEM_WRITE",
-};
-
 static const char* dma_fault_src_str[] =
 {
     "DMA_FAULT_SRC_SRAM",
@@ -2713,7 +2674,7 @@ static const char* pmu_event_str[] =
     "****",
     "PMU_EVENT_NPU_IDLE",
     "PMU_EVENT_CC_STALLED_ON_BLOCKDEP",
-    "PMU_EVENT_CC_STALLED_ON_SHRAM_RECONFIG",
+    "****",
     "PMU_EVENT_NPU_ACTIVE",
     "****",
     "****",
@@ -3473,7 +3434,7 @@ private:
     uint32_t word0;
 public:
     CONSTEXPR id_r() :
-        word0(536899584)
+        word0(536899585)
     {}
     CONSTEXPR id_r(uint32_t init) :
         word0(init)
@@ -3712,13 +3673,13 @@ public:
         word0 = (~(((1U << 1) - 1)<<11) & word0) | ((((1U << 1) - 1) & static_cast<uint32_t>(value)) << 11);
         return *this;
     }
-    CONSTEXPR NPU_NAMESPACE::dma_fault_channel get_faulting_channel() const
+    CONSTEXPR NPU_NAMESPACE::pmu_axi_channel get_faulting_channel() const
     {
         auto v = ((1U << 4) - 1) & (word0 >> 12);
         assert(v <= 9);
-        return static_cast<NPU_NAMESPACE::dma_fault_channel>(v);
+        return static_cast<NPU_NAMESPACE::pmu_axi_channel>(v);
     }
-    CONSTEXPR status_r& set_faulting_channel(NPU_NAMESPACE::dma_fault_channel value)
+    CONSTEXPR status_r& set_faulting_channel(NPU_NAMESPACE::pmu_axi_channel value)
     {
         word0 = (~(((1U << 4) - 1)<<12) & word0) | ((((1U << 4) - 1) & static_cast<uint32_t>(value)) << 12);
         return *this;
@@ -5228,6 +5189,65 @@ public:
 #endif
 };
 
+// feature_disable_r - Disable micro-architectural features
+struct feature_disable_r
+{
+#ifndef __cplusplus
+    union
+    {
+        struct
+        {
+            uint32_t ib_reuse_kd_disable : 1; // Setting to 1 will disable the optimization to reuse IFM data when using kernel decomposition for large kernels
+            uint32_t ib_reuse_ifm_depth_disable : 1; // Setting to 1 will disable the optimization to reuse IFM data when performing convolution operations
+            uint32_t reserved0 : 30;
+        };
+        uint32_t word;
+    };
+#else
+private:
+    uint32_t word0;
+public:
+    CONSTEXPR feature_disable_r() :
+        word0(0)
+    {}
+    CONSTEXPR feature_disable_r(uint32_t init) :
+        word0(init)
+    {}
+    CONSTEXPR void operator=(uint32_t value)
+    {
+        word0 = value;
+    }
+    CONSTEXPR operator uint32_t()
+    {
+        return word0;
+    }
+    feature_disable_r copy()
+    {
+        return *this;
+    }
+    CONSTEXPR uint32_t get_ib_reuse_kd_disable() const
+    {
+        auto v = ((1U << 1) - 1) & (word0 >> 0);
+        return v;
+    }
+    CONSTEXPR feature_disable_r& set_ib_reuse_kd_disable(uint32_t value)
+    {
+        word0 = (~(((1U << 1) - 1)<<0) & word0) | ((((1U << 1) - 1) & value) << 0);
+        return *this;
+    }
+    CONSTEXPR uint32_t get_ib_reuse_ifm_depth_disable() const
+    {
+        auto v = ((1U << 1) - 1) & (word0 >> 1);
+        return v;
+    }
+    CONSTEXPR feature_disable_r& set_ib_reuse_ifm_depth_disable(uint32_t value)
+    {
+        word0 = (~(((1U << 1) - 1)<<1) & word0) | ((((1U << 1) - 1) & value) << 1);
+        return *this;
+    }
+#endif
+};
+
 // dma_ifm_src_r - DMA IFM channel source position on AXI
 struct dma_ifm_src_r
 {
@@ -5265,100 +5285,6 @@ public:
     }
     dma_ifm_src_r copy()
     {
-        return *this;
-    }
-#endif
-};
-
-// dma_ifm_dst_r - DMA IFM channel destination position in SHRAM
-struct dma_ifm_dst_r
-{
-#ifndef __cplusplus
-    union
-    {
-        struct
-        {
-            uint32_t value : 32; // 32-bit register value
-        };
-        uint32_t word;
-    };
-#else
-private:
-    uint32_t word0;
-public:
-    CONSTEXPR dma_ifm_dst_r() :
-        word0(0)
-    {}
-    CONSTEXPR dma_ifm_dst_r(uint32_t init) :
-        word0(init)
-    {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word0 = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word0;
-    }
-    dma_ifm_dst_r copy()
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_value() const
-    {
-        auto v = word0;
-        return v;
-    }
-    CONSTEXPR dma_ifm_dst_r& set_value(uint32_t value)
-    {
-        word0 = value;
-        return *this;
-    }
-#endif
-};
-
-// dma_ofm_src_r - DMA OFM channel source position in SHRAM
-struct dma_ofm_src_r
-{
-#ifndef __cplusplus
-    union
-    {
-        struct
-        {
-            uint32_t value : 32; // 32-bit register value
-        };
-        uint32_t word;
-    };
-#else
-private:
-    uint32_t word0;
-public:
-    CONSTEXPR dma_ofm_src_r() :
-        word0(0)
-    {}
-    CONSTEXPR dma_ofm_src_r(uint32_t init) :
-        word0(init)
-    {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word0 = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word0;
-    }
-    dma_ofm_src_r copy()
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_value() const
-    {
-        auto v = word0;
-        return v;
-    }
-    CONSTEXPR dma_ofm_src_r& set_value(uint32_t value)
-    {
-        word0 = value;
         return *this;
     }
 #endif
@@ -13568,10 +13494,11 @@ struct NPU_REG
     STRUCT clkforce_r CLKFORCE; // 0x0140
     STRUCT debug_address_r DEBUG_ADDRESS; // 0x0144
     STRUCT debug_misc_r DEBUG_MISC; // 0x0148
-    uint32_t unused4[61];
+    uint32_t unused4[2];
+    STRUCT feature_disable_r FEATURE_DISABLE; // 0x0154
+    uint32_t unused5[58];
     STRUCT dma_ifm_src_r DMA_IFM_SRC; // 0x0240
-    STRUCT dma_ifm_dst_r DMA_IFM_DST; // 0x0248
-    STRUCT dma_ofm_src_r DMA_OFM_SRC; // 0x024C
+    uint32_t unused6[2];
     STRUCT dma_ofm_dst_r DMA_OFM_DST; // 0x0250
     STRUCT dma_weight_src_r DMA_WEIGHT_SRC; // 0x0258
     STRUCT dma_cmd_src_r DMA_CMD_SRC; // 0x0260
@@ -13583,10 +13510,10 @@ struct NPU_REG
     STRUCT dma_weight1_src_r DMA_WEIGHT1_SRC; // 0x0288
     STRUCT dma_weight2_src_r DMA_WEIGHT2_SRC; // 0x0290
     STRUCT dma_weight3_src_r DMA_WEIGHT3_SRC; // 0x0298
-    uint32_t unused5[6];
+    uint32_t unused7[6];
     STRUCT current_op_r CURRENT_OP; // 0x02B8
     STRUCT current_cmd_r CURRENT_CMD; // 0x02BC
-    uint32_t unused6[80];
+    uint32_t unused8[80];
     STRUCT internal_memory_r INTERNAL_MEMORY[256]; // 0x0400
     STRUCT ifm_pad_top_r IFM_PAD_TOP; // 0x0800
     STRUCT ifm_pad_left_r IFM_PAD_LEFT; // 0x0804
@@ -13594,16 +13521,16 @@ struct NPU_REG
     STRUCT ifm_pad_bottom_r IFM_PAD_BOTTOM; // 0x080C
     STRUCT ifm_depth_m1_r IFM_DEPTH_M1; // 0x0810
     STRUCT ifm_precision_r IFM_PRECISION; // 0x0814
-    uint32_t unused7[1];
+    uint32_t unused9[1];
     STRUCT ifm_upscale_r IFM_UPSCALE; // 0x081C
     STRUCT ifm_broadcast_r IFM_BROADCAST; // 0x0820
     STRUCT ifm_zero_point_r IFM_ZERO_POINT; // 0x0824
     STRUCT ifm_width0_m1_r IFM_WIDTH0_M1; // 0x0828
     STRUCT ifm_height0_m1_r IFM_HEIGHT0_M1; // 0x082C
     STRUCT ifm_height1_m1_r IFM_HEIGHT1_M1; // 0x0830
-    uint32_t unused8[2];
+    uint32_t unused10[2];
     STRUCT ifm_region_r IFM_REGION; // 0x083C
-    uint32_t unused9[1];
+    uint32_t unused11[1];
     STRUCT ofm_width_m1_r OFM_WIDTH_M1; // 0x0844
     STRUCT ofm_height_m1_r OFM_HEIGHT_M1; // 0x0848
     STRUCT ofm_depth_m1_r OFM_DEPTH_M1; // 0x084C
@@ -13612,16 +13539,16 @@ struct NPU_REG
     STRUCT ofm_blk_height_m1_r OFM_BLK_HEIGHT_M1; // 0x0858
     STRUCT ofm_blk_depth_m1_r OFM_BLK_DEPTH_M1; // 0x085C
     STRUCT ofm_zero_point_r OFM_ZERO_POINT; // 0x0860
-    uint32_t unused10[1];
+    uint32_t unused12[1];
     STRUCT ofm_width0_m1_r OFM_WIDTH0_M1; // 0x0868
     STRUCT ofm_height0_m1_r OFM_HEIGHT0_M1; // 0x086C
     STRUCT ofm_height1_m1_r OFM_HEIGHT1_M1; // 0x0870
-    uint32_t unused11[2];
+    uint32_t unused13[2];
     STRUCT ofm_region_r OFM_REGION; // 0x087C
     STRUCT kernel_width_m1_r KERNEL_WIDTH_M1; // 0x0880
     STRUCT kernel_height_m1_r KERNEL_HEIGHT_M1; // 0x0884
     STRUCT kernel_stride_r KERNEL_STRIDE; // 0x0888
-    uint32_t unused12[1];
+    uint32_t unused14[1];
     STRUCT acc_format_r ACC_FORMAT; // 0x0890
     STRUCT activation_r ACTIVATION; // 0x0894
     STRUCT activation_min_r ACTIVATION_MIN; // 0x0898
@@ -13639,18 +13566,18 @@ struct NPU_REG
     STRUCT dma0_size0_r DMA0_SIZE0; // 0x08C8
     STRUCT dma0_size1_r DMA0_SIZE1; // 0x08CC
     STRUCT dma0_idx_region_r DMA0_IDX_REGION; // 0x08D0
-    uint32_t unused13[11];
+    uint32_t unused15[11];
     STRUCT ifm2_broadcast_r IFM2_BROADCAST; // 0x0900
-    uint32_t unused14[4];
+    uint32_t unused16[4];
     STRUCT ifm2_precision_r IFM2_PRECISION; // 0x0914
-    uint32_t unused15[3];
+    uint32_t unused17[3];
     STRUCT ifm2_zero_point_r IFM2_ZERO_POINT; // 0x0924
     STRUCT ifm2_width0_m1_r IFM2_WIDTH0_M1; // 0x0928
     STRUCT ifm2_height0_m1_r IFM2_HEIGHT0_M1; // 0x092C
     STRUCT ifm2_height1_m1_r IFM2_HEIGHT1_M1; // 0x0930
-    uint32_t unused16[2];
+    uint32_t unused18[2];
     STRUCT ifm2_region_r IFM2_REGION; // 0x093C
-    uint32_t unused17[48];
+    uint32_t unused19[48];
     STRUCT ifm_base0_r IFM_BASE0; // 0x0A00
     STRUCT ifm_base1_r IFM_BASE1; // 0x0A08
     STRUCT ifm_base2_r IFM_BASE2; // 0x0A10
@@ -13658,7 +13585,7 @@ struct NPU_REG
     STRUCT ifm_stride_x_r IFM_STRIDE_X; // 0x0A20
     STRUCT ifm_stride_y_r IFM_STRIDE_Y; // 0x0A28
     STRUCT ifm_stride_c_r IFM_STRIDE_C; // 0x0A30
-    uint32_t unused18[2];
+    uint32_t unused20[2];
     STRUCT ofm_base0_r OFM_BASE0; // 0x0A40
     STRUCT ofm_base1_r OFM_BASE1; // 0x0A48
     STRUCT ofm_base2_r OFM_BASE2; // 0x0A50
@@ -13666,7 +13593,7 @@ struct NPU_REG
     STRUCT ofm_stride_x_r OFM_STRIDE_X; // 0x0A60
     STRUCT ofm_stride_y_r OFM_STRIDE_Y; // 0x0A68
     STRUCT ofm_stride_c_r OFM_STRIDE_C; // 0x0A70
-    uint32_t unused19[2];
+    uint32_t unused21[2];
     STRUCT weight_base_r WEIGHT_BASE; // 0x0A80
     STRUCT weight_length_r WEIGHT_LENGTH; // 0x0A88
     STRUCT scale_base_r SCALE_BASE; // 0x0A90
@@ -13690,7 +13617,7 @@ struct NPU_REG
     STRUCT ifm2_stride_x_r IFM2_STRIDE_X; // 0x0B20
     STRUCT ifm2_stride_y_r IFM2_STRIDE_Y; // 0x0B28
     STRUCT ifm2_stride_c_r IFM2_STRIDE_C; // 0x0B30
-    uint32_t unused20[2];
+    uint32_t unused22[2];
     STRUCT weight1_base_r WEIGHT1_BASE; // 0x0B40
     STRUCT weight1_length_r WEIGHT1_LENGTH; // 0x0B48
     STRUCT weight2_base_r WEIGHT2_BASE; // 0x0B50
@@ -13699,12 +13626,12 @@ struct NPU_REG
     STRUCT weight3_length_r WEIGHT3_LENGTH; // 0x0B68
     STRUCT resize_x_step_r RESIZE_X_STEP; // 0x0B70
     STRUCT resize_y_step_r RESIZE_Y_STEP; // 0x0B78
-    uint32_t unused21[16];
+    uint32_t unused23[16];
     STRUCT dma0_idx_max_r DMA0_IDX_MAX; // 0x0BC0
     STRUCT dma0_idx_skip1_r DMA0_IDX_SKIP1; // 0x0BC8
-    uint32_t unused22[252];
+    uint32_t unused24[252];
     STRUCT revision_r REVISION; // 0x0FC0
-    uint32_t unused23[3];
+    uint32_t unused25[3];
     STRUCT pid4_r PID4; // 0x0FD0
     STRUCT pid5_r PID5; // 0x0FD4
     STRUCT pid6_r PID6; // 0x0FD8
@@ -13717,14 +13644,14 @@ struct NPU_REG
     STRUCT cid1_r CID1; // 0x0FF4
     STRUCT cid2_r CID2; // 0x0FF8
     STRUCT cid3_r CID3; // 0x0FFC
-    uint32_t unused24[64];
+    uint32_t unused26[64];
     STRUCT wd_status_r WD_STATUS; // 0x1100
     STRUCT mac_status_r MAC_STATUS; // 0x1104
     STRUCT ao_status_r AO_STATUS; // 0x1108
-    uint32_t unused25[1];
+    uint32_t unused27[1];
     STRUCT dma_status0_r DMA_STATUS0; // 0x1110
     STRUCT dma_status1_r DMA_STATUS1; // 0x1114
-    uint32_t unused26[26];
+    uint32_t unused28[26];
     STRUCT pmcr_r PMCR; // 0x1180
     STRUCT pmcntenset_r PMCNTENSET; // 0x1184
     STRUCT pmcntenclr_r PMCNTENCLR; // 0x1188
@@ -13732,14 +13659,14 @@ struct NPU_REG
     STRUCT pmovsclr_r PMOVSCLR; // 0x1190
     STRUCT pmintset_r PMINTSET; // 0x1194
     STRUCT pmintclr_r PMINTCLR; // 0x1198
-    uint32_t unused27[1];
+    uint32_t unused29[1];
     STRUCT pmccntr_r PMCCNTR; // 0x11A0
     STRUCT pmccntr_cfg_r PMCCNTR_CFG; // 0x11A8
     STRUCT pmcaxi_chan_r PMCAXI_CHAN; // 0x11AC
     STRUCT pmclut_r PMCLUT; // 0x11B0
-    uint32_t unused28[83];
+    uint32_t unused30[83];
     STRUCT pmevcntr_r PMEVCNTR[8]; // 0x1300
-    uint32_t unused29[24];
+    uint32_t unused31[24];
     STRUCT pmevtyper_r PMEVTYPER[8]; // 0x1380
 
 #ifdef __cplusplus
@@ -13750,7 +13677,7 @@ struct NPU_REG
     }
     void reset()
     {
-        ID = 536899584;
+        ID = 536899585;
         STATUS = 8;
         CMD = 12;
         RESET = 0;
@@ -13777,9 +13704,8 @@ struct NPU_REG
         CLKFORCE = 0;
         DEBUG_ADDRESS = 0;
         DEBUG_MISC = 0;
+        FEATURE_DISABLE = 0;
         DMA_IFM_SRC = 0;
-        DMA_IFM_DST = 0;
-        DMA_OFM_SRC = 0;
         DMA_OFM_DST = 0;
         DMA_WEIGHT_SRC = 0;
         DMA_CMD_SRC = 0;
@@ -13946,7 +13872,7 @@ struct NPU_REG
             case 32: return access_type_t::RW;
             case 36: return access_type_t::RO;
             case 40: return access_type_t::RO;
-            case 48: return access_type_t::RW;
+            case 48: return access_type_t::RO;
             case 56: return access_type_t::RW;
             case 60: return access_type_t::RW;
             case 64: return access_type_t::RW;
@@ -13971,9 +13897,8 @@ struct NPU_REG
             case 320: return access_type_t::RW;
             case 324: return access_type_t::RW;
             case 328: return access_type_t::RW;
+            case 340: return access_type_t::RW;
             case 576: return access_type_t::RO;
-            case 584: return access_type_t::RO;
-            case 588: return access_type_t::RO;
             case 592: return access_type_t::RO;
             case 600: return access_type_t::RO;
             case 608: return access_type_t::RO;
@@ -16990,7 +16915,7 @@ private:
     uint32_t opcode:10; //  opcode
     uint32_t reserved0:4;
     uint32_t control:2; //  control
-    uint32_t broadcast_mode:4; //  Broadcast mode for IFM1. When not using broadcast_mode_scalar, accesses to IFM1 sets corresponding axes to 0 and corresponding IFM1 H/W/C to 1)
+    uint32_t broadcast_mode:4; //  Broadcast mode for IFM
     uint32_t reserved1:12;
 #ifdef __cplusplus
 public:
@@ -19917,7 +19842,7 @@ private:
     uint32_t opcode:10; //  opcode
     uint32_t reserved0:4;
     uint32_t control:2; //  control
-    uint32_t broadcast_mode:4; //  Broadcast mode for IFM2. When not using broadcast_mode_scalar, accesses to IFM2 sets corresponding axes to 0 and corresponding IFM2 H/W/C to 1)
+    uint32_t broadcast_mode:4; //  Broadcast mode for IFM2
     uint32_t reserved1:12;
 #ifdef __cplusplus
 public:
@@ -24367,15 +24292,6 @@ public:
     FUNC(custom_dma, NOT_IMPLEMENTED) SEP \
     FUNC(custom_dma, IMPLEMENTED)
 
-#define EXPAND_DMA_FAULT_CHANNEL(FUNC, SEP) \
-    FUNC(dma_fault_channel, CMD_READ) SEP \
-    FUNC(dma_fault_channel, IFM_READ) SEP \
-    FUNC(dma_fault_channel, WEIGHT_READ) SEP \
-    FUNC(dma_fault_channel, SBS_READ) SEP \
-    FUNC(dma_fault_channel, MEM2MEM_READ) SEP \
-    FUNC(dma_fault_channel, OFM_WRITE) SEP \
-    FUNC(dma_fault_channel, MEM2MEM_WRITE)
-
 #define EXPAND_DMA_FAULT_SRC(FUNC, SEP) \
     FUNC(dma_fault_src, SRAM) SEP \
     FUNC(dma_fault_src, EXT)
@@ -24462,7 +24378,6 @@ public:
     FUNC(pmu_event, CYCLE) SEP \
     FUNC(pmu_event, NPU_IDLE) SEP \
     FUNC(pmu_event, CC_STALLED_ON_BLOCKDEP) SEP \
-    FUNC(pmu_event, CC_STALLED_ON_SHRAM_RECONFIG) SEP \
     FUNC(pmu_event, NPU_ACTIVE) SEP \
     FUNC(pmu_event, MAC_ACTIVE) SEP \
     FUNC(pmu_event, MAC_DPU_ACTIVE) SEP \
