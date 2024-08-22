@@ -44,6 +44,7 @@
 #define ADDRESS_MASK ((1ull << ADDRESS_BITS) - 1)
 
 #define NPU_CMD_PWR_CLK_MASK (0xC)
+#define NPU_MAC_PWR_RAMP_CYCLES_MASK (0x3F)
 
 /******************************************************************************
  * Functions
@@ -221,6 +222,9 @@ enum ethosu_error_codes ethosu_dev_soft_reset(struct ethosu_device *dev)
 
     // Reinitialize AXI settings
     ethosu_dev_axi_init(dev);
+
+    // MAC power ramping up/down control
+    dev->reg->POWER_CTRL.word = (NPU_MAC_PWR_RAMP_CYCLES & NPU_MAC_PWR_RAMP_CYCLES_MASK);
 
     return ETHOSU_SUCCESS;
 }
