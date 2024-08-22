@@ -20,6 +20,13 @@
 
 /* Set default values if not manually overriden */
 
+/* MAC power ramping up/down control
+ * NOTE: Actual number of cycles is 4*NPU_MAC_PWR_RAMP_CYCLES
+ */
+#ifndef NPU_MAC_PWR_RAMP_CYCLES
+#define NPU_MAC_PWR_RAMP_CYCLES 0 /* Valid range 0-63, where 0 disables power ramping */
+#endif
+
 /* Default MEM_ATTR entries */
 #ifndef NPU_MEM_ATTR_0
 #define NPU_MEM_ATTR_0 0 /* SRAM AXI port, non_sharable, device_non_bufferable */
