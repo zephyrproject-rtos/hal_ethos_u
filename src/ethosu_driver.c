@@ -376,8 +376,6 @@ static int handle_command_stream(struct ethosu_driver *drv, const uint8_t *cmd_s
  ******************************************************************************/
 void __attribute__((weak)) ethosu_irq_handler(struct ethosu_driver *drv)
 {
-    LOG_DEBUG("Got interrupt from Ethos-U");
-
     // Prevent race condition where interrupt triggered after a timeout waiting
     // for semaphore, but before NPU is reset.
     if (drv->job.result == ETHOSU_JOB_RESULT_TIMEOUT)
