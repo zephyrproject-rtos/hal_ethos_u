@@ -128,28 +128,64 @@ configuration by specializing the device part at compile time.
 
 ## Data caching
 
-For running the driver on Arm CPUs which are configured with data cache, the
-cache maintenance functions in the driver are exported with weakly linked
-symbols that should be overridden. An example implementation using the CMSIS
-primitives found in cachel1_armv7.h could be as below:
+For running the driver on Arm CPUs which are configured with data cache, certain
+caution must be taken to ensure cache coherency. The driver expects that cache
+clean/flush has been done by the user application before being invoked. The
+driver does provide a deprecated weakly linked function `ethosu_flush_dcache`
+that could be overriden, causing the driver to cache flush/clean base pointers
+marked in the flush mask before each inference. By default the flush mask is set
+to only clean the scratch base pointer containing RW data (IFM in particular).
+It is recommended to not implement this function but have the user application
+make sure that IFM data has been written to memory before invoking an inference
+on the NPU.
+
+The driver also exposes a weakly linked symbol for cache invalidation called
+`ethosu_invalidate_dcache`, that must be overriden when the data cache is used.
+After starting an inference on the NPU, the driver will call this function to
+invalidate the base pointers marked in the invalidation mask. By defaults it
+invalidates the scratch base pointer keeping RW data, to ensure cache coherency
+after the inference is done. The invalidation call is done before waiting for
+the NPU to finish the inference so that depending on the network, the cycles
+for invalidating the cache may be completely hidden (the CPU performs cache
+invalidation before yielding while waiting for the NPU to finish).
+
+Make sure that any base pointers marked for flush/invalidation is aligned to the
+cache line size of your CPU, typically 32 bytes. While not implemented, to the
+really advanced user aiming for maximum performance, it is theoretically
+possible to tell the network compiler to align the IFM/OFM to cache line size,
+and modify the driver so that only OFM data is invalidated (and if left to the
+driver, only IFM data is cache cleaned/flushed). Due to the uncertainty of
+tensor alignment, the driver only flushes/invalidates on base pointer level.
+
+By default the cache flush- and invalidation mask is set to only mark the
+default scratch base pointer (base pointer 1). For maximum flexibility, the
+driver provides a function to modify the cache flush/invalidate masks called
+`ethosu_set_basep_cache_mask`. This function sets the two 8 bit masks, one for
+flush and one for invalidate, where bit 0 corresponds to base pointer 0, bit 1
+corresponds to base pointer 1 etc. See `include/ethosu_driver.h` for more
+information.
+
+An example implementation for the weak functions, using CMSIS primitives could
+look like below:
 
 ```[C++]
 extern "C" {
+// Deprecated - recommended to flush/clean in application code
+// p must be 32 byte aligned
 void ethosu_flush_dcache(uint32_t *p, size_t bytes) {
-    if (p)
-        SCB_CleanDCache_by_Addr(p, bytes);
-    else
-        SCB_CleanDCache();
+    SCB_CleanDCache_by_Addr(p, bytes);
 }
 
+// p must be 32 byte aligned
 void ethosu_invalidate_dcache(uint32_t *p, size_t bytes) {
-    if (p)
-        SCB_InvalidateDCache_by_Addr(p, bytes);
-    else
-        SCB_InvalidateDCache();
+    SCB_InvalidateDCache_by_Addr(p, bytes);
 }
 }
 ```
+The NPU contain memory attributes that should be set to match the settings used
+in the MPU configuration for the memories used. See `NPU_MEM_ATTR_[0-3]` for
+Ethos-U85 and the `AXI_LIMIT[0-3]_MEM_TYPE` for Ethos-U55/Ethos-U65 in
+corresponding `src/ethosu_config_uX5.h` files.
 
 ## Mutex and semaphores
 
