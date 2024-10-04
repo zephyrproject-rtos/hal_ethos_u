@@ -53,6 +53,7 @@
 #define DRIVER_ACTION_LENGTH_32_BIT_WORD 1
 #define ETHOSU_FOURCC ('1' << 24 | 'P' << 16 | 'O' << 8 | 'C') // "Custom Operator Payload 1"
 
+#define SCRATCH_BASE_ADDR_INDEX 1
 #define FAST_MEMORY_BASE_ADDR_INDEX 2
 
 /******************************************************************************
@@ -314,8 +315,7 @@ static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s c
 
 static int handle_command_stream(struct ethosu_driver *drv, const uint8_t *cmd_stream, const int cms_length)
 {
-    uint32_t cms_bytes       = cms_length * BYTES_IN_32_BITS;
-    ptrdiff_t cmd_stream_ptr = (ptrdiff_t)cmd_stream;
+    uint32_t cms_bytes = cms_length * BYTES_IN_32_BITS;
 
     LOG_INFO("handle_command_stream: cmd_stream=%p, cms_length %d", cmd_stream, cms_length);
 
@@ -325,7 +325,7 @@ static int handle_command_stream(struct ethosu_driver *drv, const uint8_t *cmd_s
         return -1;
     }
 
-    // Verify 16 byte alignment for base address'
+    // Verify minimum 16 byte alignment for base address'
     for (int i = 0; i < drv->job.num_base_addr; i++)
     {
         if (0 != (drv->job.base_addr[i] & MASK_16_BYTE_ALIGN))
@@ -335,22 +335,28 @@ static int handle_command_stream(struct ethosu_driver *drv, const uint8_t *cmd_s
         }
     }
 
-    // Flush the cache if available on CPU.
-    // The upcasting to uin32_t* is ok since the pointer never is dereferenced.
-    // The base_addr_size is null if invoking from prior to invoke_V2, in that case
-    // the whole cache is being flushed.
+    // DEPRECATION WARNING:
+    // It is advised against letting the driver handle flushing/cleaning of the cache, as this will
+    // be done for every invokation. It is up to the application code to ensure cache coherency
+    // before invoking an inference.
+    //
+    // The cache flush call below will flush/clean every base pointer marked in the flush mask.
+    // Typically only the scratch tensor contains RW data shared between the CPU and NPU, and needs
+    // to be flushed/cleaned before invoking an inference.
+    //
+    // It is recommended to not implement/override the default empty ethosu_flush_dcache() weak
+    // function.
+    //
+    // NOTE: It is required that any base pointer marked for cache flush/clean is aligned to the
+    // cache line size.
 
-    if (drv->job.base_addr_size != NULL)
+    // Flush/clean the cache for base pointers marked in the mask
+    for (int i = 0; i < drv->job.num_base_addr; i++)
     {
-        ethosu_flush_dcache((uint32_t *)cmd_stream_ptr, cms_bytes);
-        for (int i = 0; i < drv->job.num_base_addr; i++)
+        if (drv->basep_flush_mask & (1 << i))
         {
             ethosu_flush_dcache((uint32_t *)(uintptr_t)drv->job.base_addr[i], drv->job.base_addr_size[i]);
         }
-    }
-    else
-    {
-        ethosu_flush_dcache(NULL, 0);
     }
 
     // Request power gating disabled during inference run
@@ -392,6 +398,12 @@ void __attribute__((weak)) ethosu_irq_handler(struct ethosu_driver *drv)
  * Functions API
  ******************************************************************************/
 
+void ethosu_set_basep_cache_mask(struct ethosu_driver *drv, uint8_t flush_mask, uint8_t invalidate_mask)
+{
+    drv->basep_flush_mask      = flush_mask;
+    drv->basep_invalidate_mask = invalidate_mask;
+}
+
 int ethosu_init(struct ethosu_driver *drv,
                 void *const base_address,
                 const void *fast_memory,
@@ -430,6 +442,10 @@ int ethosu_init(struct ethosu_driver *drv,
     drv->fast_memory           = (uintptr_t)fast_memory;
     drv->fast_memory_size      = fast_memory_size;
     drv->power_request_counter = 0;
+
+    // Set default cache flush/clean and invalidate base pointer masks to invalidate the scratch
+    // base pointer where Vela for TFLM is placing the scratch buffer (tensor arena)
+    ethosu_set_basep_cache_mask(drv, (1 << SCRATCH_BASE_ADDR_INDEX), (1 << SCRATCH_BASE_ADDR_INDEX));
 
     // Initialize the device and set requested security state and privilege mode
     if (!ethosu_dev_init(&drv->dev, base_address, secure_enable, privilege_enable))
@@ -540,6 +556,17 @@ int ethosu_wait(struct ethosu_driver *drv, bool block)
         }
         // fall through
     case ETHOSU_JOB_DONE:
+        // Invalidate cache for base pointers marked to be invalidated, typically the
+        // scratch tensor base pointer containing the tensor arena.
+        // NOTE: Requires the base pointers to be cache line size aligned.
+        for (int i = 0; i < drv->job.num_base_addr; i++)
+        {
+            if (drv->basep_invalidate_mask & (1 << i))
+            {
+                ethosu_invalidate_dcache((uint32_t *)(uintptr_t)drv->job.base_addr[i], drv->job.base_addr_size[i]);
+            }
+        }
+
         // Wait for interrupt in blocking mode. In non-blocking mode
         // the interrupt has already triggered
         ret = ethosu_semaphore_take(drv->semaphore, ETHOSU_SEMAPHORE_WAIT_INFERENCE);
@@ -585,19 +612,6 @@ int ethosu_wait(struct ethosu_driver *drv, bool block)
         }
         else
         {
-            // Invalidate cache
-            if (drv->job.base_addr_size != NULL)
-            {
-                for (int i = 0; i < drv->job.num_base_addr; i++)
-                {
-                    ethosu_invalidate_dcache((uint32_t *)(uintptr_t)drv->job.base_addr[i], drv->job.base_addr_size[i]);
-                }
-            }
-            else
-            {
-                ethosu_invalidate_dcache(NULL, 0);
-            }
-
             LOG_DEBUG("Inference finished successfully...");
             ret = 0;
         }
@@ -625,6 +639,9 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
                         const int num_base_addr,
                         void *user_arg)
 {
+    assert(custom_data_ptr != NULL);
+    assert(base_addr != NULL);
+    assert(base_addr_size != NULL);
 
     const struct cop_data_s *data_ptr = custom_data_ptr;
     const struct cop_data_s *data_end = (struct cop_data_s *)((ptrdiff_t)custom_data_ptr + custom_data_size);
@@ -663,8 +680,7 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
     // Adjust base address to fast memory area
     if (drv->fast_memory != 0 && num_base_addr > FAST_MEMORY_BASE_ADDR_INDEX)
     {
-
-        if (base_addr_size != NULL && base_addr_size[FAST_MEMORY_BASE_ADDR_INDEX] > drv->fast_memory_size)
+        if (base_addr_size[FAST_MEMORY_BASE_ADDR_INDEX] > drv->fast_memory_size)
         {
             LOG_ERR("Fast memory area too small. fast_memory_size=%zu, base_addr_size=%zu",
                     drv->fast_memory_size,
