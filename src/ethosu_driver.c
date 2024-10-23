@@ -661,7 +661,7 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
     data_ptr++;
 
     // Adjust base address to fast memory area
-    if (drv->fast_memory != 0 && num_base_addr >= FAST_MEMORY_BASE_ADDR_INDEX)
+    if (drv->fast_memory != 0 && num_base_addr > FAST_MEMORY_BASE_ADDR_INDEX)
     {
 
         if (base_addr_size != NULL && base_addr_size[FAST_MEMORY_BASE_ADDR_INDEX] > drv->fast_memory_size)
