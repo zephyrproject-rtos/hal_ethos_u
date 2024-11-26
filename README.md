@@ -40,6 +40,11 @@ $ cmake -B build  \
     -DETHOSU_TARGET_NPU_CONFIG=ethos-u<nr>-<macs>
 $ cmake --build build
 ```
+## Compiler flags used
+
+The Arm Ethos-U core driver component adds the -Werror flag in addition
+to the compiler flags specified in the toolchain file, or options passed
+on the command line.
 
 ## Driver APIs
 
