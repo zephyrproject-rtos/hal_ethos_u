@@ -11,7 +11,7 @@ the user to configure the build to match their system configuration.
 
 One such requirement is to define the target CPU, normally by setting
 `CMAKE_SYSTEM_PROCESSOR`. **Note** that when using the toolchain files provided
-in [core_platform](https://git.mlplatform.org/ml/ethos-u/ethos-u-core-platform.git),
+in [core_platform](https://gitlab.arm.com/artificial-intelligence/ethos-u/ethos-u-core-platform),
 the variable `TARGET_CPU` must be used instead of `CMAKE_SYSTEM_PROCESSOR`.
 
 Target CPU is specified on the form "cortex-m<nr><features>", for example:
@@ -31,7 +31,7 @@ $ cmake -B build  \
 $ cmake --build build
 ```
 
-or when using toolchain files from [core_platform](https://git.mlplatform.org/ml/ethos-u/ethos-u-core-platform.git)
+or when using toolchain files from [core_platform](https://gitlab.arm.com/artificial-intelligence/ethos-u/ethos-u-core-platform)
 
 ```[bash]
 $ cmake -B build  \
@@ -315,12 +315,10 @@ Signed-off-by: Foo Bar foo.bar@example.org
 The contributions will be code reviewed by Arm before they can be accepted into
 the repository.
 
-In order to submit a contribution push your patch to
-`ssh://<GITHUB_USER_ID>@review.mlplatform.org:29418/ml/ethos-u/ethos-u-core-driver`.
-To do this you will need to sign-in to
-[review.mlplatform.org](https://review.mlplatform.org) using a GitHub account
-and add your SSH key under your settings. If there is a problem adding the SSH
-key make sure there is a valid email address in the Email Addresses field.
+In order to submit a contribution, submit a merge request to the
+[core_driver](https://gitlab.arm.com/artificial-intelligence/ethos-u/ethos-u-core-driver)
+repository. To do this you will need to sign-up at [gitlab.arm.com](https://gitlab.arm.com)
+and add your SSH key under your settings.
 
 ## Security
 
