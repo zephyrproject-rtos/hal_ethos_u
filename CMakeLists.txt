@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright 2019-2021, 2023-2024 Arm Limited and/or its affiliates <open-source-office@arm.com>
+# SPDX-FileCopyrightText: Copyright 2019-2021, 2023-2025 Arm Limited and/or its affiliates <open-source-office@arm.com>
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the License); you may
@@ -29,7 +29,7 @@ add_compile_options(-Werror)
 # Build options
 #
 
-set(CMSIS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmsis" CACHE PATH "Path to CMSIS.")
+set(CMSIS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmsis_6" CACHE PATH "Path to CMSIS.")
 
 set(LOG_NAMES err warning info debug)
 set(ETHOSU_LOG_ENABLE ON CACHE BOOL "Toggle driver logs on/off (Defaults to ON)")
