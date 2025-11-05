@@ -394,6 +394,7 @@ void __attribute__((weak)) ethosu_irq_handler(struct ethosu_driver *drv)
     // for semaphore, but before NPU is reset.
     if (drv->job.result == ETHOSU_JOB_RESULT_TIMEOUT)
     {
+        (void)ethosu_dev_handle_interrupt(&drv->dev);
         return;
     }
 
