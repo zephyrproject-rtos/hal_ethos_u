@@ -1,5 +1,6 @@
 /*
- * SPDX-FileCopyrightText: Copyright 2019-2021, 2024 Arm Limited and/or its affiliates <open-source-office@arm.com>
+ * SPDX-FileCopyrightText: <text>Copyright 2019-2021, 2024, 2026 Arm Limited and/or its affiliates
+ * <open-source-office@arm.com></text>
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the License); you may
@@ -25,24 +26,23 @@
 #include <stdint.h>
 
 /******************************************************************************
- * Types
+ * Defines
  ******************************************************************************/
 
-struct NPU_REG; // Forward declare, to be implemented by each device
+#define ETHOSU_PRODUCT_U55 0U
+#define ETHOSU_PRODUCT_U65 1U
+#define ETHOSU_PRODUCT_U85 2U
 
-struct ethosu_device
-{
-    volatile struct NPU_REG *reg; // Register map
-    uint32_t secure;
-    uint32_t privileged;
-};
-
-enum ethosu_error_codes
-{
-    ETHOSU_SUCCESS         = 0,  ///< Success
-    ETHOSU_GENERIC_FAILURE = -1, ///< Generic failure
-    ETHOSU_INVALID_PARAM   = -2  ///< Invalid parameter
-};
+#define ETHOSU_MACS_32 5U
+#define ETHOSU_MACS_64 6U
+#define ETHOSU_MACS_128 7U
+#define ETHOSU_MACS_256 8U
+#define ETHOSU_MACS_512 9U
+#define ETHOSU_MACS_1024 10U
+#define ETHOSU_MACS_2048 11U
+/******************************************************************************
+ * Types
+ ******************************************************************************/
 
 enum ethosu_clock_q_request
 {

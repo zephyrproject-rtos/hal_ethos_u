@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright 2019-2025 Arm Limited and/or its affiliates <open-source-office@arm.com>
+ * SPDX-FileCopyrightText: Copyright 2019-2026 Arm Limited and/or its affiliates <open-source-office@arm.com>
  * SPDX-FileCopyrightText: Copyright 2025 Alif Semiconductor
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -20,18 +20,16 @@
  * Includes
  ******************************************************************************/
 
-#include "ethosu_interface.h"
-
-#include "ethosu_device.h"
-#include "ethosu_log.h"
-
-#ifdef ETHOSU55
 #include "ethosu_config_u55.h"
-#else
-#include "ethosu_config_u65.h"
-#endif
+#include "ethosu_device.h"
+#include "ethosu_interface_u55.h"
+#include "ethosu_log.h"
+#include "ethosu_types.h"
 
 #include <assert.h>
+#ifndef __ARMCC_VERSION
+#include <sys/types.h>
+#endif
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -42,150 +40,109 @@
  * Defines
  ******************************************************************************/
 
-#define ETHOSU_PRODUCT_U55 0
-#define ETHOSU_PRODUCT_U65 1
-
-#define BASEP_OFFSET 4
-
-#ifdef ETHOSU65
-#define ADDRESS_BITS 40
-#else
 #define ADDRESS_BITS 32
-#endif
-
 #define ADDRESS_MASK ((1ull << ADDRESS_BITS) - 1)
-
 #define NPU_CMD_PWR_CLK_MASK (0xC)
 
 /******************************************************************************
  * Functions
  ******************************************************************************/
 
-uint64_t __attribute__((weak)) ethosu_address_remap(uint64_t address, int index)
+static bool u55_dev_init(struct ethosu_device *dev,
+                         const struct ethosu_device_desc *desc,
+                         struct ethosu_device_config *cfg,
+                         struct ethosu_device_user_ops *user_ops,
+                         void *base_address,
+                         uint32_t secure_enable,
+                         uint32_t privilege_enable)
 {
-    (void)(index);
-    return address;
-}
+    assert(cfg->config != NULL);
 
-unsigned int __attribute__((weak)) ethosu_config_select(uint64_t address, int index)
-{
-    (void)(address);
-    assert(index >= -1 && index <= 7);
-    switch (index)
-    {
-    case -1:
-        return NPU_QCONFIG;
-    default:
-    case 0:
-        return NPU_REGIONCFG_0;
-    case 1:
-        return NPU_REGIONCFG_1;
-    case 2:
-        return NPU_REGIONCFG_2;
-    case 3:
-        return NPU_REGIONCFG_3;
-    case 4:
-        return NPU_REGIONCFG_4;
-    case 5:
-        return NPU_REGIONCFG_5;
-    case 6:
-        return NPU_REGIONCFG_6;
-    case 7:
-        return NPU_REGIONCFG_7;
-    }
-}
+    dev->reg = (volatile struct NPU_REG *)base_address;
 
-bool ethosu_dev_init(struct ethosu_device *dev, void *base_address, uint32_t secure_enable, uint32_t privilege_enable)
-{
-    dev->reg        = (volatile struct NPU_REG *)base_address;
-    dev->secure     = secure_enable;
-    dev->privileged = privilege_enable;
-
-#ifdef ETHOSU55
     if (dev->reg->CONFIG.product != ETHOSU_PRODUCT_U55)
-#else
-    if (dev->reg->CONFIG.product != ETHOSU_PRODUCT_U65)
-#endif
     {
-        LOG_ERR("Failed to initialize device. Driver has not been compiled for this product");
+        LOG_ERR("Failed to initialize Ethos-U55 device. Wrong device type (got %d, expected %d",
+                dev->reg->CONFIG.product,
+                ETHOSU_PRODUCT_U55);
         return false;
     }
+
+    dev->secure         = secure_enable;
+    dev->privileged     = privilege_enable;
+    dev->desc           = desc;
+    dev->config         = cfg;
+    dev->user_ops       = user_ops;
+    dev->caps.product   = ETHOSU_PRODUCT_U55;
+    dev->caps.log2_macs = dev->reg->CONFIG.macs_per_cc;
 
     // Make sure the NPU is in a known state
-    if (ethosu_dev_soft_reset(dev) != ETHOSU_SUCCESS)
-    {
-        return false;
-    }
-
-    return true;
+    return dev->desc->ops->soft_reset(dev);
 }
 
-enum ethosu_error_codes ethosu_dev_axi_init(struct ethosu_device *dev)
+static void u55_dev_axi_init(struct ethosu_device *dev)
 {
-    struct axi_limit0_r l0 = {0};
-    struct axi_limit1_r l1 = {0};
-    struct axi_limit2_r l2 = {0};
-    struct axi_limit3_r l3 = {0};
+    struct u55_config_t *cfg = (struct u55_config_t *)dev->config->config;
 
-    l0.max_beats                = AXI_LIMIT0_MAX_BEATS_BYTES;
-    l0.memtype                  = AXI_LIMIT0_MEM_TYPE;
-    l0.max_outstanding_read_m1  = AXI_LIMIT0_MAX_OUTSTANDING_READS - 1;
-    l0.max_outstanding_write_m1 = AXI_LIMIT0_MAX_OUTSTANDING_WRITES - 1;
-
-    l1.max_beats                = AXI_LIMIT1_MAX_BEATS_BYTES;
-    l1.memtype                  = AXI_LIMIT1_MEM_TYPE;
-    l1.max_outstanding_read_m1  = AXI_LIMIT1_MAX_OUTSTANDING_READS - 1;
-    l1.max_outstanding_write_m1 = AXI_LIMIT1_MAX_OUTSTANDING_WRITES - 1;
-
-    l2.max_beats                = AXI_LIMIT2_MAX_BEATS_BYTES;
-    l2.memtype                  = AXI_LIMIT2_MEM_TYPE;
-    l2.max_outstanding_read_m1  = AXI_LIMIT2_MAX_OUTSTANDING_READS - 1;
-    l2.max_outstanding_write_m1 = AXI_LIMIT2_MAX_OUTSTANDING_WRITES - 1;
-
-    l3.max_beats                = AXI_LIMIT3_MAX_BEATS_BYTES;
-    l3.memtype                  = AXI_LIMIT3_MEM_TYPE;
-    l3.max_outstanding_read_m1  = AXI_LIMIT3_MAX_OUTSTANDING_READS - 1;
-    l3.max_outstanding_write_m1 = AXI_LIMIT3_MAX_OUTSTANDING_WRITES - 1;
-
-    dev->reg->AXI_LIMIT0.word = l0.word;
-    dev->reg->AXI_LIMIT1.word = l1.word;
-    dev->reg->AXI_LIMIT2.word = l2.word;
-    dev->reg->AXI_LIMIT3.word = l3.word;
-
-    return ETHOSU_SUCCESS;
+    dev->reg->AXI_LIMIT0.word = cfg->axi_limit0.word;
+    dev->reg->AXI_LIMIT1.word = cfg->axi_limit1.word;
+    dev->reg->AXI_LIMIT2.word = cfg->axi_limit2.word;
+    dev->reg->AXI_LIMIT3.word = cfg->axi_limit3.word;
 }
 
-void ethosu_dev_run_command_stream(struct ethosu_device *dev,
-                                   const uint8_t *cmd_stream_ptr,
-                                   uint32_t cms_length,
-                                   const uint64_t *base_addr,
-                                   int num_base_addr)
+static void u55_dev_run_command_stream(struct ethosu_device *dev,
+                                       const uint8_t *cmd_stream_ptr,
+                                       uint32_t cms_length,
+                                       const uint64_t *base_addr,
+                                       int num_base_addr)
 {
     assert(num_base_addr <= NPU_REG_BASEP_ARRLEN);
 
-    struct cmd_r cmd;
-    struct regioncfg_r rcfg = {0};
-    uint64_t qbase          = ethosu_address_remap((uintptr_t)cmd_stream_ptr, -1);
+    struct cmd_r cmd         = {0};
+    struct regioncfg_r rcfg  = {0};
+    struct u55_config_t *cfg = (struct u55_config_t *)dev->config->config;
+    uint64_t qbase           = (uintptr_t)cmd_stream_ptr;
+    bool address_remap       = (dev->user_ops && dev->user_ops->address_remap);
+    bool config_select       = (dev->user_ops && dev->user_ops->config_select);
+
+    if (address_remap)
+    {
+        qbase = dev->user_ops->address_remap((uintptr_t)cmd_stream_ptr, -1);
+    }
     assert(qbase <= ADDRESS_MASK);
     LOG_DEBUG("QBASE=0x%016llx, QSIZE=%" PRIu32 ", cmd_stream_ptr=%p", qbase, cms_length, cmd_stream_ptr);
 
     dev->reg->QBASE.word[0] = qbase & 0xffffffff;
-#ifdef ETHOSU65
-    dev->reg->QBASE.word[1] = qbase >> 32;
-#endif
-    dev->reg->QSIZE.word   = cms_length;
-    dev->reg->QCONFIG.word = ethosu_config_select(qbase, -1);
+    dev->reg->QSIZE.word    = cms_length;
+
+    if (config_select)
+    {
+        dev->reg->QCONFIG.word = dev->user_ops->config_select(qbase, -1);
+    }
+    else
+    {
+        dev->reg->QCONFIG.word = cfg->qconfig.word;
+    }
 
     for (int i = 0; i < num_base_addr; i++)
     {
-        uint64_t addr = ethosu_address_remap(base_addr[i], i);
+        uint64_t addr = base_addr[i];
+        if (address_remap)
+        {
+            addr = dev->user_ops->address_remap(base_addr[i], i);
+        }
         assert(addr <= ADDRESS_MASK);
-        LOG_DEBUG("BASEP%d=0x%016llx", i, addr);
+        LOG_DEBUG("BASEP%d=0x%016" PRIx64, i, addr);
         dev->reg->BASEP[i].word[0] = addr & 0xffffffff;
-#ifdef ETHOSU65
-        dev->reg->BASEP[i].word[1] = addr >> 32;
-#endif
-        rcfg.word |= ethosu_config_select(addr, i) << (i * 2);
+
+        if (config_select)
+        {
+            rcfg.word |= (dev->user_ops->config_select(addr, i) << (i * 2));
+        }
+        else
+        {
+            rcfg.word |= (cfg->regioncfg.word & (0x3 << (i * 2)));
+        }
     }
 
     dev->reg->REGIONCFG.word = rcfg.word;
@@ -197,7 +154,7 @@ void ethosu_dev_run_command_stream(struct ethosu_device *dev,
     LOG_DEBUG("CMD=0x%08" PRIx32, cmd.word);
 }
 
-void ethosu_dev_print_err_status(struct ethosu_device *dev)
+static void u55_dev_print_err_status(struct ethosu_device *dev)
 {
     LOG_ERR("NPU status=0x%08" PRIx32 ", qread=%" PRIu32 ", cmd_end_reached=%u",
             dev->reg->STATUS.word,
@@ -205,7 +162,7 @@ void ethosu_dev_print_err_status(struct ethosu_device *dev)
             dev->reg->STATUS.cmd_end_reached);
 }
 
-bool ethosu_dev_handle_interrupt(struct ethosu_device *dev)
+static bool u55_dev_handle_interrupt(struct ethosu_device *dev)
 {
     struct cmd_r cmd;
 
@@ -224,7 +181,7 @@ bool ethosu_dev_handle_interrupt(struct ethosu_device *dev)
     return true;
 }
 
-bool ethosu_dev_verify_access_state(struct ethosu_device *dev)
+static bool u55_dev_verify_access_state(struct ethosu_device *dev)
 {
     if (dev->reg->PROT.active_CSL != (dev->secure ? SECURITY_LEVEL_SECURE : SECURITY_LEVEL_NON_SECURE) ||
         dev->reg->PROT.active_CPL != (dev->privileged ? PRIVILEGE_LEVEL_PRIVILEGED : PRIVILEGE_LEVEL_USER))
@@ -234,7 +191,7 @@ bool ethosu_dev_verify_access_state(struct ethosu_device *dev)
     return true;
 }
 
-enum ethosu_error_codes ethosu_dev_soft_reset(struct ethosu_device *dev)
+static bool u55_dev_soft_reset(struct ethosu_device *dev)
 {
     // Note that after a soft-reset, the NPU is unconditionally
     // powered until the next CMD gets written.
@@ -257,23 +214,23 @@ enum ethosu_error_codes ethosu_dev_soft_reset(struct ethosu_device *dev)
     if (dev->reg->STATUS.reset_status != 0)
     {
         LOG_ERR("Soft reset timed out");
-        return ETHOSU_GENERIC_FAILURE;
+        return false;
     }
 
     // Verify that NPU has switched security state and privilege level
-    if (ethosu_dev_verify_access_state(dev) != true)
+    if (dev->desc->ops->verify_access_state(dev) != true)
     {
         LOG_ERR("Failed to switch security state and privilege level");
-        return ETHOSU_GENERIC_FAILURE;
+        return false;
     }
 
     // Reinitialize AXI settings
-    ethosu_dev_axi_init(dev);
+    dev->desc->ops->axi_init(dev);
 
-    return ETHOSU_SUCCESS;
+    return true;
 }
 
-void ethosu_dev_get_hw_info(struct ethosu_device *dev, struct ethosu_hw_info *hwinfo)
+static void u55_dev_get_hw_info(struct ethosu_device *dev, struct ethosu_hw_info *hwinfo)
 {
     struct config_r cfg;
     struct id_r id;
@@ -294,9 +251,9 @@ void ethosu_dev_get_hw_info(struct ethosu_device *dev, struct ethosu_hw_info *hw
     hwinfo->version.version_status = id.version_status;
 }
 
-enum ethosu_error_codes ethosu_dev_set_clock_and_power(struct ethosu_device *dev,
-                                                       enum ethosu_clock_q_request clock_q,
-                                                       enum ethosu_power_q_request power_q)
+static void u55_dev_set_clock_and_power(struct ethosu_device *dev,
+                                        enum ethosu_clock_q_request clock_q,
+                                        enum ethosu_power_q_request power_q)
 {
     struct cmd_r cmd = {0};
     cmd.word         = dev->reg->CMD.word & NPU_CMD_PWR_CLK_MASK;
@@ -312,11 +269,9 @@ enum ethosu_error_codes ethosu_dev_set_clock_and_power(struct ethosu_device *dev
 
     dev->reg->CMD.word = cmd.word;
     LOG_DEBUG("CMD=0x%08" PRIx32, cmd.word);
-
-    return ETHOSU_SUCCESS;
 }
 
-bool ethosu_dev_verify_optimizer_config(struct ethosu_device *dev, uint32_t cfg_in, uint32_t id_in)
+static bool u55_dev_verify_optimizer_config(struct ethosu_device *dev, uint32_t cfg_in, uint32_t id_in)
 {
     struct config_r *opt_cfg = (struct config_r *)&cfg_in;
     struct config_r hw_cfg;
@@ -392,3 +347,64 @@ bool ethosu_dev_verify_optimizer_config(struct ethosu_device *dev, uint32_t cfg_
 
     return ret;
 }
+
+/******************************************************************************
+ * Backend descriptor
+ ******************************************************************************/
+
+static const struct ethosu_device_ops u55_ops = {
+    .init                    = u55_dev_init,
+    .axi_init                = u55_dev_axi_init,
+    .run_command_stream      = u55_dev_run_command_stream,
+    .print_err_status        = u55_dev_print_err_status,
+    .handle_interrupt        = u55_dev_handle_interrupt,
+    .get_hw_info             = u55_dev_get_hw_info,
+    .verify_access_state     = u55_dev_verify_access_state,
+    .soft_reset              = u55_dev_soft_reset,
+    .set_clock_and_power     = u55_dev_set_clock_and_power,
+    .verify_optimizer_config = u55_dev_verify_optimizer_config,
+};
+
+const struct ethosu_device_desc ethosu_device_desc_u55 = {
+    .name = "ethos-u55",
+    .ops  = &u55_ops,
+};
+
+/******************************************************************************
+ * Default config
+ ******************************************************************************
+ * NOTE: This is a global instance meant as default! It's intentionally not
+ * const so that it's possible to override in runtime if desired.
+ ******************************************************************************/
+
+struct u55_config_t u55_config_default = {
+    .qconfig.cmd_region0                 = NPU_QCONFIG,
+    .regioncfg.region0                   = NPU_REGIONCFG_0,
+    .regioncfg.region1                   = NPU_REGIONCFG_1,
+    .regioncfg.region2                   = NPU_REGIONCFG_2,
+    .regioncfg.region3                   = NPU_REGIONCFG_3,
+    .regioncfg.region4                   = NPU_REGIONCFG_4,
+    .regioncfg.region5                   = NPU_REGIONCFG_5,
+    .regioncfg.region6                   = NPU_REGIONCFG_6,
+    .regioncfg.region7                   = NPU_REGIONCFG_7,
+    .axi_limit0.max_beats                = AXI_LIMIT0_MAX_BEATS_BYTES,
+    .axi_limit0.memtype                  = AXI_LIMIT0_MEM_TYPE,
+    .axi_limit0.max_outstanding_read_m1  = AXI_LIMIT0_MAX_OUTSTANDING_READS - 1,
+    .axi_limit0.max_outstanding_write_m1 = AXI_LIMIT0_MAX_OUTSTANDING_WRITES - 1,
+    .axi_limit1.max_beats                = AXI_LIMIT1_MAX_BEATS_BYTES,
+    .axi_limit1.memtype                  = AXI_LIMIT1_MEM_TYPE,
+    .axi_limit1.max_outstanding_read_m1  = AXI_LIMIT1_MAX_OUTSTANDING_READS - 1,
+    .axi_limit1.max_outstanding_write_m1 = AXI_LIMIT1_MAX_OUTSTANDING_WRITES - 1,
+    .axi_limit2.max_beats                = AXI_LIMIT2_MAX_BEATS_BYTES,
+    .axi_limit2.memtype                  = AXI_LIMIT2_MEM_TYPE,
+    .axi_limit2.max_outstanding_read_m1  = AXI_LIMIT2_MAX_OUTSTANDING_READS - 1,
+    .axi_limit2.max_outstanding_write_m1 = AXI_LIMIT2_MAX_OUTSTANDING_WRITES - 1,
+    .axi_limit3.max_beats                = AXI_LIMIT3_MAX_BEATS_BYTES,
+    .axi_limit3.memtype                  = AXI_LIMIT3_MEM_TYPE,
+    .axi_limit3.max_outstanding_read_m1  = AXI_LIMIT3_MAX_OUTSTANDING_READS - 1,
+    .axi_limit3.max_outstanding_write_m1 = AXI_LIMIT3_MAX_OUTSTANDING_WRITES - 1,
+};
+
+struct ethosu_device_config ethosu_device_config_u55 = {
+    .config = &u55_config_default,
+};

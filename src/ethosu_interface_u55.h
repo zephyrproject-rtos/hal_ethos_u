@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2020-2021 Arm Limited. All rights reserved.
- *
+ * SPDX-FileCopyrightText: Copyright 2020-2021, 2026 Arm Limited and/or its affiliates <open-source-office@arm.com>
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the License); you may
@@ -16,8 +15,10 @@
  * limitations under the License.
  */
 
-#ifndef ETHOSU65_INTERFACE_H
-#define ETHOSU65_INTERFACE_H
+// clang-format off
+
+#ifndef ETHOSU_INTERFACE_U55_H
+#define ETHOSU_INTERFACE_U55_H
 
 #ifdef __KERNEL__
 #include <linux/types.h>
@@ -57,8 +58,8 @@ namespace NPU_NAMESPACE
 {
 #endif
 #define NNX_ARCH_VERSION_MAJOR 1
-#define NNX_ARCH_VERSION_MINOR 0
-#define NNX_ARCH_VERSION_PATCH 6
+#define NNX_ARCH_VERSION_MINOR 1
+#define NNX_ARCH_VERSION_PATCH 0
 
 // Register offsets
 //
@@ -101,7 +102,6 @@ namespace NPU_NAMESPACE
 #define NPU_REG_CLKFORCE 0x0140
 #define NPU_REG_DEBUG_ADDRESS 0x0144
 #define NPU_REG_DEBUG_MISC 0x0148
-#define NPU_REG_DEBUGCORE 0x014C
 #define NPU_REG_DEBUG_BLOCK 0x0150
 #define DEBUG_REGISTERS_SIZE 0x0180
 
@@ -220,7 +220,6 @@ namespace NPU_NAMESPACE
 #define NPU_REG_KERNEL_WIDTH_M1 0x0880
 #define NPU_REG_KERNEL_HEIGHT_M1 0x0884
 #define NPU_REG_KERNEL_STRIDE 0x0888
-#define NPU_REG_PARALLEL_MODE 0x088C
 #define NPU_REG_ACC_FORMAT 0x0890
 #define NPU_REG_ACTIVATION 0x0894
 #define NPU_REG_ACTIVATION_MIN 0x0898
@@ -319,10 +318,6 @@ namespace NPU_NAMESPACE
 #define NPU_REG_DMA0_DST_HI 0x0ACC
 #define NPU_REG_DMA0_LEN 0x0AD0
 #define NPU_REG_DMA0_LEN_HI 0x0AD4
-#define NPU_REG_DMA0_SKIP0 0x0AD8
-#define NPU_REG_DMA0_SKIP0_HI 0x0ADC
-#define NPU_REG_DMA0_SKIP1 0x0AE0
-#define NPU_REG_DMA0_SKIP1_HI 0x0AE4
 #define TSU_DMA_BASE_REGISTERS_SIZE 0x0B00
 
 //
@@ -347,19 +342,13 @@ namespace NPU_NAMESPACE
 //
 // Register subpage TSU_WS1_BASE
 //
-#define NPU_REG_WEIGHT1_BASE 0x0B40
-#define NPU_REG_WEIGHT1_BASE_HI 0x0B44
-#define NPU_REG_WEIGHT1_LENGTH 0x0B48
-#define NPU_REG_WEIGHT1_LENGTH_HI 0x0B4C
-#define NPU_REG_SCALE1_BASE 0x0B50
-#define NPU_REG_SCALE1_BASE_HI 0x0B54
-#define NPU_REG_SCALE1_LENGTH 0x0B58
-#define NPU_REG_SCALE1_LENGTH_HI 0x0B5C
 #define TSU_WS1_BASE_REGISTERS_SIZE 0x0B80
 
 //
 // Register subpage TSU_USER_BASE
 //
+#define NPU_REG_USER_DEFINED_BASE 0x0B80
+#define NPU_REG_USER_DEFINED_ARRLEN 0x0008
 #define TSU_USER_BASE_REGISTERS_SIZE 0x0BC0
 
 //
@@ -499,7 +488,6 @@ enum class cmd0_opcode : uint16_t
     NPU_SET_KERNEL_WIDTH_M1   = 288,
     NPU_SET_KERNEL_HEIGHT_M1  = 289,
     NPU_SET_KERNEL_STRIDE     = 290,
-    NPU_SET_PARALLEL_MODE     = 291,
     NPU_SET_ACC_FORMAT        = 292,
     NPU_SET_ACTIVATION        = 293,
     NPU_SET_ACTIVATION_MIN    = 294,
@@ -525,49 +513,57 @@ enum class cmd0_opcode : uint16_t
 
 enum class cmd1_opcode : uint16_t
 {
-    NPU_SET_IFM_BASE0      = 0,
-    NPU_SET_IFM_BASE1      = 1,
-    NPU_SET_IFM_BASE2      = 2,
-    NPU_SET_IFM_BASE3      = 3,
-    NPU_SET_IFM_STRIDE_X   = 4,
-    NPU_SET_IFM_STRIDE_Y   = 5,
-    NPU_SET_IFM_STRIDE_C   = 6,
-    NPU_SET_OFM_BASE0      = 16,
-    NPU_SET_OFM_BASE1      = 17,
-    NPU_SET_OFM_BASE2      = 18,
-    NPU_SET_OFM_BASE3      = 19,
-    NPU_SET_OFM_STRIDE_X   = 20,
-    NPU_SET_OFM_STRIDE_Y   = 21,
-    NPU_SET_OFM_STRIDE_C   = 22,
-    NPU_SET_WEIGHT_BASE    = 32,
-    NPU_SET_WEIGHT_LENGTH  = 33,
-    NPU_SET_SCALE_BASE     = 34,
-    NPU_SET_SCALE_LENGTH   = 35,
-    NPU_SET_OFM_SCALE      = 36,
-    NPU_SET_OPA_SCALE      = 37,
-    NPU_SET_OPB_SCALE      = 38,
-    NPU_SET_DMA0_SRC       = 48,
-    NPU_SET_DMA0_DST       = 49,
-    NPU_SET_DMA0_LEN       = 50,
-    NPU_SET_DMA0_SKIP0     = 51,
-    NPU_SET_DMA0_SKIP1     = 52,
-    NPU_SET_IFM2_BASE0     = 128,
-    NPU_SET_IFM2_BASE1     = 129,
-    NPU_SET_IFM2_BASE2     = 130,
-    NPU_SET_IFM2_BASE3     = 131,
-    NPU_SET_IFM2_STRIDE_X  = 132,
-    NPU_SET_IFM2_STRIDE_Y  = 133,
-    NPU_SET_IFM2_STRIDE_C  = 134,
-    NPU_SET_WEIGHT1_BASE   = 144,
-    NPU_SET_WEIGHT1_LENGTH = 145,
-    NPU_SET_SCALE1_BASE    = 146,
-    NPU_SET_SCALE1_LENGTH  = 147,
+    NPU_SET_IFM_BASE0     = 0,
+    NPU_SET_IFM_BASE1     = 1,
+    NPU_SET_IFM_BASE2     = 2,
+    NPU_SET_IFM_BASE3     = 3,
+    NPU_SET_IFM_STRIDE_X  = 4,
+    NPU_SET_IFM_STRIDE_Y  = 5,
+    NPU_SET_IFM_STRIDE_C  = 6,
+    NPU_SET_OFM_BASE0     = 16,
+    NPU_SET_OFM_BASE1     = 17,
+    NPU_SET_OFM_BASE2     = 18,
+    NPU_SET_OFM_BASE3     = 19,
+    NPU_SET_OFM_STRIDE_X  = 20,
+    NPU_SET_OFM_STRIDE_Y  = 21,
+    NPU_SET_OFM_STRIDE_C  = 22,
+    NPU_SET_WEIGHT_BASE   = 32,
+    NPU_SET_WEIGHT_LENGTH = 33,
+    NPU_SET_SCALE_BASE    = 34,
+    NPU_SET_SCALE_LENGTH  = 35,
+    NPU_SET_OFM_SCALE     = 36,
+    NPU_SET_OPA_SCALE     = 37,
+    NPU_SET_OPB_SCALE     = 38,
+    NPU_SET_DMA0_SRC      = 48,
+    NPU_SET_DMA0_DST      = 49,
+    NPU_SET_DMA0_LEN      = 50,
+    NPU_SET_IFM2_BASE0    = 128,
+    NPU_SET_IFM2_BASE1    = 129,
+    NPU_SET_IFM2_BASE2    = 130,
+    NPU_SET_IFM2_BASE3    = 131,
+    NPU_SET_IFM2_STRIDE_X = 132,
+    NPU_SET_IFM2_STRIDE_Y = 133,
+    NPU_SET_IFM2_STRIDE_C = 134,
+    NPU_SET_USER_DEFINED0 = 160,
+    NPU_SET_USER_DEFINED1 = 161,
+    NPU_SET_USER_DEFINED2 = 162,
+    NPU_SET_USER_DEFINED3 = 163,
+    NPU_SET_USER_DEFINED4 = 164,
+    NPU_SET_USER_DEFINED5 = 165,
+    NPU_SET_USER_DEFINED6 = 166,
+    NPU_SET_USER_DEFINED7 = 167,
 };
 
 enum class cmd_ctrl : uint8_t
 {
     CMD0_CTRL = 0,
     CMD1_CTRL = 1,
+};
+
+enum class custom_dma_cs : uint8_t
+{
+    DISABLE = 0,
+    ENABLE  = 1,
 };
 
 enum class custom_dma : uint8_t
@@ -591,8 +587,6 @@ enum class dma_region_mode : uint8_t
 enum class dma_stride_mode : uint8_t
 {
     D1 = 0,
-    D2 = 1,
-    D3 = 2,
 };
 
 enum class elementwise_mode : uint8_t
@@ -666,12 +660,6 @@ enum class ofm_scale_mode : uint8_t
 {
     PER_CHANNEL = 0,
     GLOBAL      = 1,
-};
-
-enum class parallel_mode : uint8_t
-{
-    SINGLE_CORE     = 0,
-    DUAL_CORE_DEPTH = 1,
 };
 
 enum class pmu_axi_channel : uint8_t
@@ -930,7 +918,6 @@ enum cmd0_opcode
     CMD0_OPCODE_NPU_SET_KERNEL_WIDTH_M1   = 288,
     CMD0_OPCODE_NPU_SET_KERNEL_HEIGHT_M1  = 289,
     CMD0_OPCODE_NPU_SET_KERNEL_STRIDE     = 290,
-    CMD0_OPCODE_NPU_SET_PARALLEL_MODE     = 291,
     CMD0_OPCODE_NPU_SET_ACC_FORMAT        = 292,
     CMD0_OPCODE_NPU_SET_ACTIVATION        = 293,
     CMD0_OPCODE_NPU_SET_ACTIVATION_MIN    = 294,
@@ -956,49 +943,57 @@ enum cmd0_opcode
 
 enum cmd1_opcode
 {
-    CMD1_OPCODE_NPU_SET_IFM_BASE0      = 0,
-    CMD1_OPCODE_NPU_SET_IFM_BASE1      = 1,
-    CMD1_OPCODE_NPU_SET_IFM_BASE2      = 2,
-    CMD1_OPCODE_NPU_SET_IFM_BASE3      = 3,
-    CMD1_OPCODE_NPU_SET_IFM_STRIDE_X   = 4,
-    CMD1_OPCODE_NPU_SET_IFM_STRIDE_Y   = 5,
-    CMD1_OPCODE_NPU_SET_IFM_STRIDE_C   = 6,
-    CMD1_OPCODE_NPU_SET_OFM_BASE0      = 16,
-    CMD1_OPCODE_NPU_SET_OFM_BASE1      = 17,
-    CMD1_OPCODE_NPU_SET_OFM_BASE2      = 18,
-    CMD1_OPCODE_NPU_SET_OFM_BASE3      = 19,
-    CMD1_OPCODE_NPU_SET_OFM_STRIDE_X   = 20,
-    CMD1_OPCODE_NPU_SET_OFM_STRIDE_Y   = 21,
-    CMD1_OPCODE_NPU_SET_OFM_STRIDE_C   = 22,
-    CMD1_OPCODE_NPU_SET_WEIGHT_BASE    = 32,
-    CMD1_OPCODE_NPU_SET_WEIGHT_LENGTH  = 33,
-    CMD1_OPCODE_NPU_SET_SCALE_BASE     = 34,
-    CMD1_OPCODE_NPU_SET_SCALE_LENGTH   = 35,
-    CMD1_OPCODE_NPU_SET_OFM_SCALE      = 36,
-    CMD1_OPCODE_NPU_SET_OPA_SCALE      = 37,
-    CMD1_OPCODE_NPU_SET_OPB_SCALE      = 38,
-    CMD1_OPCODE_NPU_SET_DMA0_SRC       = 48,
-    CMD1_OPCODE_NPU_SET_DMA0_DST       = 49,
-    CMD1_OPCODE_NPU_SET_DMA0_LEN       = 50,
-    CMD1_OPCODE_NPU_SET_DMA0_SKIP0     = 51,
-    CMD1_OPCODE_NPU_SET_DMA0_SKIP1     = 52,
-    CMD1_OPCODE_NPU_SET_IFM2_BASE0     = 128,
-    CMD1_OPCODE_NPU_SET_IFM2_BASE1     = 129,
-    CMD1_OPCODE_NPU_SET_IFM2_BASE2     = 130,
-    CMD1_OPCODE_NPU_SET_IFM2_BASE3     = 131,
-    CMD1_OPCODE_NPU_SET_IFM2_STRIDE_X  = 132,
-    CMD1_OPCODE_NPU_SET_IFM2_STRIDE_Y  = 133,
-    CMD1_OPCODE_NPU_SET_IFM2_STRIDE_C  = 134,
-    CMD1_OPCODE_NPU_SET_WEIGHT1_BASE   = 144,
-    CMD1_OPCODE_NPU_SET_WEIGHT1_LENGTH = 145,
-    CMD1_OPCODE_NPU_SET_SCALE1_BASE    = 146,
-    CMD1_OPCODE_NPU_SET_SCALE1_LENGTH  = 147,
+    CMD1_OPCODE_NPU_SET_IFM_BASE0     = 0,
+    CMD1_OPCODE_NPU_SET_IFM_BASE1     = 1,
+    CMD1_OPCODE_NPU_SET_IFM_BASE2     = 2,
+    CMD1_OPCODE_NPU_SET_IFM_BASE3     = 3,
+    CMD1_OPCODE_NPU_SET_IFM_STRIDE_X  = 4,
+    CMD1_OPCODE_NPU_SET_IFM_STRIDE_Y  = 5,
+    CMD1_OPCODE_NPU_SET_IFM_STRIDE_C  = 6,
+    CMD1_OPCODE_NPU_SET_OFM_BASE0     = 16,
+    CMD1_OPCODE_NPU_SET_OFM_BASE1     = 17,
+    CMD1_OPCODE_NPU_SET_OFM_BASE2     = 18,
+    CMD1_OPCODE_NPU_SET_OFM_BASE3     = 19,
+    CMD1_OPCODE_NPU_SET_OFM_STRIDE_X  = 20,
+    CMD1_OPCODE_NPU_SET_OFM_STRIDE_Y  = 21,
+    CMD1_OPCODE_NPU_SET_OFM_STRIDE_C  = 22,
+    CMD1_OPCODE_NPU_SET_WEIGHT_BASE   = 32,
+    CMD1_OPCODE_NPU_SET_WEIGHT_LENGTH = 33,
+    CMD1_OPCODE_NPU_SET_SCALE_BASE    = 34,
+    CMD1_OPCODE_NPU_SET_SCALE_LENGTH  = 35,
+    CMD1_OPCODE_NPU_SET_OFM_SCALE     = 36,
+    CMD1_OPCODE_NPU_SET_OPA_SCALE     = 37,
+    CMD1_OPCODE_NPU_SET_OPB_SCALE     = 38,
+    CMD1_OPCODE_NPU_SET_DMA0_SRC      = 48,
+    CMD1_OPCODE_NPU_SET_DMA0_DST      = 49,
+    CMD1_OPCODE_NPU_SET_DMA0_LEN      = 50,
+    CMD1_OPCODE_NPU_SET_IFM2_BASE0    = 128,
+    CMD1_OPCODE_NPU_SET_IFM2_BASE1    = 129,
+    CMD1_OPCODE_NPU_SET_IFM2_BASE2    = 130,
+    CMD1_OPCODE_NPU_SET_IFM2_BASE3    = 131,
+    CMD1_OPCODE_NPU_SET_IFM2_STRIDE_X = 132,
+    CMD1_OPCODE_NPU_SET_IFM2_STRIDE_Y = 133,
+    CMD1_OPCODE_NPU_SET_IFM2_STRIDE_C = 134,
+    CMD1_OPCODE_NPU_SET_USER_DEFINED0 = 160,
+    CMD1_OPCODE_NPU_SET_USER_DEFINED1 = 161,
+    CMD1_OPCODE_NPU_SET_USER_DEFINED2 = 162,
+    CMD1_OPCODE_NPU_SET_USER_DEFINED3 = 163,
+    CMD1_OPCODE_NPU_SET_USER_DEFINED4 = 164,
+    CMD1_OPCODE_NPU_SET_USER_DEFINED5 = 165,
+    CMD1_OPCODE_NPU_SET_USER_DEFINED6 = 166,
+    CMD1_OPCODE_NPU_SET_USER_DEFINED7 = 167,
 };
 
 enum cmd_ctrl
 {
     CMD_CTRL_CMD0_CTRL = 0,
     CMD_CTRL_CMD1_CTRL = 1,
+};
+
+enum custom_dma_cs
+{
+    CUSTOM_DMA_CS_DISABLE = 0,
+    CUSTOM_DMA_CS_ENABLE  = 1,
 };
 
 enum custom_dma
@@ -1022,8 +1017,6 @@ enum dma_region_mode
 enum dma_stride_mode
 {
     DMA_STRIDE_MODE_D1 = 0,
-    DMA_STRIDE_MODE_D2 = 1,
-    DMA_STRIDE_MODE_D3 = 2,
 };
 
 enum elementwise_mode
@@ -1097,12 +1090,6 @@ enum ofm_scale_mode
 {
     OFM_SCALE_MODE_PER_CHANNEL = 0,
     OFM_SCALE_MODE_GLOBAL      = 1,
-};
-
-enum parallel_mode
-{
-    PARALLEL_MODE_SINGLE_CORE     = 0,
-    PARALLEL_MODE_DUAL_CORE_DEPTH = 1,
 };
 
 enum pmu_axi_channel
@@ -1622,7 +1609,7 @@ static const char *cmd0_opcode_str[] = {
     "CMD0_OPCODE_NPU_SET_KERNEL_WIDTH_M1",
     "CMD0_OPCODE_NPU_SET_KERNEL_HEIGHT_M1",
     "CMD0_OPCODE_NPU_SET_KERNEL_STRIDE",
-    "CMD0_OPCODE_NPU_SET_PARALLEL_MODE",
+    "****",
     "CMD0_OPCODE_NPU_SET_ACC_FORMAT",
     "CMD0_OPCODE_NPU_SET_ACTIVATION",
     "CMD0_OPCODE_NPU_SET_ACTIVATION_MIN",
@@ -1785,8 +1772,8 @@ static const char *cmd1_opcode_str[] = {
     "CMD1_OPCODE_NPU_SET_DMA0_SRC",
     "CMD1_OPCODE_NPU_SET_DMA0_DST",
     "CMD1_OPCODE_NPU_SET_DMA0_LEN",
-    "CMD1_OPCODE_NPU_SET_DMA0_SKIP0",
-    "CMD1_OPCODE_NPU_SET_DMA0_SKIP1",
+    "****",
+    "****",
     "****",
     "****",
     "****",
@@ -1878,15 +1865,40 @@ static const char *cmd1_opcode_str[] = {
     "****",
     "****",
     "****",
-    "CMD1_OPCODE_NPU_SET_WEIGHT1_BASE",
-    "CMD1_OPCODE_NPU_SET_WEIGHT1_LENGTH",
-    "CMD1_OPCODE_NPU_SET_SCALE1_BASE",
-    "CMD1_OPCODE_NPU_SET_SCALE1_LENGTH",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "****",
+    "CMD1_OPCODE_NPU_SET_USER_DEFINED0",
+    "CMD1_OPCODE_NPU_SET_USER_DEFINED1",
+    "CMD1_OPCODE_NPU_SET_USER_DEFINED2",
+    "CMD1_OPCODE_NPU_SET_USER_DEFINED3",
+    "CMD1_OPCODE_NPU_SET_USER_DEFINED4",
+    "CMD1_OPCODE_NPU_SET_USER_DEFINED5",
+    "CMD1_OPCODE_NPU_SET_USER_DEFINED6",
+    "CMD1_OPCODE_NPU_SET_USER_DEFINED7",
 };
 
 static const char *cmd_ctrl_str[] = {
     "CMD_CTRL_CMD0_CTRL",
     "CMD_CTRL_CMD1_CTRL",
+};
+
+static const char *custom_dma_cs_str[] = {
+    "CUSTOM_DMA_CS_DISABLE",
+    "CUSTOM_DMA_CS_ENABLE",
 };
 
 static const char *custom_dma_str[] = {
@@ -1906,8 +1918,6 @@ static const char *dma_region_mode_str[] = {
 
 static const char *dma_stride_mode_str[] = {
     "DMA_STRIDE_MODE_D1",
-    "DMA_STRIDE_MODE_D2",
-    "DMA_STRIDE_MODE_D3",
 };
 
 static const char *elementwise_mode_str[] = {
@@ -1971,11 +1981,6 @@ static const char *mem_attr_str[] = {
 static const char *ofm_scale_mode_str[] = {
     "OFM_SCALE_MODE_PER_CHANNEL",
     "OFM_SCALE_MODE_GLOBAL",
-};
-
-static const char *parallel_mode_str[] = {
-    "PARALLEL_MODE_SINGLE_CORE",
-    "PARALLEL_MODE_DUAL_CORE_DEPTH",
 };
 
 static const char *pmu_axi_channel_str[] = {
@@ -2501,7 +2506,7 @@ struct id_r
     uint32_t word0;
 
   public:
-    CONSTEXPR id_r() : word0(268853249) {}
+    CONSTEXPR id_r() : word0(269500929) {}
     CONSTEXPR id_r(uint32_t init) : word0(init) {}
     CONSTEXPR void operator=(uint32_t value)
     {
@@ -3237,9 +3242,8 @@ struct qbase_r
     {
         struct
         {
-            uint32_t offset_LO : 32; // Offset - LSB
-            uint32_t offset_HI : 8;  // Offset - MSB
-            uint32_t reserved0 : 24;
+            uint32_t offset : 32; // Offset
+            uint32_t reserved0 : 32;
         };
         uint32_t word[2];
     };
@@ -3578,7 +3582,7 @@ struct config_r
     uint32_t word0;
 
   public:
-    CONSTEXPR config_r() : word0(268435456) {}
+    CONSTEXPR config_r() : word0(0) {}
     CONSTEXPR config_r(uint32_t init) : word0(init) {}
     CONSTEXPR void operator=(uint32_t value)
     {
@@ -4010,11 +4014,11 @@ struct axi_limit0_r
             uint32_t memtype : 4; // Memtype to be used to encode AxCACHE signals
             uint32_t reserved1 : 8;
             uint32_t
-                max_outstanding_read_m1 : 6; // Maximum number of outstanding AXI read transactions - 1 in range 0 to 63
-            uint32_t reserved2 : 2;
-            uint32_t max_outstanding_write_m1 : 5; // Maximum number of outstanding AXI write transactions - 1 in range
-                                                   // 0 to 31
-            uint32_t reserved3 : 3;
+                max_outstanding_read_m1 : 5; // Maximum number of outstanding AXI read transactions - 1 in range 0 to 31
+            uint32_t reserved2 : 3;
+            uint32_t max_outstanding_write_m1 : 4; // Maximum number of outstanding AXI write transactions - 1 in range
+                                                   // 0 to 15
+            uint32_t reserved3 : 4;
         };
         uint32_t word;
     };
@@ -4089,42 +4093,42 @@ struct axi_limit0_r
     }
     CONSTEXPR uint32_t get_max_outstanding_read_m1() const
     {
-        uint32_t value = ((1U << 6) - 1) & (word0 >> 16);
+        uint32_t value = ((1U << 5) - 1) & (word0 >> 16);
         return value;
     }
     uint32_t get_max_outstanding_read_m1() const volatile
     {
-        uint32_t value = ((1U << 6) - 1) & (word0 >> 16);
+        uint32_t value = ((1U << 5) - 1) & (word0 >> 16);
         return value;
     }
     CONSTEXPR axi_limit0_r &set_max_outstanding_read_m1(uint32_t value)
     {
-        word0 = (((~((1U << 6) - 1)) << 16) & word0) | ((((1U << 6) - 1) & value) << 16);
+        word0 = (((~((1U << 5) - 1)) << 16) & word0) | ((((1U << 5) - 1) & value) << 16);
         return *this;
     }
     volatile axi_limit0_r &set_max_outstanding_read_m1(uint32_t value) volatile
     {
-        word0 = (((~((1U << 6) - 1)) << 16) & word0) | ((((1U << 6) - 1) & value) << 16);
+        word0 = (((~((1U << 5) - 1)) << 16) & word0) | ((((1U << 5) - 1) & value) << 16);
         return *this;
     }
     CONSTEXPR uint32_t get_max_outstanding_write_m1() const
     {
-        uint32_t value = ((1U << 5) - 1) & (word0 >> 24);
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 24);
         return value;
     }
     uint32_t get_max_outstanding_write_m1() const volatile
     {
-        uint32_t value = ((1U << 5) - 1) & (word0 >> 24);
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 24);
         return value;
     }
     CONSTEXPR axi_limit0_r &set_max_outstanding_write_m1(uint32_t value)
     {
-        word0 = (((~((1U << 5) - 1)) << 24) & word0) | ((((1U << 5) - 1) & value) << 24);
+        word0 = (((~((1U << 4) - 1)) << 24) & word0) | ((((1U << 4) - 1) & value) << 24);
         return *this;
     }
     volatile axi_limit0_r &set_max_outstanding_write_m1(uint32_t value) volatile
     {
-        word0 = (((~((1U << 5) - 1)) << 24) & word0) | ((((1U << 5) - 1) & value) << 24);
+        word0 = (((~((1U << 4) - 1)) << 24) & word0) | ((((1U << 4) - 1) & value) << 24);
         return *this;
     }
 #endif
@@ -4143,11 +4147,11 @@ struct axi_limit1_r
             uint32_t memtype : 4; // Memtype to be used to encode AxCACHE signals
             uint32_t reserved1 : 8;
             uint32_t
-                max_outstanding_read_m1 : 6; // Maximum number of outstanding AXI read transactions - 1 in range 0 to 63
-            uint32_t reserved2 : 2;
-            uint32_t max_outstanding_write_m1 : 5; // Maximum number of outstanding AXI write transactions - 1 in range
-                                                   // 0 to 31
-            uint32_t reserved3 : 3;
+                max_outstanding_read_m1 : 5; // Maximum number of outstanding AXI read transactions - 1 in range 0 to 31
+            uint32_t reserved2 : 3;
+            uint32_t max_outstanding_write_m1 : 4; // Maximum number of outstanding AXI write transactions - 1 in range
+                                                   // 0 to 15
+            uint32_t reserved3 : 4;
         };
         uint32_t word;
     };
@@ -4222,42 +4226,42 @@ struct axi_limit1_r
     }
     CONSTEXPR uint32_t get_max_outstanding_read_m1() const
     {
-        uint32_t value = ((1U << 6) - 1) & (word0 >> 16);
+        uint32_t value = ((1U << 5) - 1) & (word0 >> 16);
         return value;
     }
     uint32_t get_max_outstanding_read_m1() const volatile
     {
-        uint32_t value = ((1U << 6) - 1) & (word0 >> 16);
+        uint32_t value = ((1U << 5) - 1) & (word0 >> 16);
         return value;
     }
     CONSTEXPR axi_limit1_r &set_max_outstanding_read_m1(uint32_t value)
     {
-        word0 = (((~((1U << 6) - 1)) << 16) & word0) | ((((1U << 6) - 1) & value) << 16);
+        word0 = (((~((1U << 5) - 1)) << 16) & word0) | ((((1U << 5) - 1) & value) << 16);
         return *this;
     }
     volatile axi_limit1_r &set_max_outstanding_read_m1(uint32_t value) volatile
     {
-        word0 = (((~((1U << 6) - 1)) << 16) & word0) | ((((1U << 6) - 1) & value) << 16);
+        word0 = (((~((1U << 5) - 1)) << 16) & word0) | ((((1U << 5) - 1) & value) << 16);
         return *this;
     }
     CONSTEXPR uint32_t get_max_outstanding_write_m1() const
     {
-        uint32_t value = ((1U << 5) - 1) & (word0 >> 24);
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 24);
         return value;
     }
     uint32_t get_max_outstanding_write_m1() const volatile
     {
-        uint32_t value = ((1U << 5) - 1) & (word0 >> 24);
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 24);
         return value;
     }
     CONSTEXPR axi_limit1_r &set_max_outstanding_write_m1(uint32_t value)
     {
-        word0 = (((~((1U << 5) - 1)) << 24) & word0) | ((((1U << 5) - 1) & value) << 24);
+        word0 = (((~((1U << 4) - 1)) << 24) & word0) | ((((1U << 4) - 1) & value) << 24);
         return *this;
     }
     volatile axi_limit1_r &set_max_outstanding_write_m1(uint32_t value) volatile
     {
-        word0 = (((~((1U << 5) - 1)) << 24) & word0) | ((((1U << 5) - 1) & value) << 24);
+        word0 = (((~((1U << 4) - 1)) << 24) & word0) | ((((1U << 4) - 1) & value) << 24);
         return *this;
     }
 #endif
@@ -4276,11 +4280,11 @@ struct axi_limit2_r
             uint32_t memtype : 4; // Memtype to be used to encode AxCACHE signals
             uint32_t reserved1 : 8;
             uint32_t
-                max_outstanding_read_m1 : 6; // Maximum number of outstanding AXI read transactions - 1 in range 0 to 63
-            uint32_t reserved2 : 2;
-            uint32_t max_outstanding_write_m1 : 5; // Maximum number of outstanding AXI write transactions - 1 in range
-                                                   // 0 to 31
-            uint32_t reserved3 : 3;
+                max_outstanding_read_m1 : 5; // Maximum number of outstanding AXI read transactions - 1 in range 0 to 31
+            uint32_t reserved2 : 3;
+            uint32_t max_outstanding_write_m1 : 4; // Maximum number of outstanding AXI write transactions - 1 in range
+                                                   // 0 to 15
+            uint32_t reserved3 : 4;
         };
         uint32_t word;
     };
@@ -4355,42 +4359,42 @@ struct axi_limit2_r
     }
     CONSTEXPR uint32_t get_max_outstanding_read_m1() const
     {
-        uint32_t value = ((1U << 6) - 1) & (word0 >> 16);
+        uint32_t value = ((1U << 5) - 1) & (word0 >> 16);
         return value;
     }
     uint32_t get_max_outstanding_read_m1() const volatile
     {
-        uint32_t value = ((1U << 6) - 1) & (word0 >> 16);
+        uint32_t value = ((1U << 5) - 1) & (word0 >> 16);
         return value;
     }
     CONSTEXPR axi_limit2_r &set_max_outstanding_read_m1(uint32_t value)
     {
-        word0 = (((~((1U << 6) - 1)) << 16) & word0) | ((((1U << 6) - 1) & value) << 16);
+        word0 = (((~((1U << 5) - 1)) << 16) & word0) | ((((1U << 5) - 1) & value) << 16);
         return *this;
     }
     volatile axi_limit2_r &set_max_outstanding_read_m1(uint32_t value) volatile
     {
-        word0 = (((~((1U << 6) - 1)) << 16) & word0) | ((((1U << 6) - 1) & value) << 16);
+        word0 = (((~((1U << 5) - 1)) << 16) & word0) | ((((1U << 5) - 1) & value) << 16);
         return *this;
     }
     CONSTEXPR uint32_t get_max_outstanding_write_m1() const
     {
-        uint32_t value = ((1U << 5) - 1) & (word0 >> 24);
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 24);
         return value;
     }
     uint32_t get_max_outstanding_write_m1() const volatile
     {
-        uint32_t value = ((1U << 5) - 1) & (word0 >> 24);
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 24);
         return value;
     }
     CONSTEXPR axi_limit2_r &set_max_outstanding_write_m1(uint32_t value)
     {
-        word0 = (((~((1U << 5) - 1)) << 24) & word0) | ((((1U << 5) - 1) & value) << 24);
+        word0 = (((~((1U << 4) - 1)) << 24) & word0) | ((((1U << 4) - 1) & value) << 24);
         return *this;
     }
     volatile axi_limit2_r &set_max_outstanding_write_m1(uint32_t value) volatile
     {
-        word0 = (((~((1U << 5) - 1)) << 24) & word0) | ((((1U << 5) - 1) & value) << 24);
+        word0 = (((~((1U << 4) - 1)) << 24) & word0) | ((((1U << 4) - 1) & value) << 24);
         return *this;
     }
 #endif
@@ -4409,11 +4413,11 @@ struct axi_limit3_r
             uint32_t memtype : 4; // Memtype to be used to encode AxCACHE signals
             uint32_t reserved1 : 8;
             uint32_t
-                max_outstanding_read_m1 : 6; // Maximum number of outstanding AXI read transactions - 1 in range 0 to 63
-            uint32_t reserved2 : 2;
-            uint32_t max_outstanding_write_m1 : 5; // Maximum number of outstanding AXI write transactions - 1 in range
-                                                   // 0 to 31
-            uint32_t reserved3 : 3;
+                max_outstanding_read_m1 : 5; // Maximum number of outstanding AXI read transactions - 1 in range 0 to 31
+            uint32_t reserved2 : 3;
+            uint32_t max_outstanding_write_m1 : 4; // Maximum number of outstanding AXI write transactions - 1 in range
+                                                   // 0 to 15
+            uint32_t reserved3 : 4;
         };
         uint32_t word;
     };
@@ -4488,42 +4492,42 @@ struct axi_limit3_r
     }
     CONSTEXPR uint32_t get_max_outstanding_read_m1() const
     {
-        uint32_t value = ((1U << 6) - 1) & (word0 >> 16);
+        uint32_t value = ((1U << 5) - 1) & (word0 >> 16);
         return value;
     }
     uint32_t get_max_outstanding_read_m1() const volatile
     {
-        uint32_t value = ((1U << 6) - 1) & (word0 >> 16);
+        uint32_t value = ((1U << 5) - 1) & (word0 >> 16);
         return value;
     }
     CONSTEXPR axi_limit3_r &set_max_outstanding_read_m1(uint32_t value)
     {
-        word0 = (((~((1U << 6) - 1)) << 16) & word0) | ((((1U << 6) - 1) & value) << 16);
+        word0 = (((~((1U << 5) - 1)) << 16) & word0) | ((((1U << 5) - 1) & value) << 16);
         return *this;
     }
     volatile axi_limit3_r &set_max_outstanding_read_m1(uint32_t value) volatile
     {
-        word0 = (((~((1U << 6) - 1)) << 16) & word0) | ((((1U << 6) - 1) & value) << 16);
+        word0 = (((~((1U << 5) - 1)) << 16) & word0) | ((((1U << 5) - 1) & value) << 16);
         return *this;
     }
     CONSTEXPR uint32_t get_max_outstanding_write_m1() const
     {
-        uint32_t value = ((1U << 5) - 1) & (word0 >> 24);
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 24);
         return value;
     }
     uint32_t get_max_outstanding_write_m1() const volatile
     {
-        uint32_t value = ((1U << 5) - 1) & (word0 >> 24);
+        uint32_t value = ((1U << 4) - 1) & (word0 >> 24);
         return value;
     }
     CONSTEXPR axi_limit3_r &set_max_outstanding_write_m1(uint32_t value)
     {
-        word0 = (((~((1U << 5) - 1)) << 24) & word0) | ((((1U << 5) - 1) & value) << 24);
+        word0 = (((~((1U << 4) - 1)) << 24) & word0) | ((((1U << 4) - 1) & value) << 24);
         return *this;
     }
     volatile axi_limit3_r &set_max_outstanding_write_m1(uint32_t value) volatile
     {
-        word0 = (((~((1U << 5) - 1)) << 24) & word0) | ((((1U << 5) - 1) & value) << 24);
+        word0 = (((~((1U << 4) - 1)) << 24) & word0) | ((((1U << 4) - 1) & value) << 24);
         return *this;
     }
 #endif
@@ -4538,9 +4542,8 @@ struct basep_r
     {
         struct
         {
-            uint32_t offset_LO : 32; // Offset - LSB
-            uint32_t offset_HI : 8;  // Offset - MSB
-            uint32_t reserved0 : 24;
+            uint32_t offset : 32; // Offset
+            uint32_t reserved0 : 32;
         };
         uint32_t word[2];
     };
@@ -7023,68 +7026,6 @@ struct debug_misc_r
 #endif
 };
 
-// debugcore_r - Select core number for debug registers (0x200-0x2FF) and RAM reads (0x400-0x7FF). Value is 0 or 1
-struct debugcore_r
-{
-#ifndef __cplusplus
-    union
-    {
-        struct
-        {
-            uint32_t core : 32; // Debug core
-        };
-        uint32_t word;
-    };
-#else
-  private:
-    uint32_t word0;
-
-  public:
-    CONSTEXPR debugcore_r() : word0(0) {}
-    CONSTEXPR debugcore_r(uint32_t init) : word0(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word0 = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word0 = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word0;
-    }
-    operator uint32_t() volatile
-    {
-        return word0;
-    }
-    debugcore_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_core() const
-    {
-        uint32_t value = word0;
-        return value;
-    }
-    uint32_t get_core() const volatile
-    {
-        uint32_t value = word0;
-        return value;
-    }
-    CONSTEXPR debugcore_r &set_core(uint32_t value)
-    {
-        word0 = value;
-        return *this;
-    }
-    volatile debugcore_r &set_core(uint32_t value) volatile
-    {
-        word0 = value;
-        return *this;
-    }
-#endif
-};
-
 // debug_block_r - Set from which of four block banks the TSU registers are read. 0 = read from the current bank 256+n =
 // force to read from bank n where n is in the range 0 to 3
 struct debug_block_r
@@ -9422,9 +9363,8 @@ struct dma_ifm_src_r
     {
         struct
         {
-            uint32_t offset_LO : 32; // Offset - LSB
-            uint32_t offset_HI : 8;  // Offset - MSB
-            uint32_t reserved0 : 24;
+            uint32_t offset : 32; // Offset
+            uint32_t reserved0 : 32;
         };
         uint32_t word[2];
     };
@@ -9597,9 +9537,8 @@ struct dma_ofm_dst_r
     {
         struct
         {
-            uint32_t offset_LO : 32; // Offset - LSB
-            uint32_t offset_HI : 8;  // Offset - MSB
-            uint32_t reserved0 : 24;
+            uint32_t offset : 32; // Offset
+            uint32_t reserved0 : 32;
         };
         uint32_t word[2];
     };
@@ -9648,9 +9587,8 @@ struct dma_weight_src_r
     {
         struct
         {
-            uint32_t offset_LO : 32; // Offset - LSB
-            uint32_t offset_HI : 8;  // Offset - MSB
-            uint32_t reserved0 : 24;
+            uint32_t offset : 32; // Offset
+            uint32_t reserved0 : 32;
         };
         uint32_t word[2];
     };
@@ -9699,9 +9637,8 @@ struct dma_cmd_src_r
     {
         struct
         {
-            uint32_t offset_LO : 32; // Offset - LSB
-            uint32_t offset_HI : 8;  // Offset - MSB
-            uint32_t reserved0 : 24;
+            uint32_t offset : 32; // Offset
+            uint32_t reserved0 : 32;
         };
         uint32_t word[2];
     };
@@ -9812,9 +9749,8 @@ struct dma_m2m_src_r
     {
         struct
         {
-            uint32_t offset_LO : 32; // Offset - LSB
-            uint32_t offset_HI : 8;  // Offset - MSB
-            uint32_t reserved0 : 24;
+            uint32_t offset : 32; // Offset
+            uint32_t reserved0 : 32;
         };
         uint32_t word[2];
     };
@@ -9863,9 +9799,8 @@ struct dma_m2m_dst_r
     {
         struct
         {
-            uint32_t offset_LO : 32; // Offset - LSB
-            uint32_t offset_HI : 8;  // Offset - MSB
-            uint32_t reserved0 : 24;
+            uint32_t offset : 32; // Offset
+            uint32_t reserved0 : 32;
         };
         uint32_t word[2];
     };
@@ -9976,9 +9911,8 @@ struct dma_scale_src_r
     {
         struct
         {
-            uint32_t offset_LO : 32; // Offset - LSB
-            uint32_t offset_HI : 8;  // Offset - MSB
-            uint32_t reserved0 : 24;
+            uint32_t offset : 32; // Offset
+            uint32_t reserved0 : 32;
         };
         uint32_t word[2];
     };
@@ -12121,68 +12055,6 @@ struct kernel_stride_r
         return *this;
     }
     volatile kernel_stride_r &set_value(uint32_t value) volatile
-    {
-        word0 = value;
-        return *this;
-    }
-#endif
-};
-
-// parallel_mode_r - None
-struct parallel_mode_r
-{
-#ifndef __cplusplus
-    union
-    {
-        struct
-        {
-            uint32_t value : 32; // 32-bit register value
-        };
-        uint32_t word;
-    };
-#else
-  private:
-    uint32_t word0;
-
-  public:
-    CONSTEXPR parallel_mode_r() : word0(0) {}
-    CONSTEXPR parallel_mode_r(uint32_t init) : word0(init) {}
-    CONSTEXPR void operator=(uint32_t value)
-    {
-        word0 = value;
-    }
-    void operator=(uint32_t value) volatile
-    {
-        word0 = value;
-    }
-    CONSTEXPR operator uint32_t()
-    {
-        return word0;
-    }
-    operator uint32_t() volatile
-    {
-        return word0;
-    }
-    parallel_mode_r copy() volatile
-    {
-        return *this;
-    }
-    CONSTEXPR uint32_t get_value() const
-    {
-        uint32_t value = word0;
-        return value;
-    }
-    uint32_t get_value() const volatile
-    {
-        uint32_t value = word0;
-        return value;
-    }
-    CONSTEXPR parallel_mode_r &set_value(uint32_t value)
-    {
-        word0 = value;
-        return *this;
-    }
-    volatile parallel_mode_r &set_value(uint32_t value) volatile
     {
         word0 = value;
         return *this;
@@ -14852,106 +14724,6 @@ struct dma0_len_r
 #endif
 };
 
-// dma0_skip0_r - None
-struct dma0_skip0_r
-{
-#ifndef __cplusplus
-    union
-    {
-        struct
-        {
-            uint32_t value_LO : 32; // 64-bit register value - LSB
-            uint32_t value_HI : 32; // 64-bit register value - MSB
-        };
-        uint32_t word[2];
-    };
-#else
-  private:
-    uint32_t word0;
-    uint32_t word1;
-
-  public:
-    CONSTEXPR dma0_skip0_r() : word0(0), word1(0) {}
-    CONSTEXPR dma0_skip0_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
-        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
-    {
-    }
-    CONSTEXPR void operator=(uint64_t value)
-    {
-        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
-    }
-    void operator=(uint64_t value) volatile
-    {
-        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
-    }
-    CONSTEXPR operator uint64_t()
-    {
-        return (static_cast<uint64_t>(word1) << 32) | word0;
-    }
-    operator uint64_t() volatile
-    {
-        return (static_cast<uint64_t>(word1) << 32) | word0;
-    }
-    dma0_skip0_r copy() volatile
-    {
-        return *this;
-    }
-#endif
-};
-
-// dma0_skip1_r - None
-struct dma0_skip1_r
-{
-#ifndef __cplusplus
-    union
-    {
-        struct
-        {
-            uint32_t value_LO : 32; // 64-bit register value - LSB
-            uint32_t value_HI : 32; // 64-bit register value - MSB
-        };
-        uint32_t word[2];
-    };
-#else
-  private:
-    uint32_t word0;
-    uint32_t word1;
-
-  public:
-    CONSTEXPR dma0_skip1_r() : word0(0), word1(0) {}
-    CONSTEXPR dma0_skip1_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
-        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
-    {
-    }
-    CONSTEXPR void operator=(uint64_t value)
-    {
-        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
-    }
-    void operator=(uint64_t value) volatile
-    {
-        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
-    }
-    CONSTEXPR operator uint64_t()
-    {
-        return (static_cast<uint64_t>(word1) << 32) | word0;
-    }
-    operator uint64_t() volatile
-    {
-        return (static_cast<uint64_t>(word1) << 32) | word0;
-    }
-    dma0_skip1_r copy() volatile
-    {
-        return *this;
-    }
-#endif
-};
-
 // ifm2_base0_r - None
 struct ifm2_base0_r
 {
@@ -15302,206 +15074,6 @@ struct ifm2_stride_c_r
 #endif
 };
 
-// weight1_base_r - None
-struct weight1_base_r
-{
-#ifndef __cplusplus
-    union
-    {
-        struct
-        {
-            uint32_t value_LO : 32; // 64-bit register value - LSB
-            uint32_t value_HI : 32; // 64-bit register value - MSB
-        };
-        uint32_t word[2];
-    };
-#else
-  private:
-    uint32_t word0;
-    uint32_t word1;
-
-  public:
-    CONSTEXPR weight1_base_r() : word0(0), word1(0) {}
-    CONSTEXPR weight1_base_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
-        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
-    {
-    }
-    CONSTEXPR void operator=(uint64_t value)
-    {
-        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
-    }
-    void operator=(uint64_t value) volatile
-    {
-        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
-    }
-    CONSTEXPR operator uint64_t()
-    {
-        return (static_cast<uint64_t>(word1) << 32) | word0;
-    }
-    operator uint64_t() volatile
-    {
-        return (static_cast<uint64_t>(word1) << 32) | word0;
-    }
-    weight1_base_r copy() volatile
-    {
-        return *this;
-    }
-#endif
-};
-
-// weight1_length_r - None
-struct weight1_length_r
-{
-#ifndef __cplusplus
-    union
-    {
-        struct
-        {
-            uint32_t value_LO : 32; // 64-bit register value - LSB
-            uint32_t value_HI : 32; // 64-bit register value - MSB
-        };
-        uint32_t word[2];
-    };
-#else
-  private:
-    uint32_t word0;
-    uint32_t word1;
-
-  public:
-    CONSTEXPR weight1_length_r() : word0(0), word1(0) {}
-    CONSTEXPR weight1_length_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
-        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
-    {
-    }
-    CONSTEXPR void operator=(uint64_t value)
-    {
-        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
-    }
-    void operator=(uint64_t value) volatile
-    {
-        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
-    }
-    CONSTEXPR operator uint64_t()
-    {
-        return (static_cast<uint64_t>(word1) << 32) | word0;
-    }
-    operator uint64_t() volatile
-    {
-        return (static_cast<uint64_t>(word1) << 32) | word0;
-    }
-    weight1_length_r copy() volatile
-    {
-        return *this;
-    }
-#endif
-};
-
-// scale1_base_r - None
-struct scale1_base_r
-{
-#ifndef __cplusplus
-    union
-    {
-        struct
-        {
-            uint32_t value_LO : 32; // 64-bit register value - LSB
-            uint32_t value_HI : 32; // 64-bit register value - MSB
-        };
-        uint32_t word[2];
-    };
-#else
-  private:
-    uint32_t word0;
-    uint32_t word1;
-
-  public:
-    CONSTEXPR scale1_base_r() : word0(0), word1(0) {}
-    CONSTEXPR scale1_base_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
-        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
-    {
-    }
-    CONSTEXPR void operator=(uint64_t value)
-    {
-        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
-    }
-    void operator=(uint64_t value) volatile
-    {
-        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
-    }
-    CONSTEXPR operator uint64_t()
-    {
-        return (static_cast<uint64_t>(word1) << 32) | word0;
-    }
-    operator uint64_t() volatile
-    {
-        return (static_cast<uint64_t>(word1) << 32) | word0;
-    }
-    scale1_base_r copy() volatile
-    {
-        return *this;
-    }
-#endif
-};
-
-// scale1_length_r - None
-struct scale1_length_r
-{
-#ifndef __cplusplus
-    union
-    {
-        struct
-        {
-            uint32_t value_LO : 32; // 64-bit register value - LSB
-            uint32_t value_HI : 32; // 64-bit register value - MSB
-        };
-        uint32_t word[2];
-    };
-#else
-  private:
-    uint32_t word0;
-    uint32_t word1;
-
-  public:
-    CONSTEXPR scale1_length_r() : word0(0), word1(0) {}
-    CONSTEXPR scale1_length_r(uint64_t init) :
-        word0(static_cast<uint32_t>((init)&std::numeric_limits<uint64_t>::max())),
-        word1(static_cast<uint32_t>((init >> 32) & std::numeric_limits<uint64_t>::max()))
-    {
-    }
-    CONSTEXPR void operator=(uint64_t value)
-    {
-        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
-    }
-    void operator=(uint64_t value) volatile
-    {
-        word0 = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-        word1 = static_cast<uint32_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
-    }
-    CONSTEXPR operator uint64_t()
-    {
-        return (static_cast<uint64_t>(word1) << 32) | word0;
-    }
-    operator uint64_t() volatile
-    {
-        return (static_cast<uint64_t>(word1) << 32) | word0;
-    }
-    scale1_length_r copy() volatile
-    {
-        return *this;
-    }
-#endif
-};
-
 // revision_r - Internal FPGA build revision: first 32-bits of the Ultan Git hash used for the build
 struct revision_r
 {
@@ -15829,7 +15401,7 @@ struct pid0_r
     uint32_t word0;
 
   public:
-    CONSTEXPR pid0_r() : word0(129) {}
+    CONSTEXPR pid0_r() : word0(128) {}
     CONSTEXPR pid0_r(uint32_t init) : word0(init) {}
     CONSTEXPR void operator=(uint32_t value)
     {
@@ -16341,9 +15913,9 @@ struct NPU_REG
     STRUCT clkforce_r CLKFORCE;           // 0x0140
     STRUCT debug_address_r DEBUG_ADDRESS; // 0x0144
     STRUCT debug_misc_r DEBUG_MISC;       // 0x0148
-    STRUCT debugcore_r DEBUGCORE;         // 0x014C
-    STRUCT debug_block_r DEBUG_BLOCK;     // 0x0150
-    uint32_t unused5[11];
+    uint32_t unused5[1];
+    STRUCT debug_block_r DEBUG_BLOCK; // 0x0150
+    uint32_t unused6[11];
     STRUCT pmcr_r PMCR;             // 0x0180
     STRUCT pmcntenset_r PMCNTENSET; // 0x0184
     STRUCT pmcntenclr_r PMCNTENCLR; // 0x0188
@@ -16351,11 +15923,11 @@ struct NPU_REG
     STRUCT pmovsclr_r PMOVSCLR;     // 0x0190
     STRUCT pmintset_r PMINTSET;     // 0x0194
     STRUCT pmintclr_r PMINTCLR;     // 0x0198
-    uint32_t unused6[1];
+    uint32_t unused7[1];
     STRUCT pmccntr_r PMCCNTR;         // 0x01A0
     STRUCT pmccntr_cfg_r PMCCNTR_CFG; // 0x01A8
     STRUCT pmcaxi_chan_r PMCAXI_CHAN; // 0x01AC
-    uint32_t unused7[20];
+    uint32_t unused8[20];
     STRUCT kernel_x_r KERNEL_X;                     // 0x0200
     STRUCT kernel_y_r KERNEL_Y;                     // 0x0204
     STRUCT kernel_w_m1_r KERNEL_W_M1;               // 0x0208
@@ -16383,15 +15955,15 @@ struct NPU_REG
     STRUCT dma_m2m_dst_r DMA_M2M_DST;               // 0x0274
     STRUCT current_qread_r CURRENT_QREAD;           // 0x027C
     STRUCT dma_scale_src_r DMA_SCALE_SRC;           // 0x0280
-    uint32_t unused8[11];
+    uint32_t unused9[11];
     STRUCT current_block_r CURRENT_BLOCK; // 0x02B4
     STRUCT current_op_r CURRENT_OP;       // 0x02B8
     STRUCT current_cmd_r CURRENT_CMD;     // 0x02BC
-    uint32_t unused9[16];
+    uint32_t unused10[16];
     STRUCT pmevcntr_r PMEVCNTR[4]; // 0x0300
-    uint32_t unused10[28];
-    STRUCT pmevtyper_r PMEVTYPER[4]; // 0x0380
     uint32_t unused11[28];
+    STRUCT pmevtyper_r PMEVTYPER[4]; // 0x0380
+    uint32_t unused12[28];
     STRUCT shared_buffer_r SHARED_BUFFER[256]; // 0x0400
     STRUCT ifm_pad_top_r IFM_PAD_TOP;          // 0x0800
     STRUCT ifm_pad_left_r IFM_PAD_LEFT;        // 0x0804
@@ -16399,17 +15971,17 @@ struct NPU_REG
     STRUCT ifm_pad_bottom_r IFM_PAD_BOTTOM;    // 0x080C
     STRUCT ifm_depth_m1_r IFM_DEPTH_M1;        // 0x0810
     STRUCT ifm_precision_r IFM_PRECISION;      // 0x0814
-    uint32_t unused12[1];
-    STRUCT ifm_upscale_r IFM_UPSCALE; // 0x081C
     uint32_t unused13[1];
+    STRUCT ifm_upscale_r IFM_UPSCALE; // 0x081C
+    uint32_t unused14[1];
     STRUCT ifm_zero_point_r IFM_ZERO_POINT; // 0x0824
     STRUCT ifm_width0_m1_r IFM_WIDTH0_M1;   // 0x0828
     STRUCT ifm_height0_m1_r IFM_HEIGHT0_M1; // 0x082C
     STRUCT ifm_height1_m1_r IFM_HEIGHT1_M1; // 0x0830
     STRUCT ifm_ib_end_r IFM_IB_END;         // 0x0834
-    uint32_t unused14[1];
-    STRUCT ifm_region_r IFM_REGION; // 0x083C
     uint32_t unused15[1];
+    STRUCT ifm_region_r IFM_REGION; // 0x083C
+    uint32_t unused16[1];
     STRUCT ofm_width_m1_r OFM_WIDTH_M1;           // 0x0844
     STRUCT ofm_height_m1_r OFM_HEIGHT_M1;         // 0x0848
     STRUCT ofm_depth_m1_r OFM_DEPTH_M1;           // 0x084C
@@ -16418,44 +15990,44 @@ struct NPU_REG
     STRUCT ofm_blk_height_m1_r OFM_BLK_HEIGHT_M1; // 0x0858
     STRUCT ofm_blk_depth_m1_r OFM_BLK_DEPTH_M1;   // 0x085C
     STRUCT ofm_zero_point_r OFM_ZERO_POINT;       // 0x0860
-    uint32_t unused16[1];
+    uint32_t unused17[1];
     STRUCT ofm_width0_m1_r OFM_WIDTH0_M1;   // 0x0868
     STRUCT ofm_height0_m1_r OFM_HEIGHT0_M1; // 0x086C
     STRUCT ofm_height1_m1_r OFM_HEIGHT1_M1; // 0x0870
-    uint32_t unused17[2];
+    uint32_t unused18[2];
     STRUCT ofm_region_r OFM_REGION;             // 0x087C
     STRUCT kernel_width_m1_r KERNEL_WIDTH_M1;   // 0x0880
     STRUCT kernel_height_m1_r KERNEL_HEIGHT_M1; // 0x0884
     STRUCT kernel_stride_r KERNEL_STRIDE;       // 0x0888
-    STRUCT parallel_mode_r PARALLEL_MODE;       // 0x088C
-    STRUCT acc_format_r ACC_FORMAT;             // 0x0890
-    STRUCT activation_r ACTIVATION;             // 0x0894
-    STRUCT activation_min_r ACTIVATION_MIN;     // 0x0898
-    STRUCT activation_max_r ACTIVATION_MAX;     // 0x089C
-    STRUCT weight_region_r WEIGHT_REGION;       // 0x08A0
-    STRUCT scale_region_r SCALE_REGION;         // 0x08A4
-    uint32_t unused18[3];
-    STRUCT ab_start_r AB_START; // 0x08B4
     uint32_t unused19[1];
+    STRUCT acc_format_r ACC_FORMAT;         // 0x0890
+    STRUCT activation_r ACTIVATION;         // 0x0894
+    STRUCT activation_min_r ACTIVATION_MIN; // 0x0898
+    STRUCT activation_max_r ACTIVATION_MAX; // 0x089C
+    STRUCT weight_region_r WEIGHT_REGION;   // 0x08A0
+    STRUCT scale_region_r SCALE_REGION;     // 0x08A4
+    uint32_t unused20[3];
+    STRUCT ab_start_r AB_START; // 0x08B4
+    uint32_t unused21[1];
     STRUCT blockdep_r BLOCKDEP;               // 0x08BC
     STRUCT dma0_src_region_r DMA0_SRC_REGION; // 0x08C0
     STRUCT dma0_dst_region_r DMA0_DST_REGION; // 0x08C4
     STRUCT dma0_size0_r DMA0_SIZE0;           // 0x08C8
     STRUCT dma0_size1_r DMA0_SIZE1;           // 0x08CC
-    uint32_t unused20[12];
+    uint32_t unused22[12];
     STRUCT ifm2_broadcast_r IFM2_BROADCAST; // 0x0900
     STRUCT ifm2_scalar_r IFM2_SCALAR;       // 0x0904
-    uint32_t unused21[3];
+    uint32_t unused23[3];
     STRUCT ifm2_precision_r IFM2_PRECISION; // 0x0914
-    uint32_t unused22[3];
+    uint32_t unused24[3];
     STRUCT ifm2_zero_point_r IFM2_ZERO_POINT; // 0x0924
     STRUCT ifm2_width0_m1_r IFM2_WIDTH0_M1;   // 0x0928
     STRUCT ifm2_height0_m1_r IFM2_HEIGHT0_M1; // 0x092C
     STRUCT ifm2_height1_m1_r IFM2_HEIGHT1_M1; // 0x0930
     STRUCT ifm2_ib_start_r IFM2_IB_START;     // 0x0934
-    uint32_t unused23[1];
+    uint32_t unused25[1];
     STRUCT ifm2_region_r IFM2_REGION; // 0x093C
-    uint32_t unused24[48];
+    uint32_t unused26[48];
     STRUCT ifm_base0_r IFM_BASE0;       // 0x0A00
     STRUCT ifm_base1_r IFM_BASE1;       // 0x0A08
     STRUCT ifm_base2_r IFM_BASE2;       // 0x0A10
@@ -16463,7 +16035,7 @@ struct NPU_REG
     STRUCT ifm_stride_x_r IFM_STRIDE_X; // 0x0A20
     STRUCT ifm_stride_y_r IFM_STRIDE_Y; // 0x0A28
     STRUCT ifm_stride_c_r IFM_STRIDE_C; // 0x0A30
-    uint32_t unused25[2];
+    uint32_t unused27[2];
     STRUCT ofm_base0_r OFM_BASE0;       // 0x0A40
     STRUCT ofm_base1_r OFM_BASE1;       // 0x0A48
     STRUCT ofm_base2_r OFM_BASE2;       // 0x0A50
@@ -16471,7 +16043,7 @@ struct NPU_REG
     STRUCT ofm_stride_x_r OFM_STRIDE_X; // 0x0A60
     STRUCT ofm_stride_y_r OFM_STRIDE_Y; // 0x0A68
     STRUCT ofm_stride_c_r OFM_STRIDE_C; // 0x0A70
-    uint32_t unused26[2];
+    uint32_t unused28[2];
     STRUCT weight_base_r WEIGHT_BASE;         // 0x0A80
     STRUCT weight_length_r WEIGHT_LENGTH;     // 0x0A88
     STRUCT scale_base_r SCALE_BASE;           // 0x0A90
@@ -16481,13 +16053,11 @@ struct NPU_REG
     STRUCT opa_scale_r OPA_SCALE;             // 0x0AA8
     STRUCT opa_scale_shift_r OPA_SCALE_SHIFT; // 0x0AAC
     STRUCT opb_scale_r OPB_SCALE;             // 0x0AB0
-    uint32_t unused27[3];
-    STRUCT dma0_src_r DMA0_SRC;     // 0x0AC0
-    STRUCT dma0_dst_r DMA0_DST;     // 0x0AC8
-    STRUCT dma0_len_r DMA0_LEN;     // 0x0AD0
-    STRUCT dma0_skip0_r DMA0_SKIP0; // 0x0AD8
-    STRUCT dma0_skip1_r DMA0_SKIP1; // 0x0AE0
-    uint32_t unused28[6];
+    uint32_t unused29[3];
+    STRUCT dma0_src_r DMA0_SRC; // 0x0AC0
+    STRUCT dma0_dst_r DMA0_DST; // 0x0AC8
+    STRUCT dma0_len_r DMA0_LEN; // 0x0AD0
+    uint32_t unused30[10];
     STRUCT ifm2_base0_r IFM2_BASE0;       // 0x0B00
     STRUCT ifm2_base1_r IFM2_BASE1;       // 0x0B08
     STRUCT ifm2_base2_r IFM2_BASE2;       // 0x0B10
@@ -16495,14 +16065,11 @@ struct NPU_REG
     STRUCT ifm2_stride_x_r IFM2_STRIDE_X; // 0x0B20
     STRUCT ifm2_stride_y_r IFM2_STRIDE_Y; // 0x0B28
     STRUCT ifm2_stride_c_r IFM2_STRIDE_C; // 0x0B30
-    uint32_t unused29[2];
-    STRUCT weight1_base_r WEIGHT1_BASE;     // 0x0B40
-    STRUCT weight1_length_r WEIGHT1_LENGTH; // 0x0B48
-    STRUCT scale1_base_r SCALE1_BASE;       // 0x0B50
-    STRUCT scale1_length_r SCALE1_LENGTH;   // 0x0B58
-    uint32_t unused30[280];
+    uint32_t unused31[18];
+    uint32_t USER_DEFINED[16]; // 0x0B80
+    uint32_t unused32[256];
     STRUCT revision_r REVISION; // 0x0FC0
-    uint32_t unused31[3];
+    uint32_t unused33[3];
     STRUCT pid4_r PID4; // 0x0FD0
     STRUCT pid5_r PID5; // 0x0FD4
     STRUCT pid6_r PID6; // 0x0FD8
@@ -16529,7 +16096,7 @@ struct NPU_REG
     }
     void reset()
     {
-        ID         = 268853249;
+        ID         = 269500929;
         STATUS     = 8;
         CMD        = 12;
         RESET      = 0;
@@ -16538,7 +16105,7 @@ struct NPU_REG
         QCONFIG    = 0;
         QSIZE      = 0;
         PROT       = 0;
-        CONFIG     = 268435456;
+        CONFIG     = 0;
         LOCK       = 0;
         REGIONCFG  = 0;
         AXI_LIMIT0 = 0;
@@ -16555,7 +16122,6 @@ struct NPU_REG
         CLKFORCE           = 0;
         DEBUG_ADDRESS      = 0;
         DEBUG_MISC         = 0;
-        DEBUGCORE          = 0;
         DEBUG_BLOCK        = 0;
         PMCR               = 8192;
         PMCNTENSET         = 0;
@@ -16631,7 +16197,6 @@ struct NPU_REG
         KERNEL_WIDTH_M1   = 0;
         KERNEL_HEIGHT_M1  = 0;
         KERNEL_STRIDE     = 0;
-        PARALLEL_MODE     = 0;
         ACC_FORMAT        = 0;
         ACTIVATION        = 0;
         ACTIVATION_MIN    = 0;
@@ -16679,8 +16244,6 @@ struct NPU_REG
         DMA0_SRC          = 0;
         DMA0_DST          = 0;
         DMA0_LEN          = 0;
-        DMA0_SKIP0        = 0;
-        DMA0_SKIP1        = 0;
         IFM2_BASE0        = 0;
         IFM2_BASE1        = 0;
         IFM2_BASE2        = 0;
@@ -16688,23 +16251,21 @@ struct NPU_REG
         IFM2_STRIDE_X     = 0;
         IFM2_STRIDE_Y     = 0;
         IFM2_STRIDE_C     = 0;
-        WEIGHT1_BASE      = 0;
-        WEIGHT1_LENGTH    = 0;
-        SCALE1_BASE       = 0;
-        SCALE1_LENGTH     = 0;
-        REVISION          = 0;
-        PID4              = 4;
-        PID5              = 0;
-        PID6              = 0;
-        PID7              = 0;
-        PID0              = 129;
-        PID1              = 181;
-        PID2              = 11;
-        PID3              = 0;
-        CID0              = 13;
-        CID1              = 240;
-        CID2              = 5;
-        CID3              = 177;
+        for (size_t i = 0; i < (sizeof(USER_DEFINED) / sizeof(USER_DEFINED[0])); ++i)
+            USER_DEFINED[i] = 0;
+        REVISION = 0;
+        PID4     = 4;
+        PID5     = 0;
+        PID6     = 0;
+        PID7     = 0;
+        PID0     = 128;
+        PID1     = 181;
+        PID2     = 11;
+        PID3     = 0;
+        CID0     = 13;
+        CID1     = 240;
+        CID2     = 5;
+        CID3     = 177;
     }
     uint32_t &operator[](const int addr_offset)
     {
@@ -16777,8 +16338,6 @@ struct NPU_REG
         case 324:
             return access_type_t::RW;
         case 328:
-            return access_type_t::RW;
-        case 332:
             return access_type_t::RW;
         case 336:
             return access_type_t::RW;
@@ -17446,8 +17005,6 @@ struct NPU_REG
             return access_type_t::RW;
         case 2184:
             return access_type_t::RW;
-        case 2188:
-            return access_type_t::RW;
         case 2192:
             return access_type_t::RW;
         case 2196:
@@ -17542,10 +17099,6 @@ struct NPU_REG
             return access_type_t::RW;
         case 2768:
             return access_type_t::RW;
-        case 2776:
-            return access_type_t::RW;
-        case 2784:
-            return access_type_t::RW;
         case 2816:
             return access_type_t::RW;
         case 2824:
@@ -17560,13 +17113,21 @@ struct NPU_REG
             return access_type_t::RW;
         case 2864:
             return access_type_t::RW;
-        case 2880:
+        case 2944:
             return access_type_t::RW;
-        case 2888:
+        case 2952:
             return access_type_t::RW;
-        case 2896:
+        case 2960:
             return access_type_t::RW;
-        case 2904:
+        case 2968:
+            return access_type_t::RW;
+        case 2976:
+            return access_type_t::RW;
+        case 2984:
+            return access_type_t::RW;
+        case 2992:
+            return access_type_t::RW;
+        case 3000:
             return access_type_t::RW;
         case 4032:
             return access_type_t::RO;
@@ -17912,14 +17473,6 @@ struct isa
         {
             const npu_set_kernel_stride_t &v = *reinterpret_cast<const npu_set_kernel_stride_t *>(in);
             op                               = "NPU_SET_KERNEL_STRIDE";
-            v.disassemble(fields);
-            break;
-        }
-        case (static_cast<uint32_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL) << 14) |
-            static_cast<uint32_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_PARALLEL_MODE):
-        {
-            const npu_set_parallel_mode_t &v = *reinterpret_cast<const npu_set_parallel_mode_t *>(in);
-            op                               = "NPU_SET_PARALLEL_MODE";
             v.disassemble(fields);
             break;
         }
@@ -18284,22 +17837,6 @@ struct isa
             break;
         }
         case (static_cast<uint32_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL) << 14) |
-            static_cast<uint32_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_DMA0_SKIP0):
-        {
-            const npu_set_dma0_skip0_t &v = *reinterpret_cast<const npu_set_dma0_skip0_t *>(in);
-            op                            = "NPU_SET_DMA0_SKIP0";
-            v.disassemble(fields);
-            break;
-        }
-        case (static_cast<uint32_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL) << 14) |
-            static_cast<uint32_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_DMA0_SKIP1):
-        {
-            const npu_set_dma0_skip1_t &v = *reinterpret_cast<const npu_set_dma0_skip1_t *>(in);
-            op                            = "NPU_SET_DMA0_SKIP1";
-            v.disassemble(fields);
-            break;
-        }
-        case (static_cast<uint32_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL) << 14) |
             static_cast<uint32_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM2_BASE0):
         {
             const npu_set_ifm2_base0_t &v = *reinterpret_cast<const npu_set_ifm2_base0_t *>(in);
@@ -18356,34 +17893,66 @@ struct isa
             break;
         }
         case (static_cast<uint32_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL) << 14) |
-            static_cast<uint32_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_WEIGHT1_BASE):
+            static_cast<uint32_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED0):
         {
-            const npu_set_weight1_base_t &v = *reinterpret_cast<const npu_set_weight1_base_t *>(in);
-            op                              = "NPU_SET_WEIGHT1_BASE";
+            const npu_set_user_defined0_t &v = *reinterpret_cast<const npu_set_user_defined0_t *>(in);
+            op                               = "NPU_SET_USER_DEFINED0";
             v.disassemble(fields);
             break;
         }
         case (static_cast<uint32_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL) << 14) |
-            static_cast<uint32_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_WEIGHT1_LENGTH):
+            static_cast<uint32_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED1):
         {
-            const npu_set_weight1_length_t &v = *reinterpret_cast<const npu_set_weight1_length_t *>(in);
-            op                                = "NPU_SET_WEIGHT1_LENGTH";
+            const npu_set_user_defined1_t &v = *reinterpret_cast<const npu_set_user_defined1_t *>(in);
+            op                               = "NPU_SET_USER_DEFINED1";
             v.disassemble(fields);
             break;
         }
         case (static_cast<uint32_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL) << 14) |
-            static_cast<uint32_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_SCALE1_BASE):
+            static_cast<uint32_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED2):
         {
-            const npu_set_scale1_base_t &v = *reinterpret_cast<const npu_set_scale1_base_t *>(in);
-            op                             = "NPU_SET_SCALE1_BASE";
+            const npu_set_user_defined2_t &v = *reinterpret_cast<const npu_set_user_defined2_t *>(in);
+            op                               = "NPU_SET_USER_DEFINED2";
             v.disassemble(fields);
             break;
         }
         case (static_cast<uint32_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL) << 14) |
-            static_cast<uint32_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_SCALE1_LENGTH):
+            static_cast<uint32_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED3):
         {
-            const npu_set_scale1_length_t &v = *reinterpret_cast<const npu_set_scale1_length_t *>(in);
-            op                               = "NPU_SET_SCALE1_LENGTH";
+            const npu_set_user_defined3_t &v = *reinterpret_cast<const npu_set_user_defined3_t *>(in);
+            op                               = "NPU_SET_USER_DEFINED3";
+            v.disassemble(fields);
+            break;
+        }
+        case (static_cast<uint32_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL) << 14) |
+            static_cast<uint32_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED4):
+        {
+            const npu_set_user_defined4_t &v = *reinterpret_cast<const npu_set_user_defined4_t *>(in);
+            op                               = "NPU_SET_USER_DEFINED4";
+            v.disassemble(fields);
+            break;
+        }
+        case (static_cast<uint32_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL) << 14) |
+            static_cast<uint32_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED5):
+        {
+            const npu_set_user_defined5_t &v = *reinterpret_cast<const npu_set_user_defined5_t *>(in);
+            op                               = "NPU_SET_USER_DEFINED5";
+            v.disassemble(fields);
+            break;
+        }
+        case (static_cast<uint32_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL) << 14) |
+            static_cast<uint32_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED6):
+        {
+            const npu_set_user_defined6_t &v = *reinterpret_cast<const npu_set_user_defined6_t *>(in);
+            op                               = "NPU_SET_USER_DEFINED6";
+            v.disassemble(fields);
+            break;
+        }
+        case (static_cast<uint32_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL) << 14) |
+            static_cast<uint32_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED7):
+        {
+            const npu_set_user_defined7_t &v = *reinterpret_cast<const npu_set_user_defined7_t *>(in);
+            op                               = "NPU_SET_USER_DEFINED7";
             v.disassemble(fields);
             break;
         }
@@ -20061,18 +19630,19 @@ struct isa
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
         uint32_t region : 3;  //  Region number n
-        uint32_t reserved1 : 13;
+        uint32_t reserved1 : 12;
+        uint32_t custom_dma_cs : 1; //  Custom DMA select
 #ifdef __cplusplus
       public:
-        npu_set_ifm_region_t(uint32_t _region) :
+        npu_set_ifm_region_t(uint32_t _region, NPU_NAMESPACE::custom_dma_cs _custom_dma_cs) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_IFM_REGION)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), region(_region & ((1U << 3) - 1)),
-            reserved1(0)
+            reserved1(0), custom_dma_cs(static_cast<uint8_t>(_custom_dma_cs) & ((1U << 1) - 1))
         {
         }
         CONSTEXPR npu_set_ifm_region_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_IFM_REGION)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), region(0), reserved1(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), region(0), reserved1(0), custom_dma_cs(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -20118,10 +19688,24 @@ struct isa
             region = static_cast<uint8_t>(value) & ((1U << 3) - 1);
             return *this;
         }
+        CONSTEXPR NPU_NAMESPACE::custom_dma_cs get_custom_dma_cs() const
+        {
+            return static_cast<NPU_NAMESPACE::custom_dma_cs>(custom_dma_cs);
+        }
+        CONSTEXPR npu_set_ifm_region_t &set_custom_dma_cs(NPU_NAMESPACE::custom_dma_cs value)
+        {
+            custom_dma_cs = static_cast<uint8_t>(value) & ((1U << 1) - 1);
+            return *this;
+        }
 #ifdef NPU_DISASSEMBLE
         void disassemble(std::vector<std::pair<std::string, std::string>> &fields) const
         {
             fields.push_back(std::make_pair<std::string, std::string>("region", std::to_string(region)));
+            fields.push_back(std::make_pair<std::string, std::string>(
+                "custom_dma_cs",
+                (custom_dma_cs < (sizeof(custom_dma_cs_str) / sizeof(custom_dma_cs_str[0])) ?
+                     custom_dma_cs_str[custom_dma_cs] :
+                     "****")));
         }
 #endif
 #endif
@@ -21021,18 +20605,19 @@ struct isa
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
         uint32_t region : 3;  //  Index n for OFM access
-        uint32_t reserved1 : 13;
+        uint32_t reserved1 : 12;
+        uint32_t custom_dma_cs : 1; //  Custom DMA select
 #ifdef __cplusplus
       public:
-        npu_set_ofm_region_t(uint32_t _region) :
+        npu_set_ofm_region_t(uint32_t _region, NPU_NAMESPACE::custom_dma_cs _custom_dma_cs) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_OFM_REGION)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), region(_region & ((1U << 3) - 1)),
-            reserved1(0)
+            reserved1(0), custom_dma_cs(static_cast<uint8_t>(_custom_dma_cs) & ((1U << 1) - 1))
         {
         }
         CONSTEXPR npu_set_ofm_region_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_OFM_REGION)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), region(0), reserved1(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), region(0), reserved1(0), custom_dma_cs(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -21078,10 +20663,24 @@ struct isa
             region = static_cast<uint8_t>(value) & ((1U << 3) - 1);
             return *this;
         }
+        CONSTEXPR NPU_NAMESPACE::custom_dma_cs get_custom_dma_cs() const
+        {
+            return static_cast<NPU_NAMESPACE::custom_dma_cs>(custom_dma_cs);
+        }
+        CONSTEXPR npu_set_ofm_region_t &set_custom_dma_cs(NPU_NAMESPACE::custom_dma_cs value)
+        {
+            custom_dma_cs = static_cast<uint8_t>(value) & ((1U << 1) - 1);
+            return *this;
+        }
 #ifdef NPU_DISASSEMBLE
         void disassemble(std::vector<std::pair<std::string, std::string>> &fields) const
         {
             fields.push_back(std::make_pair<std::string, std::string>("region", std::to_string(region)));
+            fields.push_back(std::make_pair<std::string, std::string>(
+                "custom_dma_cs",
+                (custom_dma_cs < (sizeof(custom_dma_cs_str) / sizeof(custom_dma_cs_str[0])) ?
+                     custom_dma_cs_str[custom_dma_cs] :
+                     "****")));
         }
 #endif
 #endif
@@ -21412,85 +21011,6 @@ struct isa
                      "****")));
             fields.push_back(std::make_pair<std::string, std::string>("stride_x_msb", std::to_string(stride_x_msb)));
             fields.push_back(std::make_pair<std::string, std::string>("stride_y_msb", std::to_string(stride_y_msb)));
-        }
-#endif
-#endif
-    };
-    // Multi-core parallel mode
-    struct npu_set_parallel_mode_t
-    {
-#ifdef __cplusplus
-      private:
-#endif
-        uint32_t opcode : 10; //  opcode
-        uint32_t reserved0 : 4;
-        uint32_t control : 2;       //  control
-        uint32_t parallel_mode : 1; //  Multi-core parallel mode
-        uint32_t reserved1 : 15;
-#ifdef __cplusplus
-      public:
-        npu_set_parallel_mode_t(NPU_NAMESPACE::parallel_mode _parallel_mode) :
-            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_PARALLEL_MODE)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
-            parallel_mode(static_cast<uint8_t>(_parallel_mode) & ((1U << 1) - 1)), reserved1(0)
-        {
-        }
-        CONSTEXPR npu_set_parallel_mode_t() :
-            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_PARALLEL_MODE)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), parallel_mode(0), reserved1(0)
-        {
-        }
-        CONSTEXPR bool valid() const
-        {
-            return opcode == static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_PARALLEL_MODE) &&
-                   control == static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL);
-        }
-        CONSTEXPR void init()
-        {
-            opcode  = static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_PARALLEL_MODE);
-            control = static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL);
-        }
-        operator uint32_t()
-        {
-            uint32_t word;
-            std::memcpy(&word, this, sizeof(word));
-            return word;
-        }
-        CONSTEXPR NPU_NAMESPACE::cmd0_opcode get_opcode() const
-        {
-            return static_cast<NPU_NAMESPACE::cmd0_opcode>(opcode);
-        }
-        CONSTEXPR npu_set_parallel_mode_t &set_opcode(NPU_NAMESPACE::cmd0_opcode value)
-        {
-            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
-            return *this;
-        }
-        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
-        {
-            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
-        }
-        CONSTEXPR npu_set_parallel_mode_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
-        {
-            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
-            return *this;
-        }
-        CONSTEXPR NPU_NAMESPACE::parallel_mode get_parallel_mode() const
-        {
-            return static_cast<NPU_NAMESPACE::parallel_mode>(parallel_mode);
-        }
-        CONSTEXPR npu_set_parallel_mode_t &set_parallel_mode(NPU_NAMESPACE::parallel_mode value)
-        {
-            parallel_mode = static_cast<uint8_t>(value) & ((1U << 1) - 1);
-            return *this;
-        }
-#ifdef NPU_DISASSEMBLE
-        void disassemble(std::vector<std::pair<std::string, std::string>> &fields) const
-        {
-            fields.push_back(std::make_pair<std::string, std::string>(
-                "parallel_mode",
-                (parallel_mode < (sizeof(parallel_mode_str) / sizeof(parallel_mode_str[0])) ?
-                     parallel_mode_str[parallel_mode] :
-                     "****")));
         }
 #endif
 #endif
@@ -21829,18 +21349,19 @@ struct isa
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
         uint32_t region : 3;  //  Index n for weight stream access
-        uint32_t reserved1 : 13;
+        uint32_t reserved1 : 12;
+        uint32_t custom_dma_cs : 1; //  Custom DMA select
 #ifdef __cplusplus
       public:
-        npu_set_weight_region_t(uint32_t _region) :
+        npu_set_weight_region_t(uint32_t _region, NPU_NAMESPACE::custom_dma_cs _custom_dma_cs) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_WEIGHT_REGION)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), region(_region & ((1U << 3) - 1)),
-            reserved1(0)
+            reserved1(0), custom_dma_cs(static_cast<uint8_t>(_custom_dma_cs) & ((1U << 1) - 1))
         {
         }
         CONSTEXPR npu_set_weight_region_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_WEIGHT_REGION)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), region(0), reserved1(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), region(0), reserved1(0), custom_dma_cs(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -21886,10 +21407,24 @@ struct isa
             region = static_cast<uint8_t>(value) & ((1U << 3) - 1);
             return *this;
         }
+        CONSTEXPR NPU_NAMESPACE::custom_dma_cs get_custom_dma_cs() const
+        {
+            return static_cast<NPU_NAMESPACE::custom_dma_cs>(custom_dma_cs);
+        }
+        CONSTEXPR npu_set_weight_region_t &set_custom_dma_cs(NPU_NAMESPACE::custom_dma_cs value)
+        {
+            custom_dma_cs = static_cast<uint8_t>(value) & ((1U << 1) - 1);
+            return *this;
+        }
 #ifdef NPU_DISASSEMBLE
         void disassemble(std::vector<std::pair<std::string, std::string>> &fields) const
         {
             fields.push_back(std::make_pair<std::string, std::string>("region", std::to_string(region)));
+            fields.push_back(std::make_pair<std::string, std::string>(
+                "custom_dma_cs",
+                (custom_dma_cs < (sizeof(custom_dma_cs_str) / sizeof(custom_dma_cs_str[0])) ?
+                     custom_dma_cs_str[custom_dma_cs] :
+                     "****")));
         }
 #endif
 #endif
@@ -21904,18 +21439,19 @@ struct isa
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
         uint32_t region : 3;  //  Index n for scale stream access
-        uint32_t reserved1 : 13;
+        uint32_t reserved1 : 12;
+        uint32_t custom_dma_cs : 1; //  Custom DMA select
 #ifdef __cplusplus
       public:
-        npu_set_scale_region_t(uint32_t _region) :
+        npu_set_scale_region_t(uint32_t _region, NPU_NAMESPACE::custom_dma_cs _custom_dma_cs) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_SCALE_REGION)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), region(_region & ((1U << 3) - 1)),
-            reserved1(0)
+            reserved1(0), custom_dma_cs(static_cast<uint8_t>(_custom_dma_cs) & ((1U << 1) - 1))
         {
         }
         CONSTEXPR npu_set_scale_region_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_SCALE_REGION)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), region(0), reserved1(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), region(0), reserved1(0), custom_dma_cs(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -21961,10 +21497,24 @@ struct isa
             region = static_cast<uint8_t>(value) & ((1U << 3) - 1);
             return *this;
         }
+        CONSTEXPR NPU_NAMESPACE::custom_dma_cs get_custom_dma_cs() const
+        {
+            return static_cast<NPU_NAMESPACE::custom_dma_cs>(custom_dma_cs);
+        }
+        CONSTEXPR npu_set_scale_region_t &set_custom_dma_cs(NPU_NAMESPACE::custom_dma_cs value)
+        {
+            custom_dma_cs = static_cast<uint8_t>(value) & ((1U << 1) - 1);
+            return *this;
+        }
 #ifdef NPU_DISASSEMBLE
         void disassemble(std::vector<std::pair<std::string, std::string>> &fields) const
         {
             fields.push_back(std::make_pair<std::string, std::string>("region", std::to_string(region)));
+            fields.push_back(std::make_pair<std::string, std::string>(
+                "custom_dma_cs",
+                (custom_dma_cs < (sizeof(custom_dma_cs_str) / sizeof(custom_dma_cs_str[0])) ?
+                     custom_dma_cs_str[custom_dma_cs] :
+                     "****")));
         }
 #endif
 #endif
@@ -22132,23 +21682,26 @@ struct isa
         uint32_t reserved1 : 5;
         uint32_t region_mode : 1; //  Region mode
         uint32_t stride_mode : 2; //  Stride mode
-        uint32_t reserved2 : 5;
+        uint32_t reserved2 : 4;
+        uint32_t custom_dma_cs : 1; //  Custom DMA select
 #ifdef __cplusplus
       public:
         npu_set_dma0_src_region_t(uint32_t _region,
                                   NPU_NAMESPACE::dma_region_mode _region_mode,
-                                  NPU_NAMESPACE::dma_stride_mode _stride_mode) :
+                                  NPU_NAMESPACE::dma_stride_mode _stride_mode,
+                                  NPU_NAMESPACE::custom_dma_cs _custom_dma_cs) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_DMA0_SRC_REGION)),
             reserved0(0), control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
             region(_region & ((1U << 3) - 1)), reserved1(0),
             region_mode(static_cast<uint8_t>(_region_mode) & ((1U << 1) - 1)),
-            stride_mode(static_cast<uint8_t>(_stride_mode) & ((1U << 2) - 1)), reserved2(0)
+            stride_mode(static_cast<uint8_t>(_stride_mode) & ((1U << 2) - 1)), reserved2(0),
+            custom_dma_cs(static_cast<uint8_t>(_custom_dma_cs) & ((1U << 1) - 1))
         {
         }
         CONSTEXPR npu_set_dma0_src_region_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_DMA0_SRC_REGION)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), region(0), reserved1(0), region_mode(0),
-            stride_mode(0), reserved2(0)
+            stride_mode(0), reserved2(0), custom_dma_cs(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -22212,6 +21765,15 @@ struct isa
             stride_mode = static_cast<uint8_t>(value) & ((1U << 2) - 1);
             return *this;
         }
+        CONSTEXPR NPU_NAMESPACE::custom_dma_cs get_custom_dma_cs() const
+        {
+            return static_cast<NPU_NAMESPACE::custom_dma_cs>(custom_dma_cs);
+        }
+        CONSTEXPR npu_set_dma0_src_region_t &set_custom_dma_cs(NPU_NAMESPACE::custom_dma_cs value)
+        {
+            custom_dma_cs = static_cast<uint8_t>(value) & ((1U << 1) - 1);
+            return *this;
+        }
 #ifdef NPU_DISASSEMBLE
         void disassemble(std::vector<std::pair<std::string, std::string>> &fields) const
         {
@@ -22225,6 +21787,11 @@ struct isa
                 "stride_mode",
                 (stride_mode < (sizeof(dma_stride_mode_str) / sizeof(dma_stride_mode_str[0])) ?
                      dma_stride_mode_str[stride_mode] :
+                     "****")));
+            fields.push_back(std::make_pair<std::string, std::string>(
+                "custom_dma_cs",
+                (custom_dma_cs < (sizeof(custom_dma_cs_str) / sizeof(custom_dma_cs_str[0])) ?
+                     custom_dma_cs_str[custom_dma_cs] :
                      "****")));
         }
 #endif
@@ -22244,23 +21811,26 @@ struct isa
         uint32_t reserved1 : 5;
         uint32_t region_mode : 1; //  Region mode
         uint32_t stride_mode : 2; //  Stride mode
-        uint32_t reserved2 : 5;
+        uint32_t reserved2 : 4;
+        uint32_t custom_dma_cs : 1; //  Custom DMA select
 #ifdef __cplusplus
       public:
         npu_set_dma0_dst_region_t(uint32_t _region,
                                   NPU_NAMESPACE::dma_region_mode _region_mode,
-                                  NPU_NAMESPACE::dma_stride_mode _stride_mode) :
+                                  NPU_NAMESPACE::dma_stride_mode _stride_mode,
+                                  NPU_NAMESPACE::custom_dma_cs _custom_dma_cs) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_DMA0_DST_REGION)),
             reserved0(0), control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)),
             region(_region & ((1U << 3) - 1)), reserved1(0),
             region_mode(static_cast<uint8_t>(_region_mode) & ((1U << 1) - 1)),
-            stride_mode(static_cast<uint8_t>(_stride_mode) & ((1U << 2) - 1)), reserved2(0)
+            stride_mode(static_cast<uint8_t>(_stride_mode) & ((1U << 2) - 1)), reserved2(0),
+            custom_dma_cs(static_cast<uint8_t>(_custom_dma_cs) & ((1U << 1) - 1))
         {
         }
         CONSTEXPR npu_set_dma0_dst_region_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd0_opcode::NPU_SET_DMA0_DST_REGION)), reserved0(0),
             control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD0_CTRL)), region(0), reserved1(0), region_mode(0),
-            stride_mode(0), reserved2(0)
+            stride_mode(0), reserved2(0), custom_dma_cs(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -22324,6 +21894,15 @@ struct isa
             stride_mode = static_cast<uint8_t>(value) & ((1U << 2) - 1);
             return *this;
         }
+        CONSTEXPR NPU_NAMESPACE::custom_dma_cs get_custom_dma_cs() const
+        {
+            return static_cast<NPU_NAMESPACE::custom_dma_cs>(custom_dma_cs);
+        }
+        CONSTEXPR npu_set_dma0_dst_region_t &set_custom_dma_cs(NPU_NAMESPACE::custom_dma_cs value)
+        {
+            custom_dma_cs = static_cast<uint8_t>(value) & ((1U << 1) - 1);
+            return *this;
+        }
 #ifdef NPU_DISASSEMBLE
         void disassemble(std::vector<std::pair<std::string, std::string>> &fields) const
         {
@@ -22337,6 +21916,11 @@ struct isa
                 "stride_mode",
                 (stride_mode < (sizeof(dma_stride_mode_str) / sizeof(dma_stride_mode_str[0])) ?
                      dma_stride_mode_str[stride_mode] :
+                     "****")));
+            fields.push_back(std::make_pair<std::string, std::string>(
+                "custom_dma_cs",
+                (custom_dma_cs < (sizeof(custom_dma_cs_str) / sizeof(custom_dma_cs_str[0])) ?
+                     custom_dma_cs_str[custom_dma_cs] :
                      "****")));
         }
 #endif
@@ -23279,21 +22863,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_ifm_base0_t(uint64_t _addr) :
+        npu_set_ifm_base0_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM_BASE0)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_ifm_base0_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM_BASE0)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -23312,14 +22893,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_ifm_base0_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_ifm_base0_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_ifm_base0_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_ifm_base0_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -23341,21 +22939,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_ifm_base1_t(uint64_t _addr) :
+        npu_set_ifm_base1_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM_BASE1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_ifm_base1_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM_BASE1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -23374,14 +22969,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_ifm_base1_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_ifm_base1_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_ifm_base1_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_ifm_base1_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -23403,21 +23015,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_ifm_base2_t(uint64_t _addr) :
+        npu_set_ifm_base2_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM_BASE2)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_ifm_base2_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM_BASE2)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -23436,14 +23045,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_ifm_base2_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_ifm_base2_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_ifm_base2_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_ifm_base2_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -23465,21 +23091,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_ifm_base3_t(uint64_t _addr) :
+        npu_set_ifm_base3_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM_BASE3)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_ifm_base3_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM_BASE3)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -23498,14 +23121,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_ifm_base3_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_ifm_base3_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_ifm_base3_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_ifm_base3_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -23527,21 +23167,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_ifm_stride_x_t(uint64_t _addr) :
+        npu_set_ifm_stride_x_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM_STRIDE_X)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_ifm_stride_x_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM_STRIDE_X)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -23560,14 +23197,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_ifm_stride_x_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_ifm_stride_x_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_ifm_stride_x_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_ifm_stride_x_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -23589,21 +23243,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_ifm_stride_y_t(uint64_t _addr) :
+        npu_set_ifm_stride_y_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM_STRIDE_Y)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_ifm_stride_y_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM_STRIDE_Y)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -23622,14 +23273,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_ifm_stride_y_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_ifm_stride_y_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_ifm_stride_y_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_ifm_stride_y_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -23651,21 +23319,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_ifm_stride_c_t(uint64_t _addr) :
+        npu_set_ifm_stride_c_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM_STRIDE_C)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_ifm_stride_c_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM_STRIDE_C)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -23684,14 +23349,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_ifm_stride_c_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_ifm_stride_c_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_ifm_stride_c_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_ifm_stride_c_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -23713,21 +23395,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_ofm_base0_t(uint64_t _addr) :
+        npu_set_ofm_base0_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_OFM_BASE0)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_ofm_base0_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_OFM_BASE0)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -23746,14 +23425,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_ofm_base0_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_ofm_base0_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_ofm_base0_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_ofm_base0_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -23775,21 +23471,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_ofm_base1_t(uint64_t _addr) :
+        npu_set_ofm_base1_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_OFM_BASE1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_ofm_base1_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_OFM_BASE1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -23808,14 +23501,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_ofm_base1_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_ofm_base1_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_ofm_base1_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_ofm_base1_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -23837,21 +23547,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_ofm_base2_t(uint64_t _addr) :
+        npu_set_ofm_base2_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_OFM_BASE2)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_ofm_base2_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_OFM_BASE2)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -23870,14 +23577,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_ofm_base2_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_ofm_base2_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_ofm_base2_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_ofm_base2_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -23899,21 +23623,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_ofm_base3_t(uint64_t _addr) :
+        npu_set_ofm_base3_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_OFM_BASE3)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_ofm_base3_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_OFM_BASE3)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -23932,14 +23653,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_ofm_base3_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_ofm_base3_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_ofm_base3_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_ofm_base3_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -23961,21 +23699,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_ofm_stride_x_t(uint64_t _addr) :
+        npu_set_ofm_stride_x_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_OFM_STRIDE_X)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_ofm_stride_x_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_OFM_STRIDE_X)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -23994,14 +23729,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_ofm_stride_x_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_ofm_stride_x_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_ofm_stride_x_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_ofm_stride_x_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -24023,21 +23775,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_ofm_stride_y_t(uint64_t _addr) :
+        npu_set_ofm_stride_y_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_OFM_STRIDE_Y)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_ofm_stride_y_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_OFM_STRIDE_Y)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -24056,14 +23805,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_ofm_stride_y_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_ofm_stride_y_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_ofm_stride_y_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_ofm_stride_y_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -24085,21 +23851,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_ofm_stride_c_t(uint64_t _addr) :
+        npu_set_ofm_stride_c_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_OFM_STRIDE_C)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_ofm_stride_c_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_OFM_STRIDE_C)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -24118,14 +23881,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_ofm_stride_c_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_ofm_stride_c_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_ofm_stride_c_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_ofm_stride_c_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -24147,21 +23927,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_weight_base_t(uint64_t _addr) :
+        npu_set_weight_base_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_WEIGHT_BASE)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_weight_base_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_WEIGHT_BASE)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -24180,14 +23957,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_weight_base_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_weight_base_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_weight_base_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_weight_base_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -24283,21 +24077,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_scale_base_t(uint64_t _addr) :
+        npu_set_scale_base_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_SCALE_BASE)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_scale_base_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_SCALE_BASE)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -24316,14 +24107,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_scale_base_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_scale_base_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_scale_base_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_scale_base_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -24669,21 +24477,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_dma0_src_t(uint64_t _addr) :
+        npu_set_dma0_src_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_DMA0_SRC)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_dma0_src_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_DMA0_SRC)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -24702,14 +24507,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_dma0_src_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_dma0_src_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_dma0_src_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_dma0_src_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -24731,21 +24553,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_dma0_dst_t(uint64_t _addr) :
+        npu_set_dma0_dst_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_DMA0_DST)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_dma0_dst_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_DMA0_DST)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -24764,14 +24583,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_dma0_dst_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_dma0_dst_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_dma0_dst_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_dma0_dst_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -24793,21 +24629,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_dma0_len_t(uint64_t _addr) :
+        npu_set_dma0_len_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_DMA0_LEN)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_dma0_len_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_DMA0_LEN)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -24826,138 +24659,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_dma0_len_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_dma0_len_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
             return *this;
         }
-#ifdef NPU_DISASSEMBLE
-        void disassemble(std::vector<std::pair<std::string, std::string>> &fields) const
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
         {
-            std::stringstream saddr;
-            saddr << std::hex << "0x" << get_addr();
-            fields.push_back(std::make_pair<std::string, std::string>("addr", saddr.str()));
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
         }
-#endif
-#endif
-    };
-    // byte distance to skip after each inner (1D) transfer (2D/3D mode) (any alignment)
-    struct npu_set_dma0_skip0_t
-    {
-#ifdef __cplusplus
-      private:
-#endif
-        uint32_t opcode : 10; //  opcode
-        uint32_t reserved0 : 4;
-        uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
-#ifdef __cplusplus
-      public:
-        npu_set_dma0_skip0_t(uint64_t _addr) :
-            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_DMA0_SKIP0)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+        CONSTEXPR npu_set_dma0_len_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
         {
-        }
-        CONSTEXPR npu_set_dma0_skip0_t() :
-            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_DMA0_SKIP0)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
-        {
-        }
-        CONSTEXPR bool valid() const
-        {
-            return opcode == static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_DMA0_SKIP0) && control >= 1 &&
-                   control <= 2;
-        }
-        CONSTEXPR void init()
-        {
-            opcode  = static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_DMA0_SKIP0);
-            control = static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL);
-        }
-        operator uint64_t()
-        {
-            uint64_t word;
-            std::memcpy(&word, this, sizeof(word));
-            return word;
-        }
-        CONSTEXPR uint64_t get_addr() const
-        {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
-        }
-        CONSTEXPR npu_set_dma0_skip0_t &set_addr(uint64_t value)
-        {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
             return *this;
         }
-#ifdef NPU_DISASSEMBLE
-        void disassemble(std::vector<std::pair<std::string, std::string>> &fields) const
+        CONSTEXPR uint32_t get_addr() const
         {
-            std::stringstream saddr;
-            saddr << std::hex << "0x" << get_addr();
-            fields.push_back(std::make_pair<std::string, std::string>("addr", saddr.str()));
+            return static_cast<uint32_t>(addr);
         }
-#endif
-#endif
-    };
-    // byte distance to skip after each 2D transfer (3D mode) (any alignment)
-    struct npu_set_dma0_skip1_t
-    {
-#ifdef __cplusplus
-      private:
-#endif
-        uint32_t opcode : 10; //  opcode
-        uint32_t reserved0 : 4;
-        uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
-#ifdef __cplusplus
-      public:
-        npu_set_dma0_skip1_t(uint64_t _addr) :
-            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_DMA0_SKIP1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+        CONSTEXPR npu_set_dma0_len_t &set_addr(uint32_t value)
         {
-        }
-        CONSTEXPR npu_set_dma0_skip1_t() :
-            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_DMA0_SKIP1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
-        {
-        }
-        CONSTEXPR bool valid() const
-        {
-            return opcode == static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_DMA0_SKIP1) && control >= 1 &&
-                   control <= 2;
-        }
-        CONSTEXPR void init()
-        {
-            opcode  = static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_DMA0_SKIP1);
-            control = static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL);
-        }
-        operator uint64_t()
-        {
-            uint64_t word;
-            std::memcpy(&word, this, sizeof(word));
-            return word;
-        }
-        CONSTEXPR uint64_t get_addr() const
-        {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
-        }
-        CONSTEXPR npu_set_dma0_skip1_t &set_addr(uint64_t value)
-        {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -24979,21 +24705,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_ifm2_base0_t(uint64_t _addr) :
+        npu_set_ifm2_base0_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM2_BASE0)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_ifm2_base0_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM2_BASE0)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -25012,14 +24735,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_ifm2_base0_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_ifm2_base0_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_ifm2_base0_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_ifm2_base0_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -25041,21 +24781,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_ifm2_base1_t(uint64_t _addr) :
+        npu_set_ifm2_base1_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM2_BASE1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_ifm2_base1_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM2_BASE1)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -25074,14 +24811,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_ifm2_base1_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_ifm2_base1_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_ifm2_base1_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_ifm2_base1_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -25103,21 +24857,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_ifm2_base2_t(uint64_t _addr) :
+        npu_set_ifm2_base2_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM2_BASE2)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_ifm2_base2_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM2_BASE2)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -25136,14 +24887,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_ifm2_base2_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_ifm2_base2_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_ifm2_base2_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_ifm2_base2_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -25165,21 +24933,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_ifm2_base3_t(uint64_t _addr) :
+        npu_set_ifm2_base3_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM2_BASE3)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_ifm2_base3_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM2_BASE3)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -25198,14 +24963,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_ifm2_base3_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_ifm2_base3_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_ifm2_base3_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_ifm2_base3_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -25227,21 +25009,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_ifm2_stride_x_t(uint64_t _addr) :
+        npu_set_ifm2_stride_x_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM2_STRIDE_X)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_ifm2_stride_x_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM2_STRIDE_X)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -25260,14 +25039,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_ifm2_stride_x_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_ifm2_stride_x_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_ifm2_stride_x_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_ifm2_stride_x_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -25289,21 +25085,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_ifm2_stride_y_t(uint64_t _addr) :
+        npu_set_ifm2_stride_y_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM2_STRIDE_Y)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_ifm2_stride_y_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM2_STRIDE_Y)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -25322,14 +25115,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_ifm2_stride_y_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_ifm2_stride_y_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_ifm2_stride_y_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_ifm2_stride_y_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -25351,21 +25161,18 @@ struct isa
         uint32_t opcode : 10; //  opcode
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
+        uint32_t reserved1 : 16;
+        uint32_t addr : 32; //  address offset
 #ifdef __cplusplus
       public:
-        npu_set_ifm2_stride_c_t(uint64_t _addr) :
+        npu_set_ifm2_stride_c_t(uint32_t _addr) :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM2_STRIDE_C)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(_addr)
         {
         }
         CONSTEXPR npu_set_ifm2_stride_c_t() :
             opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_IFM2_STRIDE_C)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), addr(0)
         {
         }
         CONSTEXPR bool valid() const
@@ -25384,14 +25191,31 @@ struct isa
             std::memcpy(&word, this, sizeof(word));
             return word;
         }
-        CONSTEXPR uint64_t get_addr() const
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
         {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_ifm2_stride_c_t &set_addr(uint64_t value)
+        CONSTEXPR npu_set_ifm2_stride_c_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_ifm2_stride_c_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_addr() const
+        {
+            return static_cast<uint32_t>(addr);
+        }
+        CONSTEXPR npu_set_ifm2_stride_c_t &set_addr(uint32_t value)
+        {
+            addr = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
@@ -25404,70 +25228,8 @@ struct isa
 #endif
 #endif
     };
-    // Weight stream byte offset in WEIGHT_REGION for core 1
-    struct npu_set_weight1_base_t
-    {
-#ifdef __cplusplus
-      private:
-#endif
-        uint32_t opcode : 10; //  opcode
-        uint32_t reserved0 : 4;
-        uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
-#ifdef __cplusplus
-      public:
-        npu_set_weight1_base_t(uint64_t _addr) :
-            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_WEIGHT1_BASE)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
-        {
-        }
-        CONSTEXPR npu_set_weight1_base_t() :
-            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_WEIGHT1_BASE)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
-        {
-        }
-        CONSTEXPR bool valid() const
-        {
-            return opcode == static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_WEIGHT1_BASE) && control >= 1 &&
-                   control <= 2;
-        }
-        CONSTEXPR void init()
-        {
-            opcode  = static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_WEIGHT1_BASE);
-            control = static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL);
-        }
-        operator uint64_t()
-        {
-            uint64_t word;
-            std::memcpy(&word, this, sizeof(word));
-            return word;
-        }
-        CONSTEXPR uint64_t get_addr() const
-        {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
-        }
-        CONSTEXPR npu_set_weight1_base_t &set_addr(uint64_t value)
-        {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
-            return *this;
-        }
-#ifdef NPU_DISASSEMBLE
-        void disassemble(std::vector<std::pair<std::string, std::string>> &fields) const
-        {
-            std::stringstream saddr;
-            saddr << std::hex << "0x" << get_addr();
-            fields.push_back(std::make_pair<std::string, std::string>("addr", saddr.str()));
-        }
-#endif
-#endif
-    };
-    // Weight stream byte length for core 1
-    struct npu_set_weight1_length_t
+    // User defined register 0
+    struct npu_set_user_defined0_t
     {
 #ifdef __cplusplus
       private:
@@ -25476,27 +25238,27 @@ struct isa
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
         uint32_t reserved1 : 16;
-        uint32_t length : 32; //  Weight stream byte length
+        uint32_t user_reg : 32; //  User defined register
 #ifdef __cplusplus
       public:
-        npu_set_weight1_length_t(uint32_t _length) :
-            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_WEIGHT1_LENGTH)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), length(_length)
+        npu_set_user_defined0_t(uint32_t _user_reg) :
+            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED0)), reserved0(0),
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), user_reg(_user_reg)
         {
         }
-        CONSTEXPR npu_set_weight1_length_t() :
-            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_WEIGHT1_LENGTH)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), length(0)
+        CONSTEXPR npu_set_user_defined0_t() :
+            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED0)), reserved0(0),
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), user_reg(0)
         {
         }
         CONSTEXPR bool valid() const
         {
-            return opcode == static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_WEIGHT1_LENGTH) &&
-                   control >= 1 && control <= 2;
+            return opcode == static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED0) && control >= 1 &&
+                   control <= 2;
         }
         CONSTEXPR void init()
         {
-            opcode  = static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_WEIGHT1_LENGTH);
+            opcode  = static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED0);
             control = static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL);
         }
         operator uint64_t()
@@ -25509,7 +25271,7 @@ struct isa
         {
             return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_weight1_length_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
+        CONSTEXPR npu_set_user_defined0_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
             opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
             return *this;
@@ -25518,92 +25280,30 @@ struct isa
         {
             return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
         }
-        CONSTEXPR npu_set_weight1_length_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        CONSTEXPR npu_set_user_defined0_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
         {
             control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
             return *this;
         }
-        CONSTEXPR uint32_t get_length() const
+        CONSTEXPR uint32_t get_user_reg() const
         {
-            return static_cast<uint32_t>(length);
+            return static_cast<uint32_t>(user_reg);
         }
-        CONSTEXPR npu_set_weight1_length_t &set_length(uint32_t value)
+        CONSTEXPR npu_set_user_defined0_t &set_user_reg(uint32_t value)
         {
-            length = value;
+            user_reg = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
         void disassemble(std::vector<std::pair<std::string, std::string>> &fields) const
         {
-            fields.push_back(std::make_pair<std::string, std::string>("length", std::to_string(length)));
+            fields.push_back(std::make_pair<std::string, std::string>("user_reg", std::to_string(user_reg)));
         }
 #endif
 #endif
     };
-    // Scale and bias stream input byte offset from SCALE_REGION for core 1
-    struct npu_set_scale1_base_t
-    {
-#ifdef __cplusplus
-      private:
-#endif
-        uint32_t opcode : 10; //  opcode
-        uint32_t reserved0 : 4;
-        uint32_t control : 2; //  control
-        uint32_t addr_hi : 8; //  address extension
-        uint32_t reserved1 : 8;
-        uint32_t addr_lo : 32; //  address offset
-#ifdef __cplusplus
-      public:
-        npu_set_scale1_base_t(uint64_t _addr) :
-            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_SCALE1_BASE)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)),
-            addr_hi(static_cast<uint8_t>((_addr >> 32) & std::numeric_limits<uint64_t>::max())), reserved1(0),
-            addr_lo(static_cast<uint32_t>((_addr)&std::numeric_limits<uint64_t>::max()))
-        {
-        }
-        CONSTEXPR npu_set_scale1_base_t() :
-            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_SCALE1_BASE)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), addr_hi(0), reserved1(0), addr_lo(0)
-        {
-        }
-        CONSTEXPR bool valid() const
-        {
-            return opcode == static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_SCALE1_BASE) && control >= 1 &&
-                   control <= 2;
-        }
-        CONSTEXPR void init()
-        {
-            opcode  = static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_SCALE1_BASE);
-            control = static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL);
-        }
-        operator uint64_t()
-        {
-            uint64_t word;
-            std::memcpy(&word, this, sizeof(word));
-            return word;
-        }
-        CONSTEXPR uint64_t get_addr() const
-        {
-            return (static_cast<uint64_t>(addr_hi) << 32) | addr_lo;
-        }
-        CONSTEXPR npu_set_scale1_base_t &set_addr(uint64_t value)
-        {
-            addr_lo = static_cast<uint32_t>((value)&std::numeric_limits<uint64_t>::max());
-            addr_hi = static_cast<uint8_t>((value >> 32) & std::numeric_limits<uint64_t>::max());
-            return *this;
-        }
-#ifdef NPU_DISASSEMBLE
-        void disassemble(std::vector<std::pair<std::string, std::string>> &fields) const
-        {
-            std::stringstream saddr;
-            saddr << std::hex << "0x" << get_addr();
-            fields.push_back(std::make_pair<std::string, std::string>("addr", saddr.str()));
-        }
-#endif
-#endif
-    };
-    // Scale and bias stream input byte length for core 1
-    struct npu_set_scale1_length_t
+    // User defined register 1
+    struct npu_set_user_defined1_t
     {
 #ifdef __cplusplus
       private:
@@ -25612,29 +25312,27 @@ struct isa
         uint32_t reserved0 : 4;
         uint32_t control : 2; //  control
         uint32_t reserved1 : 16;
-        uint32_t length : 20; //  Scale and bias stream byte length
-        uint32_t reserved2 : 12;
+        uint32_t user_reg : 32; //  User defined register
 #ifdef __cplusplus
       public:
-        npu_set_scale1_length_t(uint32_t _length) :
-            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_SCALE1_LENGTH)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0),
-            length(_length & ((1U << 20) - 1)), reserved2(0)
+        npu_set_user_defined1_t(uint32_t _user_reg) :
+            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED1)), reserved0(0),
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), user_reg(_user_reg)
         {
         }
-        CONSTEXPR npu_set_scale1_length_t() :
-            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_SCALE1_LENGTH)), reserved0(0),
-            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), length(0), reserved2(0)
+        CONSTEXPR npu_set_user_defined1_t() :
+            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED1)), reserved0(0),
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), user_reg(0)
         {
         }
         CONSTEXPR bool valid() const
         {
-            return opcode == static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_SCALE1_LENGTH) && control >= 1 &&
+            return opcode == static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED1) && control >= 1 &&
                    control <= 2;
         }
         CONSTEXPR void init()
         {
-            opcode  = static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_SCALE1_LENGTH);
+            opcode  = static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED1);
             control = static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL);
         }
         operator uint64_t()
@@ -25647,7 +25345,7 @@ struct isa
         {
             return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
         }
-        CONSTEXPR npu_set_scale1_length_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
+        CONSTEXPR npu_set_user_defined1_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
         {
             opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
             return *this;
@@ -25656,24 +25354,468 @@ struct isa
         {
             return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
         }
-        CONSTEXPR npu_set_scale1_length_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        CONSTEXPR npu_set_user_defined1_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
         {
             control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
             return *this;
         }
-        CONSTEXPR uint32_t get_length() const
+        CONSTEXPR uint32_t get_user_reg() const
         {
-            return static_cast<uint32_t>(length);
+            return static_cast<uint32_t>(user_reg);
         }
-        CONSTEXPR npu_set_scale1_length_t &set_length(uint32_t value)
+        CONSTEXPR npu_set_user_defined1_t &set_user_reg(uint32_t value)
         {
-            length = value & ((1U << 20) - 1);
+            user_reg = value;
             return *this;
         }
 #ifdef NPU_DISASSEMBLE
         void disassemble(std::vector<std::pair<std::string, std::string>> &fields) const
         {
-            fields.push_back(std::make_pair<std::string, std::string>("length", std::to_string(length)));
+            fields.push_back(std::make_pair<std::string, std::string>("user_reg", std::to_string(user_reg)));
+        }
+#endif
+#endif
+    };
+    // User defined register 2
+    struct npu_set_user_defined2_t
+    {
+#ifdef __cplusplus
+      private:
+#endif
+        uint32_t opcode : 10; //  opcode
+        uint32_t reserved0 : 4;
+        uint32_t control : 2; //  control
+        uint32_t reserved1 : 16;
+        uint32_t user_reg : 32; //  User defined register
+#ifdef __cplusplus
+      public:
+        npu_set_user_defined2_t(uint32_t _user_reg) :
+            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED2)), reserved0(0),
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), user_reg(_user_reg)
+        {
+        }
+        CONSTEXPR npu_set_user_defined2_t() :
+            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED2)), reserved0(0),
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), user_reg(0)
+        {
+        }
+        CONSTEXPR bool valid() const
+        {
+            return opcode == static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED2) && control >= 1 &&
+                   control <= 2;
+        }
+        CONSTEXPR void init()
+        {
+            opcode  = static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED2);
+            control = static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL);
+        }
+        operator uint64_t()
+        {
+            uint64_t word;
+            std::memcpy(&word, this, sizeof(word));
+            return word;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
+        }
+        CONSTEXPR npu_set_user_defined2_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
+        {
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_user_defined2_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_user_reg() const
+        {
+            return static_cast<uint32_t>(user_reg);
+        }
+        CONSTEXPR npu_set_user_defined2_t &set_user_reg(uint32_t value)
+        {
+            user_reg = value;
+            return *this;
+        }
+#ifdef NPU_DISASSEMBLE
+        void disassemble(std::vector<std::pair<std::string, std::string>> &fields) const
+        {
+            fields.push_back(std::make_pair<std::string, std::string>("user_reg", std::to_string(user_reg)));
+        }
+#endif
+#endif
+    };
+    // User defined register 3
+    struct npu_set_user_defined3_t
+    {
+#ifdef __cplusplus
+      private:
+#endif
+        uint32_t opcode : 10; //  opcode
+        uint32_t reserved0 : 4;
+        uint32_t control : 2; //  control
+        uint32_t reserved1 : 16;
+        uint32_t user_reg : 32; //  User defined register
+#ifdef __cplusplus
+      public:
+        npu_set_user_defined3_t(uint32_t _user_reg) :
+            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED3)), reserved0(0),
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), user_reg(_user_reg)
+        {
+        }
+        CONSTEXPR npu_set_user_defined3_t() :
+            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED3)), reserved0(0),
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), user_reg(0)
+        {
+        }
+        CONSTEXPR bool valid() const
+        {
+            return opcode == static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED3) && control >= 1 &&
+                   control <= 2;
+        }
+        CONSTEXPR void init()
+        {
+            opcode  = static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED3);
+            control = static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL);
+        }
+        operator uint64_t()
+        {
+            uint64_t word;
+            std::memcpy(&word, this, sizeof(word));
+            return word;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
+        }
+        CONSTEXPR npu_set_user_defined3_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
+        {
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_user_defined3_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_user_reg() const
+        {
+            return static_cast<uint32_t>(user_reg);
+        }
+        CONSTEXPR npu_set_user_defined3_t &set_user_reg(uint32_t value)
+        {
+            user_reg = value;
+            return *this;
+        }
+#ifdef NPU_DISASSEMBLE
+        void disassemble(std::vector<std::pair<std::string, std::string>> &fields) const
+        {
+            fields.push_back(std::make_pair<std::string, std::string>("user_reg", std::to_string(user_reg)));
+        }
+#endif
+#endif
+    };
+    // User defined register 4
+    struct npu_set_user_defined4_t
+    {
+#ifdef __cplusplus
+      private:
+#endif
+        uint32_t opcode : 10; //  opcode
+        uint32_t reserved0 : 4;
+        uint32_t control : 2; //  control
+        uint32_t reserved1 : 16;
+        uint32_t user_reg : 32; //  User defined register
+#ifdef __cplusplus
+      public:
+        npu_set_user_defined4_t(uint32_t _user_reg) :
+            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED4)), reserved0(0),
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), user_reg(_user_reg)
+        {
+        }
+        CONSTEXPR npu_set_user_defined4_t() :
+            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED4)), reserved0(0),
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), user_reg(0)
+        {
+        }
+        CONSTEXPR bool valid() const
+        {
+            return opcode == static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED4) && control >= 1 &&
+                   control <= 2;
+        }
+        CONSTEXPR void init()
+        {
+            opcode  = static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED4);
+            control = static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL);
+        }
+        operator uint64_t()
+        {
+            uint64_t word;
+            std::memcpy(&word, this, sizeof(word));
+            return word;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
+        }
+        CONSTEXPR npu_set_user_defined4_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
+        {
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_user_defined4_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_user_reg() const
+        {
+            return static_cast<uint32_t>(user_reg);
+        }
+        CONSTEXPR npu_set_user_defined4_t &set_user_reg(uint32_t value)
+        {
+            user_reg = value;
+            return *this;
+        }
+#ifdef NPU_DISASSEMBLE
+        void disassemble(std::vector<std::pair<std::string, std::string>> &fields) const
+        {
+            fields.push_back(std::make_pair<std::string, std::string>("user_reg", std::to_string(user_reg)));
+        }
+#endif
+#endif
+    };
+    // User defined register 5
+    struct npu_set_user_defined5_t
+    {
+#ifdef __cplusplus
+      private:
+#endif
+        uint32_t opcode : 10; //  opcode
+        uint32_t reserved0 : 4;
+        uint32_t control : 2; //  control
+        uint32_t reserved1 : 16;
+        uint32_t user_reg : 32; //  User defined register
+#ifdef __cplusplus
+      public:
+        npu_set_user_defined5_t(uint32_t _user_reg) :
+            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED5)), reserved0(0),
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), user_reg(_user_reg)
+        {
+        }
+        CONSTEXPR npu_set_user_defined5_t() :
+            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED5)), reserved0(0),
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), user_reg(0)
+        {
+        }
+        CONSTEXPR bool valid() const
+        {
+            return opcode == static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED5) && control >= 1 &&
+                   control <= 2;
+        }
+        CONSTEXPR void init()
+        {
+            opcode  = static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED5);
+            control = static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL);
+        }
+        operator uint64_t()
+        {
+            uint64_t word;
+            std::memcpy(&word, this, sizeof(word));
+            return word;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
+        }
+        CONSTEXPR npu_set_user_defined5_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
+        {
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_user_defined5_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_user_reg() const
+        {
+            return static_cast<uint32_t>(user_reg);
+        }
+        CONSTEXPR npu_set_user_defined5_t &set_user_reg(uint32_t value)
+        {
+            user_reg = value;
+            return *this;
+        }
+#ifdef NPU_DISASSEMBLE
+        void disassemble(std::vector<std::pair<std::string, std::string>> &fields) const
+        {
+            fields.push_back(std::make_pair<std::string, std::string>("user_reg", std::to_string(user_reg)));
+        }
+#endif
+#endif
+    };
+    // User defined register 6
+    struct npu_set_user_defined6_t
+    {
+#ifdef __cplusplus
+      private:
+#endif
+        uint32_t opcode : 10; //  opcode
+        uint32_t reserved0 : 4;
+        uint32_t control : 2; //  control
+        uint32_t reserved1 : 16;
+        uint32_t user_reg : 32; //  User defined register
+#ifdef __cplusplus
+      public:
+        npu_set_user_defined6_t(uint32_t _user_reg) :
+            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED6)), reserved0(0),
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), user_reg(_user_reg)
+        {
+        }
+        CONSTEXPR npu_set_user_defined6_t() :
+            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED6)), reserved0(0),
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), user_reg(0)
+        {
+        }
+        CONSTEXPR bool valid() const
+        {
+            return opcode == static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED6) && control >= 1 &&
+                   control <= 2;
+        }
+        CONSTEXPR void init()
+        {
+            opcode  = static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED6);
+            control = static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL);
+        }
+        operator uint64_t()
+        {
+            uint64_t word;
+            std::memcpy(&word, this, sizeof(word));
+            return word;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
+        }
+        CONSTEXPR npu_set_user_defined6_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
+        {
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_user_defined6_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_user_reg() const
+        {
+            return static_cast<uint32_t>(user_reg);
+        }
+        CONSTEXPR npu_set_user_defined6_t &set_user_reg(uint32_t value)
+        {
+            user_reg = value;
+            return *this;
+        }
+#ifdef NPU_DISASSEMBLE
+        void disassemble(std::vector<std::pair<std::string, std::string>> &fields) const
+        {
+            fields.push_back(std::make_pair<std::string, std::string>("user_reg", std::to_string(user_reg)));
+        }
+#endif
+#endif
+    };
+    // User defined register 7
+    struct npu_set_user_defined7_t
+    {
+#ifdef __cplusplus
+      private:
+#endif
+        uint32_t opcode : 10; //  opcode
+        uint32_t reserved0 : 4;
+        uint32_t control : 2; //  control
+        uint32_t reserved1 : 16;
+        uint32_t user_reg : 32; //  User defined register
+#ifdef __cplusplus
+      public:
+        npu_set_user_defined7_t(uint32_t _user_reg) :
+            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED7)), reserved0(0),
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), user_reg(_user_reg)
+        {
+        }
+        CONSTEXPR npu_set_user_defined7_t() :
+            opcode(static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED7)), reserved0(0),
+            control(static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL)), reserved1(0), user_reg(0)
+        {
+        }
+        CONSTEXPR bool valid() const
+        {
+            return opcode == static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED7) && control >= 1 &&
+                   control <= 2;
+        }
+        CONSTEXPR void init()
+        {
+            opcode  = static_cast<uint16_t>(NPU_NAMESPACE::cmd1_opcode::NPU_SET_USER_DEFINED7);
+            control = static_cast<uint8_t>(NPU_NAMESPACE::cmd_ctrl::CMD1_CTRL);
+        }
+        operator uint64_t()
+        {
+            uint64_t word;
+            std::memcpy(&word, this, sizeof(word));
+            return word;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd1_opcode get_opcode() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd1_opcode>(opcode);
+        }
+        CONSTEXPR npu_set_user_defined7_t &set_opcode(NPU_NAMESPACE::cmd1_opcode value)
+        {
+            opcode = static_cast<uint16_t>(value) & ((1U << 10) - 1);
+            return *this;
+        }
+        CONSTEXPR NPU_NAMESPACE::cmd_ctrl get_control() const
+        {
+            return static_cast<NPU_NAMESPACE::cmd_ctrl>(control);
+        }
+        CONSTEXPR npu_set_user_defined7_t &set_control(NPU_NAMESPACE::cmd_ctrl value)
+        {
+            control = static_cast<uint8_t>(value) & ((1U << 2) - 1);
+            return *this;
+        }
+        CONSTEXPR uint32_t get_user_reg() const
+        {
+            return static_cast<uint32_t>(user_reg);
+        }
+        CONSTEXPR npu_set_user_defined7_t &set_user_reg(uint32_t value)
+        {
+            user_reg = value;
+            return *this;
+        }
+#ifdef NPU_DISASSEMBLE
+        void disassemble(std::vector<std::pair<std::string, std::string>> &fields) const
+        {
+            fields.push_back(std::make_pair<std::string, std::string>("user_reg", std::to_string(user_reg)));
         }
 #endif
 #endif
@@ -25722,7 +25864,6 @@ struct isa
     NPU_SET_(kernel_width_m1)                                                                                          \
     NPU_SET_(kernel_height_m1)                                                                                         \
     NPU_SET_(kernel_stride)                                                                                            \
-    NPU_SET_(parallel_mode)                                                                                            \
     NPU_SET_(acc_format)                                                                                               \
     NPU_SET_(activation)                                                                                               \
     NPU_SET_(activation_min)                                                                                           \
@@ -25768,8 +25909,6 @@ struct isa
     NPU_SET_(dma0_src)                                                                                                 \
     NPU_SET_(dma0_dst)                                                                                                 \
     NPU_SET_(dma0_len)                                                                                                 \
-    NPU_SET_(dma0_skip0)                                                                                               \
-    NPU_SET_(dma0_skip1)                                                                                               \
     NPU_SET_(ifm2_base0)                                                                                               \
     NPU_SET_(ifm2_base1)                                                                                               \
     NPU_SET_(ifm2_base2)                                                                                               \
@@ -25777,10 +25916,14 @@ struct isa
     NPU_SET_(ifm2_stride_x)                                                                                            \
     NPU_SET_(ifm2_stride_y)                                                                                            \
     NPU_SET_(ifm2_stride_c)                                                                                            \
-    NPU_SET_(weight1_base)                                                                                             \
-    NPU_SET_(weight1_length)                                                                                           \
-    NPU_SET_(scale1_base)                                                                                              \
-    NPU_SET_(scale1_length)
+    NPU_SET_(user_defined0)                                                                                            \
+    NPU_SET_(user_defined1)                                                                                            \
+    NPU_SET_(user_defined2)                                                                                            \
+    NPU_SET_(user_defined3)                                                                                            \
+    NPU_SET_(user_defined4)                                                                                            \
+    NPU_SET_(user_defined5)                                                                                            \
+    NPU_SET_(user_defined6)                                                                                            \
+    NPU_SET_(user_defined7)
 
 #define EXPAND_ACC_FORMAT(FUNC, SEP) FUNC(acc_format, I32) SEP FUNC(acc_format, I40) SEP FUNC(acc_format, F16)
 
@@ -25847,67 +25990,65 @@ struct isa
                                         SEP FUNC(cmd0_opcode, NPU_SET_KERNEL_WIDTH_M1) SEP FUNC(                       \
                                             cmd0_opcode,                                                               \
                                             NPU_SET_KERNEL_HEIGHT_M1) SEP FUNC(cmd0_opcode, NPU_SET_KERNEL_STRIDE)     \
-                                            SEP FUNC(cmd0_opcode, NPU_SET_PARALLEL_MODE) SEP FUNC(                     \
+                                            SEP FUNC(cmd0_opcode, NPU_SET_ACC_FORMAT) SEP FUNC(                        \
                                                 cmd0_opcode,                                                           \
-                                                NPU_SET_ACC_FORMAT) SEP FUNC(cmd0_opcode, NPU_SET_ACTIVATION)          \
-                                                SEP FUNC(cmd0_opcode,                                                  \
-                                                         NPU_SET_ACTIVATION_MIN) SEP FUNC(cmd0_opcode,                 \
-                                                                                          NPU_SET_ACTIVATION_MAX)      \
-                                                    SEP FUNC(cmd0_opcode, NPU_SET_WEIGHT_REGION) SEP FUNC(             \
-                                                        cmd0_opcode,                                                   \
-                                                        NPU_SET_SCALE_REGION) SEP FUNC(cmd0_opcode, NPU_SET_AB_START)  \
-                                                        SEP FUNC(cmd0_opcode, NPU_SET_BLOCKDEP)                        \
-                                                            SEP FUNC(cmd0_opcode, NPU_SET_DMA0_SRC_REGION) SEP FUNC(   \
+                                                NPU_SET_ACTIVATION) SEP FUNC(cmd0_opcode, NPU_SET_ACTIVATION_MIN)      \
+                                                SEP FUNC(cmd0_opcode, NPU_SET_ACTIVATION_MAX) SEP FUNC(                \
+                                                    cmd0_opcode,                                                       \
+                                                    NPU_SET_WEIGHT_REGION) SEP FUNC(cmd0_opcode, NPU_SET_SCALE_REGION) \
+                                                    SEP FUNC(cmd0_opcode,                                              \
+                                                             NPU_SET_AB_START) SEP FUNC(cmd0_opcode, NPU_SET_BLOCKDEP) \
+                                                        SEP FUNC(cmd0_opcode, NPU_SET_DMA0_SRC_REGION) SEP FUNC(       \
+                                                            cmd0_opcode,                                               \
+                                                            NPU_SET_DMA0_DST_REGION) SEP FUNC(cmd0_opcode,             \
+                                                                                              NPU_SET_DMA0_SIZE0)      \
+                                                            SEP FUNC(cmd0_opcode, NPU_SET_DMA0_SIZE1) SEP FUNC(        \
                                                                 cmd0_opcode,                                           \
-                                                                NPU_SET_DMA0_DST_REGION) SEP FUNC(cmd0_opcode,         \
-                                                                                                  NPU_SET_DMA0_SIZE0)  \
-                                                                SEP FUNC(cmd0_opcode, NPU_SET_DMA0_SIZE1) SEP FUNC(    \
+                                                                NPU_SET_IFM2_BROADCAST)                                \
+                                                                SEP FUNC(cmd0_opcode, NPU_SET_IFM2_SCALAR) SEP FUNC(   \
                                                                     cmd0_opcode,                                       \
-                                                                    NPU_SET_IFM2_BROADCAST) SEP                        \
-                                                                    FUNC(cmd0_opcode, NPU_SET_IFM2_SCALAR) SEP FUNC(   \
-                                                                        cmd0_opcode,                                   \
-                                                                        NPU_SET_IFM2_PRECISION) SEP                    \
-                                                                        FUNC(cmd0_opcode, NPU_SET_IFM2_ZERO_POINT) SEP \
-                                                                            FUNC(cmd0_opcode,                          \
-                                                                                 NPU_SET_IFM2_WIDTH0_M1) SEP           \
-                                                                                FUNC(cmd0_opcode,                      \
-                                                                                     NPU_SET_IFM2_HEIGHT0_M1) SEP      \
-                                                                                    FUNC(cmd0_opcode,                  \
+                                                                    NPU_SET_IFM2_PRECISION)                            \
+                                                                    SEP FUNC(cmd0_opcode, NPU_SET_IFM2_ZERO_POINT)     \
+                                                                        SEP FUNC(cmd0_opcode, NPU_SET_IFM2_WIDTH0_M1)  \
+                                                                            SEP FUNC(cmd0_opcode,                      \
+                                                                                     NPU_SET_IFM2_HEIGHT0_M1)          \
+                                                                                SEP FUNC(cmd0_opcode,                  \
                                                                                          NPU_SET_IFM2_HEIGHT1_M1)      \
-                                                                                        SEP FUNC(                      \
-                                                                                            cmd0_opcode,               \
-                                                                                            NPU_SET_IFM2_IB_START)     \
-                                                                                            SEP FUNC(                  \
-                                                                                                cmd0_opcode,           \
-                                                                                                NPU_SET_IFM2_REGION)
+                                                                                    SEP FUNC(cmd0_opcode,              \
+                                                                                             NPU_SET_IFM2_IB_START)    \
+                                                                                        SEP FUNC(cmd0_opcode,          \
+                                                                                                 NPU_SET_IFM2_REGION)
 
 #define EXPAND_CMD1_OPCODE(FUNC, SEP)                                                                                  \
     FUNC(cmd1_opcode, NPU_SET_IFM_BASE0)                                                                               \
-    SEP FUNC(cmd1_opcode, NPU_SET_IFM_BASE1) SEP FUNC(cmd1_opcode, NPU_SET_IFM_BASE2)                                  \
-        SEP FUNC(cmd1_opcode, NPU_SET_IFM_BASE3) SEP FUNC(cmd1_opcode, NPU_SET_IFM_STRIDE_X)                           \
-            SEP FUNC(cmd1_opcode, NPU_SET_IFM_STRIDE_Y) SEP FUNC(cmd1_opcode, NPU_SET_IFM_STRIDE_C) SEP FUNC(          \
-                cmd1_opcode, NPU_SET_OFM_BASE0) SEP FUNC(cmd1_opcode, NPU_SET_OFM_BASE1)                               \
-                SEP FUNC(cmd1_opcode, NPU_SET_OFM_BASE2) SEP FUNC(cmd1_opcode, NPU_SET_OFM_BASE3) SEP FUNC(            \
-                    cmd1_opcode, NPU_SET_OFM_STRIDE_X) SEP FUNC(cmd1_opcode, NPU_SET_OFM_STRIDE_Y)                     \
-                    SEP FUNC(cmd1_opcode, NPU_SET_OFM_STRIDE_C) SEP FUNC(cmd1_opcode, NPU_SET_WEIGHT_BASE) SEP FUNC(   \
-                        cmd1_opcode, NPU_SET_WEIGHT_LENGTH) SEP FUNC(cmd1_opcode, NPU_SET_SCALE_BASE)                  \
-                        SEP FUNC(cmd1_opcode, NPU_SET_SCALE_LENGTH) SEP FUNC(cmd1_opcode, NPU_SET_OFM_SCALE)           \
-                            SEP FUNC(cmd1_opcode, NPU_SET_OPA_SCALE) SEP FUNC(cmd1_opcode, NPU_SET_OPB_SCALE)          \
-                                SEP FUNC(cmd1_opcode, NPU_SET_DMA0_SRC) SEP FUNC(cmd1_opcode, NPU_SET_DMA0_DST)        \
-                                    SEP FUNC(cmd1_opcode, NPU_SET_DMA0_LEN) SEP FUNC(cmd1_opcode, NPU_SET_DMA0_SKIP0)  \
-                                        SEP FUNC(cmd1_opcode, NPU_SET_DMA0_SKIP1) SEP FUNC(                            \
-                                            cmd1_opcode, NPU_SET_IFM2_BASE0) SEP FUNC(cmd1_opcode, NPU_SET_IFM2_BASE1) \
-                                            SEP FUNC(cmd1_opcode, NPU_SET_IFM2_BASE2) SEP FUNC(cmd1_opcode,            \
-                                                                                               NPU_SET_IFM2_BASE3)     \
-                                                SEP FUNC(cmd1_opcode, NPU_SET_IFM2_STRIDE_X)                           \
-                                                    SEP FUNC(cmd1_opcode, NPU_SET_IFM2_STRIDE_Y)                       \
-                                                        SEP FUNC(cmd1_opcode, NPU_SET_IFM2_STRIDE_C)                   \
-                                                            SEP FUNC(cmd1_opcode, NPU_SET_WEIGHT1_BASE)                \
-                                                                SEP FUNC(cmd1_opcode, NPU_SET_WEIGHT1_LENGTH)          \
-                                                                    SEP FUNC(cmd1_opcode, NPU_SET_SCALE1_BASE)         \
-                                                                        SEP FUNC(cmd1_opcode, NPU_SET_SCALE1_LENGTH)
+    SEP FUNC(cmd1_opcode, NPU_SET_IFM_BASE1) SEP FUNC(cmd1_opcode, NPU_SET_IFM_BASE2) SEP FUNC(                        \
+        cmd1_opcode, NPU_SET_IFM_BASE3) SEP FUNC(cmd1_opcode, NPU_SET_IFM_STRIDE_X)                                    \
+        SEP FUNC(cmd1_opcode, NPU_SET_IFM_STRIDE_Y) SEP FUNC(cmd1_opcode, NPU_SET_IFM_STRIDE_C) SEP FUNC(              \
+            cmd1_opcode, NPU_SET_OFM_BASE0) SEP FUNC(cmd1_opcode, NPU_SET_OFM_BASE1)                                   \
+            SEP FUNC(cmd1_opcode, NPU_SET_OFM_BASE2) SEP FUNC(cmd1_opcode, NPU_SET_OFM_BASE3) SEP FUNC(                \
+                cmd1_opcode, NPU_SET_OFM_STRIDE_X) SEP FUNC(cmd1_opcode, NPU_SET_OFM_STRIDE_Y)                         \
+                SEP FUNC(cmd1_opcode, NPU_SET_OFM_STRIDE_C) SEP FUNC(cmd1_opcode, NPU_SET_WEIGHT_BASE) SEP FUNC(       \
+                    cmd1_opcode, NPU_SET_WEIGHT_LENGTH) SEP FUNC(cmd1_opcode, NPU_SET_SCALE_BASE)                      \
+                    SEP FUNC(cmd1_opcode, NPU_SET_SCALE_LENGTH) SEP FUNC(cmd1_opcode, NPU_SET_OFM_SCALE) SEP FUNC(     \
+                        cmd1_opcode, NPU_SET_OPA_SCALE) SEP FUNC(cmd1_opcode, NPU_SET_OPB_SCALE)                       \
+                        SEP FUNC(cmd1_opcode, NPU_SET_DMA0_SRC) SEP FUNC(cmd1_opcode, NPU_SET_DMA0_DST) SEP FUNC(      \
+                            cmd1_opcode, NPU_SET_DMA0_LEN) SEP FUNC(cmd1_opcode, NPU_SET_IFM2_BASE0)                   \
+                            SEP FUNC(cmd1_opcode, NPU_SET_IFM2_BASE1) SEP FUNC(cmd1_opcode, NPU_SET_IFM2_BASE2)        \
+                                SEP FUNC(cmd1_opcode, NPU_SET_IFM2_BASE3) SEP FUNC(cmd1_opcode, NPU_SET_IFM2_STRIDE_X) \
+                                    SEP FUNC(cmd1_opcode, NPU_SET_IFM2_STRIDE_Y)                                       \
+                                        SEP FUNC(cmd1_opcode, NPU_SET_IFM2_STRIDE_C)                                   \
+                                            SEP FUNC(cmd1_opcode, NPU_SET_USER_DEFINED0)                               \
+                                                SEP FUNC(cmd1_opcode, NPU_SET_USER_DEFINED1)                           \
+                                                    SEP FUNC(cmd1_opcode, NPU_SET_USER_DEFINED2)                       \
+                                                        SEP FUNC(cmd1_opcode, NPU_SET_USER_DEFINED3)                   \
+                                                            SEP FUNC(cmd1_opcode, NPU_SET_USER_DEFINED4)               \
+                                                                SEP FUNC(cmd1_opcode, NPU_SET_USER_DEFINED5)           \
+                                                                    SEP FUNC(cmd1_opcode, NPU_SET_USER_DEFINED6)       \
+                                                                        SEP FUNC(cmd1_opcode, NPU_SET_USER_DEFINED7)
 
 #define EXPAND_CMD_CTRL(FUNC, SEP) FUNC(cmd_ctrl, CMD0_CTRL) SEP FUNC(cmd_ctrl, CMD1_CTRL)
+
+#define EXPAND_CUSTOM_DMA_CS(FUNC, SEP) FUNC(custom_dma_cs, DISABLE) SEP FUNC(custom_dma_cs, ENABLE)
 
 #define EXPAND_CUSTOM_DMA(FUNC, SEP) FUNC(custom_dma, NOT_IMPLEMENTED) SEP FUNC(custom_dma, IMPLEMENTED)
 
@@ -25915,8 +26056,7 @@ struct isa
 
 #define EXPAND_DMA_REGION_MODE(FUNC, SEP) FUNC(dma_region_mode, EXTERNAL) SEP FUNC(dma_region_mode, INTERNAL)
 
-#define EXPAND_DMA_STRIDE_MODE(FUNC, SEP)                                                                              \
-    FUNC(dma_stride_mode, D1) SEP FUNC(dma_stride_mode, D2) SEP FUNC(dma_stride_mode, D3)
+#define EXPAND_DMA_STRIDE_MODE(FUNC, SEP) FUNC(dma_stride_mode, D1)
 
 #define EXPAND_ELEMENTWISE_MODE(FUNC, SEP)                                                                             \
     FUNC(elementwise_mode, MUL)                                                                                        \
@@ -25947,8 +26087,6 @@ struct isa
         SEP FUNC(mem_attr, AXI1_OUTSTANDING_COUNTER3)
 
 #define EXPAND_OFM_SCALE_MODE(FUNC, SEP) FUNC(ofm_scale_mode, PER_CHANNEL) SEP FUNC(ofm_scale_mode, GLOBAL)
-
-#define EXPAND_PARALLEL_MODE(FUNC, SEP) FUNC(parallel_mode, SINGLE_CORE) SEP FUNC(parallel_mode, DUAL_CORE_DEPTH)
 
 #define EXPAND_PMU_AXI_CHANNEL(FUNC, SEP)                                                                              \
     FUNC(pmu_axi_channel, RD_CMD)                                                                                      \

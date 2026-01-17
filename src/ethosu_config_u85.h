@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright 2020, 2024 Arm Limited and/or its affiliates <open-source-office@arm.com>
+ * SPDX-FileCopyrightText: Copyright 2020, 2024, 2026 Arm Limited and/or its affiliates <open-source-office@arm.com>
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the License); you may
@@ -20,11 +20,8 @@
 
 /* Set default values if not manually overriden */
 
-/* MAC power ramping up/down control
- * NOTE: Actual number of cycles is 4*NPU_MAC_PWR_RAMP_CYCLES
- */
 #ifndef NPU_MAC_PWR_RAMP_CYCLES
-#define NPU_MAC_PWR_RAMP_CYCLES 0 /* Valid range 0-63, where 0 disables power ramping */
+#define NPU_MAC_PWR_RAMP_CYCLES 0
 #endif
 
 /* Default MEM_ATTR entries */
@@ -85,24 +82,24 @@
 /* AXI SRAM/EXT limits
  * Set defaults to max. Hardware can be configured to cap at lower values.
  */
-#ifndef AXI_LIMIT_SRAM_MAX_OUTSTANDING_READ_M1
-#define AXI_LIMIT_SRAM_MAX_OUTSTANDING_READ_M1 12
+#ifndef AXI_LIMIT_SRAM_MAX_OUTSTANDING_READ
+#define AXI_LIMIT_SRAM_MAX_OUTSTANDING_READ 12
 #endif
 
-#ifndef AXI_LIMIT_SRAM_MAX_OUTSTANDING_WRITE_M1
-#define AXI_LIMIT_SRAM_MAX_OUTSTANDING_WRITE_M1 16
+#ifndef AXI_LIMIT_SRAM_MAX_OUTSTANDING_WRITE
+#define AXI_LIMIT_SRAM_MAX_OUTSTANDING_WRITE 16
 #endif
 
 #ifndef AXI_LIMIT_SRAM_MAX_BEATS
 #define AXI_LIMIT_SRAM_MAX_BEATS 2 /* 0=64B, 1=128B, 2=256B */
 #endif
 
-#ifndef AXI_LIMIT_EXT_MAX_OUTSTANDING_READ_M1
-#define AXI_LIMIT_EXT_MAX_OUTSTANDING_READ_M1 64 /* Hardware max might be less */
+#ifndef AXI_LIMIT_EXT_MAX_OUTSTANDING_READ
+#define AXI_LIMIT_EXT_MAX_OUTSTANDING_READ 64 /* Hardware max might be less */
 #endif
 
-#ifndef AXI_LIMIT_EXT_MAX_OUTSTANDING_WRITE_M1
-#define AXI_LIMIT_EXT_MAX_OUTSTANDING_WRITE_M1 32
+#ifndef AXI_LIMIT_EXT_MAX_OUTSTANDING_WRITE
+#define AXI_LIMIT_EXT_MAX_OUTSTANDING_WRITE 32
 #endif
 
 #ifndef AXI_LIMIT_EXT_MAX_BEATS

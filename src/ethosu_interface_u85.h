@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright 2020-2024 Arm Limited and/or its affiliates <open-source-office@arm.com>
+ * SPDX-FileCopyrightText: Copyright 2020-2024, 2026 Arm Limited and/or its affiliates <open-source-office@arm.com>
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the License); you may
@@ -17,8 +17,8 @@
 
 // clang-format off
 
-#ifndef ETHOSU85_INTERFACE_H
-#define ETHOSU85_INTERFACE_H
+#ifndef ETHOSU_INTERFACE_U85_H
+#define ETHOSU_INTERFACE_U85_H
 
 #ifdef __KERNEL__
 #include <linux/types.h>

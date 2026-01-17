@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright 2019-2025 Arm Limited and/or its affiliates <open-source-office@arm.com>
+ * SPDX-FileCopyrightText: Copyright 2019-2026 Arm Limited and/or its affiliates <open-source-office@arm.com>
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the License); you may
@@ -23,23 +23,17 @@
 #include "ethosu_device.h"
 #include "ethosu_log.h"
 
-#if defined(ETHOSU55)
-#include "ethosu_config_u55.h"
-#elif defined(ETHOSU65)
-#include "ethosu_config_u65.h"
-#elif defined(ETHOSU85)
-#include "ethosu_config_u85.h"
-#else
-#error Missing device type macro
-#endif
-
 #include <assert.h>
 #include <cmsis_compiler.h>
+#ifndef __ARMCC_VERSION
+#include <sys/types.h>
+#endif
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /******************************************************************************
  * Defines
@@ -47,13 +41,11 @@
 
 #define UNUSED(x) ((void)x)
 
-#define BYTES_IN_32_BITS 4
 #define MASK_16_BYTE_ALIGN (0xF)
 #define OPTIMIZER_CONFIG_LENGTH_32_BIT_WORD 2
 #define DRIVER_ACTION_LENGTH_32_BIT_WORD 1
 #define ETHOSU_FOURCC ('1' << 24 | 'P' << 16 | 'O' << 8 | 'C') // "Custom Operator Payload 1"
 
-#define SCRATCH_BASE_ADDR_INDEX 1
 #define FAST_MEMORY_BASE_ADDR_INDEX 2
 
 /******************************************************************************
@@ -113,12 +105,44 @@ struct opt_cfg_s
     uint32_t id;
 };
 
+struct ethosu_semaphore_t
+{
+    uint8_t count;
+};
+
+#ifndef ETHOSU_MAX_WAITERS
+#ifdef ETHOSU_MULTI_DEVICE
+#define ETHOSU_MAX_WAITERS 8
+#else
+#define ETHOSU_MAX_WAITERS 1
+#endif
+#endif
+
+struct ethosu_waiter
+{
+    uint32_t req_product;
+    uint32_t req_log2_macs;
+    void *sem;
+    struct ethosu_waiter *next;
+    struct ethosu_driver *assigned_driver;
+};
+
 /******************************************************************************
  * Variables
  ******************************************************************************/
 
 // Registered drivers linked list HEAD
 static struct ethosu_driver *registered_drivers = NULL;
+
+// Waiters - keeps track of availability of different device types
+static struct ethosu_waiter waiter_pool[ETHOSU_MAX_WAITERS];
+static struct ethosu_waiter *wait_head, *wait_tail;
+static struct ethosu_waiter *wait_free_head;
+
+// Counting semaphore for available waiter slots, ETHOSU_MAX_WAITERS as initial count
+static void *waiter_pool_sem;
+
+static bool waiters_inited;
 
 /******************************************************************************
  * Weak functions - Cache
@@ -183,13 +207,7 @@ ethosu_invalidate_dcache(const uint64_t *base_addr, const size_t *base_addr_size
  * definitions and implement true thread-safety (in application layer).
  ******************************************************************************/
 
-struct ethosu_semaphore_t
-{
-    uint8_t count;
-};
-
 static void *ethosu_mutex;
-static void *ethosu_semaphore;
 
 void *__attribute__((weak)) ethosu_mutex_create(void)
 {
@@ -214,13 +232,14 @@ int __attribute__((weak)) ethosu_mutex_unlock(void *mutex)
     return 0;
 }
 
-// Baremetal implementation of creating a semaphore
-void *__attribute__((weak)) ethosu_semaphore_create(void)
+// Baremetal implementation of initing a counting semaphore
+void *__attribute__((weak)) ethosu_semaphore_create(unsigned int max_count, unsigned int initial_count)
 {
+    UNUSED(max_count);
     struct ethosu_semaphore_t *sem = malloc(sizeof(*sem));
     if (sem != NULL)
     {
-        sem->count = 0;
+        sem->count = initial_count;
     }
     return sem;
 }
@@ -233,12 +252,23 @@ void __attribute__((weak)) ethosu_semaphore_destroy(void *sem)
 // Baremetal simulation of waiting/sleeping for and then taking a semaphore using intrisics
 int __attribute__((weak)) ethosu_semaphore_take(void *sem, uint64_t timeout)
 {
-    UNUSED(timeout);
     // Baremetal pseudo-example on how to trigger a timeout:
-    // if (timeout != ETHOSU_SEMAPHORE_WAIT_FOREVER) {
+    // if (timeout && timeout != ETHOSU_SEMAPHORE_WAIT_FOREVER) {
     //     setup_a_timer_to_call_SEV_after_time(timeout);
     // }
     struct ethosu_semaphore_t *s = sem;
+
+    // Support "NO_WAIT" mode
+    if (!timeout)
+    {
+        if (s->count > 0)
+        {
+            s->count--;
+            return 0;
+        }
+        return -1;
+    }
+
     while (s->count == 0)
     {
         __WFE();
@@ -279,14 +309,127 @@ void __attribute__((weak)) ethosu_inference_end(struct ethosu_driver *drv, void 
 /******************************************************************************
  * Static functions
  ******************************************************************************/
+
+static void ethosu_waiters_init_once(void)
+{
+    if (waiters_inited)
+    {
+        return;
+    }
+
+    wait_free_head = &waiter_pool[0];
+    for (int i = 0; i < ETHOSU_MAX_WAITERS - 1; i++)
+    {
+        waiter_pool[i].next = &waiter_pool[i + 1];
+        waiter_pool[i].sem  = ethosu_semaphore_create(1, 0);
+    }
+    waiter_pool[ETHOSU_MAX_WAITERS - 1].sem = ethosu_semaphore_create(1, 0);
+
+    waiter_pool_sem = ethosu_semaphore_create(ETHOSU_MAX_WAITERS, ETHOSU_MAX_WAITERS);
+
+    waiters_inited = true;
+}
+
+static struct ethosu_driver *ethosu_find_free_matching_driver(uint32_t product, uint32_t log2_macs)
+{
+    for (struct ethosu_driver *d = registered_drivers; d; d = d->next)
+    {
+        if (!d->reserved && product == d->dev.caps.product && log2_macs == d->dev.caps.log2_macs)
+        {
+            return d;
+        }
+    }
+    return NULL;
+}
+
+static bool ethosu_matching_driver_exists(uint32_t product, uint32_t log2_macs)
+{
+    for (struct ethosu_driver *d = registered_drivers; d; d = d->next)
+    {
+        if (product == d->dev.caps.product && log2_macs == d->dev.caps.log2_macs)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+static void ethosu_waiter_enqueue(struct ethosu_waiter *w)
+{
+    w->next = NULL;
+    if (!wait_tail)
+    {
+        wait_head = wait_tail = w;
+    }
+    else
+    {
+        wait_tail->next = w;
+        wait_tail       = w;
+    }
+}
+// Remove a known node (prev may be NULL if removing head)
+static void ethosu_waiter_dequeue(struct ethosu_waiter *prev, struct ethosu_waiter *cur)
+{
+    if (prev)
+    {
+        prev->next = cur->next;
+    }
+    else
+    {
+        wait_head = cur->next;
+    }
+
+    if (wait_tail == cur)
+    {
+        wait_tail = prev;
+    }
+    cur->next = NULL;
+}
+
+static bool ethosu_waiter_matches_driver(const struct ethosu_waiter *w, const struct ethosu_driver *drv)
+{
+    return (w->req_product == drv->dev.caps.product && w->req_log2_macs == drv->dev.caps.log2_macs);
+}
+
+static struct ethosu_waiter *ethosu_get_waiter_for_driver(struct ethosu_driver *drv)
+{
+    struct ethosu_waiter *prev = NULL;
+    for (struct ethosu_waiter *cur = wait_head; cur; cur = cur->next)
+    {
+        if (ethosu_waiter_matches_driver(cur, drv))
+        {
+            ethosu_waiter_dequeue(prev, cur);
+            return cur;
+        }
+        prev = cur;
+    }
+
+    return NULL;
+}
+
 static void ethosu_register_driver(struct ethosu_driver *drv)
 {
+    struct ethosu_waiter *waiter = NULL;
+
     ethosu_mutex_lock(ethosu_mutex);
     drv->next          = registered_drivers;
     registered_drivers = drv;
+
+    // Handle case when there's already a waiter compatible with this driver
+    waiter = ethosu_get_waiter_for_driver(drv);
+    if (waiter)
+    {
+        // Mark the driver as reserved and assign it to the waiter
+        drv->reserved           = true;
+        waiter->assigned_driver = drv;
+    }
     ethosu_mutex_unlock(ethosu_mutex);
 
-    ethosu_semaphore_give(ethosu_semaphore);
+    // Wake outside lock
+    if (waiter)
+    {
+        ethosu_semaphore_give(waiter->sem);
+    }
 
     LOG_INFO("New NPU driver registered (handle: 0x%p, NPU: 0x%p)", drv, drv->dev.reg);
 }
@@ -300,13 +443,13 @@ static int ethosu_deregister_driver(struct ethosu_driver *drv)
     curr = registered_drivers;
     prev = &registered_drivers;
 
+    // TODO: Add a guard to make sure it's not reserved and/or running here?
     while (curr != NULL)
     {
         if (curr == drv)
         {
             *prev = curr->next;
             LOG_INFO("NPU driver handle %p deregistered.", drv);
-            ethosu_semaphore_take(ethosu_semaphore, ETHOSU_SEMAPHORE_WAIT_FOREVER);
             break;
         }
 
@@ -334,7 +477,7 @@ static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s c
 {
     LOG_INFO("Optimizer release nbr: %u patch: %u", opt_cfg_p->da_data.rel_nbr, opt_cfg_p->da_data.patch_nbr);
 
-    if (ethosu_dev_verify_optimizer_config(&drv->dev, opt_cfg_p->cfg, opt_cfg_p->id) != true)
+    if (drv->dev.desc->ops->verify_optimizer_config(&drv->dev, opt_cfg_p->cfg, opt_cfg_p->id) != true)
     {
         return -1;
     }
@@ -344,9 +487,13 @@ static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s c
 
 static int handle_command_stream(struct ethosu_driver *drv, const uint8_t *cmd_stream, const int cms_length)
 {
-    uint32_t cms_bytes = cms_length * BYTES_IN_32_BITS;
+    // cms_length is number of 32bit words
+    uint32_t cms_bytes = cms_length * 4;
 
-    LOG_INFO("handle_command_stream: cmd_stream=%p, cms_length %d", cmd_stream, cms_length);
+    LOG_INFO("handle_command_stream: cmd_stream=%p, cms_length %d words (%" PRIu32 " bytes)",
+             cmd_stream,
+             cms_length,
+             cms_bytes);
 
     if (0 != ((ptrdiff_t)cmd_stream & MASK_16_BYTE_ALIGN))
     {
@@ -364,6 +511,8 @@ static int handle_command_stream(struct ethosu_driver *drv, const uint8_t *cmd_s
         }
     }
 
+    // TODO: Add call to flush/clean the command stream too?
+
     // Flush/clean the data cache
     ethosu_flush_dcache(drv->job.base_addr, drv->job.base_addr_size, drv->job.num_base_addr);
 
@@ -380,9 +529,29 @@ static int handle_command_stream(struct ethosu_driver *drv, const uint8_t *cmd_s
     ethosu_inference_begin(drv, drv->job.user_arg);
 
     // Execute the command stream
-    ethosu_dev_run_command_stream(&drv->dev, cmd_stream, cms_bytes, drv->job.base_addr, drv->job.num_base_addr);
+    drv->dev.desc->ops->run_command_stream(
+        &drv->dev, cmd_stream, cms_bytes, drv->job.base_addr, drv->job.num_base_addr);
 
     return 0;
+}
+
+static bool ethosu_verify_cop_data_size(const int custom_data_size)
+{
+    // Custom data size must be at least 4 bytes
+    if (custom_data_size < 4)
+    {
+        LOG_ERR("custom_data_size=%d < 4", custom_data_size);
+        return false;
+    }
+
+    // Custom data size must be a multiple of 4
+    if ((custom_data_size % 4) != 0)
+    {
+        LOG_ERR("custom_data_size=0x%x not a multiple of 4", (unsigned)custom_data_size);
+        return false;
+    }
+
+    return true;
 }
 
 /******************************************************************************
@@ -394,12 +563,12 @@ void __attribute__((weak)) ethosu_irq_handler(struct ethosu_driver *drv)
     // for semaphore, but before NPU is reset.
     if (drv->job.result == ETHOSU_JOB_RESULT_TIMEOUT)
     {
-        (void)ethosu_dev_handle_interrupt(&drv->dev);
+        (void)drv->dev.desc->ops->handle_interrupt(&drv->dev);
         return;
     }
 
     drv->job.state  = ETHOSU_JOB_DONE;
-    drv->job.result = ethosu_dev_handle_interrupt(&drv->dev) ? ETHOSU_JOB_RESULT_OK : ETHOSU_JOB_RESULT_ERROR;
+    drv->job.result = drv->dev.desc->ops->handle_interrupt(&drv->dev) ? ETHOSU_JOB_RESULT_OK : ETHOSU_JOB_RESULT_ERROR;
     ethosu_semaphore_give(drv->semaphore);
 }
 
@@ -414,8 +583,59 @@ int ethosu_init(struct ethosu_driver *drv,
                 uint32_t secure_enable,
                 uint32_t privilege_enable)
 {
-    LOG_INFO("Initializing NPU: base_address=%p, fast_memory=%p, fast_memory_size=%zu, secure=%" PRIu32
+#ifdef ETHOSU_MULTI_DEVICE
+    UNUSED(drv);
+    UNUSED(base_address);
+    UNUSED(fast_memory);
+    UNUSED(fast_memory_size);
+    UNUSED(secure_enable);
+    UNUSED(privilege_enable);
+    LOG_ERR("Multi device support enabled, ethosu_init() API is not available! Use _ex func");
+    return -1;
+#else
+    const struct ethosu_device_desc *default_dev; // compile time driver
+    struct ethosu_device_config *default_config;  // compile time config
+#if defined(ETHOSU55)
+    default_dev    = &ethosu_device_desc_u55;
+    default_config = &ethosu_device_config_u55;
+#elif defined(ETHOSU65)
+    default_dev    = &ethosu_device_desc_u65;
+    default_config = &ethosu_device_config_u65;
+#elif defined(ETHOSU85)
+    default_dev    = &ethosu_device_desc_u85;
+    default_config = &ethosu_device_config_u85;
+#else
+#error Compile time API chosen, but no device type macro found (ETHOSU**)
+#endif
+    return ethosu_init_ex(drv,
+                          default_dev,
+                          default_config,
+                          NULL,
+                          base_address,
+                          fast_memory,
+                          fast_memory_size,
+                          secure_enable,
+                          privilege_enable);
+#endif
+}
+
+int ethosu_init_ex(struct ethosu_driver *drv,
+                   const struct ethosu_device_desc *dev_desc,
+                   struct ethosu_device_config *dev_config,
+                   struct ethosu_device_user_ops *dev_user_ops,
+                   void *const base_address,
+                   const void *fast_memory,
+                   const size_t fast_memory_size,
+                   uint32_t secure_enable,
+                   uint32_t privilege_enable)
+{
+    assert(drv != NULL);
+    assert(dev_desc != NULL);
+    assert(dev_config != NULL);
+
+    LOG_INFO("Initializing %s NPU: base_address=%p, fast_memory=%p, fast_memory_size=%zu, secure=%" PRIu32
              ", privileged=%" PRIu32,
+             dev_desc->name,
              base_address,
              fast_memory,
              fast_memory_size,
@@ -432,28 +652,46 @@ int ethosu_init(struct ethosu_driver *drv,
         }
     }
 
-    if (!ethosu_semaphore)
-    {
-        ethosu_semaphore = ethosu_semaphore_create();
-        if (!ethosu_semaphore)
-        {
-            LOG_ERR("Failed to create global driver semaphore");
-            return -1;
-        }
-    }
+    ethosu_mutex_lock(ethosu_mutex);
+    ethosu_waiters_init_once();
+    ethosu_mutex_unlock(ethosu_mutex);
 
     drv->fast_memory           = (uintptr_t)fast_memory;
     drv->fast_memory_size      = fast_memory_size;
     drv->power_request_counter = 0;
+    drv->reserved              = false;
 
     // Initialize the device and set requested security state and privilege mode
-    if (!ethosu_dev_init(&drv->dev, base_address, secure_enable, privilege_enable))
+    if (!dev_desc->ops->init(
+            &drv->dev, dev_desc, dev_config, dev_user_ops, base_address, secure_enable, privilege_enable))
     {
         LOG_ERR("Failed to initialize Ethos-U device");
         return -1;
     }
 
-    drv->semaphore = ethosu_semaphore_create();
+    switch (drv->dev.caps.product)
+    {
+#if defined(ETHOSU55) || defined(ETHOSU_MULTI_DEVICE)
+    case ETHOSU_PRODUCT_U55:
+        drv->pmu = &ethosu_pmu_desc_u55;
+        break;
+#endif
+#if defined(ETHOSU65) || defined(ETHOSU_MULTI_DEVICE)
+    case ETHOSU_PRODUCT_U65:
+        drv->pmu = &ethosu_pmu_desc_u65;
+        break;
+#endif
+#if defined(ETHOSU85) || defined(ETHOSU_MULTI_DEVICE)
+    case ETHOSU_PRODUCT_U85:
+        drv->pmu = &ethosu_pmu_desc_u85;
+        break;
+#endif
+    default:
+        LOG_ERR("Invalid driver product!");
+        return -1;
+    }
+
+    drv->semaphore = ethosu_semaphore_create(1, 0);
     if (!drv->semaphore)
     {
         LOG_ERR("Failed to create driver semaphore");
@@ -475,16 +713,17 @@ void ethosu_deinit(struct ethosu_driver *drv)
 int ethosu_soft_reset(struct ethosu_driver *drv)
 {
     // Soft reset the NPU
-    if (ethosu_dev_soft_reset(&drv->dev) != ETHOSU_SUCCESS)
+    if (!drv->dev.desc->ops->soft_reset(&drv->dev))
     {
         LOG_ERR("Failed to soft-reset NPU");
         return -1;
     }
 
     // Update power and clock gating after the soft reset
-    ethosu_dev_set_clock_and_power(&drv->dev,
-                                   drv->power_request_counter > 0 ? ETHOSU_CLOCK_Q_DISABLE : ETHOSU_CLOCK_Q_ENABLE,
-                                   drv->power_request_counter > 0 ? ETHOSU_POWER_Q_DISABLE : ETHOSU_POWER_Q_ENABLE);
+    drv->dev.desc->ops->set_clock_and_power(
+        &drv->dev,
+        drv->power_request_counter > 0 ? ETHOSU_CLOCK_Q_DISABLE : ETHOSU_CLOCK_Q_ENABLE,
+        drv->power_request_counter > 0 ? ETHOSU_POWER_Q_DISABLE : ETHOSU_POWER_Q_ENABLE);
 
     return 0;
 }
@@ -517,7 +756,7 @@ void ethosu_release_power(struct ethosu_driver *drv)
         // Decrement ref counter and enable power gating if no requests remain
         if (--drv->power_request_counter == 0)
         {
-            ethosu_dev_set_clock_and_power(&drv->dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
+            drv->dev.desc->ops->set_clock_and_power(&drv->dev, ETHOSU_CLOCK_Q_ENABLE, ETHOSU_POWER_Q_ENABLE);
         }
     }
 }
@@ -533,7 +772,7 @@ void ethosu_get_driver_version(struct ethosu_driver_version *ver)
 void ethosu_get_hw_info(struct ethosu_driver *drv, struct ethosu_hw_info *hw)
 {
     assert(hw != NULL);
-    ethosu_dev_get_hw_info(&drv->dev, hw);
+    drv->dev.desc->ops->get_hw_info(&drv->dev, hw);
 }
 
 int ethosu_wait(struct ethosu_driver *drv, bool block)
@@ -589,7 +828,7 @@ int ethosu_wait(struct ethosu_driver *drv, bool block)
             if (drv->job.result == ETHOSU_JOB_RESULT_ERROR)
             {
                 LOG_ERR("NPU error(s) occured during inference.");
-                ethosu_dev_print_err_status(&drv->dev);
+                drv->dev.desc->ops->print_err_status(&drv->dev);
             }
             else
             {
@@ -637,6 +876,12 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
     const struct cop_data_s *data_ptr = custom_data_ptr;
     const struct cop_data_s *data_end = (struct cop_data_s *)((ptrdiff_t)custom_data_ptr + custom_data_size);
 
+    if (!drv)
+    {
+        LOG_ERR("Failed to invoke inference, driver arg is NULL");
+        return -1;
+    }
+
     // Make sure an inference is not already running
     if (drv->job.state != ETHOSU_JOB_IDLE)
     {
@@ -652,17 +897,15 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
     drv->job.num_base_addr    = num_base_addr;
     drv->job.user_arg         = user_arg;
 
-    // First word in custom_data_ptr should contain "Custom Operator Payload 1"
-    if (data_ptr->word != ETHOSU_FOURCC)
+    if (!ethosu_verify_cop_data_size(custom_data_size))
     {
-        LOG_ERR("Custom Operator Payload: %" PRIu32 " is not correct, expected %x", data_ptr->word, ETHOSU_FOURCC);
         goto err;
     }
 
-    // Custom data length must be a multiple of 32 bits
-    if ((custom_data_size % BYTES_IN_32_BITS) != 0)
+    // Verify first word
+    if (data_ptr->word != ETHOSU_FOURCC)
     {
-        LOG_ERR("custom_data_size=0x%x not a multiple of 4", (unsigned)custom_data_size);
+        LOG_ERR("Custom Operator Payload: %" PRIu32 " is not correct, expected %x", data_ptr->word, ETHOSU_FOURCC);
         goto err;
     }
 
@@ -744,56 +987,268 @@ int ethosu_invoke_v3(struct ethosu_driver *drv,
     return ethosu_wait(drv, true);
 }
 
-struct ethosu_driver *ethosu_reserve_driver(void)
+// Call this to automatically find a suitable driver matching what the network has been compiled for
+int ethosu_invoke_auto(const void *custom_data_ptr,
+                       const int custom_data_size,
+                       uint64_t *const base_addr,
+                       const size_t *base_addr_size,
+                       const int num_base_addr,
+                       void *user_arg)
 {
-    struct ethosu_driver *drv = NULL;
+    const struct cop_data_s *data_ptr = custom_data_ptr;
+    const struct cop_data_s *data_end = (struct cop_data_s *)((ptrdiff_t)custom_data_ptr + custom_data_size);
+    struct ethosu_driver *drv         = NULL;
+    int ret                           = 0;
 
-    LOG_INFO("Acquiring NPU driver handle");
-    ethosu_semaphore_take(ethosu_semaphore, ETHOSU_SEMAPHORE_WAIT_FOREVER); // This is meant to block until available
-
-    ethosu_mutex_lock(ethosu_mutex);
-    drv = registered_drivers;
-
-    while (drv != NULL)
+    if (!ethosu_verify_cop_data_size(custom_data_size))
     {
-        if (!drv->reserved)
+        goto err;
+    }
+
+    // Verify first word
+    if (data_ptr->word != ETHOSU_FOURCC)
+    {
+        LOG_ERR("Custom Operator Payload: %" PRIu32 " is not correct, expected %x", data_ptr->word, ETHOSU_FOURCC);
+        goto err;
+    }
+
+    data_ptr++;
+
+    // Parse Custom Operator Payload data
+    while (data_ptr < data_end)
+    {
+        switch (data_ptr->driver_action_command)
         {
-            drv->reserved = true;
-            LOG_DEBUG("NPU driver handle %p reserved", drv);
+        case OPTIMIZER_CONFIG:
+            LOG_DEBUG("OPTIMIZER_CONFIG");
+            struct opt_cfg_s const *opt_cfg_p = (const struct opt_cfg_s *)data_ptr;
+
+            // Got the optimizer config, which NPU the network has been compiled for
+            // Find a suitable driver for it
+            drv = ethosu_reserve_driver_ex((opt_cfg_p->cfg >> 28), opt_cfg_p->cfg & 0XF);
+            if (drv)
+            {
+                LOG_DEBUG("Found suitable driver");
+                data_ptr = data_end;
+                break;
+            }
+            else
+            {
+                LOG_ERR("Found no suitable driver to run inference");
+                goto err;
+            }
+
+            data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD + OPTIMIZER_CONFIG_LENGTH_32_BIT_WORD;
+            break;
+        case COMMAND_STREAM:
+            data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD + ((data_ptr->reserved << 16) | data_ptr->length);
+            break;
+        case NOP:
+            data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD;
+            break;
+        default:
+            LOG_ERR("UNSUPPORTED driver_action_command: %u", data_ptr->driver_action_command);
+            goto err;
             break;
         }
-        drv = drv->next;
     }
+
+    if (ethosu_invoke_async(
+            drv, custom_data_ptr, custom_data_size, base_addr, base_addr_size, num_base_addr, user_arg) < 0)
+    {
+        ethosu_release_driver(drv);
+        return -1;
+    }
+
+    ret = ethosu_wait(drv, true);
+    ethosu_release_driver(drv);
+
+    return ret;
+err:
+    LOG_ERR("Failed to invoke inference (auto mode)");
+    return -1;
+}
+
+#ifndef ETHOSU_MULTI_DEVICE
+static inline int ethosu_log2(const int val)
+{
+    assert(val != 0);
+    assert(val % 2 == 0);
+    return (31 - __builtin_clz(val));
+}
+#endif
+
+struct ethosu_driver *ethosu_reserve_driver(void)
+{
+#ifdef ETHOSU_MULTI_DEVICE
+    LOG_ERR("Multi device support enabled, ethosu_reserve_driver() API is not available! Use _ex func");
+    return NULL;
+#else
+    return ethosu_reserve_driver_ex(
+#if defined(ETHOSU55)
+        ETHOSU_PRODUCT_U55
+#elif defined(ETHOSU65)
+        ETHOSU_PRODUCT_U65
+#elif defined(ETHOSU85)
+        ETHOSU_PRODUCT_U85
+#endif
+        ,
+        ethosu_log2(ETHOSU_MACS));
+#endif
+}
+
+struct ethosu_driver *ethosu_reserve_driver_ex(uint32_t product, uint32_t log2_macs)
+{
+    struct ethosu_driver *drv = NULL;
+    struct ethosu_waiter *w   = NULL;
+
+    LOG_DEBUG("Acquiring NPU driver handle");
+
+    ethosu_mutex_lock(ethosu_mutex);
+
+    if (registered_drivers == NULL)
+    {
+        ethosu_mutex_unlock(ethosu_mutex);
+        LOG_ERR("Can not reserve a driver, no drivers registered");
+        return NULL;
+    }
+
+    // Fast path: see if there's a driver available
+    drv = ethosu_find_free_matching_driver(product, log2_macs);
+    if (drv)
+    {
+        drv->reserved = true;
+        ethosu_mutex_unlock(ethosu_mutex);
+        LOG_DEBUG("NPU driver handle %p reserved", drv);
+        return drv;
+    }
+
+    // Make sure there are registered drivers that match the request
+    if (!ethosu_matching_driver_exists(product, log2_macs))
+    {
+        ethosu_mutex_unlock(ethosu_mutex);
+        LOG_ERR("Can not reserve a driver, no drivers of requested type are registered");
+        return NULL;
+    }
+
     ethosu_mutex_unlock(ethosu_mutex);
 
-    if (!drv)
+    // Need to wait: get a waiter slot (block until available)
+    ethosu_semaphore_take(waiter_pool_sem, ETHOSU_SEMAPHORE_WAIT_FOREVER);
+
+    ethosu_mutex_lock(ethosu_mutex);
+
+    // Re-check under lock to avoid race (driver may have freed while we were grabbing slot)
+    drv = ethosu_find_free_matching_driver(product, log2_macs);
+    if (drv)
     {
-        LOG_ERR("No NPU driver handle available, but semaphore taken");
+        drv->reserved = true;
+        ethosu_mutex_unlock(ethosu_mutex);
+
+        // Return waiter slot token since we didn't enqueue
+        ethosu_semaphore_give(waiter_pool_sem);
+
+        LOG_DEBUG("NPU driver handle %p reserved", drv);
+        return drv;
     }
+
+    // Allocate waiter node from free list (guaranteed non-NULL by waiter_pool_sem)
+    w              = wait_free_head;
+    wait_free_head = wait_free_head->next;
+
+    // Make sure to set/reset waiter before use
+    w->req_product     = product;
+    w->req_log2_macs   = log2_macs;
+    w->assigned_driver = NULL;
+    w->next            = NULL;
+    // Reset waiter semaphore (max_count is 1), use timeout 0 (NO_WAIT equivalent)
+    (void)ethosu_semaphore_take(w->sem, 0);
+
+    ethosu_waiter_enqueue(w);
+
+    ethosu_mutex_unlock(ethosu_mutex);
+
+    LOG_DEBUG("Waiting for a driver handle to become available");
+    // Sleep until a matching driver release/register selects us
+    ethosu_semaphore_take(w->sem, ETHOSU_SEMAPHORE_WAIT_FOREVER);
+
+    // Releaser reserved a driver before waking us
+    ethosu_mutex_lock(ethosu_mutex);
+    drv                = w->assigned_driver;
+    w->assigned_driver = NULL;
+    ethosu_mutex_unlock(ethosu_mutex);
+
+    if (drv)
+    {
+        LOG_DEBUG("NPU driver handle %p reserved", drv);
+    }
+    else
+    {
+        LOG_ERR("Internal error, assigned driver is NULL");
+    }
+
+    // Return waiter node to pool
+    ethosu_mutex_lock(ethosu_mutex);
+    w->next        = wait_free_head;
+    wait_free_head = w;
+    ethosu_mutex_unlock(ethosu_mutex);
+
+    ethosu_semaphore_give(waiter_pool_sem);
 
     return drv;
 }
 
 void ethosu_release_driver(struct ethosu_driver *drv)
 {
+    struct ethosu_waiter *waiter = NULL;
+
+    if (!drv)
+    {
+        LOG_ERR("Release driver called with NULL arg");
+        return;
+    }
+
+    LOG_DEBUG("Releasing NPU driver handle %p", drv);
+
     ethosu_mutex_lock(ethosu_mutex);
-    if (drv != NULL && drv->reserved)
+    if (drv->reserved)
     {
         if (drv->job.state == ETHOSU_JOB_RUNNING || drv->job.state == ETHOSU_JOB_DONE)
         {
+            LOG_WARN("Release on driver called while it's still running or ethosu_wait() not called");
             // Give the inference one shot to complete or force kill the job
             if (ethosu_wait(drv, false) == 1)
             {
+                LOG_WARN("Killing the job and resetting NPU");
                 // Still running, soft reset the NPU and reset driver
                 drv->power_request_counter = 0;
                 ethosu_soft_reset(drv);
                 ethosu_reset_job(drv);
             }
         }
-
-        drv->reserved = false;
-        LOG_DEBUG("NPU driver handle %p released", drv);
-        ethosu_semaphore_give(ethosu_semaphore);
     }
+
+    // Mark free
+    drv->reserved = false;
+
+    // Choose one waiter compatible with THIS driver
+    waiter = ethosu_get_waiter_for_driver(drv);
+    if (waiter)
+    {
+        LOG_DEBUG("Someone is waiting for this NPU handle, reserving it");
+        // Reserve immediately under lock so no one else can steal it
+        drv->reserved           = true;
+        waiter->assigned_driver = drv;
+    }
+
     ethosu_mutex_unlock(ethosu_mutex);
+
+    LOG_DEBUG("NPU driver handle %p released", drv);
+
+    // Wake outside lock
+    if (waiter)
+    {
+        LOG_DEBUG("Waking up the waiter");
+        ethosu_semaphore_give(waiter->sem);
+    }
 }

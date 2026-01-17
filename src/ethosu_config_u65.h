@@ -1,7 +1,6 @@
 /*
- * Copyright (c) 2019-2020,2022 Arm Limited.
- *
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Copyright 2019-2020, 2022, 2026 Arm Limited and/or its affiliates
+ * <open-source-office@arm.com> SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the License); you may
  * not use this file except in compliance with the License.
@@ -16,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef ETHOSU_CONFIG_H
-#define ETHOSU_CONFIG_H
+#ifndef ETHOSU_CONFIG_U65_H
+#define ETHOSU_CONFIG_U65_H
 
 /* Set default values if not manually overriden */
 
@@ -121,4 +120,4 @@
 #define AXI_LIMIT3_MAX_OUTSTANDING_WRITES 32
 #endif
 
-#endif /* #ifndef ETHOSU_CONFIG_H */
+#endif /* #ifndef ETHOSU_CONFIG_U65_H */

@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright 2019-2025 Arm Limited and/or its affiliates <open-source-office@arm.com>
+ * SPDX-FileCopyrightText: Copyright 2019-2026 Arm Limited and/or its affiliates <open-source-office@arm.com>
  * SPDX-FileCopyrightText: Copyright 2025 Alif Semiconductor
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -23,6 +23,8 @@
  * Includes
  ******************************************************************************/
 
+#include "ethosu_device.h"
+#include "ethosu_pmu_types.h"
 #include "ethosu_types.h"
 
 #include <stdbool.h>
@@ -37,9 +39,9 @@ extern "C" {
  * Defines
  ******************************************************************************/
 
-#define ETHOSU_DRIVER_VERSION_MAJOR 1 ///< Driver major version
-#define ETHOSU_DRIVER_VERSION_MINOR 0 ///< Driver minor version
-#define ETHOSU_DRIVER_VERSION_PATCH 0 ///< Driver patch version
+#define ETHOSU_DRIVER_VERSION_MAJOR 1  ///< Driver major version
+#define ETHOSU_DRIVER_VERSION_MINOR 99 ///< Driver minor version
+#define ETHOSU_DRIVER_VERSION_PATCH 0  ///< Driver patch version
 
 #define ETHOSU_SEMAPHORE_WAIT_FOREVER (UINT64_MAX)
 
@@ -81,6 +83,7 @@ struct ethosu_driver
 {
     struct ethosu_device dev;
     struct ethosu_driver *next;
+    const struct ethosu_pmu_desc *pmu;
     struct ethosu_job job;
     void *semaphore;
     uint64_t fast_memory;
@@ -101,6 +104,47 @@ enum ethosu_request_clients
     ETHOSU_PMU_REQUEST       = 0,
     ETHOSU_INFERENCE_REQUEST = 1,
 };
+
+/******************************************************************************
+ * PMU
+ ******************************************************************************/
+
+struct ethosu_pmu_ops
+{
+    void (*ETHOSU_PMU_Enable)(struct ethosu_driver *drv);
+    void (*ETHOSU_PMU_Disable)(struct ethosu_driver *drv);
+    uint32_t (*ETHOSU_PMU_Get_NumEventCounters)(void);
+    void (*ETHOSU_PMU_Set_EVTYPER)(struct ethosu_driver *drv, uint32_t num, enum ethosu_pmu_event_type type);
+    enum ethosu_pmu_event_type (*ETHOSU_PMU_Get_EVTYPER)(struct ethosu_driver *drv, uint32_t num);
+    void (*ETHOSU_PMU_CYCCNT_Reset)(struct ethosu_driver *drv);
+    void (*ETHOSU_PMU_EVCNTR_ALL_Reset)(struct ethosu_driver *drv);
+    void (*ETHOSU_PMU_CNTR_Enable)(struct ethosu_driver *drv, uint32_t mask);
+    void (*ETHOSU_PMU_CNTR_Disable)(struct ethosu_driver *drv, uint32_t mask);
+    uint32_t (*ETHOSU_PMU_CNTR_Status)(struct ethosu_driver *drv);
+    uint64_t (*ETHOSU_PMU_Get_CCNTR)(struct ethosu_driver *drv);
+    void (*ETHOSU_PMU_Set_CCNTR)(struct ethosu_driver *drv, uint64_t val);
+    uint32_t (*ETHOSU_PMU_Get_EVCNTR)(struct ethosu_driver *drv, uint32_t num);
+    void (*ETHOSU_PMU_Set_EVCNTR)(struct ethosu_driver *drv, uint32_t num, uint32_t val);
+    uint32_t (*ETHOSU_PMU_Get_CNTR_OVS)(struct ethosu_driver *drv);
+    void (*ETHOSU_PMU_Set_CNTR_OVS)(struct ethosu_driver *drv, uint32_t mask);
+    void (*ETHOSU_PMU_Set_CNTR_IRQ_Enable)(struct ethosu_driver *drv, uint32_t mask);
+    void (*ETHOSU_PMU_Set_CNTR_IRQ_Disable)(struct ethosu_driver *drv, uint32_t mask);
+    uint32_t (*ETHOSU_PMU_Get_IRQ_Enable)(struct ethosu_driver *drv);
+    void (*ETHOSU_PMU_CNTR_Increment)(struct ethosu_driver *drv, uint32_t mask);
+    void (*ETHOSU_PMU_PMCCNTR_CFG_Set_Start_Event)(struct ethosu_driver *drv, enum ethosu_pmu_event_type start_event);
+    void (*ETHOSU_PMU_PMCCNTR_CFG_Set_Stop_Event)(struct ethosu_driver *drv, enum ethosu_pmu_event_type stop_event);
+    uint32_t (*ETHOSU_PMU_Get_QREAD)(struct ethosu_driver *drv);
+    uint32_t (*ETHOSU_PMU_Get_STATUS)(struct ethosu_driver *drv);
+};
+
+struct ethosu_pmu_desc
+{
+    const struct ethosu_pmu_ops *ops;
+};
+
+extern const struct ethosu_pmu_desc ethosu_pmu_desc_u55;
+extern const struct ethosu_pmu_desc ethosu_pmu_desc_u65;
+extern const struct ethosu_pmu_desc ethosu_pmu_desc_u85;
 
 /******************************************************************************
  * Prototypes (weak functions in driver)
@@ -154,9 +198,11 @@ void ethosu_mutex_destroy(void *mutex);
  * Minimal sempahore implementation for baremetal applications. See
  * ethosu_driver.c.
  *
+ * @param max_count       Max allowed count for the semaphore
+ * @param initial_count   Initial count value for the semaphore
  * @return Pointer to semaphore handle
  */
-void *ethosu_semaphore_create(void);
+void *ethosu_semaphore_create(unsigned int max_count, unsigned int initial_count);
 
 /**
  * Destroy semaphore.
@@ -214,28 +260,6 @@ void ethosu_inference_begin(struct ethosu_driver *drv, void *user_arg);
  */
 void ethosu_inference_end(struct ethosu_driver *drv, void *user_arg);
 
-/**
- * Remapping command stream and base pointer addresses.
- *
- * @param address   Address to be remapped.
- * @param index     -1 command stream, 0-n base address index
- *
- * @return Remapped address
- */
-uint64_t ethosu_address_remap(uint64_t address, int index);
-
-/**
- * Select configuration for region access.
- *
- * Default implementation uses NPU_QCONFIG and NPU_REGIONCFG_n defines.
- *
- * @param address   Address of region.
- * @param index     -1 command stream, 0-n base address index
- *
- * @return Configuration to use
- */
-unsigned int ethosu_config_select(uint64_t address, int index);
-
 /******************************************************************************
  * Prototypes
  ******************************************************************************/
@@ -245,7 +269,7 @@ unsigned int ethosu_config_select(uint64_t address, int index);
  *
  * @param drv               Pointer to driver handle
  * @param base_address      NPU register base address
- * @param fast_memory       Fast memory area, used for Ethos-U65 with spilling
+ * @param fast_memory       Fast memory area, used for Ethos-U65/U85 with spilling
  * @param fast_memory_size  Size in bytes of fast memory area
  * @param secure_enable     Configure NPU in secure- or non-secure mode
  * @param privilege_enable  Configure NPU in privileged- or non-privileged mode
@@ -257,6 +281,30 @@ int ethosu_init(struct ethosu_driver *drv,
                 const size_t fast_memory_size,
                 uint32_t secure_enable,
                 uint32_t privilege_enable);
+
+/**
+ * Initialize the Ethos-U driver.
+ *
+ * @param drv               Pointer to driver handle
+ * @param dev_desc          Pointer to device descriptor
+ * @param dev_config        Pointer to device config
+ * @param dev_user_ops      Pointer to device user ops (can be NULL)
+ * @param base_address      NPU register base address
+ * @param fast_memory       Fast memory area, used for Ethos-U65/U85 with spilling
+ * @param fast_memory_size  Size in bytes of fast memory area
+ * @param secure_enable     Configure NPU in secure- or non-secure mode
+ * @param privilege_enable  Configure NPU in privileged- or non-privileged mode
+ * @return 0 on success, else negative error code
+ */
+int ethosu_init_ex(struct ethosu_driver *drv,
+                   const struct ethosu_device_desc *dev_desc,
+                   struct ethosu_device_config *dev_config,
+                   struct ethosu_device_user_ops *dev_user_ops,
+                   void *const base_address,
+                   const void *fast_memory,
+                   const size_t fast_memory_size,
+                   uint32_t secure_enable,
+                   uint32_t privilege_enable);
 
 /**
  * Deinitialize the Ethos-U driver.
@@ -345,6 +393,19 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
                         void *user_arg);
 
 /**
+ * Call this to automatically find a suitable driver matching what the network has been compiled for.
+ * Note that this will potentially block waiting for a driver to become available, as it does
+ * implicit reserve- and release of a matching driver.
+ *
+ * @see ethosu_invoke_v3 for documentation, except it doesn't take a driver arg.
+ */
+int ethosu_invoke_auto(const void *custom_data_ptr,
+                       const int custom_data_size,
+                       uint64_t *const base_addr,
+                       const size_t *base_addr_size,
+                       const int num_base_addr,
+                       void *user_arg);
+/**
  * Wait for inference to complete (block=true)
  * Poll status or finish up if inference is complete (block=false)
  * (This function is only intended to be used in conjuction with ethosu_invoke_async)
@@ -364,7 +425,19 @@ int ethosu_wait(struct ethosu_driver *drv, bool block);
 struct ethosu_driver *ethosu_reserve_driver(void);
 
 /**
- * Release driver that was previously reserved with @see ethosu_reserve_driver.
+ * Reserves a driver to execute inference with. Call will block until a driver
+ * is available. Macros for the product (ETHOSU_PRODUCT_U*) and number of macs
+ * (ETHOSU_MACS_*) parameters can be found in ethosu_type.h
+ *
+ * @param product       Ethos-U product
+ * @param log2_macs     log2(num macs)
+ * @return Pointer to driver handle.
+ */
+struct ethosu_driver *ethosu_reserve_driver_ex(uint32_t product, uint32_t log2_macs);
+
+/**
+ * Release driver that was previously reserved with @see ethosu_reserve_driver
+ * or @see ethosu_reserve_driver_ex
  *
  * @param drv       Pointer to driver handle
  */

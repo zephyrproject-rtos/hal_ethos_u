@@ -46,6 +46,150 @@ The Arm Ethos-U core driver component adds the -Werror flag in addition
 to the compiler flags specified in the toolchain file, or options passed
 on the command line.
 
+## EXPERIMENTAL - Multi device
+
+Experimental support for using multiple device types (Ethos-U55/U65/U85) in one system.
+Set the CMake variable `ETHOSU_MULTI_DEVICE` to `ON` to enable the feature.
+With this feature enabled, the driver is no longer looking at the `ETHOSU_TARGET_NPU_CONFIG`
+variable, but builds support for all device types/products (the target system is not
+required to have multiple NPU devices).
+
+This feature does require some minor code changes, to adapt for a more flexible
+per device configuration.
+
+The `ethosu_init()` and `ethosu_reserve_driver()` functions can not be used when
+this feature is enabled, they are replaced by `ethosu_init_ex()` and
+`ethosu_reserve_driver_ex()` respectively.
+
+### Init
+In the target/system init code, change the typical `ethosu_init()` calls to:
+```[C]
+int ethosu_init_ex(struct ethosu_driver *drv,
+                   const struct ethosu_device_desc *dev_desc,
+                   struct ethosu_device_config *dev_config,
+                   struct ethosu_device_user_ops *dev_user_ops,
+                   void *const base_address,
+                   const void *fast_memory,
+                   const size_t fast_memory_size,
+                   uint32_t secure_enable,
+                   uint32_t privilege_enable);
+
+ethosu_init_ex(&ethosu0_driver,
+               &ethosu_device_desc_u85,
+               &ethosu_device_config_u85,
+               NULL, // No user ops, or create a struct ethosu_user_ops and reference it here
+               ...);
+```
+where the second argument is a const device descriptor provided by the driver
+to be set, depending on device type/product used:
+```[C]
+extern const struct ethosu_device_desc ethosu_device_desc_u55;
+extern const struct ethosu_device_desc ethosu_device_desc_u65;
+extern const struct ethosu_device_desc ethosu_device_desc_u85;
+```
+
+The third argument specifices a device config, where default configs are provided
+as well. **Note** The default ones are global variables, shared between all instances
+of a specific device type/product.
+
+```[C]
+// Default configs - intentionally not const
+extern struct ethosu_device_config ethosu_device_config_u55;
+extern struct ethosu_device_config ethosu_device_config_u65;
+extern struct ethosu_device_config ethosu_device_config_u85;
+```
+
+The fourth argument specifices optional user ops (these were previously weak functions
+provided by the driver), set to `NULL` if not used. **Note** No default implementation
+is provided for these in this prototype. See `include/ethosu_device.h` for more info:
+```[C]
+struct ethosu_device_user_ops
+{
+    uint64_t (*address_remap)(uint64_t address, int index);
+    unsigned int (*config_select)(uint64_t address, int index);
+};
+```
+
+### Custom config
+A user can decide to create a custom configuration, for example:
+```[C]
+// Copy initial config values from default
+struct u55_config_t u55_cfg = *((struct u55_config_t *) ethosu_device_config_u55.config);
+
+// then if desired, change specific settings later in the code:
+// u55_cfg.qconfig.cmd_region0 = ...
+
+// Or create it from scratch and set all settings here
+// struct u55_config_t u55_cfg = {
+//     .qconfig.cmd_region0 = ...
+//     ...
+// };
+
+// Assign the device specific config struct to a generic ethosu_device_config struct
+struct ethosu_device_config ethosu0_config = {
+    .config = &u55_cfg,
+};
+// and send &ethosu0_config instead of default config to ethosu_init_ex()
+```
+
+### Driver reservation
+To reserve a driver, the user must explicitly provide what device type/product
+is being asked for. For example, Ethos-U55 with 128MAC config:
+```[C]
+struct ethosu_driver *drv;
+drv = ethosu_reserve_driver_ex(ETHOSU_PRODUCT_U55, ETHOSU_MACS_128);
+...
+```
+using the available driver provided macros:
+```[C]
+ETHOSU_PRODUCT_U55
+ETHOSU_PRODUCT_U65
+ETHOSU_PRODUCT_U85
+```
+and
+```[C]
+ETHOSU_MACS_32
+ETHOSU_MACS_64
+ETHOSU_MACS_128
+ETHOSU_MACS_256
+ETHOSU_MACS_512
+ETHOSU_MACS_1024
+ETHOSU_MACS_2048
+```
+
+### New optional invoke (auto) method
+In addition to the invoke methods described in the following sections, with the multi device
+experimental feature, a new function called `ethosu_invoke_auto()` has been added. This function
+omits the driver argument, hence the user should not reserve a driver before calling it. The
+`ethosu_invoke_auto()` function automatically parses the provided data and tries to reserve a
+suitable driver internally. **Note** This function will block until a suitable driver is found.
+After the inference has been invoked, and before this function returns, it will release the driver.
+
+```[C]
+/**
+ * Call this to automatically find a suitable driver matching what the network has been compiled for.
+ * Note that this will potentially block waiting for a driver to become available, as it does
+ * implicit reserve- and release of a matching driver.
+ *
+ * @see ethosu_invoke_v3 for documentation, except it doesn't take a driver arg.
+ */
+int ethosu_invoke_auto(const void *custom_data_ptr,
+                       const int custom_data_size,
+                       uint64_t *const base_addr,
+                       const size_t *base_addr_size,
+                       const int num_base_addr,
+                       void *user_arg);
+```
+
+### Breaking changes
+- The `ETHOSU_PMU_Get_NumEventCounters()` has been changed to `ETHOSU_PMU_Get_NumEventCounters(struct ethosu_driver *drv)`.
+- The weak function `ethosu_semaphore_create()` has been changed to `ethosu_semaphore_create(unsigned int max_count, unsigned int initial_count)`
+- The weak function `ethosu_address_remap()` is no longer global. It is now a per device user op.
+- The weak function `ethosu_config_select()` is no longer global. It is now a per device user op. This is provided as a convenience function, as configuration can also be changed at runtime by modifying the `ethosu_device_config` struct, before an invoke.
+- Do not use the `ETHOSU_PMU_NCOUNTERS` macro when using multi device mode. Call `ETHOSU_PMU_GET_NumEventCounters(drv)` function instead.
+- The abstracted PMU event list is no longer tied to interface PMU event list in terms of sorting/order. It's now a union of all available PMU events for all supported device types/products. Any old references to index numbers must be updated.
+
+
 ## Driver APIs
 
 The driver APIs are defined in `include/ethosu_driver.h` and the related types
@@ -210,8 +354,8 @@ int ethosu_mutex_lock(void *mutex);
 // unlock the given mutex
 int ethosu_mutex_unlock(void *mutex);
 
-// create a (binary) semaphore by returning back a handle
-void *ethosu_semaphore_create(void);
+// create a (counting) semaphore by returning back a handle
+void *ethosu_semaphore_create(unsigned int max_count, unsigned int initial_count);
 // take from the given semaphore, accepting a timeout (unit impl. defined)
 int ethosu_semaphore_take(void *sem, uint64_t timeout);
 // give from the given semaphore
