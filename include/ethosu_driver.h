@@ -266,6 +266,7 @@ void ethosu_inference_end(struct ethosu_driver *drv, void *user_arg);
 
 /**
  * Initialize the Ethos-U driver.
+ * All driver handles should be initialised before any other driver function is called.
  *
  * @param drv               Pointer to driver handle
  * @param base_address      NPU register base address
@@ -283,7 +284,8 @@ int ethosu_init(struct ethosu_driver *drv,
                 uint32_t privilege_enable);
 
 /**
- * Initialize the Ethos-U driver.
+ * Initialize the Ethos-U driver (multi device mode).
+ * All driver handles should be initialised before any other driver function is called.
  *
  * @param drv               Pointer to driver handle
  * @param dev_desc          Pointer to device descriptor
@@ -308,6 +310,8 @@ int ethosu_init_ex(struct ethosu_driver *drv,
 
 /**
  * Deinitialize the Ethos-U driver.
+ * Caller must make sure that the driver handle is not in use,
+ * and that there are no outstanding reserve calls for it.
  *
  * @param drv       Pointer to driver handle
  */

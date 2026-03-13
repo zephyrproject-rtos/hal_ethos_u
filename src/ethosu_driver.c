@@ -110,21 +110,17 @@ struct ethosu_semaphore_t
     uint8_t count;
 };
 
+// One is used for each NPU product/config used in the system
 #ifndef ETHOSU_MAX_WAITERS
-#ifdef ETHOSU_MULTI_DEVICE
-#define ETHOSU_MAX_WAITERS 8
-#else
-#define ETHOSU_MAX_WAITERS 1
-#endif
+#define ETHOSU_MAX_WAITERS 4
 #endif
 
 struct ethosu_waiter
 {
-    uint32_t req_product;
-    uint32_t req_log2_macs;
+    uint32_t product;
+    uint32_t log2_macs;
     void *sem;
-    struct ethosu_waiter *next;
-    struct ethosu_driver *assigned_driver;
+    uint32_t num_registered_drivers;
 };
 
 /******************************************************************************
@@ -136,13 +132,6 @@ static struct ethosu_driver *registered_drivers = NULL;
 
 // Waiters - keeps track of availability of different device types
 static struct ethosu_waiter waiter_pool[ETHOSU_MAX_WAITERS];
-static struct ethosu_waiter *wait_head, *wait_tail;
-static struct ethosu_waiter *wait_free_head;
-
-// Counting semaphore for available waiter slots, ETHOSU_MAX_WAITERS as initial count
-static void *waiter_pool_sem;
-
-static bool waiters_inited;
 
 /******************************************************************************
  * Weak functions - Cache
@@ -310,26 +299,6 @@ void __attribute__((weak)) ethosu_inference_end(struct ethosu_driver *drv, void 
  * Static functions
  ******************************************************************************/
 
-static void ethosu_waiters_init_once(void)
-{
-    if (waiters_inited)
-    {
-        return;
-    }
-
-    wait_free_head = &waiter_pool[0];
-    for (int i = 0; i < ETHOSU_MAX_WAITERS - 1; i++)
-    {
-        waiter_pool[i].next = &waiter_pool[i + 1];
-        waiter_pool[i].sem  = ethosu_semaphore_create(1, 0);
-    }
-    waiter_pool[ETHOSU_MAX_WAITERS - 1].sem = ethosu_semaphore_create(1, 0);
-
-    waiter_pool_sem = ethosu_semaphore_create(ETHOSU_MAX_WAITERS, ETHOSU_MAX_WAITERS);
-
-    waiters_inited = true;
-}
-
 static struct ethosu_driver *ethosu_find_free_matching_driver(uint32_t product, uint32_t log2_macs)
 {
     for (struct ethosu_driver *d = registered_drivers; d; d = d->next)
@@ -342,114 +311,157 @@ static struct ethosu_driver *ethosu_find_free_matching_driver(uint32_t product, 
     return NULL;
 }
 
-static bool ethosu_matching_driver_exists(uint32_t product, uint32_t log2_macs)
+// Must be called within global mutex lock
+static struct ethosu_waiter *ethosu_create_waiter_for_driver(struct ethosu_driver *drv)
 {
-    for (struct ethosu_driver *d = registered_drivers; d; d = d->next)
+    for (int i = 0; i < ETHOSU_MAX_WAITERS; i++)
     {
-        if (product == d->dev.caps.product && log2_macs == d->dev.caps.log2_macs)
+        if (waiter_pool[i].sem)
         {
-            return true;
+            // Not a free slot
+            continue;
         }
-    }
-    return false;
-}
 
-static void ethosu_waiter_enqueue(struct ethosu_waiter *w)
-{
-    w->next = NULL;
-    if (!wait_tail)
-    {
-        wait_head = wait_tail = w;
-    }
-    else
-    {
-        wait_tail->next = w;
-        wait_tail       = w;
-    }
-}
-// Remove a known node (prev may be NULL if removing head)
-static void ethosu_waiter_dequeue(struct ethosu_waiter *prev, struct ethosu_waiter *cur)
-{
-    if (prev)
-    {
-        prev->next = cur->next;
-    }
-    else
-    {
-        wait_head = cur->next;
-    }
-
-    if (wait_tail == cur)
-    {
-        wait_tail = prev;
-    }
-    cur->next = NULL;
-}
-
-static bool ethosu_waiter_matches_driver(const struct ethosu_waiter *w, const struct ethosu_driver *drv)
-{
-    return (w->req_product == drv->dev.caps.product && w->req_log2_macs == drv->dev.caps.log2_macs);
-}
-
-static struct ethosu_waiter *ethosu_get_waiter_for_driver(struct ethosu_driver *drv)
-{
-    struct ethosu_waiter *prev = NULL;
-    for (struct ethosu_waiter *cur = wait_head; cur; cur = cur->next)
-    {
-        if (ethosu_waiter_matches_driver(cur, drv))
+        if ((waiter_pool[i].sem = ethosu_semaphore_create(255, 0)) == NULL)
         {
-            ethosu_waiter_dequeue(prev, cur);
-            return cur;
+            waiter_pool[i].product   = 0;
+            waiter_pool[i].log2_macs = 0;
+            LOG_ERR("Failed to create semaphore for new waiter");
+            return NULL;
         }
-        prev = cur;
+        waiter_pool[i].product   = drv->dev.caps.product;
+        waiter_pool[i].log2_macs = drv->dev.caps.log2_macs;
+        return &waiter_pool[i];
+    }
+
+    // No free waiter slots
+    LOG_ERR("Failed to create waiter for driver, increase ETHOSU_MAX_WAITERS!");
+
+    return NULL;
+}
+
+// Must be called within global mutex lock
+static struct ethosu_waiter *ethosu_get_waiter(uint32_t product, uint32_t log2_macs)
+{
+    for (int i = 0; i < ETHOSU_MAX_WAITERS; i++)
+    {
+        if (waiter_pool[i].product == product && waiter_pool[i].log2_macs == log2_macs)
+        {
+            return &waiter_pool[i];
+        }
     }
 
     return NULL;
 }
 
-static void ethosu_register_driver(struct ethosu_driver *drv)
+// Must be called within global mutex lock
+static struct ethosu_waiter *ethosu_get_waiter_for_driver(struct ethosu_driver *drv)
+{
+    return ethosu_get_waiter(drv->dev.caps.product, drv->dev.caps.log2_macs);
+}
+
+// Must be called within global mutex lock
+static int ethosu_deregister_waiter_for_driver(struct ethosu_driver *drv)
+{
+    for (int i = 0; i < ETHOSU_MAX_WAITERS; i++)
+    {
+        if (waiter_pool[i].product != drv->dev.caps.product || waiter_pool[i].log2_macs != drv->dev.caps.log2_macs)
+        {
+            continue;
+        }
+
+        // Defensive check
+        if (!waiter_pool[i].sem || waiter_pool[i].num_registered_drivers == 0)
+        {
+            LOG_ERR("Internal error: semaphore is NULL or number of registered drivers == 0");
+            return -1;
+        }
+
+        // Try to decrement semaphore count, fail if not available to avoid mutex deadlock
+        if (ethosu_semaphore_take(waiter_pool[i].sem, 0) < 0)
+        {
+            LOG_ERR("Semaphore count is zero! Is the driver reserved?!");
+            return -1;
+        }
+
+        if (waiter_pool[i].num_registered_drivers == 1)
+        {
+            // This is the only registered driver, reset waiter
+            waiter_pool[i].product                = 0;
+            waiter_pool[i].log2_macs              = 0;
+            waiter_pool[i].num_registered_drivers = 0;
+            ethosu_semaphore_destroy(waiter_pool[i].sem);
+            waiter_pool[i].sem = NULL;
+        }
+        else
+        {
+            // More NPU's are registered to this waiter
+            waiter_pool[i].num_registered_drivers--;
+        }
+        // Waiter found and handled, all done
+        return 0;
+    }
+
+    LOG_ERR("Found no matching waiter to deregister!");
+    return -1;
+}
+
+static int ethosu_register_driver(struct ethosu_driver *drv)
 {
     struct ethosu_waiter *waiter = NULL;
 
     ethosu_mutex_lock(ethosu_mutex);
+    if ((waiter = ethosu_get_waiter_for_driver(drv)) == NULL)
+    {
+        if ((waiter = ethosu_create_waiter_for_driver(drv)) == NULL)
+        {
+            ethosu_mutex_unlock(ethosu_mutex);
+            LOG_ERR("Failed to register driver (handle: 0x%p)", drv);
+            return -1;
+        }
+    }
+
     drv->next          = registered_drivers;
     registered_drivers = drv;
-
-    // Handle case when there's already a waiter compatible with this driver
-    waiter = ethosu_get_waiter_for_driver(drv);
-    if (waiter)
-    {
-        // Mark the driver as reserved and assign it to the waiter
-        drv->reserved           = true;
-        waiter->assigned_driver = drv;
-    }
+    waiter->num_registered_drivers++;
     ethosu_mutex_unlock(ethosu_mutex);
 
-    // Wake outside lock
-    if (waiter)
-    {
-        ethosu_semaphore_give(waiter->sem);
-    }
-
     LOG_INFO("New NPU driver registered (handle: 0x%p, NPU: 0x%p)", drv, drv->dev.reg);
+
+    ethosu_semaphore_give(waiter->sem);
+
+    return 0;
 }
 
+// Must not be called if there are waiters for the driver or if the driver is in use!
 static int ethosu_deregister_driver(struct ethosu_driver *drv)
 {
     struct ethosu_driver *curr;
     struct ethosu_driver **prev;
 
     ethosu_mutex_lock(ethosu_mutex);
+    if (drv->reserved)
+    {
+        ethosu_mutex_unlock(ethosu_mutex);
+        LOG_ERR("Can't deregister a reserved driver!");
+        return -1;
+    }
+
     curr = registered_drivers;
     prev = &registered_drivers;
 
-    // TODO: Add a guard to make sure it's not reserved and/or running here?
     while (curr != NULL)
     {
         if (curr == drv)
         {
+            if (ethosu_deregister_waiter_for_driver(drv) < 0)
+            {
+                ethosu_mutex_unlock(ethosu_mutex);
+                LOG_ERR("Failed to deregister driver!");
+                return -1;
+            }
             *prev = curr->next;
-            LOG_INFO("NPU driver handle %p deregistered.", drv);
+            LOG_INFO("%s driver handle %p deregistered.", drv->dev.desc->name, drv);
             break;
         }
 
@@ -652,10 +664,6 @@ int ethosu_init_ex(struct ethosu_driver *drv,
         }
     }
 
-    ethosu_mutex_lock(ethosu_mutex);
-    ethosu_waiters_init_once();
-    ethosu_mutex_unlock(ethosu_mutex);
-
     drv->fast_memory           = (uintptr_t)fast_memory;
     drv->fast_memory_size      = fast_memory_size;
     drv->power_request_counter = 0;
@@ -699,15 +707,28 @@ int ethosu_init_ex(struct ethosu_driver *drv,
     }
 
     ethosu_reset_job(drv);
-    ethosu_register_driver(drv);
+
+    if (ethosu_register_driver(drv) != 0)
+    {
+        LOG_ERR("Failed to initialise driver");
+        ethosu_semaphore_destroy(drv->semaphore);
+        return -1;
+    }
 
     return 0;
 }
 
 void ethosu_deinit(struct ethosu_driver *drv)
 {
-    ethosu_deregister_driver(drv);
-    ethosu_semaphore_destroy(drv->semaphore);
+    if (ethosu_deregister_driver(drv) == 0)
+    {
+        ethosu_semaphore_destroy(drv->semaphore);
+        LOG_INFO("De-initialised %s driver (handle: 0x%p, NPU: 0x%p)", drv->dev.desc->name, drv, drv->dev.reg);
+    }
+    else
+    {
+        LOG_ERR("Failed to de-initialised %s driver (handle: 0x%p, NPU: 0x%p)", drv->dev.desc->name, drv, drv->dev.reg);
+    }
 }
 
 int ethosu_soft_reset(struct ethosu_driver *drv)
@@ -1099,102 +1120,34 @@ struct ethosu_driver *ethosu_reserve_driver(void)
 
 struct ethosu_driver *ethosu_reserve_driver_ex(uint32_t product, uint32_t log2_macs)
 {
-    struct ethosu_driver *drv = NULL;
-    struct ethosu_waiter *w   = NULL;
+    struct ethosu_driver *drv    = NULL;
+    struct ethosu_waiter *waiter = NULL;
 
-    LOG_DEBUG("Acquiring NPU driver handle");
-
+    LOG_DEBUG("Acquiring NPU driver handle (block until one becomes available)");
     ethosu_mutex_lock(ethosu_mutex);
-
-    if (registered_drivers == NULL)
+    waiter = ethosu_get_waiter(product, log2_macs);
+    if (!waiter)
     {
         ethosu_mutex_unlock(ethosu_mutex);
-        LOG_ERR("Can not reserve a driver, no drivers registered");
+        LOG_ERR("No driver for product: %" PRIu32 ", log2_macs: %" PRIu32 " found!", product, log2_macs);
+        return NULL;
+    }
+    ethosu_mutex_unlock(ethosu_mutex);
+
+    ethosu_semaphore_take(waiter->sem, ETHOSU_SEMAPHORE_WAIT_FOREVER);
+
+    ethosu_mutex_lock(ethosu_mutex);
+    drv = ethosu_find_free_matching_driver(product, log2_macs);
+    if (!drv)
+    {
+        ethosu_mutex_unlock(ethosu_mutex);
+        LOG_ERR("Internal error: no driver available but semaphore taken");
         return NULL;
     }
 
-    // Fast path: see if there's a driver available
-    drv = ethosu_find_free_matching_driver(product, log2_macs);
-    if (drv)
-    {
-        drv->reserved = true;
-        ethosu_mutex_unlock(ethosu_mutex);
-        LOG_DEBUG("NPU driver handle %p reserved", drv);
-        return drv;
-    }
-
-    // Make sure there are registered drivers that match the request
-    if (!ethosu_matching_driver_exists(product, log2_macs))
-    {
-        ethosu_mutex_unlock(ethosu_mutex);
-        LOG_ERR("Can not reserve a driver, no drivers of requested type are registered");
-        return NULL;
-    }
-
+    drv->reserved = true;
     ethosu_mutex_unlock(ethosu_mutex);
-
-    // Need to wait: get a waiter slot (block until available)
-    ethosu_semaphore_take(waiter_pool_sem, ETHOSU_SEMAPHORE_WAIT_FOREVER);
-
-    ethosu_mutex_lock(ethosu_mutex);
-
-    // Re-check under lock to avoid race (driver may have freed while we were grabbing slot)
-    drv = ethosu_find_free_matching_driver(product, log2_macs);
-    if (drv)
-    {
-        drv->reserved = true;
-        ethosu_mutex_unlock(ethosu_mutex);
-
-        // Return waiter slot token since we didn't enqueue
-        ethosu_semaphore_give(waiter_pool_sem);
-
-        LOG_DEBUG("NPU driver handle %p reserved", drv);
-        return drv;
-    }
-
-    // Allocate waiter node from free list (guaranteed non-NULL by waiter_pool_sem)
-    w              = wait_free_head;
-    wait_free_head = wait_free_head->next;
-
-    // Make sure to set/reset waiter before use
-    w->req_product     = product;
-    w->req_log2_macs   = log2_macs;
-    w->assigned_driver = NULL;
-    w->next            = NULL;
-    // Reset waiter semaphore (max_count is 1), use timeout 0 (NO_WAIT equivalent)
-    (void)ethosu_semaphore_take(w->sem, 0);
-
-    ethosu_waiter_enqueue(w);
-
-    ethosu_mutex_unlock(ethosu_mutex);
-
-    LOG_DEBUG("Waiting for a driver handle to become available");
-    // Sleep until a matching driver release/register selects us
-    ethosu_semaphore_take(w->sem, ETHOSU_SEMAPHORE_WAIT_FOREVER);
-
-    // Releaser reserved a driver before waking us
-    ethosu_mutex_lock(ethosu_mutex);
-    drv                = w->assigned_driver;
-    w->assigned_driver = NULL;
-    ethosu_mutex_unlock(ethosu_mutex);
-
-    if (drv)
-    {
-        LOG_DEBUG("NPU driver handle %p reserved", drv);
-    }
-    else
-    {
-        LOG_ERR("Internal error, assigned driver is NULL");
-    }
-
-    // Return waiter node to pool
-    ethosu_mutex_lock(ethosu_mutex);
-    w->next        = wait_free_head;
-    wait_free_head = w;
-    ethosu_mutex_unlock(ethosu_mutex);
-
-    ethosu_semaphore_give(waiter_pool_sem);
-
+    LOG_DEBUG("NPU driver handle %p reserved", drv);
     return drv;
 }
 
@@ -1211,44 +1164,33 @@ void ethosu_release_driver(struct ethosu_driver *drv)
     LOG_DEBUG("Releasing NPU driver handle %p", drv);
 
     ethosu_mutex_lock(ethosu_mutex);
-    if (drv->reserved)
+    if (!drv->reserved)
     {
-        if (drv->job.state == ETHOSU_JOB_RUNNING || drv->job.state == ETHOSU_JOB_DONE)
+        ethosu_mutex_unlock(ethosu_mutex);
+        LOG_ERR("Failed to release NPU driver handle, it is not reserved!");
+        return;
+    }
+
+    if (drv->job.state == ETHOSU_JOB_RUNNING || drv->job.state == ETHOSU_JOB_DONE)
+    {
+        LOG_WARN("Release on driver called while it's still running or ethosu_wait() not called");
+        // Give the inference one shot to complete or force kill the job
+        if (ethosu_wait(drv, false) == 1)
         {
-            LOG_WARN("Release on driver called while it's still running or ethosu_wait() not called");
-            // Give the inference one shot to complete or force kill the job
-            if (ethosu_wait(drv, false) == 1)
-            {
-                LOG_WARN("Killing the job and resetting NPU");
-                // Still running, soft reset the NPU and reset driver
-                drv->power_request_counter = 0;
-                ethosu_soft_reset(drv);
-                ethosu_reset_job(drv);
-            }
+            LOG_WARN("Killing the job and resetting NPU");
+            // Still running, soft reset the NPU and reset driver
+            drv->power_request_counter = 0;
+            ethosu_soft_reset(drv);
+            ethosu_reset_job(drv);
         }
     }
 
     // Mark free
     drv->reserved = false;
 
-    // Choose one waiter compatible with THIS driver
+    // Return this driver to the available pool
     waiter = ethosu_get_waiter_for_driver(drv);
-    if (waiter)
-    {
-        LOG_DEBUG("Someone is waiting for this NPU handle, reserving it");
-        // Reserve immediately under lock so no one else can steal it
-        drv->reserved           = true;
-        waiter->assigned_driver = drv;
-    }
-
     ethosu_mutex_unlock(ethosu_mutex);
-
+    ethosu_semaphore_give(waiter->sem);
     LOG_DEBUG("NPU driver handle %p released", drv);
-
-    // Wake outside lock
-    if (waiter)
-    {
-        LOG_DEBUG("Waking up the waiter");
-        ethosu_semaphore_give(waiter->sem);
-    }
 }
