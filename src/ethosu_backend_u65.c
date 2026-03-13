@@ -206,7 +206,7 @@ static bool u65_dev_soft_reset(struct ethosu_device *dev)
     reset.pending_CSL = dev->secure ? SECURITY_LEVEL_SECURE : SECURITY_LEVEL_NON_SECURE;
 
     // Reset and set security level
-    LOG_INFO("Soft reset NPU");
+    LOG_INFO("Soft reset %s", dev->desc->name);
     dev->reg->RESET.word = reset.word;
 
     // Wait until reset status indicates that reset has been completed

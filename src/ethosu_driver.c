@@ -426,7 +426,7 @@ static int ethosu_register_driver(struct ethosu_driver *drv)
     waiter->num_registered_drivers++;
     ethosu_mutex_unlock(ethosu_mutex);
 
-    LOG_INFO("New NPU driver registered (handle: 0x%p, NPU: 0x%p)", drv, drv->dev.reg);
+    LOG_INFO("New %s driver registered (handle: 0x%p, NPU: 0x%p)", drv->dev.desc->name, drv, drv->dev.reg);
 
     ethosu_semaphore_give(waiter->sem);
 
@@ -673,7 +673,7 @@ int ethosu_init_ex(struct ethosu_driver *drv,
     if (!dev_desc->ops->init(
             &drv->dev, dev_desc, dev_config, dev_user_ops, base_address, secure_enable, privilege_enable))
     {
-        LOG_ERR("Failed to initialize Ethos-U device");
+        LOG_ERR("Failed to initialize %s device", dev_desc->name);
         return -1;
     }
 
@@ -736,7 +736,7 @@ int ethosu_soft_reset(struct ethosu_driver *drv)
     // Soft reset the NPU
     if (!drv->dev.desc->ops->soft_reset(&drv->dev))
     {
-        LOG_ERR("Failed to soft-reset NPU");
+        LOG_ERR("Failed to soft-reset %s", drv->dev.desc->name);
         return -1;
     }
 
@@ -758,7 +758,7 @@ int ethosu_request_power(struct ethosu_driver *drv)
         // security state/privilege mode if necessary.
         if (ethosu_soft_reset(drv))
         {
-            LOG_ERR("Failed to request power for Ethos-U");
+            LOG_ERR("Failed to request power for %s", drv->dev.desc->name);
             drv->power_request_counter--;
             return -1;
         }
@@ -848,12 +848,12 @@ int ethosu_wait(struct ethosu_driver *drv, bool block)
         {
             if (drv->job.result == ETHOSU_JOB_RESULT_ERROR)
             {
-                LOG_ERR("NPU error(s) occured during inference.");
+                LOG_ERR("Error(s) for %s occured during inference.", drv->dev.desc->name);
                 drv->dev.desc->ops->print_err_status(&drv->dev);
             }
             else
             {
-                LOG_ERR("NPU inference timed out.");
+                LOG_ERR("%s inference timed out.", drv->dev.desc->name);
             }
 
             // Reset the NPU
@@ -863,7 +863,7 @@ int ethosu_wait(struct ethosu_driver *drv, bool block)
         }
         else
         {
-            LOG_DEBUG("Inference finished successfully...");
+            LOG_DEBUG("Inference on %s finished successfully...", drv->dev.desc->name);
             ret = 0;
         }
 
@@ -986,7 +986,7 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
 
     return 0;
 err:
-    LOG_ERR("Failed to invoke inference.");
+    LOG_ERR("Failed to invoke inference for %s", drv->dev.desc->name);
     ethosu_reset_job(drv);
     return -1;
 }
@@ -1157,7 +1157,7 @@ struct ethosu_driver *ethosu_reserve_driver_ex(uint32_t product, uint32_t log2_m
 
     drv->reserved = true;
     ethosu_mutex_unlock(ethosu_mutex);
-    LOG_DEBUG("NPU driver handle %p reserved", drv);
+    LOG_DEBUG("%s driver handle %p reserved", drv->dev.desc->name, drv);
     return drv;
 }
 
@@ -1171,7 +1171,7 @@ void ethosu_release_driver(struct ethosu_driver *drv)
         return;
     }
 
-    LOG_DEBUG("Releasing NPU driver handle %p", drv);
+    LOG_DEBUG("Releasing %s driver handle %p", drv->dev.desc->name, drv);
 
     ethosu_mutex_lock(ethosu_mutex);
     if (!drv->reserved)
@@ -1202,5 +1202,5 @@ void ethosu_release_driver(struct ethosu_driver *drv)
     waiter = ethosu_get_waiter_for_driver(drv);
     ethosu_mutex_unlock(ethosu_mutex);
     ethosu_semaphore_give(waiter->sem);
-    LOG_DEBUG("NPU driver handle %p released", drv);
+    LOG_DEBUG("%s driver handle %p released", drv->dev.desc->name, drv);
 }
