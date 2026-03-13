@@ -409,6 +409,22 @@ int ethosu_invoke_auto(const void *custom_data_ptr,
                        const size_t *base_addr_size,
                        const int num_base_addr,
                        void *user_arg);
+
+/**
+ * Parses the provided custom operator payload data to find which product configuration the
+ * network is compiled for. The output data can for instance be passed to ethosu_reserve_driver_ex().
+ *
+ * @param custom_data_ptr     Custom data payload
+ * @param custom_data_size    Size in bytes of custom data
+ * @param product_out         Output variable where product type is placed on successful data parsing
+ * @param log2_macs_out       Output variable where mac configuration is placed on successful data parsing
+ * @return 0 on success, -1 on error
+ */
+int ethosu_get_product_config_from_cop_data(const void *custom_data_ptr,
+                                            const int custom_data_size,
+                                            uint32_t *product_out,
+                                            uint32_t *log2_macs_out);
+
 /**
  * Wait for inference to complete (block=true)
  * Poll status or finish up if inference is complete (block=false)

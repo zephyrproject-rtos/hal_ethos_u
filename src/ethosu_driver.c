@@ -549,7 +549,7 @@ static int handle_command_stream(struct ethosu_driver *drv, const uint8_t *cmd_s
 
 static bool ethosu_verify_cop_data_size(const int custom_data_size)
 {
-    // Custom data size must be at least 4 bytes
+    // COP data size must be at least 4 bytes
     if (custom_data_size < 4)
     {
         LOG_ERR("custom_data_size=%d < 4", custom_data_size);
@@ -1008,29 +1008,25 @@ int ethosu_invoke_v3(struct ethosu_driver *drv,
     return ethosu_wait(drv, true);
 }
 
-// Call this to automatically find a suitable driver matching what the network has been compiled for
-int ethosu_invoke_auto(const void *custom_data_ptr,
-                       const int custom_data_size,
-                       uint64_t *const base_addr,
-                       const size_t *base_addr_size,
-                       const int num_base_addr,
-                       void *user_arg)
+int ethosu_get_product_config_from_cop_data(const void *custom_data_ptr,
+                                            const int custom_data_size,
+                                            uint32_t *product_out,
+                                            uint32_t *log2_macs_out)
 {
     const struct cop_data_s *data_ptr = custom_data_ptr;
     const struct cop_data_s *data_end = (struct cop_data_s *)((ptrdiff_t)custom_data_ptr + custom_data_size);
-    struct ethosu_driver *drv         = NULL;
-    int ret                           = 0;
+    const struct opt_cfg_s *opt_cfg_p = NULL;
 
     if (!ethosu_verify_cop_data_size(custom_data_size))
     {
-        goto err;
+        return -1;
     }
 
     // Verify first word
     if (data_ptr->word != ETHOSU_FOURCC)
     {
         LOG_ERR("Custom Operator Payload: %" PRIu32 " is not correct, expected %x", data_ptr->word, ETHOSU_FOURCC);
-        goto err;
+        return -1;
     }
 
     data_ptr++;
@@ -1041,26 +1037,12 @@ int ethosu_invoke_auto(const void *custom_data_ptr,
         switch (data_ptr->driver_action_command)
         {
         case OPTIMIZER_CONFIG:
-            LOG_DEBUG("OPTIMIZER_CONFIG");
-            struct opt_cfg_s const *opt_cfg_p = (const struct opt_cfg_s *)data_ptr;
+            opt_cfg_p = (const struct opt_cfg_s *)data_ptr;
 
-            // Got the optimizer config, which NPU the network has been compiled for
-            // Find a suitable driver for it
-            drv = ethosu_reserve_driver_ex((opt_cfg_p->cfg >> 28), opt_cfg_p->cfg & 0XF);
-            if (drv)
-            {
-                LOG_DEBUG("Found suitable driver");
-                data_ptr = data_end;
-                break;
-            }
-            else
-            {
-                LOG_ERR("Found no suitable driver to run inference");
-                goto err;
-            }
-
-            data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD + OPTIMIZER_CONFIG_LENGTH_32_BIT_WORD;
-            break;
+            // Got the optimizer config, telling which NPU the network has been compiled for
+            *product_out   = (opt_cfg_p->cfg >> 28);
+            *log2_macs_out = (opt_cfg_p->cfg & 0XF);
+            return 0;
         case COMMAND_STREAM:
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD + ((data_ptr->reserved << 16) | data_ptr->length);
             break;
@@ -1069,16 +1051,44 @@ int ethosu_invoke_auto(const void *custom_data_ptr,
             break;
         default:
             LOG_ERR("UNSUPPORTED driver_action_command: %u", data_ptr->driver_action_command);
-            goto err;
-            break;
+            return -1;
         }
+    }
+
+    LOG_ERR("Could not find product config in COP data!");
+    return -1;
+}
+
+// Call this to automatically find a suitable driver matching what the network has been compiled for
+int ethosu_invoke_auto(const void *custom_data_ptr,
+                       const int custom_data_size,
+                       uint64_t *const base_addr,
+                       const size_t *base_addr_size,
+                       const int num_base_addr,
+                       void *user_arg)
+{
+    struct ethosu_driver *drv = NULL;
+    uint32_t product          = 0;
+    uint32_t log2_macs        = 0;
+    int ret                   = 0;
+
+    if (ethosu_get_product_config_from_cop_data(custom_data_ptr, custom_data_size, &product, &log2_macs) != 0)
+    {
+        goto err;
+    }
+    // Find a suitable driver, will block until one comes availalable, if a driver matching the requested has been
+    // registered
+    drv = ethosu_reserve_driver_ex(product, log2_macs);
+    if (!drv)
+    {
+        goto err;
     }
 
     if (ethosu_invoke_async(
             drv, custom_data_ptr, custom_data_size, base_addr, base_addr_size, num_base_addr, user_arg) < 0)
     {
         ethosu_release_driver(drv);
-        return -1;
+        goto err;
     }
 
     ret = ethosu_wait(drv, true);
