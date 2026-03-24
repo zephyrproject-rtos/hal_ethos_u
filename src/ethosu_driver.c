@@ -641,9 +641,11 @@ int ethosu_init_ex(struct ethosu_driver *drv,
                    uint32_t secure_enable,
                    uint32_t privilege_enable)
 {
-    assert(drv != NULL);
-    assert(dev_desc != NULL);
-    assert(dev_config != NULL);
+    if (!drv || !dev_desc || !dev_config || !base_address)
+    {
+        LOG_ERR("Init called with NULL arg(s)");
+        return -1;
+    }
 
     LOG_INFO("Initializing %s NPU: base_address=%p, fast_memory=%p, fast_memory_size=%zu, secure=%" PRIu32
              ", privileged=%" PRIu32,
@@ -720,6 +722,12 @@ int ethosu_init_ex(struct ethosu_driver *drv,
 
 void ethosu_deinit(struct ethosu_driver *drv)
 {
+    if (!drv)
+    {
+        LOG_ERR("De-init called with NULL arg");
+        return;
+    }
+
     if (ethosu_deregister_driver(drv) == 0)
     {
         ethosu_semaphore_destroy(drv->semaphore);
@@ -733,6 +741,12 @@ void ethosu_deinit(struct ethosu_driver *drv)
 
 int ethosu_soft_reset(struct ethosu_driver *drv)
 {
+    if (!drv)
+    {
+        LOG_ERR("Soft reset called with NULL arg");
+        return -1;
+    }
+
     // Soft reset the NPU
     if (!drv->dev.desc->ops->soft_reset(&drv->dev))
     {
@@ -751,6 +765,12 @@ int ethosu_soft_reset(struct ethosu_driver *drv)
 
 int ethosu_request_power(struct ethosu_driver *drv)
 {
+    if (!drv)
+    {
+        LOG_ERR("Request power called with NULL arg");
+        return -1;
+    }
+
     // Check if this is the first power request, increase counter
     if (drv->power_request_counter++ == 0)
     {
@@ -768,6 +788,12 @@ int ethosu_request_power(struct ethosu_driver *drv)
 
 void ethosu_release_power(struct ethosu_driver *drv)
 {
+    if (!drv)
+    {
+        LOG_ERR("Release power called with NULL arg");
+        return;
+    }
+
     if (drv->power_request_counter == 0)
     {
         LOG_WARN("No power request left to release, reference counter is 0");
@@ -784,7 +810,12 @@ void ethosu_release_power(struct ethosu_driver *drv)
 
 void ethosu_get_driver_version(struct ethosu_driver_version *ver)
 {
-    assert(ver != NULL);
+    if (!ver)
+    {
+        LOG_ERR("Get driver version called with NULL arg");
+        return;
+    }
+
     ver->major = ETHOSU_DRIVER_VERSION_MAJOR;
     ver->minor = ETHOSU_DRIVER_VERSION_MINOR;
     ver->patch = ETHOSU_DRIVER_VERSION_PATCH;
@@ -792,13 +823,24 @@ void ethosu_get_driver_version(struct ethosu_driver_version *ver)
 
 void ethosu_get_hw_info(struct ethosu_driver *drv, struct ethosu_hw_info *hw)
 {
-    assert(hw != NULL);
+    if (!drv || !hw)
+    {
+        LOG_ERR("Get hardware info called with NULL arg(s)");
+        return;
+    }
+
     drv->dev.desc->ops->get_hw_info(&drv->dev, hw);
 }
 
 int ethosu_wait(struct ethosu_driver *drv, bool block)
 {
     int ret = 0;
+
+    if (!drv)
+    {
+        LOG_ERR("Wait called with NULL arg");
+        return -1;
+    }
 
     switch (drv->job.state)
     {
@@ -890,16 +932,12 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
                         const int num_base_addr,
                         void *user_arg)
 {
-    assert(custom_data_ptr != NULL);
-    assert(base_addr != NULL);
-    assert(base_addr_size != NULL);
-
     const struct cop_data_s *data_ptr = custom_data_ptr;
     const struct cop_data_s *data_end = (struct cop_data_s *)((ptrdiff_t)custom_data_ptr + custom_data_size);
 
-    if (!drv)
+    if (!drv || !custom_data_ptr || !base_addr || !base_addr_size)
     {
-        LOG_ERR("Failed to invoke inference, driver arg is NULL");
+        LOG_ERR("Invoke called with NULL arg(s)");
         return -1;
     }
 
@@ -1017,6 +1055,12 @@ int ethosu_get_product_config_from_cop_data(const void *custom_data_ptr,
     const struct cop_data_s *data_end = (struct cop_data_s *)((ptrdiff_t)custom_data_ptr + custom_data_size);
     const struct opt_cfg_s *opt_cfg_p = NULL;
 
+    if (!custom_data_ptr)
+    {
+        LOG_ERR("custom_data_ptr is NULL");
+        return -1;
+    }
+
     if (!ethosu_verify_cop_data_size(custom_data_size))
     {
         return -1;
@@ -1040,8 +1084,15 @@ int ethosu_get_product_config_from_cop_data(const void *custom_data_ptr,
             opt_cfg_p = (const struct opt_cfg_s *)data_ptr;
 
             // Got the optimizer config, telling which NPU the network has been compiled for
-            *product_out   = (opt_cfg_p->cfg >> 28);
-            *log2_macs_out = (opt_cfg_p->cfg & 0XF);
+            if (product_out)
+            {
+                *product_out = (opt_cfg_p->cfg >> 28);
+            }
+
+            if (log2_macs_out)
+            {
+                *log2_macs_out = (opt_cfg_p->cfg & 0XF);
+            }
             return 0;
         case COMMAND_STREAM:
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD + ((data_ptr->reserved << 16) | data_ptr->length);
@@ -1071,6 +1122,12 @@ int ethosu_invoke_auto(const void *custom_data_ptr,
     uint32_t product          = 0;
     uint32_t log2_macs        = 0;
     int ret                   = 0;
+
+    if (!custom_data_ptr || !base_addr || !base_addr_size)
+    {
+        LOG_ERR("Invoke auto called with NULL arg(s)");
+        return -1;
+    }
 
     if (ethosu_get_product_config_from_cop_data(custom_data_ptr, custom_data_size, &product, &log2_macs) != 0)
     {

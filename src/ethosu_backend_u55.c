@@ -56,7 +56,11 @@ static bool u55_dev_init(struct ethosu_device *dev,
                          uint32_t secure_enable,
                          uint32_t privilege_enable)
 {
-    assert(cfg->config != NULL);
+    if (!cfg->config)
+    {
+        LOG_ERR("config is NULL!");
+        return false;
+    }
 
     dev->reg = (volatile struct NPU_REG *)base_address;
 
