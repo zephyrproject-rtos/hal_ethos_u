@@ -238,7 +238,7 @@ static bool u85_dev_soft_reset(struct ethosu_device *dev)
 
     // MAC power ramping up/down control
     dev->reg->POWER_CTRL.word =
-        ((struct u85_config_t *)dev->config)->power_ctrl.mac_step_cycles & NPU_MAC_PWR_RAMP_CYCLES_MASK;
+        ((struct u85_config_t *)dev->config->config)->power_ctrl.mac_step_cycles & NPU_MAC_PWR_RAMP_CYCLES_MASK;
 
     return true;
 }
