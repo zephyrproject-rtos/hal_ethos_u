@@ -637,6 +637,25 @@ static bool ethosu_verify_cop_data_size(const int custom_data_size)
     return true;
 }
 
+static bool ethosu_verify_cop_record_words(const struct cop_data_s *data_ptr,
+                                           const struct cop_data_s *data_end,
+                                           size_t record_words,
+                                           const char *record_name)
+{
+    ptrdiff_t remaining_words = data_end - data_ptr;
+
+    if (remaining_words < 0 || (size_t)remaining_words < record_words)
+    {
+        LOG_ERR("Custom Operator Payload truncated %s record. remaining_words=%td, expected_words=%zu",
+                record_name,
+                remaining_words,
+                record_words);
+        return false;
+    }
+
+    return true;
+}
+
 /******************************************************************************
  * Weak functions - Interrupt handler
  ******************************************************************************/
@@ -1065,27 +1084,45 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
         switch (data_ptr->driver_action_command)
         {
         case OPTIMIZER_CONFIG:
+        {
+            const size_t record_words = DRIVER_ACTION_LENGTH_32_BIT_WORD + OPTIMIZER_CONFIG_LENGTH_32_BIT_WORD;
             LOG_DEBUG("OPTIMIZER_CONFIG");
-            struct opt_cfg_s const *opt_cfg_p = (const struct opt_cfg_s *)data_ptr;
+            const struct opt_cfg_s *opt_cfg_p = (const struct opt_cfg_s *)data_ptr;
+
+            if (!ethosu_verify_cop_record_words(data_ptr, data_end, record_words, "OPTIMIZER_CONFIG"))
+            {
+                goto err;
+            }
 
             if (handle_optimizer_config(drv, opt_cfg_p) < 0)
             {
                 goto err;
             }
-            data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD + OPTIMIZER_CONFIG_LENGTH_32_BIT_WORD;
+            data_ptr += record_words;
             break;
+        }
         case COMMAND_STREAM:
+        {
+            size_t record_words;
+
             // Vela only supports putting one COMMAND_STREAM per op
             LOG_DEBUG("COMMAND_STREAM");
-            const uint8_t *command_stream = (const uint8_t *)(data_ptr + 1);
             int cms_length                = (data_ptr->reserved << 16) | data_ptr->length;
+            const uint8_t *command_stream = (const uint8_t *)(data_ptr + 1);
+
+            record_words = DRIVER_ACTION_LENGTH_32_BIT_WORD + (size_t)cms_length;
+            if (!ethosu_verify_cop_record_words(data_ptr, data_end, record_words, "COMMAND_STREAM"))
+            {
+                goto err;
+            }
 
             if (handle_command_stream(drv, command_stream, cms_length) < 0)
             {
                 goto err;
             }
-            data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD + cms_length;
+            data_ptr += record_words;
             break;
+        }
         case NOP:
             LOG_DEBUG("NOP");
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD;
@@ -1156,6 +1193,13 @@ int ethosu_get_product_config_from_cop_data(const void *custom_data_ptr,
         switch (data_ptr->driver_action_command)
         {
         case OPTIMIZER_CONFIG:
+            if (!ethosu_verify_cop_record_words(data_ptr,
+                                                data_end,
+                                                DRIVER_ACTION_LENGTH_32_BIT_WORD + OPTIMIZER_CONFIG_LENGTH_32_BIT_WORD,
+                                                "OPTIMIZER_CONFIG"))
+            {
+                return -1;
+            }
             opt_cfg_p = (const struct opt_cfg_s *)data_ptr;
 
             // Got the optimizer config, telling which NPU the network has been compiled for
@@ -1170,8 +1214,17 @@ int ethosu_get_product_config_from_cop_data(const void *custom_data_ptr,
             }
             return 0;
         case COMMAND_STREAM:
-            data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD + ((data_ptr->reserved << 16) | data_ptr->length);
+        {
+            size_t record_words =
+                DRIVER_ACTION_LENGTH_32_BIT_WORD + (size_t)((data_ptr->reserved << 16) | data_ptr->length);
+
+            if (!ethosu_verify_cop_record_words(data_ptr, data_end, record_words, "COMMAND_STREAM"))
+            {
+                return -1;
+            }
+            data_ptr += record_words;
             break;
+        }
         case NOP:
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD;
             break;
