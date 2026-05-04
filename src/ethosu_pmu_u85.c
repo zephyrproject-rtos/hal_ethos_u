@@ -76,7 +76,7 @@ static uint32_t pmu_event_value(enum ethosu_pmu_event_type event)
         LOG_ERR("PMU event (ethosu_pmu_event_type %d) NOT supported", event);
     }
 
-    return PMU_EVENT_NO_EVENT;
+    return UINT32_MAX;
 }
 
 /*****************************************************************************
