@@ -260,6 +260,31 @@ void ethosu_inference_begin(struct ethosu_driver *drv, void *user_arg);
  */
 void ethosu_inference_end(struct ethosu_driver *drv, void *user_arg);
 
+#ifndef ETHOSU_MULTI_DEVICE
+/**
+ * Remapping command stream and base pointer addresses.
+ * Legacy hook used by the single-device ethosu_init() API.
+ *
+ * @param address   Address to be remapped.
+ * @param index     -1 command stream, 0-n base address index
+ *
+ * @return Remapped address
+ */
+uint64_t ethosu_address_remap(uint64_t address, int index);
+
+/**
+ * Select configuration for region access.
+ * Legacy hook used by the single-device ethosu_init() API.
+ * Default implementation uses NPU_QCONFIG and NPU_REGIONCFG_n defines.
+ *
+ * @param address   Address of region.
+ * @param index     -1 command stream, 0-n base address index
+ *
+ * @return Configuration to use
+ */
+unsigned int ethosu_config_select(uint64_t address, int index);
+#endif
+
 /******************************************************************************
  * Prototypes
  ******************************************************************************/

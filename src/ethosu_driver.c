@@ -23,6 +23,16 @@
 #include "ethosu_device.h"
 #include "ethosu_log.h"
 
+#ifndef ETHOSU_MULTI_DEVICE
+#if defined(ETHOSU55)
+#include "ethosu_config_u55.h"
+#elif defined(ETHOSU65)
+#include "ethosu_config_u65.h"
+#elif defined(ETHOSU85)
+#include "ethosu_config_u85.h"
+#endif
+#endif
+
 #include <assert.h>
 #include <cmsis_compiler.h>
 #ifndef __ARMCC_VERSION
@@ -294,6 +304,67 @@ void __attribute__((weak)) ethosu_inference_end(struct ethosu_driver *drv, void 
     UNUSED(user_arg);
     UNUSED(drv);
 }
+
+#ifndef ETHOSU_MULTI_DEVICE
+uint64_t __attribute__((weak)) ethosu_address_remap(uint64_t address, int index)
+{
+    UNUSED(index);
+    return address;
+}
+
+unsigned int __attribute__((weak)) ethosu_config_select(uint64_t address, int index)
+{
+    UNUSED(address);
+    assert(index >= -1 && index <= 7);
+
+    switch (index)
+    {
+    case -1:
+        return NPU_QCONFIG;
+    default:
+    case 0:
+        return NPU_REGIONCFG_0;
+    case 1:
+        return NPU_REGIONCFG_1;
+    case 2:
+        return NPU_REGIONCFG_2;
+    case 3:
+        return NPU_REGIONCFG_3;
+    case 4:
+        return NPU_REGIONCFG_4;
+    case 5:
+        return NPU_REGIONCFG_5;
+    case 6:
+        return NPU_REGIONCFG_6;
+    case 7:
+        return NPU_REGIONCFG_7;
+    }
+}
+#else
+uint64_t ethosu_address_remap(uint64_t address, int index)
+{
+    /*
+     * Not usable when ETHOSU_MULTI_DEVICE is defined.
+     * Use ethosu_init_ex() and provide an address_remap callback through
+     * struct ethosu_device_user_ops instead.
+     */
+    UNUSED(address);
+    UNUSED(index);
+    return 0;
+}
+
+unsigned int ethosu_config_select(uint64_t address, int index)
+{
+    /*
+     * Not usable when ETHOSU_MULTI_DEVICE is defined.
+     * Use ethosu_init_ex() and provide a config_select callback through
+     * struct ethosu_device_user_ops instead.
+     */
+    UNUSED(address);
+    UNUSED(index);
+    return 0;
+}
+#endif
 
 /******************************************************************************
  * Static functions
@@ -607,6 +678,10 @@ int ethosu_init(struct ethosu_driver *drv,
 #else
     const struct ethosu_device_desc *default_dev; // compile time driver
     struct ethosu_device_config *default_config;  // compile time config
+    static struct ethosu_device_user_ops legacy_user_ops = {
+        .address_remap = ethosu_address_remap,
+        .config_select = ethosu_config_select,
+    };
 #if defined(ETHOSU55)
     default_dev    = &ethosu_device_desc_u55;
     default_config = &ethosu_device_config_u55;
@@ -622,7 +697,7 @@ int ethosu_init(struct ethosu_driver *drv,
     return ethosu_init_ex(drv,
                           default_dev,
                           default_config,
-                          NULL,
+                          &legacy_user_ops,
                           base_address,
                           fast_memory,
                           fast_memory_size,

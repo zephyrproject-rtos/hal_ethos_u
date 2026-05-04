@@ -184,8 +184,8 @@ int ethosu_invoke_auto(const void *custom_data_ptr,
 ### Breaking changes
 - The `ETHOSU_PMU_Get_NumEventCounters()` has been changed to `ETHOSU_PMU_Get_NumEventCounters(struct ethosu_driver *drv)`.
 - The weak function `ethosu_semaphore_create()` has been changed to `ethosu_semaphore_create(unsigned int max_count, unsigned int initial_count)`
-- The weak function `ethosu_address_remap()` is no longer global. It is now a per device user op.
-- The weak function `ethosu_config_select()` is no longer global. It is now a per device user op. This is provided as a convenience function, as configuration can also be changed at runtime by modifying the `ethosu_device_config` struct, before an invoke.
+- When using multi device mode, the weak function `ethosu_address_remap()` is replaced by a per device user op.
+- When using multi device mode, the weak function `ethosu_config_select()` is replaced by a per device user op. This is provided as a convenience function, as configuration can also be changed at runtime by modifying the `ethosu_device_config` struct, before an invoke.
 - Do not use the `ETHOSU_PMU_NCOUNTERS` macro when using multi device mode. Call `ETHOSU_PMU_GET_NumEventCounters(drv)` function instead.
 - The abstracted PMU event list is no longer tied to interface PMU event list in terms of sorting/order. It's now a union of all available PMU events for all supported device types/products. Any old references to index numbers must be updated.
 
