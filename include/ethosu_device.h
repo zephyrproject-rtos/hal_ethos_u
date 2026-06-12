@@ -125,21 +125,14 @@ struct ethosu_device_config
 };
 
 /******************************************************************************
- * Backends (exported descriptors)
- ******************************************************************************/
-
-extern const struct ethosu_device_desc ethosu_device_desc_u55;
-extern const struct ethosu_device_desc ethosu_device_desc_u65;
-extern const struct ethosu_device_desc ethosu_device_desc_u85;
-
-// Default configs - intentionally not const
-extern struct ethosu_device_config ethosu_device_config_u55;
-extern struct ethosu_device_config ethosu_device_config_u65;
-extern struct ethosu_device_config ethosu_device_config_u85;
-
-/******************************************************************************
  * U85 Device config
  ******************************************************************************/
+#if defined(ETHOSU_MULTI_DEVICE) || defined(ETHOSU85)
+
+// Default config - intentionally not const
+extern struct ethosu_device_config ethosu_device_config_u85;
+
+extern const struct ethosu_device_desc ethosu_device_desc_u85;
 
 struct u85_mem_attr_t
 {
@@ -229,10 +222,17 @@ struct u85_config_t
     struct u85_axi_t axi_ext;
     struct u85_power_ctrl_t power_ctrl;
 };
+#endif
 
 /******************************************************************************
  * U65 Device config
  ******************************************************************************/
+#if defined(ETHOSU_MULTI_DEVICE) || defined(ETHOSU65)
+
+// Default config - intentionally not const
+extern struct ethosu_device_config ethosu_device_config_u65;
+
+extern const struct ethosu_device_desc ethosu_device_desc_u65;
 
 struct u65_axi_limit_t
 {
@@ -297,10 +297,17 @@ struct u65_config_t
     struct u65_axi_limit_t axi_limit2;
     struct u65_axi_limit_t axi_limit3;
 };
+#endif
 
 /******************************************************************************
  * U55 Device config
  ******************************************************************************/
+#if defined(ETHOSU_MULTI_DEVICE) || defined(ETHOSU55)
+
+// Default config - intentionally not const
+extern struct ethosu_device_config ethosu_device_config_u55;
+
+extern const struct ethosu_device_desc ethosu_device_desc_u55;
 
 struct u55_axi_limit_t
 {
@@ -365,6 +372,7 @@ struct u55_config_t
     struct u55_axi_limit_t axi_limit2;
     struct u55_axi_limit_t axi_limit3;
 };
+#endif
 
 #ifdef __cplusplus
 }

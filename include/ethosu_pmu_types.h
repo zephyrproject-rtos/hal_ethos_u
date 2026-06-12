@@ -21,10 +21,12 @@
 /*****************************************************************************
  * Defines
  *****************************************************************************/
+#ifndef ETHOSU_MULTI_DEVICE
 #ifdef ETHOSU85
 #define ETHOSU_PMU_NCOUNTERS 8
-#elif defined(ETHOSU65) || defined(ETHOSU55)
+#else
 #define ETHOSU_PMU_NCOUNTERS 4
+#endif
 #endif
 
 #define ETHOSU_PMU_CNT1_Msk (1UL << 0)

@@ -49,8 +49,6 @@
     case ETHOSU_PMU_##name:                                                                                            \
         return PMU_EVENT_##name
 
-#define ETHOSU_PMU_NCOUNTERS 4
-
 /*****************************************************************************
  * Static functions
  *****************************************************************************/
@@ -108,7 +106,7 @@ uint32_t U55_PMU_Get_NumEventCounters(void)
 
 void U55_PMU_Set_EVTYPER(struct ethosu_driver *drv, uint32_t num, enum ethosu_pmu_event_type type)
 {
-    assert(num < ETHOSU_PMU_NCOUNTERS);
+    assert(num < NPU_REG_PMEVCNTR_ARRLEN);
     uint32_t val = pmu_event_value(type);
     if (val == UINT32_MAX)
     {
@@ -122,7 +120,7 @@ void U55_PMU_Set_EVTYPER(struct ethosu_driver *drv, uint32_t num, enum ethosu_pm
 
 enum ethosu_pmu_event_type U55_PMU_Get_EVTYPER(struct ethosu_driver *drv, uint32_t num)
 {
-    assert(num < ETHOSU_PMU_NCOUNTERS);
+    assert(num < NPU_REG_PMEVCNTR_ARRLEN);
     uint32_t val                    = drv->dev.reg->PMEVTYPER[num].word;
     enum ethosu_pmu_event_type type = pmu_event_type(val);
     LOG_DEBUG("num=%" PRIu32 ", type=%d, val=%" PRIu32, num, type, val);
@@ -198,7 +196,7 @@ void U55_PMU_Set_CCNTR(struct ethosu_driver *drv, uint64_t val)
 
 uint32_t U55_PMU_Get_EVCNTR(struct ethosu_driver *drv, uint32_t num)
 {
-    assert(num < ETHOSU_PMU_NCOUNTERS);
+    assert(num < NPU_REG_PMEVCNTR_ARRLEN);
     uint32_t val = drv->dev.reg->PMEVCNTR[num].word;
     LOG_DEBUG("num=%" PRIu32 ", val=%" PRIu32, num, val);
 
@@ -207,7 +205,7 @@ uint32_t U55_PMU_Get_EVCNTR(struct ethosu_driver *drv, uint32_t num)
 
 void U55_PMU_Set_EVCNTR(struct ethosu_driver *drv, uint32_t num, uint32_t val)
 {
-    assert(num < ETHOSU_PMU_NCOUNTERS);
+    assert(num < NPU_REG_PMEVCNTR_ARRLEN);
     LOG_DEBUG("num=%" PRIu32 ", val=%" PRIu32, num, val);
     drv->dev.reg->PMEVCNTR[num].word = val;
 }
@@ -259,7 +257,7 @@ void U55_PMU_CNTR_Increment(struct ethosu_driver *drv, uint32_t mask)
         drv->dev.reg->PMCCNTR.CYCLE_CNT_HI = (val & MASK_32_47_BITS) >> 32;
     }
 
-    for (int i = 0; i < ETHOSU_PMU_NCOUNTERS; i++)
+    for (int i = 0; i < NPU_REG_PMEVCNTR_ARRLEN; i++)
     {
         if (mask & (1u << i))
         {

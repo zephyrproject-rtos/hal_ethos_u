@@ -198,11 +198,15 @@ void ethosu_mutex_destroy(void *mutex);
  * Minimal sempahore implementation for baremetal applications. See
  * ethosu_driver.c.
  *
- * @param max_count       Max allowed count for the semaphore
- * @param initial_count   Initial count value for the semaphore
+ * When overriding this function with an RTOS counting semaphore, create it
+ * with an initial count of zero. The maximum count must be large enough for
+ * the reservation waiter semaphore, which can hold one token per available
+ * registered driver of the same NPU variant. A safe value is the maximum
+ * number of NPU driver instances in the system.
+ *
  * @return Pointer to semaphore handle
  */
-void *ethosu_semaphore_create(unsigned int max_count, unsigned int initial_count);
+void *ethosu_semaphore_create(void);
 
 /**
  * Destroy semaphore.
@@ -263,7 +267,11 @@ void ethosu_inference_end(struct ethosu_driver *drv, void *user_arg);
 #ifndef ETHOSU_MULTI_DEVICE
 /**
  * Remapping command stream and base pointer addresses.
- * Legacy hook used by the single-device ethosu_init() API.
+ *
+ * When the multi device feature is off, the driver provides a weak
+ * function that can be overriden. When the multi device feature is
+ * on, the function pointer in the device user ops struct (per driver)
+ * must be set instead.
  *
  * @param address   Address to be remapped.
  * @param index     -1 command stream, 0-n base address index
@@ -274,8 +282,13 @@ uint64_t ethosu_address_remap(uint64_t address, int index);
 
 /**
  * Select configuration for region access.
- * Legacy hook used by the single-device ethosu_init() API.
- * Default implementation uses NPU_QCONFIG and NPU_REGIONCFG_n defines.
+ *
+ * When the multi device feature is off, the driver provides a weak
+ * function that can be overriden. When the multi device feature is
+ * on, the function pointer in the device user ops struct (per driver)
+ * must be set instead.
+ *
+ * Default weak implementation uses NPU_QCONFIG and NPU_REGIONCFG_n defines.
  *
  * @param address   Address of region.
  * @param index     -1 command stream, 0-n base address index

@@ -50,11 +50,21 @@ void ETHOSU_PMU_Disable(struct ethosu_driver *drv);
  */
 void ETHOSU_PMU_Set_EVTYPER(struct ethosu_driver *drv, uint32_t num, enum ethosu_pmu_event_type type);
 
+#ifndef ETHOSU_MULTI_DEVICE
 /**
  * \brief   Get number of PMU event counters
  * \return                Number of event counters
+ * \note    Not available when multi device support is enabled,
+ *          use the ETHOSU_PMU_Get_NumEventCountersForDrv function.
  */
-uint32_t ETHOSU_PMU_Get_NumEventCounters(struct ethosu_driver *drv);
+uint32_t ETHOSU_PMU_Get_NumEventCounters(void);
+#endif
+
+/**
+ * \brief   Get number of PMU event counters for driver
+ * \return                Number of event counters
+ */
+uint32_t ETHOSU_PMU_Get_NumEventCountersForDrv(struct ethosu_driver *drv);
 
 /**
  * \brief   Get event to count for PMU eventer counter

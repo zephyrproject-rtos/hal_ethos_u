@@ -37,7 +37,14 @@ void ETHOSU_PMU_Disable(struct ethosu_driver *drv)
     drv->pmu->ops->ETHOSU_PMU_Disable(drv);
 }
 
-uint32_t ETHOSU_PMU_Get_NumEventCounters(struct ethosu_driver *drv)
+#ifndef ETHOSU_MULTI_DEVICE
+uint32_t ETHOSU_PMU_Get_NumEventCounters(void)
+{
+    return ETHOSU_PMU_NCOUNTERS;
+}
+#endif
+
+uint32_t ETHOSU_PMU_Get_NumEventCountersForDrv(struct ethosu_driver *drv)
 {
     return drv->pmu->ops->ETHOSU_PMU_Get_NumEventCounters();
 }

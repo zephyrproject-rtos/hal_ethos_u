@@ -48,14 +48,17 @@ on the command line.
 
 ## EXPERIMENTAL - Multi device
 
-Experimental support for using multiple device types (Ethos-U55/U65/U85) in one system.
+Experimental support for using multiple NPU variants in one system. An NPU variant is
+the combination of product type (U55/U65/U85) and MAC configuration, for example ethos-u55-128,
+ethos-u65-256 or ethos-u85-1024.
+
 Set the CMake variable `ETHOSU_MULTI_DEVICE` to `ON` to enable the feature.
 With this feature enabled, the driver is no longer looking at the `ETHOSU_TARGET_NPU_CONFIG`
-variable, but builds support for all device types/products (the target system is not
-required to have multiple NPU devices).
+variable, but builds support for all Ethos-U products (the target system is *not*
+required to have multiple NPU devices to enable this mode and access the new APIs).
 
-This feature does require some minor code changes, to adapt for a more flexible
-per device configuration.
+To use this feature, it requires some minor code changes to adapt for a more flexible
+per driver instance configuration.
 
 The `ethosu_init()` and `ethosu_reserve_driver()` functions can not be used when
 this feature is enabled, they are replaced by `ethosu_init_ex()` and
@@ -101,7 +104,7 @@ extern struct ethosu_device_config ethosu_device_config_u85;
 
 The fourth argument specifices optional user ops (these were previously weak functions
 provided by the driver), set to `NULL` if not used. **Note** No default implementation
-is provided for these in this prototype. See `include/ethosu_device.h` for more info:
+is provided for these when multi device support is enabled. See `include/ethosu_device.h` for more info:
 ```[C]
 struct ethosu_device_user_ops
 {
@@ -133,8 +136,8 @@ struct ethosu_device_config ethosu0_config = {
 ```
 
 ### Driver reservation
-To reserve a driver, the user must explicitly provide what device type/product
-is being asked for. For example, Ethos-U55 with 128MAC config:
+To reserve a driver, the user must explicitly provide what NPU variant
+is being asked for. For example, Ethos-U55 with 128 MAC config:
 ```[C]
 struct ethosu_driver *drv;
 drv = ethosu_reserve_driver_ex(ETHOSU_PRODUCT_U55, ETHOSU_MACS_128);
@@ -181,14 +184,13 @@ int ethosu_invoke_auto(const void *custom_data_ptr,
                        void *user_arg);
 ```
 
-### Breaking changes
-- The `ETHOSU_PMU_Get_NumEventCounters()` has been changed to `ETHOSU_PMU_Get_NumEventCounters(struct ethosu_driver *drv)`.
-- The weak function `ethosu_semaphore_create()` has been changed to `ethosu_semaphore_create(unsigned int max_count, unsigned int initial_count)`
-- When using multi device mode, the weak function `ethosu_address_remap()` is replaced by a per device user op.
-- When using multi device mode, the weak function `ethosu_config_select()` is replaced by a per device user op. This is provided as a convenience function, as configuration can also be changed at runtime by modifying the `ethosu_device_config` struct, before an invoke.
-- Do not use the `ETHOSU_PMU_NCOUNTERS` macro when using multi device mode. Call `ETHOSU_PMU_GET_NumEventCounters(drv)` function instead.
-- The abstracted PMU event list is no longer tied to interface PMU event list in terms of sorting/order. It's now a union of all available PMU events for all supported device types/products. Any old references to index numbers must be updated.
+### Breaking changes when enabling multi device mode
+- The `ETHOSU_PMU_Get_NumEventCounters()` function and the `ETHOSU_PMU_NCOUNTERS` macro are not available. Switch to use `ETHOSU_PMU_Get_NumEventCounters(struct ethosu_driver *drv)` instead.
+- The weak function `ethosu_address_remap()` is replaced by a per device user op. To prevent this being missed, any attempt to override will result in compile time error.
+- The weak function `ethosu_config_select()` is replaced by a per device user op. To prevent this being missed, any attempt to override will result in compile time error. This is provided as a convenience function, as configuration can also be changed at runtime by modifying the `ethosu_device_config` struct.
 
+### Notes
+- The abstracted PMU event list is no longer tied to interface PMU event list in terms of sorting/order. It's now a union of all available PMU events for all supported device types/products. If hardcoded references to index numbers are used (instead of the supported PMU event macros, they must be updated).
 
 ## Driver APIs
 
@@ -355,7 +357,7 @@ int ethosu_mutex_lock(void *mutex);
 int ethosu_mutex_unlock(void *mutex);
 
 // create a (counting) semaphore by returning back a handle
-void *ethosu_semaphore_create(unsigned int max_count, unsigned int initial_count);
+void *ethosu_semaphore_create(void);
 // take from the given semaphore, accepting a timeout (unit impl. defined)
 int ethosu_semaphore_take(void *sem, uint64_t timeout);
 // give from the given semaphore

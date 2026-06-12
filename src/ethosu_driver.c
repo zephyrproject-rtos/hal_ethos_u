@@ -152,8 +152,9 @@ static struct ethosu_waiter waiter_pool[ETHOSU_MAX_WAITERS];
 /*
  * Flush/clean the data cache
  */
-void __attribute__((weak))
-ethosu_flush_dcache(const uint64_t *base_addr, const size_t *base_addr_size, int num_base_addr)
+void __attribute__((weak)) ethosu_flush_dcache(const uint64_t *base_addr,
+                                               const size_t *base_addr_size,
+                                               int num_base_addr)
 {
     /*
      * for (int i = 0; i < num_base_addr; i++)
@@ -175,8 +176,9 @@ ethosu_flush_dcache(const uint64_t *base_addr, const size_t *base_addr_size, int
 /*
  * Invalidate the data cache
  */
-void __attribute__((weak))
-ethosu_invalidate_dcache(const uint64_t *base_addr, const size_t *base_addr_size, int num_base_addr)
+void __attribute__((weak)) ethosu_invalidate_dcache(const uint64_t *base_addr,
+                                                    const size_t *base_addr_size,
+                                                    int num_base_addr)
 {
     /*
      * On 32bit systems, to avoid sign expansion, each base_addr must be cast
@@ -231,14 +233,18 @@ int __attribute__((weak)) ethosu_mutex_unlock(void *mutex)
     return 0;
 }
 
-// Baremetal implementation of initing a counting semaphore
-void *__attribute__((weak)) ethosu_semaphore_create(unsigned int max_count, unsigned int initial_count)
+// Baremetal implementation of initing a counting semaphore.
+// When overriding this function with an RTOS counting semaphore, create it
+// with an initial count of zero. The maximum count must be large enough for
+// the reservation waiter semaphore, which can hold one token per available
+// registered driver of the same NPU variant. A safe value is the maximum
+// number of NPU driver instances in the system.
+void *__attribute__((weak)) ethosu_semaphore_create(void)
 {
-    UNUSED(max_count);
     struct ethosu_semaphore_t *sem = malloc(sizeof(*sem));
     if (sem != NULL)
     {
-        sem->count = initial_count;
+        sem->count = 0;
     }
     return sem;
 }
@@ -393,7 +399,7 @@ static struct ethosu_waiter *ethosu_create_waiter_for_driver(struct ethosu_drive
             continue;
         }
 
-        if ((waiter_pool[i].sem = ethosu_semaphore_create(255, 0)) == NULL)
+        if ((waiter_pool[i].sem = ethosu_semaphore_create()) == NULL)
         {
             waiter_pool[i].product   = 0;
             waiter_pool[i].log2_macs = 0;
@@ -795,7 +801,7 @@ int ethosu_init_ex(struct ethosu_driver *drv,
         return -1;
     }
 
-    drv->semaphore = ethosu_semaphore_create(1, 0);
+    drv->semaphore = ethosu_semaphore_create();
     if (!drv->semaphore)
     {
         LOG_ERR("Failed to create driver semaphore");
