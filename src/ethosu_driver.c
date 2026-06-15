@@ -684,6 +684,7 @@ void __attribute__((weak)) ethosu_irq_handler(struct ethosu_driver *drv)
  * Functions API
  ******************************************************************************/
 
+#ifndef ETHOSU_MULTI_DEVICE
 int ethosu_init(struct ethosu_driver *drv,
                 void *const base_address,
                 const void *fast_memory,
@@ -691,16 +692,6 @@ int ethosu_init(struct ethosu_driver *drv,
                 uint32_t secure_enable,
                 uint32_t privilege_enable)
 {
-#ifdef ETHOSU_MULTI_DEVICE
-    UNUSED(drv);
-    UNUSED(base_address);
-    UNUSED(fast_memory);
-    UNUSED(fast_memory_size);
-    UNUSED(secure_enable);
-    UNUSED(privilege_enable);
-    LOG_ERR("Multi device support enabled, ethosu_init() API is not available! Use _ex func");
-    return -1;
-#else
     const struct ethosu_device_desc *default_dev; // compile time driver
     struct ethosu_device_config *default_config;  // compile time config
     static struct ethosu_device_user_ops legacy_user_ops = {
@@ -728,8 +719,8 @@ int ethosu_init(struct ethosu_driver *drv,
                           fast_memory_size,
                           secure_enable,
                           privilege_enable);
-#endif
 }
+#endif
 
 int ethosu_init_ex(struct ethosu_driver *drv,
                    const struct ethosu_device_desc *dev_desc,
@@ -1155,6 +1146,18 @@ int ethosu_invoke_v3(struct ethosu_driver *drv,
                      const int num_base_addr,
                      void *user_arg)
 {
+#ifdef ETHOSU_MULTI_DEVICE
+    // Workaround for some frameworks that call non ex_ version of reserve_driver:
+    // To allow for reserve_driver/invoke/release_driver flow to continue to work,
+    // the reserve_driver function will return NULL when multi device mode is enabled.
+    // This function will call invoke_auto() when drv == NULL, and then release_driver()
+    // will be a NOP when drv == NULL.
+    if (!drv)
+    {
+        return ethosu_invoke_auto(custom_data_ptr, custom_data_size, base_addr, base_addr_size, num_base_addr, user_arg);
+    }
+#endif
+
     if (ethosu_invoke_async(
             drv, custom_data_ptr, custom_data_size, base_addr, base_addr_size, num_base_addr, user_arg) < 0)
     {
@@ -1303,7 +1306,11 @@ static inline int ethosu_log2(const int val)
 struct ethosu_driver *ethosu_reserve_driver(void)
 {
 #ifdef ETHOSU_MULTI_DEVICE
-    LOG_ERR("Multi device support enabled, ethosu_reserve_driver() API is not available! Use _ex func");
+    // Workaround for some frameworks that call non ex_ version of reserve_driver:
+    // To allow for reserve_driver/invoke/release_driver flow to continue to work,
+    // the reserve_driver function will return NULL when multi device mode is enabled.
+    // The invoke()/invoke_v3() functions will call invoke_auto() when drv == NULL,
+    // and release_driver() will be a NOP when drv == NULL.
     return NULL;
 #else
     return ethosu_reserve_driver_ex(
@@ -1358,7 +1365,14 @@ void ethosu_release_driver(struct ethosu_driver *drv)
 
     if (!drv)
     {
+#ifndef ETHOSU_MULTI_DEVICE
+        // Workaround for some frameworks that call non ex_ version of reserve_driver:
+        // To allow for reserve_driver/invoke/release_driver flow to continue to work,
+        // the reserve_driver function will return NULL when multi device mode is enabled.
+        // The invoke()/invoke_v3() functions will call invoke_auto() when drv == NULL,
+        // so don't treat this release_driver() call with drv == NULL as error.
         LOG_ERR("Release driver called with NULL arg");
+#endif
         return;
     }
 

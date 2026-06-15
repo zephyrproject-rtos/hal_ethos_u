@@ -399,6 +399,9 @@ void ethosu_get_hw_info(struct ethosu_driver *drv, struct ethosu_hw_info *hw);
 /**
  * Invoke command stream.
  *
+ * Note that when multi device mode is enabled, calling this function with drv == NULL
+ * will call ethosu_invoke_auto function.
+ *
  * @param drv               Pointer to driver handle
  * @param custom_data_ptr   Custom data payload
  * @param custom_data_size  Size in bytes of custom data
