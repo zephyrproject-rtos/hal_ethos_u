@@ -129,7 +129,7 @@ The driver provides the following default values:
 | Product | `NPU_QCONFIG` | `NPU_REGIONCFG_0` | `NPU_REGIONCFG_1` | `NPU_REGIONCFG_2` |
 | --- | --- | --- | --- | --- |
 | Ethos-U55 | `2` -> `AXI1` | `3` -> `AXI1` | `0` -> `AXI0` | `1` -> `AXI0` |
-| Ethos-U65 | `2` -> `AXI1` | `3` -> `AXI1` | `2` -> `AXI1` | `1` -> `AXI0` |
+| Ethos-U65 | `2` -> `AXI1` | `3` -> `AXI1` | `0` -> `AXI0` | `1` -> `AXI0` |
 
 For Ethos-U55/U65, `QCONFIG` and the `REGIONCFG[0..7]` fields accept values
 0-3:

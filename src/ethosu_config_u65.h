@@ -29,7 +29,7 @@
 #endif
 
 #ifndef NPU_REGIONCFG_1
-#define NPU_REGIONCFG_1 2
+#define NPU_REGIONCFG_1 0
 #endif
 
 #ifndef NPU_REGIONCFG_2
