@@ -29,14 +29,18 @@ add_compile_options(-Werror)
 # Build options
 #
 
-set(ETHOSU_MULTI_DEVICE OFF CACHE BOOL "Toggle multidevice support ON/OFF for the driver (Defaults to device specific at compile time)")
+# Enable this option to support multiple different NPU variants (product and/or MAC config) at runtime.
+# With this feature OFF, the driver still supports multiple NPUs of the same variant (e.g., 'ethos-u55-128')
+set(ETHOSU_MULTI_VARIANT OFF CACHE BOOL "Toggle multi NPU variant support ON/OFF for the driver (Defaults to device specific at compile time)")
+
+# Ethos-U compile time variant, not used by the driver when multi variant option is enabled
+set(ETHOSU_TARGET_NPU_CONFIG "ethos-u55-128" CACHE STRING "Default NPU variant/configuration")
 
 set(CMSIS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmsis_6" CACHE PATH "Path to CMSIS.")
 
 set(LOG_NAMES err warning info debug)
 set(ETHOSU_LOG_ENABLE ON CACHE BOOL "Toggle driver logs on/off (Defaults to ON)")
 set(ETHOSU_LOG_SEVERITY "warning" CACHE STRING "Driver log severity level ${LOG_NAMES} (Defaults to 'warning')")
-set(ETHOSU_TARGET_NPU_CONFIG "ethos-u55-128" CACHE STRING "Default NPU configuration")
 set(ETHOSU_INFERENCE_TIMEOUT "" CACHE STRING "Inference timeout (unit is implementation defined)")
 set_property(CACHE ETHOSU_LOG_SEVERITY PROPERTY STRINGS ${LOG_NAMES})
 
@@ -63,9 +67,9 @@ add_library(ethosu_core_driver STATIC)
 target_include_directories(ethosu_core_driver PUBLIC include)
 target_sources(ethosu_core_driver PRIVATE src/ethosu_driver.c src/ethosu_pmu.c)
 
-if (ETHOSU_MULTI_DEVICE)
+if (ETHOSU_MULTI_VARIANT)
     target_compile_definitions(ethosu_core_driver PUBLIC
-        ETHOSU_MULTI_DEVICE)
+        ETHOSU_MULTI_VARIANT)
     target_sources(ethosu_core_driver PRIVATE
         src/ethosu_backend_u55.c
         src/ethosu_backend_u65.c
@@ -127,8 +131,8 @@ target_compile_definitions(ethosu_core_driver PUBLIC ETHOSU)
 # Print build status
 message(STATUS "*******************************************************")
 message(STATUS "PROJECT_NAME                           : ${PROJECT_NAME}")
-message(STATUS "ETHOSU_MULTI_DEVICE                    : ${ETHOSU_MULTI_DEVICE}")
-if(NOT ETHOSU_MULTI_DEVICE)
+message(STATUS "ETHOSU_MULTI_VARIANT                   : ${ETHOSU_MULTI_VARIANT}")
+if(NOT ETHOSU_MULTI_VARIANT)
     message(STATUS "ETHOSU_TARGET_NPU_CONFIG               : ${ETHOSU_TARGET_NPU_CONFIG}")
 endif()
 message(STATUS "CMAKE_SYSTEM_PROCESSOR                 : ${CMAKE_SYSTEM_PROCESSOR}")

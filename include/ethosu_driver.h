@@ -264,12 +264,12 @@ void ethosu_inference_begin(struct ethosu_driver *drv, void *user_arg);
  */
 void ethosu_inference_end(struct ethosu_driver *drv, void *user_arg);
 
-#ifndef ETHOSU_MULTI_DEVICE
+#ifndef ETHOSU_MULTI_VARIANT
 /**
  * Remapping command stream and base pointer addresses.
  *
- * When the multi device feature is off, the driver provides a weak
- * function that can be overriden. When the multi device feature is
+ * When the multi variant feature is off, the driver provides a weak
+ * function that can be overriden. When the multi variant feature is
  * on, the function pointer in the device user ops struct (per driver)
  * must be set instead.
  *
@@ -283,8 +283,8 @@ uint64_t ethosu_address_remap(uint64_t address, int index);
 /**
  * Select configuration for region access.
  *
- * When the multi device feature is off, the driver provides a weak
- * function that can be overriden. When the multi device feature is
+ * When the multi variant feature is off, the driver provides a weak
+ * function that can be overriden. When the multi variant feature is
  * on, the function pointer in the device user ops struct (per driver)
  * must be set instead.
  *
@@ -322,7 +322,7 @@ int ethosu_init(struct ethosu_driver *drv,
                 uint32_t privilege_enable);
 
 /**
- * Initialize the Ethos-U driver (multi device mode).
+ * Initialize the Ethos-U driver (multi variant mode).
  * All driver handles should be initialised before any other driver function is called.
  *
  * @param drv               Pointer to driver handle
@@ -399,7 +399,7 @@ void ethosu_get_hw_info(struct ethosu_driver *drv, struct ethosu_hw_info *hw);
 /**
  * Invoke command stream.
  *
- * Note that when multi device mode is enabled, calling this function with drv == NULL
+ * Note that when multi variant mode is enabled, calling this function with drv == NULL
  * will call ethosu_invoke_auto function.
  *
  * @param drv               Pointer to driver handle

@@ -23,7 +23,7 @@
 #include "ethosu_device.h"
 #include "ethosu_log.h"
 
-#ifndef ETHOSU_MULTI_DEVICE
+#ifndef ETHOSU_MULTI_VARIANT
 #if defined(ETHOSU55)
 #include "ethosu_config_u55.h"
 #elif defined(ETHOSU65)
@@ -311,7 +311,7 @@ void __attribute__((weak)) ethosu_inference_end(struct ethosu_driver *drv, void 
     UNUSED(drv);
 }
 
-#ifndef ETHOSU_MULTI_DEVICE
+#ifndef ETHOSU_MULTI_VARIANT
 uint64_t __attribute__((weak)) ethosu_address_remap(uint64_t address, int index)
 {
     UNUSED(index);
@@ -350,7 +350,7 @@ unsigned int __attribute__((weak)) ethosu_config_select(uint64_t address, int in
 uint64_t ethosu_address_remap(uint64_t address, int index)
 {
     /*
-     * Not usable when ETHOSU_MULTI_DEVICE is defined.
+     * Not usable when ETHOSU_MULTI_VARIANT is defined.
      * Use ethosu_init_ex() and provide an address_remap callback through
      * struct ethosu_device_user_ops instead.
      */
@@ -362,7 +362,7 @@ uint64_t ethosu_address_remap(uint64_t address, int index)
 unsigned int ethosu_config_select(uint64_t address, int index)
 {
     /*
-     * Not usable when ETHOSU_MULTI_DEVICE is defined.
+     * Not usable when ETHOSU_MULTI_VARIANT is defined.
      * Use ethosu_init_ex() and provide a config_select callback through
      * struct ethosu_device_user_ops instead.
      */
@@ -684,7 +684,7 @@ void __attribute__((weak)) ethosu_irq_handler(struct ethosu_driver *drv)
  * Functions API
  ******************************************************************************/
 
-#ifndef ETHOSU_MULTI_DEVICE
+#ifndef ETHOSU_MULTI_VARIANT
 int ethosu_init(struct ethosu_driver *drv,
                 void *const base_address,
                 const void *fast_memory,
@@ -772,17 +772,17 @@ int ethosu_init_ex(struct ethosu_driver *drv,
 
     switch (drv->dev.caps.product)
     {
-#if defined(ETHOSU55) || defined(ETHOSU_MULTI_DEVICE)
+#if defined(ETHOSU55) || defined(ETHOSU_MULTI_VARIANT)
     case ETHOSU_PRODUCT_U55:
         drv->pmu = &ethosu_pmu_desc_u55;
         break;
 #endif
-#if defined(ETHOSU65) || defined(ETHOSU_MULTI_DEVICE)
+#if defined(ETHOSU65) || defined(ETHOSU_MULTI_VARIANT)
     case ETHOSU_PRODUCT_U65:
         drv->pmu = &ethosu_pmu_desc_u65;
         break;
 #endif
-#if defined(ETHOSU85) || defined(ETHOSU_MULTI_DEVICE)
+#if defined(ETHOSU85) || defined(ETHOSU_MULTI_VARIANT)
     case ETHOSU_PRODUCT_U85:
         drv->pmu = &ethosu_pmu_desc_u85;
         break;
@@ -1146,15 +1146,16 @@ int ethosu_invoke_v3(struct ethosu_driver *drv,
                      const int num_base_addr,
                      void *user_arg)
 {
-#ifdef ETHOSU_MULTI_DEVICE
+#ifdef ETHOSU_MULTI_VARIANT
     // Workaround for some frameworks that call non ex_ version of reserve_driver:
     // To allow for reserve_driver/invoke/release_driver flow to continue to work,
-    // the reserve_driver function will return NULL when multi device mode is enabled.
+    // the reserve_driver function will return NULL when multi variant mode is enabled.
     // This function will call invoke_auto() when drv == NULL, and then release_driver()
     // will be a NOP when drv == NULL.
     if (!drv)
     {
-        return ethosu_invoke_auto(custom_data_ptr, custom_data_size, base_addr, base_addr_size, num_base_addr, user_arg);
+        return ethosu_invoke_auto(
+            custom_data_ptr, custom_data_size, base_addr, base_addr_size, num_base_addr, user_arg);
     }
 #endif
 
@@ -1294,7 +1295,7 @@ err:
     return -1;
 }
 
-#ifndef ETHOSU_MULTI_DEVICE
+#ifndef ETHOSU_MULTI_VARIANT
 static inline int ethosu_log2(const int val)
 {
     assert(val != 0);
@@ -1305,10 +1306,10 @@ static inline int ethosu_log2(const int val)
 
 struct ethosu_driver *ethosu_reserve_driver(void)
 {
-#ifdef ETHOSU_MULTI_DEVICE
+#ifdef ETHOSU_MULTI_VARIANT
     // Workaround for some frameworks that call non ex_ version of reserve_driver:
     // To allow for reserve_driver/invoke/release_driver flow to continue to work,
-    // the reserve_driver function will return NULL when multi device mode is enabled.
+    // the reserve_driver function will return NULL when multi variant mode is enabled.
     // The invoke()/invoke_v3() functions will call invoke_auto() when drv == NULL,
     // and release_driver() will be a NOP when drv == NULL.
     return NULL;
@@ -1365,10 +1366,10 @@ void ethosu_release_driver(struct ethosu_driver *drv)
 
     if (!drv)
     {
-#ifndef ETHOSU_MULTI_DEVICE
+#ifndef ETHOSU_MULTI_VARIANT
         // Workaround for some frameworks that call non ex_ version of reserve_driver:
         // To allow for reserve_driver/invoke/release_driver flow to continue to work,
-        // the reserve_driver function will return NULL when multi device mode is enabled.
+        // the reserve_driver function will return NULL when multi variant mode is enabled.
         // The invoke()/invoke_v3() functions will call invoke_auto() when drv == NULL,
         // so don't treat this release_driver() call with drv == NULL as error.
         LOG_ERR("Release driver called with NULL arg");

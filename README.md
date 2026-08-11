@@ -51,7 +51,7 @@ on the command line.
 Driver instances are typically created by platform or target initialization
 code. The target code owns the `struct ethosu_driver` object, passes the NPU
 register base address to `ethosu_init()`, and connects the target interrupt
-handler to `ethosu_irq_handler()`. If `ETHOSU_MULTI_DEVICE` is enabled, use
+handler to `ethosu_irq_handler()`. If `ETHOSU_MULTI_VARIANT` is enabled, use
 `ethosu_init_ex()` instead so the target code can provide the device descriptor
 and configuration for each driver instance.
 
@@ -193,13 +193,13 @@ Ethos-U85 AXI information:
 | 1024 | 2 | 64 | 32 |
 | 2048 | 2 | 64 | 32 |
 
-## EXPERIMENTAL - Multi device
+## EXPERIMENTAL - Multi variant
 
 Experimental support for using multiple NPU variants in one system. An NPU variant is
 the combination of product type (U55/U65/U85) and MAC configuration, for example ethos-u55-128,
 ethos-u65-256 or ethos-u85-1024.
 
-Set the CMake variable `ETHOSU_MULTI_DEVICE` to `ON` to enable the feature.
+Set the CMake variable `ETHOSU_MULTI_VARIANT` to `ON` to enable the feature.
 With this feature enabled, the driver is no longer looking at the `ETHOSU_TARGET_NPU_CONFIG`
 variable, but builds support for all Ethos-U products (the target system is *not*
 required to have multiple NPU devices to enable this mode and access the new APIs).
@@ -251,7 +251,7 @@ extern struct ethosu_device_config ethosu_device_config_u85;
 
 The fourth argument specifices optional user ops (these were previously weak functions
 provided by the driver), set to `NULL` if not used. **Note** No default implementation
-is provided for these when multi device support is enabled. See `include/ethosu_device.h` for more info:
+is provided for these when multi variant support is enabled. See `include/ethosu_device.h` for more info:
 ```[C]
 struct ethosu_device_user_ops
 {
@@ -308,7 +308,7 @@ ETHOSU_MACS_2048
 ```
 
 ### New optional invoke (auto) method
-In addition to the invoke methods described in the following sections, with the multi device
+In addition to the invoke methods described in the following sections, with the multi variant
 experimental feature, a new function called `ethosu_invoke_auto()` has been added. This function
 omits the driver argument, hence the user should not reserve a driver before calling it. The
 `ethosu_invoke_auto()` function automatically parses the provided data and tries to reserve a
@@ -331,7 +331,7 @@ int ethosu_invoke_auto(const void *custom_data_ptr,
                        void *user_arg);
 ```
 
-### Breaking changes when enabling multi device mode
+### Breaking changes when enabling multi variant mode
 - The `ETHOSU_PMU_Get_NumEventCounters()` function and the `ETHOSU_PMU_NCOUNTERS` macro are not available. Switch to use `ETHOSU_PMU_Get_NumEventCountersForDrv(struct ethosu_driver *drv)` instead.
 - The weak function `ethosu_address_remap()` is replaced by a per device user op. To prevent this being missed, any attempt to override will result in compile time error.
 - The weak function `ethosu_config_select()` is replaced by a per device user op. To prevent this being missed, any attempt to override will result in compile time error. This is provided as a convenience function, as configuration can also be changed at runtime by modifying the `ethosu_device_config` struct.

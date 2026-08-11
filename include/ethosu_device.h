@@ -127,7 +127,7 @@ struct ethosu_device_config
 /******************************************************************************
  * U85 Device config
  ******************************************************************************/
-#if defined(ETHOSU_MULTI_DEVICE) || defined(ETHOSU85)
+#if defined(ETHOSU_MULTI_VARIANT) || defined(ETHOSU85)
 
 // Default config - intentionally not const
 extern struct ethosu_device_config ethosu_device_config_u85;
@@ -227,7 +227,7 @@ struct u85_config_t
 /******************************************************************************
  * U65 Device config
  ******************************************************************************/
-#if defined(ETHOSU_MULTI_DEVICE) || defined(ETHOSU65)
+#if defined(ETHOSU_MULTI_VARIANT) || defined(ETHOSU65)
 
 // Default config - intentionally not const
 extern struct ethosu_device_config ethosu_device_config_u65;
@@ -302,7 +302,7 @@ struct u65_config_t
 /******************************************************************************
  * U55 Device config
  ******************************************************************************/
-#if defined(ETHOSU_MULTI_DEVICE) || defined(ETHOSU55)
+#if defined(ETHOSU_MULTI_VARIANT) || defined(ETHOSU55)
 
 // Default config - intentionally not const
 extern struct ethosu_device_config ethosu_device_config_u55;
