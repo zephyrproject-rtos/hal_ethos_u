@@ -1083,15 +1083,19 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
         case OPTIMIZER_CONFIG:
         {
             const size_t record_words = DRIVER_ACTION_LENGTH_32_BIT_WORD + OPTIMIZER_CONFIG_LENGTH_32_BIT_WORD;
+            struct opt_cfg_s opt_cfg  = {0};
             LOG_DEBUG("OPTIMIZER_CONFIG");
-            const struct opt_cfg_s *opt_cfg_p = (const struct opt_cfg_s *)data_ptr;
 
             if (!ethosu_verify_cop_record_words(data_ptr, data_end, record_words, "OPTIMIZER_CONFIG"))
             {
                 goto err;
             }
 
-            if (handle_optimizer_config(drv, opt_cfg_p) < 0)
+            opt_cfg.da_data = *data_ptr;
+            opt_cfg.cfg     = data_ptr[1].word;
+            opt_cfg.id      = data_ptr[2].word;
+
+            if (handle_optimizer_config(drv, &opt_cfg) < 0)
             {
                 goto err;
             }
@@ -1175,7 +1179,6 @@ int ethosu_get_product_config_from_cop_data(const void *custom_data_ptr,
 {
     const struct cop_data_s *data_ptr = custom_data_ptr;
     const struct cop_data_s *data_end = (struct cop_data_s *)((ptrdiff_t)custom_data_ptr + custom_data_size);
-    const struct opt_cfg_s *opt_cfg_p = NULL;
 
     if (!custom_data_ptr)
     {
@@ -1203,6 +1206,9 @@ int ethosu_get_product_config_from_cop_data(const void *custom_data_ptr,
         switch (data_ptr->driver_action_command)
         {
         case OPTIMIZER_CONFIG:
+        {
+            uint32_t cfg = 0;
+
             if (!ethosu_verify_cop_record_words(data_ptr,
                                                 data_end,
                                                 DRIVER_ACTION_LENGTH_32_BIT_WORD + OPTIMIZER_CONFIG_LENGTH_32_BIT_WORD,
@@ -1210,19 +1216,21 @@ int ethosu_get_product_config_from_cop_data(const void *custom_data_ptr,
             {
                 return -1;
             }
-            opt_cfg_p = (const struct opt_cfg_s *)data_ptr;
+
+            cfg = data_ptr[1].word;
 
             // Got the optimizer config, telling which NPU the network has been compiled for
             if (product_out)
             {
-                *product_out = (opt_cfg_p->cfg >> 28);
+                *product_out = (cfg >> 28);
             }
 
             if (log2_macs_out)
             {
-                *log2_macs_out = (opt_cfg_p->cfg & 0XF);
+                *log2_macs_out = (cfg & 0XF);
             }
             return 0;
+        }
         case COMMAND_STREAM:
         {
             size_t record_words =

@@ -277,25 +277,27 @@ static void u55_dev_set_clock_and_power(struct ethosu_device *dev,
 
 static bool u55_dev_verify_optimizer_config(struct ethosu_device *dev, uint32_t cfg_in, uint32_t id_in)
 {
-    struct config_r *opt_cfg = (struct config_r *)&cfg_in;
+    struct config_r opt_cfg = {0};
     struct config_r hw_cfg;
-    struct id_r *opt_id = (struct id_r *)&id_in;
+    struct id_r opt_id = {0};
     struct id_r hw_id;
     bool ret = true;
 
-    hw_cfg.word = dev->reg->CONFIG.word;
-    hw_id.word  = dev->reg->ID.word;
+    opt_cfg.word = cfg_in;
+    opt_id.word  = id_in;
+    hw_cfg.word  = dev->reg->CONFIG.word;
+    hw_id.word   = dev->reg->ID.word;
 
     LOG_INFO("Optimizer config. product=%u, cmd_stream_version=%u, macs_per_cc=%u, shram_size=%u, custom_dma=%u",
-             opt_cfg->product,
-             opt_cfg->cmd_stream_version,
-             opt_cfg->macs_per_cc,
-             opt_cfg->shram_size,
-             opt_cfg->custom_dma);
+             opt_cfg.product,
+             opt_cfg.cmd_stream_version,
+             opt_cfg.macs_per_cc,
+             opt_cfg.shram_size,
+             opt_cfg.custom_dma);
     LOG_INFO("Optimizer config. arch version: %u.%u.%u",
-             opt_id->arch_major_rev,
-             opt_id->arch_minor_rev,
-             opt_id->arch_patch_rev);
+             opt_id.arch_major_rev,
+             opt_id.arch_minor_rev,
+             opt_id.arch_patch_rev);
     LOG_INFO("Ethos-U config. product=%u, cmd_stream_version=%u, macs_per_cc=%u, shram_size=%u, custom_dma=%u",
              hw_cfg.product,
              hw_cfg.cmd_stream_version,
@@ -304,48 +306,48 @@ static bool u55_dev_verify_optimizer_config(struct ethosu_device *dev, uint32_t 
              hw_cfg.custom_dma);
     LOG_INFO("Ethos-U. arch version=%u.%u.%u", hw_id.arch_major_rev, hw_id.arch_minor_rev, hw_id.arch_patch_rev);
 
-    if (opt_cfg->word != hw_cfg.word)
+    if (opt_cfg.word != hw_cfg.word)
     {
-        if (hw_cfg.product != opt_cfg->product)
+        if (hw_cfg.product != opt_cfg.product)
         {
-            LOG_ERR("NPU config mismatch. npu.product=%u, optimizer.product=%u", hw_cfg.product, opt_cfg->product);
+            LOG_ERR("NPU config mismatch. npu.product=%u, optimizer.product=%u", hw_cfg.product, opt_cfg.product);
             ret = false;
         }
 
-        if (hw_cfg.macs_per_cc != opt_cfg->macs_per_cc)
+        if (hw_cfg.macs_per_cc != opt_cfg.macs_per_cc)
         {
             LOG_ERR("NPU config mismatch. npu.macs_per_cc=%u, optimizer.macs_per_cc=%u",
                     hw_cfg.macs_per_cc,
-                    opt_cfg->macs_per_cc);
+                    opt_cfg.macs_per_cc);
             ret = false;
         }
 
-        if (hw_cfg.cmd_stream_version != opt_cfg->cmd_stream_version)
+        if (hw_cfg.cmd_stream_version != opt_cfg.cmd_stream_version)
         {
             LOG_ERR("NPU config mismatch. npu.cmd_stream_version=%u, optimizer.cmd_stream_version=%u",
                     hw_cfg.cmd_stream_version,
-                    opt_cfg->cmd_stream_version);
+                    opt_cfg.cmd_stream_version);
             ret = false;
         }
 
-        if (!hw_cfg.custom_dma && opt_cfg->custom_dma)
+        if (!hw_cfg.custom_dma && opt_cfg.custom_dma)
         {
             LOG_ERR("NPU config mismatch. npu.custom_dma=%u, optimizer.custom_dma=%u",
                     hw_cfg.custom_dma,
-                    opt_cfg->custom_dma);
+                    opt_cfg.custom_dma);
             ret = false;
         }
     }
 
-    if ((hw_id.arch_major_rev != opt_id->arch_major_rev) || (hw_id.arch_minor_rev < opt_id->arch_minor_rev))
+    if ((hw_id.arch_major_rev != opt_id.arch_major_rev) || (hw_id.arch_minor_rev < opt_id.arch_minor_rev))
     {
         LOG_ERR("NPU arch mismatch. npu.arch=%u.%u.%u, optimizer.arch=%u.%u.%u",
                 hw_id.arch_major_rev,
                 hw_id.arch_minor_rev,
                 hw_id.arch_patch_rev,
-                opt_id->arch_major_rev,
-                opt_id->arch_minor_rev,
-                opt_id->arch_patch_rev);
+                opt_id.arch_major_rev,
+                opt_id.arch_minor_rev,
+                opt_id.arch_patch_rev);
         ret = false;
     }
 
